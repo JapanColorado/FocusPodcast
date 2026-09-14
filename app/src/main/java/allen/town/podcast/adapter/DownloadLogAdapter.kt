@@ -10,6 +10,7 @@ import allen.town.podcast.core.storage.DBReader
 import allen.town.podcast.core.storage.DBTasks
 import allen.town.podcast.core.storage.DBWriter
 import allen.town.podcast.core.util.DownloadErrorLabel
+import allen.town.podcast.model.download.DownloadError
 import allen.town.podcast.model.download.DownloadStatus
 import allen.town.podcast.model.feed.Feed
 import allen.town.podcast.model.feed.FeedMedia
@@ -18,6 +19,8 @@ import android.app.Activity
 import android.text.format.DateUtils
 import android.text.format.Formatter
 import android.util.Log
+import io.reactivex.Completable
+import io.reactivex.schedulers.Schedulers
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
@@ -38,8 +41,14 @@ class DownloadLogAdapter(private val context: Activity) :
     }
 
     fun setRunningDownloads(runningDownloads: List<Downloader>) {
+        val sameRows = runningDownloads.size == this.runningDownloads.size
         this.runningDownloads = runningDownloads
-        notifyDataSetChanged()
+        if (sameRows) {
+            // progress tick: only the running rows changed
+            notifyItemRangeChanged(0, runningDownloads.size)
+        } else {
+            notifyDataSetChanged()
+        }
     }
 
     private fun bind(holder: DownloadLogViewHolder, status: DownloadStatus?, position: Int) {
@@ -82,7 +91,10 @@ class DownloadLogAdapter(private val context: Activity) :
             holder.icon.contentDescription = context.getString(R.string.error_label)
             holder.reason.setText(DownloadErrorLabel.from(status.reason))
             holder.reason.visibility = View.VISIBLE
-            if (newerWasSuccessful(
+            // A duplicate-episode warning is a host-side problem: the feed itself refreshed fine,
+            // so a retry button would only re-report the same warning.
+            val isDuplicateWarning = status.reason == DownloadError.ERROR_PARSER_EXCEPTION_DUPLICATE
+            if (isDuplicateWarning || newerWasSuccessful(
                     position - runningDownloads.size,
                     status.feedfileType, status.feedfileId
                 ) || status.feedfileId.toInt() == 0
@@ -162,10 +174,14 @@ class DownloadLogAdapter(private val context: Activity) :
                 context, request.source
             )
             if (request.feedfileType == FeedMedia.FEEDFILETYPE_FEEDMEDIA) {
-                val media = DBReader.getFeedMedia(request.feedfileId)
-                val feedItem = media!!.item
-                feedItem!!.disableAutoDownload()
-                DBWriter.setFeedItem(feedItem)
+                // the media row may be gone (feed unsubscribed / cleaned up) by the time the
+                // user taps cancel; also keep the DB read off the main thread
+                Completable.fromAction {
+                    val feedItem = DBReader.getFeedMedia(request.feedfileId)?.item ?: return@fromAction
+                    feedItem.disableAutoDownload()
+                    DBWriter.setFeedItem(feedItem)
+                }.subscribeOn(Schedulers.io())
+                    .subscribe({ }, { Log.e(TAG, Log.getStackTraceString(it)) })
             }
         }
         holder.reason.visibility = View.GONE

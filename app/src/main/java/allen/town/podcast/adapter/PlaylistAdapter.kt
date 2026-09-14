@@ -61,13 +61,18 @@ open class PlaylistAdapter(
         val inflater = activity!!.menuInflater
         inflater.inflate(R.menu.queue_context, menu)
         super.onCreateContextMenu(menu, v, menuInfo)
-        if (!inActionMode()) {
+        val pressed = longPressedItem
+        if (pressed == null || itemCount == 0) {
+            // super already bailed out; nothing sensible to show for a vanished row
+            menu.findItem(R.id.move_to_top_item).isVisible = false
+            menu.findItem(R.id.move_to_bottom_item).isVisible = false
+        } else if (!inActionMode()) {
             menu.findItem(R.id.multi_select).isVisible = true
             val keepSorted = Prefs.isPlaylistKeepSorted
-            if (getItem(0).id == longPressedItem!!.getId() || keepSorted) {
+            if (getItem(0).id == pressed.getId() || keepSorted) {
                 menu.findItem(R.id.move_to_top_item).isVisible = false
             }
-            if (getItem(itemCount - 1).id == longPressedItem!!.getId() || keepSorted) {
+            if (getItem(itemCount - 1).id == pressed.getId() || keepSorted) {
                 menu.findItem(R.id.move_to_bottom_item).isVisible = false
             }
         } else {

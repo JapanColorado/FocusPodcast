@@ -97,11 +97,12 @@ public class LocalFeedUpdater {
         List<FeedItem> newItems = feed.getItems();
         for (int i = 0; i < mediaFiles.size(); i++) {
             FeedItem oldItem = feedContainsFile(feed, mediaFiles.get(i).getName());
-            FeedItem newItem = createFeedItem(feed, mediaFiles.get(i), context);
             if (oldItem == null) {
-                newItems.add(newItem);
-            } else {
-                oldItem.updateFromOther(newItem);
+                newItems.add(createFeedItem(feed, mediaFiles.get(i), context));
+            } else if (oldItem.getMedia() != null && oldItem.getMedia().getSize() != mediaFiles.get(i).length()) {
+                // file content changed: re-read metadata; unchanged files are left alone so a
+                // refresh does not parse every file in the folder again
+                oldItem.updateFromOther(createFeedItem(feed, mediaFiles.get(i), context));
             }
             if (updaterProgressListener != null) {
                 updaterProgressListener.onLocalFileScanned(i, mediaFiles.size());
@@ -187,6 +188,20 @@ public class LocalFeedUpdater {
 
     private static void loadMetadata(FeedItem item, DocumentFile file, Context context) {
         MediaMetadataRetriever mediaMetadataRetriever = new MediaMetadataRetriever();
+        try {
+            loadMetadata(item, file, context, mediaMetadataRetriever);
+        } finally {
+            // native resource, must be released explicitly
+            try {
+                mediaMetadataRetriever.release();
+            } catch (IOException e) {
+                Log.w(TAG, "unable to release MediaMetadataRetriever: " + e.getMessage());
+            }
+        }
+    }
+
+    private static void loadMetadata(FeedItem item, DocumentFile file, Context context,
+                                     MediaMetadataRetriever mediaMetadataRetriever) {
         mediaMetadataRetriever.setDataSource(context, file.getUri());
 
         String dateStr = mediaMetadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DATE);
@@ -208,7 +223,9 @@ public class LocalFeedUpdater {
         }
 
         String durationStr = mediaMetadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION);
-        item.getMedia().setDuration((int) Long.parseLong(durationStr));
+        if (!TextUtils.isEmpty(durationStr)) {
+            item.getMedia().setDuration((int) Long.parseLong(durationStr));
+        }
 
         item.getMedia().setHasEmbeddedPicture(mediaMetadataRetriever.getEmbeddedPicture() != null);
 

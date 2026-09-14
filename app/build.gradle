@@ -168,6 +168,14 @@ dependencies {
     implementation 'com.github.shts:TriangleLabelView:1.1.2'
     implementation 'com.leinardi.android:speed-dial:3.2.0'
     implementation 'com.github.mfietz:fyydlin:v0.5.0'
+    // fyydlin's JitPack POM declares no dependencies, but its classes need Moshi and
+    // Retrofit (with the Moshi converter and RxJava2 adapter) at runtime. Without them the
+    // Discover screen crashes with NoClassDefFoundError and R8 refuses to build release.
+    implementation 'com.squareup.moshi:moshi:1.8.0'
+    implementation 'com.squareup.moshi:moshi-adapters:1.8.0'
+    implementation 'com.squareup.retrofit2:retrofit:2.9.0'
+    implementation 'com.squareup.retrofit2:converter-moshi:2.9.0'
+    implementation 'com.squareup.retrofit2:adapter-rxjava2:2.9.0'
     playImplementation 'com.google.android.ads:mediation-test-suite:2.0.0'
 //    implementation 'com.github.ByteHamster:SearchPreference:v2.1.0'
     implementation 'com.github.skydoves:balloon:1.4.0'

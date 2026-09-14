@@ -85,6 +85,7 @@ class FeedItemFragment : Fragment() {
     private var actionButton1: ItemActionButton? = null
     private var actionButton2: ItemActionButton? = null
     private var disposable: Disposable? = null
+    private var sizeDisposable: Disposable? = null
     private var controller: PlaybackController? = null
     private var floatingPlayActionButton: ExtendedFloatingActionButton? = null
     private var skeletonLayout: SkeletonLayout? = null
@@ -212,6 +213,7 @@ class FeedItemFragment : Fragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
+        sizeDisposable?.dispose()
         if (disposable != null) {
             disposable!!.dispose()
         }
@@ -301,8 +303,9 @@ class FeedItemFragment : Fragment() {
     private var lastPosition: Int = 0
 
     private fun updateButtons() {
+        val item = this.item ?: return // load() has not delivered yet
         progbarDownload!!.visibility = View.INVISIBLE
-        if (item!!.hasMedia() && downloaderList != null) {
+        if (item.hasMedia() && downloaderList != null) {
             for (downloader in downloaderList!!) {
                 if (downloader.downloadRequest.feedfileType == FeedMedia.FEEDFILETYPE_FEEDMEDIA
                     && downloader.downloadRequest.feedfileId == item!!.media!!.id
@@ -320,7 +323,8 @@ class FeedItemFragment : Fragment() {
             feedItemListFragmentBinding.downloadLayout.visibility = View.GONE
             progbarPlayed!!.setVisibility(View.GONE)
         } else {
-            EpisodeItemViewHolder.setSizeTextView(media, context, tvSize!!, null)
+            sizeDisposable?.dispose()
+            sizeDisposable = EpisodeItemViewHolder.setSizeTextView(media, context, tvSize!!, null)
             actionButton1 = if (FeedItemUtil.isCurrentlyPlaying(media)) {
                 PauseActionButton(item!!)
             } else if (item!!.feed.isLocalFeed) {
@@ -412,8 +416,9 @@ class FeedItemFragment : Fragment() {
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     fun onEventMainThread(event: FeedItemEvent) {
+        val currentId = this.item?.id ?: return
         for (item in event.items) {
-            if (this.item!!.id == item.id) {
+            if (currentId == item.id) {
                 load()
                 return
             }

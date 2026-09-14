@@ -41,11 +41,13 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import allen.town.podcast.core.event.DownloadEvent;
+import allen.town.podcast.core.util.NetworkUtils;
 import allen.town.podcast.core.util.download.ConnectionStateMonitor;
 import allen.town.podcast.event.FeedItemEvent;
 import allen.town.podcast.model.feed.Feed;
@@ -71,6 +73,10 @@ import allen.town.podcast.model.download.DownloadError;
 public class DownloadService extends Service {
     private static final String TAG = "DownloadService";
     private static final int SCHED_EX_POOL_SIZE = 1;
+    /** Maximum number of automatic re-submissions of a media download after a transient error. */
+    private static final int MAX_RETRIES = 1;
+    /** Delay before an automatic retry is started. */
+    private static final long RETRY_DELAY_MS = 3000;
     public static final String ACTION_CANCEL_DOWNLOAD = "action.allen.town.podcast.core.service.cancelDownload";
     public static final String ACTION_CANCEL_ALL_DOWNLOADS = "action.allen.town.podcast.core.service.cancelAll";
     public static final String EXTRA_DOWNLOAD_URL = "downloadUrl";
@@ -84,7 +90,7 @@ public class DownloadService extends Service {
     // Can be modified from another thread while iterating. Both possible race conditions are not critical:
     // Remove while iterating: We think it is still downloading and don't start a new download with the same file.
     // Add while iterating: We think it is not downloading and might start a second download with the same file.
-    static final List<Downloader> downloads = Collections.synchronizedList(new CopyOnWriteArrayList<>());
+    static final List<Downloader> downloads = new CopyOnWriteArrayList<>();
     private final ExecutorService downloadHandleExecutor;
     private final ExecutorService downloadEnqueueExecutor;
 
@@ -93,7 +99,7 @@ public class DownloadService extends Service {
     private final NewEpisodesNotification newEpisodesNotification;
     private NotificationUpdater notificationUpdater;
     private ScheduledFuture<?> notificationUpdaterFuture;
-    private ScheduledFuture<?> downloadPostFuture;
+    private volatile ScheduledFuture<?> downloadPostFuture;
     private final ScheduledThreadPoolExecutor notificationUpdateExecutor;
     private static DownloaderFactory downloaderFactory = new DefaultDownloaderFactory();
     private ConnectionStateMonitor connectionMonitor;
@@ -140,7 +146,8 @@ public class DownloadService extends Service {
         cancelDownloadReceiverFilter.addAction(ACTION_CANCEL_ALL_DOWNLOADS);
         cancelDownloadReceiverFilter.addAction(ACTION_CANCEL_DOWNLOAD);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            registerReceiver(cancelDownloadReceiver, cancelDownloadReceiverFilter,RECEIVER_EXPORTED);
+            // senders always setPackage(), so no other app needs to reach this receiver
+            registerReceiver(cancelDownloadReceiver, cancelDownloadReceiverFilter, RECEIVER_NOT_EXPORTED);
         } else {
             registerReceiver(cancelDownloadReceiver, cancelDownloadReceiverFilter);
         }
@@ -151,18 +158,52 @@ public class DownloadService extends Service {
         }
     }
 
+    /**
+     * Returns true if the user has purchased the pro version, or if the purchase service is
+     * unavailable (in which case the free-tier limits are not enforced rather than crashing).
+     */
+    private static boolean isPurchased(@Nullable Context context) {
+        PayService payService = GoRouter.getInstance().getService(PayService.class);
+        return payService == null || payService.isPurchase(context, false);
+    }
+
+    /**
+     * Starts the service in the foreground. On Android 12+ the system may refuse foreground
+     * service starts from the background; in that case the request is logged and dropped
+     * instead of crashing the caller (e.g. a WorkManager worker or a network callback).
+     */
+    private static boolean startServiceSafely(Context context, Intent intent) {
+        try {
+            ContextCompat.startForegroundService(context, intent);
+            return true;
+        } catch (IllegalStateException e) {
+            // ForegroundServiceStartNotAllowedException extends IllegalStateException
+            Timber.e(e, "Unable to start DownloadService");
+            return false;
+        }
+    }
+
     public static void download(Context context, boolean cleanupMedia, DownloadRequest... requests) {
         ArrayList<DownloadRequest> requestsToSend = new ArrayList<>();
         int count = 0;
+        boolean limitReached = false;
+        Boolean purchased = null;
         for (DownloadRequest request : requests) {
             if (!isDownloadingFile(request.getSource())) {
-                if(request.isNeedAutoSubscribe()){
+                if (request.isNeedAutoSubscribe()) {
                     //自动订阅需要判断由没有达到上限，如果是多个请求不能循环调用不然每次查询到订阅数都是没变化
-                    if(!GoRouter.getInstance().getService(PayService.class).isPurchase(context,false)
-                            && (DBReader.getSubscribedFeedsCount() + count++) >= Feed.MAX_SUBSCRIBED_FEEDS_FOR_FREE){
-                        EventBus.getDefault().post(new SubscribedFeedLimitEvent());
-                        Timber.w("The maximum number of subscriptions for the free version has been reached");
-                        break;
+                    if (purchased == null) {
+                        purchased = isPurchased(context);
+                    }
+                    if (!purchased
+                            && (DBReader.getSubscribedFeedsCount() + count++) >= Feed.MAX_SUBSCRIBED_FEEDS_FOR_FREE) {
+                        if (!limitReached) {
+                            limitReached = true;
+                            EventBus.getDefault().post(new SubscribedFeedLimitEvent());
+                            Timber.w("The maximum number of subscriptions for the free version has been reached");
+                        }
+                        // skip this subscription but keep processing other requests in the batch
+                        continue;
                     }
 
                 }
@@ -186,14 +227,15 @@ public class DownloadService extends Service {
         if (cleanupMedia) {
             launchIntent.putExtra(DownloadService.EXTRA_CLEANUP_MEDIA, true);
         }
-        ContextCompat.startForegroundService(context, launchIntent);
+        startServiceSafely(context, launchIntent);
     }
 
-    public static void refreshAllFeeds(Context context, boolean initiatedByUser) {
+    /** @return false if the system refused to start the service (background FGS restriction). */
+    public static boolean refreshAllFeeds(Context context, boolean initiatedByUser) {
         Intent launchIntent = new Intent(context, DownloadService.class);
         launchIntent.putExtra(DownloadService.EXTRA_REFRESH_ALL, true);
         launchIntent.putExtra(DownloadService.EXTRA_INITIATED_BY_USER, initiatedByUser);
-        ContextCompat.startForegroundService(context, launchIntent);
+        return startServiceSafely(context, launchIntent);
     }
 
     public static void cancel(Context context, String url) {
@@ -239,9 +281,18 @@ public class DownloadService extends Service {
         return false;
     }
 
+    /**
+     * Returns the request currently downloading the given url, or null. Uses the same
+     * definition of "downloading" as {@link #isDownloadingFile(String)} so callers that
+     * check one and then dereference the other cannot observe a mismatch.
+     */
+    @Nullable
     public static DownloadRequest findRequest(String downloadUrl) {
+        if (!isRunning) {
+            return null;
+        }
         for (Downloader downloader : downloads) {
-            if (downloader.request.getSource().equals(downloadUrl)) {
+            if (downloader.request.getSource().equals(downloadUrl) && !downloader.cancelled) {
                 return downloader.request;
             }
         }
@@ -250,14 +301,23 @@ public class DownloadService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        if (intent != null && intent.hasExtra(EXTRA_REQUESTS)) {
-            Notification notification = notificationManager.updateNotifications(downloads);
+        // The service was started with startForegroundService(), so startForeground() must be
+        // called on every path (including the immediate shutdown below) to honour the 5s contract.
+        Notification notification = notificationManager.updateNotifications(downloads);
+        try {
             startForeground(R.id.notification_downloading, notification);
+        } catch (Exception e) {
+            // ForegroundServiceStartNotAllowedException (12+) / SecurityException (14+) when the
+            // background-start exemption expired between startForegroundService() and here.
+            Timber.e(e, "startForeground failed, giving up on this start");
+            stopSelf();
+            return Service.START_NOT_STICKY;
+        }
+
+        if (intent != null && intent.hasExtra(EXTRA_REQUESTS)) {
             setupNotificationUpdaterIfNecessary();
             downloadEnqueueExecutor.execute(() -> onDownloadQueued(intent));
         } else if (intent != null && intent.getBooleanExtra(EXTRA_REFRESH_ALL, false)) {
-            Notification notification = notificationManager.updateNotifications(downloads);
-            startForeground(R.id.notification_downloading, notification);
             setupNotificationUpdaterIfNecessary();
             downloadEnqueueExecutor.execute(() -> enqueueAll(intent));
         } else if (downloads.size() == 0) {
@@ -268,10 +328,28 @@ public class DownloadService extends Service {
         return Service.START_NOT_STICKY;
     }
 
+    /**
+     * Android 15 limits dataSync foreground services to 6h per day and calls this when the
+     * quota is used up; the service must stop promptly or the app is killed.
+     */
+    @Override
+    public void onTimeout(int startId, int fgsType) {
+        Log.w(TAG, "foreground service timeout, cancelling all downloads");
+        cancelAllDownloads();
+        shutdown();
+    }
+
     @Override
     public void onDestroy() {
         Log.d(TAG, "onDestroy");
         isRunning = false;
+        // Stop accepting work before clearing the list: a queued enqueue task or a retry could
+        // otherwise re-add a downloader after the clear, and the static list would carry it
+        // into the next service instance, which would then never stop.
+        downloadEnqueueExecutor.shutdownNow();
+        downloadHandleExecutor.shutdownNow();
+        downloads.clear();
+        EventBus.getDefault().postSticky(DownloadEvent.refresh(Collections.emptyList()));
 
         boolean showAutoDownloadReport = Prefs.showAutoDownloadReport();
         if (Prefs.showDownloadReport() || showAutoDownloadReport) {
@@ -284,15 +362,11 @@ public class DownloadService extends Service {
             connectionMonitor.disable(getApplicationContext());
         }
 
-        EventBus.getDefault().postSticky(DownloadEvent.refresh(Collections.emptyList()));
         cancelNotificationUpdater();
-        downloadEnqueueExecutor.shutdownNow();
-        downloadHandleExecutor.shutdownNow();
         notificationUpdateExecutor.shutdownNow();
         if (downloadPostFuture != null) {
             downloadPostFuture.cancel(true);
         }
-        downloads.clear();
 
         // start auto download in case anything new has shown up
         DBTasks.autodownloadUndownloadedItems(getApplicationContext());
@@ -303,24 +377,61 @@ public class DownloadService extends Service {
      * Otherwise, it hangs up the refresh thread pool.
      */
     private void performDownload(Downloader downloader) {
+        DownloadRequest request = downloader.getDownloadRequest();
+        boolean retry = false;
         try {
-            downloader.call();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        try {
-            if (downloader.getResult().isSuccessful()) {
-                handleSuccessfulDownload(downloader);
-            } else {
-                handleFailedDownload(downloader);
+            if (request.getRetryCount() > 0 && !downloader.cancelled) {
+                // short, interruptible back-off before an automatic retry
+                try {
+                    Thread.sleep(RETRY_DELAY_MS);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    downloader.cancel();
+                }
             }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        downloadEnqueueExecutor.submit(() -> {
+            if (downloader.cancelled || downloadHandleExecutor.isShutdown()) {
+                return;
+            }
+            try {
+                downloader.call();
+            } catch (Exception e) {
+                Log.e(TAG, "download threw", e);
+            }
+            try {
+                if (downloader.getResult().isSuccessful()) {
+                    retry = !handleSuccessfulDownload(downloader)
+                            && handleFailedDownload(downloader);
+                } else {
+                    retry = handleFailedDownload(downloader);
+                }
+            } catch (Exception e) {
+                Log.e(TAG, "download result handling threw", e);
+            }
+        } finally {
+            // Always remove the downloader on this thread. Routing the removal through the
+            // enqueue executor made it depend on that thread being alive and unblocked, which
+            // is how entries ended up stuck in the "downloading" list forever.
+            if (retry && !downloader.cancelled && !downloadHandleExecutor.isShutdown()) {
+                request.setRetryCount(request.getRetryCount() + 1);
+                request.setSoFar(0);
+                request.setProgressPercent(0);
+                Log.d(TAG, "retrying download (attempt " + request.getRetryCount() + "): " + request.getSource());
+                // Add the replacement before removing this entry so that the list is never
+                // momentarily empty (which would let a concurrent stop check end the service).
+                // Flagging this finished downloader as cancelled hides it from isDownloadingFile()
+                // so that addNewRequest() accepts the same source again.
+                downloader.cancel();
+                try {
+                    addNewRequest(request);
+                } catch (Exception e) {
+                    Log.e(TAG, "unable to schedule retry", e);
+                }
+            }
             downloads.remove(downloader);
-            stopServiceIfEverythingDone();
-        });
+            postDownloaders();
+            notifyItemChanged(request);
+            scheduleStopCheck();
+        }
     }
 
     /**
@@ -337,15 +448,65 @@ public class DownloadService extends Service {
             });
         } catch (Exception e) {
             e.printStackTrace();
-        }
-        downloadEnqueueExecutor.submit(() -> {
+        } finally {
             downloads.remove(downloader);
+            postDownloaders();
+            scheduleStopCheck();
+        }
+    }
+
+    /**
+     * Posts a FeedItemEvent for the media of a request so that list rows stop showing a
+     * download progress once the download has ended, whatever the outcome was.
+     */
+    private void notifyItemChanged(@NonNull DownloadRequest request) {
+        if (request.getFeedfileType() != FeedMedia.FEEDFILETYPE_FEEDMEDIA) {
+            return;
+        }
+        try {
+            FeedItem item = getFeedItemFromId(request.getFeedfileId());
+            if (item != null) {
+                EventBus.getDefault().post(FeedItemEvent.updated(item));
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "unable to notify item change", e);
+        }
+    }
+
+    /**
+     * Decides whether the service can stop. The decision is serialized on the enqueue executor
+     * so that it cannot race with a request that is currently being added; if that executor is
+     * already gone, the check runs inline.
+     */
+    private void scheduleStopCheck() {
+        if (downloadEnqueueExecutor.isShutdown()) {
             stopServiceIfEverythingDone();
-        });
+            return;
+        }
+        try {
+            downloadEnqueueExecutor.execute(this::stopServiceIfEverythingDone);
+        } catch (RejectedExecutionException e) {
+            stopServiceIfEverythingDone();
+        }
+    }
+
+    /**
+     * Returns true for errors that are typically transient (connection dropped, timeout, DNS
+     * hiccup) and therefore worth one automatic retry.
+     */
+    private static boolean isTransientError(@Nullable DownloadError reason) {
+        return reason == DownloadError.ERROR_CONNECTION_ERROR
+                || reason == DownloadError.ERROR_IO_ERROR
+                || reason == DownloadError.ERROR_UNKNOWN_HOST;
     }
 
 
-    private void handleSuccessfulDownload(Downloader downloader) {
+    /**
+     * @return false if the media handler rejected the downloaded file, in which case the
+     *         downloader's result has been switched to the failure and the caller must run
+     *         the failure path.
+     */
+    private boolean handleSuccessfulDownload(Downloader downloader) {
         DownloadRequest request = downloader.getDownloadRequest();
         DownloadStatus status = downloader.getResult();
         final int type = status.getFeedfileType();
@@ -357,7 +518,7 @@ public class DownloadService extends Service {
 
             if (success) {
                 if (request.getFeedfileId() == 0) {
-                    return; // No download logs for new subscriptions
+                    return true; // No download logs for new subscriptions
                 }
                 // we create a 'successful' download log if the feed's last refresh failed
                 List<DownloadStatus> log = DBReader.getFeedDownloadLog(request.getFeedfileId());
@@ -375,56 +536,90 @@ public class DownloadService extends Service {
                     DBWriter.updateFeedDownloadURL(request.getSource(), feedSyncTask.getRedirectUrl());
                 }
             } else {
-                DBWriter.setFeedLastUpdateFailed(request.getFeedfileId(), true);
+                int pageNr = request.getArguments() == null ? 0
+                        : request.getArguments().getInt(DownloadRequest.REQUEST_ARG_PAGE_NR, 0);
+                if (pageNr == 0) {
+                    // a failed extra page must not flag the feed itself as failed
+                    DBWriter.setFeedLastUpdateFailed(request.getFeedfileId(), true);
+                }
                 saveDownloadStatus(feedSyncTask.getDownloadStatus());
             }
         } else if (type == FeedMedia.FEEDFILETYPE_FEEDMEDIA) {
             Log.d(TAG, "FeedMedia completed download");
             MediaDownloadedHandler handler = new MediaDownloadedHandler(DownloadService.this, status, request);
             handler.run();
-            saveDownloadStatus(handler.getUpdatedStatus());
+            DownloadStatus updated = handler.getUpdatedStatus();
+            if (!updated.isSuccessful()) {
+                // e.g. file missing/incomplete on disk: treat like a failed download so that
+                // the log, the failed-attempt counter and the retry policy all apply.
+                downloader.getResult().setFailed(updated.getReason(), updated.getReasonDetailed());
+                return false;
+            }
+            saveDownloadStatus(updated);
         }
+        return true;
     }
 
-    private void handleFailedDownload(Downloader downloader) {
+    /**
+     * Handles a download that did not succeed.
+     *
+     * @return true if the request should be re-submitted automatically (the caller takes care
+     *         of that once the current downloader has been removed from the list), false if
+     *         the failure is final. A FeedItemEvent for the media is posted by the caller in
+     *         every case, so this method does not need to.
+     */
+    private boolean handleFailedDownload(Downloader downloader) {
         DownloadStatus status = downloader.getResult();
+        DownloadRequest request = downloader.getDownloadRequest();
         final int type = status.getFeedfileType();
 
-        if (!status.isCancelled()) {
-            if (status.getReason() == DownloadError.ERROR_UNAUTHORIZED) {
-                notificationManager.postAuthenticationNotification(downloader.getDownloadRequest());
-            } else if (status.getReason() == DownloadError.ERROR_HTTP_DATA_ERROR
-                    && Integer.parseInt(status.getReasonDetailed()) == 416) {
+        if (status.isCancelled()) {
+            return false;
+        }
 
-                Log.d(TAG, "invalid range restarting download");
-                FileUtils.deleteQuietly(new File(downloader.getDownloadRequest().getDestination()));
-                download(this, false, downloader.getDownloadRequest());
-            } else {
-                Log.e(TAG, "download failed");
-                saveDownloadStatus(status);
-                new FailedDownloadHandler(downloader.getDownloadRequest()).run();
+        if (status.getReason() == DownloadError.ERROR_UNAUTHORIZED) {
+            notificationManager.postAuthenticationNotification(request);
+            return false;
+        }
 
-                if (type == FeedMedia.FEEDFILETYPE_FEEDMEDIA) {
-                    FeedItem item = getFeedItemFromId(status.getFeedfileId());
-                    if (item == null) {
-                        return;
-                    }
-                    item.increaseFailedAutoDownloadAttempts(System.currentTimeMillis());
-                    DBWriter.setFeedItem(item);
-                    // to make lists reload the failed item, we fake an item update
-                    EventBus.getDefault().post(FeedItemEvent.updated(item));
-                }
+        boolean retryBudgetLeft = request.getRetryCount() < MAX_RETRIES;
+        if (status.getReason() == DownloadError.ERROR_HTTP_DATA_ERROR && isHttpCode(status, 416)) {
+            // The server rejected our Range request for the partial file: discard it and
+            // start over from scratch.
+            Log.d(TAG, "invalid range restarting download");
+            FileUtils.deleteQuietly(new File(request.getDestination()));
+            if (retryBudgetLeft) {
+                return true;
             }
-        } else {
-            // if FeedMedia download has been canceled, fake FeedItem update
-            // so that lists reload that it
-            if (status.getFeedfileType() == FeedMedia.FEEDFILETYPE_FEEDMEDIA) {
-                FeedItem item = getFeedItemFromId(status.getFeedfileId());
-                if (item == null) {
-                    return;
-                }
-                EventBus.getDefault().post(FeedItemEvent.updated(item));
+        } else if (type == FeedMedia.FEEDFILETYPE_FEEDMEDIA
+                && (isTransientError(status.getReason()) || status.getReason() == DownloadError.ERROR_IO_WRONG_SIZE)
+                && retryBudgetLeft
+                && NetworkUtils.networkAvailable()) {
+            Log.w(TAG, "transient error " + status.getReason() + ", will retry: " + request.getSource());
+            return true;
+        }
+
+        // Final failure: log it, run the handler and count the attempt (this also drives the
+        // auto-download back-off). Every branch above that does not retry ends up here.
+        Log.e(TAG, "download failed: " + status.getReason());
+        saveDownloadStatus(status);
+        new FailedDownloadHandler(request).run();
+
+        if (type == FeedMedia.FEEDFILETYPE_FEEDMEDIA) {
+            FeedItem item = getFeedItemFromId(status.getFeedfileId());
+            if (item != null) {
+                item.increaseFailedAutoDownloadAttempts(System.currentTimeMillis());
+                DBWriter.setFeedItem(item);
             }
+        }
+        return false;
+    }
+
+    private static boolean isHttpCode(@NonNull DownloadStatus status, int code) {
+        try {
+            return Integer.parseInt(status.getReasonDetailed()) == code;
+        } catch (NumberFormatException e) {
+            return false;
         }
     }
 
@@ -448,10 +643,7 @@ public class DownloadService extends Service {
                 });
             } else if (TextUtils.equals(intent.getAction(), ACTION_CANCEL_ALL_DOWNLOADS)) {
                 downloadEnqueueExecutor.execute(() -> {
-                    for (Downloader d : downloads) {
-                        d.cancel();
-                    }
-                    Log.d(TAG, "cancel all downloads");
+                    cancelAllDownloads();
                     postDownloaders();
                     stopServiceIfEverythingDone();
                 });
@@ -459,7 +651,14 @@ public class DownloadService extends Service {
         }
     };
 
-    private void doCancel(String url) {
+    private void cancelAllDownloads() {
+        Log.d(TAG, "cancel all downloads");
+        for (Downloader d : downloads) {
+            d.cancel();
+        }
+    }
+
+    private synchronized void doCancel(String url) {
         Log.d(TAG, "cancel download url " + url);
         for (Downloader downloader : downloads) {
             if (downloader.cancelled || !downloader.getDownloadRequest().getSource().equals(url)) {
@@ -538,12 +737,19 @@ public class DownloadService extends Service {
         boolean initiatedByUser = intent.getBooleanExtra(EXTRA_INITIATED_BY_USER, false);
         List<Feed> feeds = DBReader.getFeedList();
         int count = 0;
+        Boolean purchased = null;
         for (Feed feed : feeds) {
             if (feed.getPreferences().getKeepUpdated()) {
-                if (++count > Feed.MAX_SUBSCRIBED_FEEDS_FOR_FREE && !GoRouter.getInstance().getService(PayService.class).isPurchase(null, false)) {
-                    EventBus.getDefault().post(new SubscribedFeedLimitEvent());
-                    Timber.i("reach feed limit , suspend refresh feeds");
-                    break;
+                if (++count > Feed.MAX_SUBSCRIBED_FEEDS_FOR_FREE) {
+                    if (purchased == null) {
+                        purchased = isPurchased(null);
+                    }
+                    if (!purchased) {
+                        EventBus.getDefault().post(new SubscribedFeedLimitEvent());
+                        Timber.i("reach feed limit , suspend refresh feeds (%d of %d skipped)",
+                                feeds.size() - count + 1, feeds.size());
+                        break;
+                    }
                 }
                 DownloadRequest.Builder builder = DownloadRequestCreator.create(feed);
                 builder.withInitiatedByUser(initiatedByUser);
@@ -569,15 +775,25 @@ public class DownloadService extends Service {
         Log.d(TAG, "add new request -> " + request.getSource());
         if (request.getSource().startsWith(Feed.PREFIX_LOCAL_FOLDER)) {
             Downloader downloader = new LocalFeedStubDownloader(request);
-            downloads.add(downloader);
-            downloadHandleExecutor.submit(() -> performLocalFeedRefresh(downloader, request));
+            submitDownloader(downloader, () -> performLocalFeedRefresh(downloader, request));
         } else {
             writeFileUrl(request);
             Downloader downloader = downloaderFactory.create(request);
             if (downloader != null) {
-                downloads.add(downloader);
-                downloadHandleExecutor.submit(() -> performDownload(downloader));
+                submitDownloader(downloader, () -> performDownload(downloader));
             }
+        }
+    }
+
+    private void submitDownloader(@NonNull Downloader downloader, @NonNull Runnable task) {
+        downloads.add(downloader);
+        try {
+            downloadHandleExecutor.submit(task);
+        } catch (RejectedExecutionException e) {
+            // executor shut down between the isShutdown() check and here; an entry left in the
+            // static list would keep the next service instance from ever stopping
+            downloads.remove(downloader);
+            Log.w(TAG, "download executor rejected " + downloader.getDownloadRequest().getSource());
         }
     }
 
@@ -696,8 +912,12 @@ public class DownloadService extends Service {
         new PostDownloaderTask(downloads).run();
 
         if (downloadPostFuture == null) {
-            downloadPostFuture = notificationUpdateExecutor.scheduleAtFixedRate(
-                    new PostDownloaderTask(downloads), 1, 1, TimeUnit.SECONDS);
+            synchronized (this) {
+                if (downloadPostFuture == null && !notificationUpdateExecutor.isShutdown()) {
+                    downloadPostFuture = notificationUpdateExecutor.scheduleAtFixedRate(
+                            new PostDownloaderTask(downloads), 1, 1, TimeUnit.SECONDS);
+                }
+            }
         }
     }
 

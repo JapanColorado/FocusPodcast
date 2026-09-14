@@ -81,7 +81,7 @@ class DownloadLogFragment : Fragment(), IBackToContentTopView {
         super.onDestroyView()
     }
 
-    @Subscribe
+    @Subscribe(threadMode = ThreadMode.MAIN) // posted from the DB executor thread
     fun onDownloadLogChanged(event: DownloadLogEvent?) {
         loadDownloadLog()
     }

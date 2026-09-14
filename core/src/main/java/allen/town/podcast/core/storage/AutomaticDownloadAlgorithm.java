@@ -89,7 +89,10 @@ public class AutomaticDownloadAlgorithm {
                     episodeSpaceLeft = episodeCacheSize - (downloadedEpisodes - deletedEpisodes);
                 }
 
-                List<FeedItem> itemsToDownload = candidates.subList(0, episodeSpaceLeft);
+                // episodeSpaceLeft can be negative (cache smaller than what is already
+                // downloaded) or larger than the candidate list; either would throw here
+                int end = Math.max(0, Math.min(episodeSpaceLeft, candidates.size()));
+                List<FeedItem> itemsToDownload = candidates.subList(0, end);
                 if (itemsToDownload.size() > 0) {
                     Log.d(TAG, "Enqueueing " + itemsToDownload.size() + " items for download");
 

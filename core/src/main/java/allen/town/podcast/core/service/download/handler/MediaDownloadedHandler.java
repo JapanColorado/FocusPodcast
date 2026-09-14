@@ -48,11 +48,23 @@ public class MediaDownloadedHandler implements Runnable {
             Log.e(TAG, "Could not find downloaded media object in database");
             return;
         }
+        // Never mark media as downloaded unless a plausible file is actually on disk.
+        File downloadedFile = new File(request.getDestination());
+        long fileLength = downloadedFile.exists() ? downloadedFile.length() : -1;
+        if (!isCompleteFile(downloadedFile.exists(), fileLength, request.getSize())) {
+            String message = "Downloaded file missing or incomplete: exists=" + downloadedFile.exists()
+                    + ", length=" + fileLength + ", expected=" + request.getSize();
+            Log.e(TAG, message);
+            updatedStatus = new DownloadStatus(media, media.getEpisodeTitle(),
+                    DownloadError.ERROR_IO_WRONG_SIZE, false, message, request.isInitiatedByUser());
+            return;
+        }
+
         // media.setDownloaded modifies played state
         boolean broadcastUnreadStateUpdate = media.getItem() != null && media.getItem().isNew();
         media.setDownloaded(true);
         media.setFile_url(request.getDestination());
-        media.setSize(new File(request.getDestination()).length());
+        media.setSize(fileLength);
         media.checkEmbeddedPicture(); // enforce check
 
         // check if file has chapters
@@ -117,5 +129,22 @@ public class MediaDownloadedHandler implements Runnable {
     @NonNull
     public DownloadStatus getUpdatedStatus() {
         return updatedStatus;
+    }
+
+    /**
+     * Decides whether a finished download left a usable file behind.
+     *
+     * @param exists       whether the destination file exists
+     * @param length       the file's length in bytes (ignored when {@code exists} is false)
+     * @param expectedSize the size announced by the server, or a value {@code <= 0} if unknown
+     * @return true if the file exists, is non-empty and is not shorter than the expected size.
+     *         A file that is larger than expected is accepted, because a server may announce
+     *         a compressed size.
+     */
+    public static boolean isCompleteFile(boolean exists, long length, long expectedSize) {
+        if (!exists || length <= 0) {
+            return false;
+        }
+        return expectedSize <= 0 || length >= expectedSize;
     }
 }

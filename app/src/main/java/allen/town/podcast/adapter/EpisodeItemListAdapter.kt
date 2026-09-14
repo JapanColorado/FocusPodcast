@@ -61,8 +61,7 @@ open class EpisodeItemListAdapter(mainActivity: MainActivity, @MenuRes menuResId
         }
         holder.itemView.setOnCreateContextMenuListener(this)
         holder.itemView.setOnLongClickListener { v: View? ->
-            longPressedItem = getItem(holder.bindingAdapterPosition)
-            longPressedPosition = holder.bindingAdapterPosition
+            rememberLongPressed(holder.bindingAdapterPosition)
             false
         }
         holder.itemView.setOnTouchListener { v: View?, e: MotionEvent ->
@@ -70,8 +69,7 @@ open class EpisodeItemListAdapter(mainActivity: MainActivity, @MenuRes menuResId
                 if (e.isFromSource(InputDevice.SOURCE_MOUSE)
                     && e.buttonState == MotionEvent.BUTTON_SECONDARY
                 ) {
-                    longPressedItem = getItem(holder.bindingAdapterPosition)
-                    longPressedPosition = holder.bindingAdapterPosition
+                    rememberLongPressed(holder.bindingAdapterPosition)
                     return@setOnTouchListener false
                 }
             }
@@ -93,6 +91,7 @@ open class EpisodeItemListAdapter(mainActivity: MainActivity, @MenuRes menuResId
     protected open fun afterBindViewHolder(holder: EpisodeItemViewHolder, pos: Int) {}
     override fun onViewRecycled(holder: EpisodeItemViewHolder) {
         super.onViewRecycled(holder)
+        holder.cancelPendingWork()
         // Set all listeners to null. This is required to prevent leaking fragments that have set a listener.
         // Activity -> recycledViewPool -> EpisodeItemViewHolder -> Listener -> Fragment (can not be garbage collected)
         holder.itemView.setOnClickListener(null)
@@ -133,6 +132,20 @@ open class EpisodeItemListAdapter(mainActivity: MainActivity, @MenuRes menuResId
 
     protected val activity: Activity?
         protected get() = mainActivityRef.get()
+
+    /**
+     * bindingAdapterPosition is NO_POSITION while the holder is detached or the list changed
+     * since the last layout (e.g. an item removed by a download/queue event during a long press).
+     */
+    private fun rememberLongPressed(position: Int) {
+        if (position == RecyclerView.NO_POSITION || position >= itemCount) {
+            longPressedItem = null
+            longPressedPosition = RecyclerView.NO_POSITION
+            return
+        }
+        longPressedItem = getItem(position)
+        longPressedPosition = position
+    }
 
     override fun onCreateContextMenu(menu: ContextMenu, v: View, menuInfo: ContextMenuInfo?) {
         val inflater = mainActivityRef.get()!!.menuInflater

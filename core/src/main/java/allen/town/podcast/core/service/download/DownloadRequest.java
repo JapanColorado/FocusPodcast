@@ -54,6 +54,17 @@ public class DownloadRequest implements Parcelable {
 
     private String itunesFeedId;
 
+    /** Number of times this request has been automatically re-submitted after a failure. */
+    private int retryCount = 0;
+
+    public int getRetryCount() {
+        return retryCount;
+    }
+
+    public void setRetryCount(int retryCount) {
+        this.retryCount = retryCount;
+    }
+
     public DownloadRequest(@NonNull String destination, @NonNull String source, @NonNull String title, long feedfileId,
                            int feedfileType, String username, String password, boolean deleteOnFailure,
                            Bundle arguments, boolean initiatedByUser) {
@@ -71,6 +82,7 @@ public class DownloadRequest implements Parcelable {
         this(in.readString(), in.readString(), in.readString(), in.readLong(), in.readInt(), in.readString(),
              in.readByte() > 0, nullIfEmpty(in.readString()), nullIfEmpty(in.readString()), in.readByte() > 0,
              in.readBundle(), in.readByte() > 0,in.readByte() > 0,in.readString());
+        this.retryCount = in.readInt();
     }
 
     private DownloadRequest(String destination, String source, String title, long feedfileId, int feedfileType,
@@ -118,6 +130,7 @@ public class DownloadRequest implements Parcelable {
         dest.writeByte(initiatedByUser ? (byte) 1 : 0);
         dest.writeByte(needAutoSubscribe ? (byte) 1 : 0);
         dest.writeString(itunesFeedId);
+        dest.writeInt(retryCount);
     }
 
     private static String nonNullString(String str) {

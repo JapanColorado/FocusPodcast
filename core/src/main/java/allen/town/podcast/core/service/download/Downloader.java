@@ -46,13 +46,15 @@ public abstract class Downloader implements Callable<Downloader> {
             wifiLock.acquire();
         }
 
-        download();
-
-        if (wifiLock != null) {
-            wifiLock.release();
+        try {
+            download();
+        } finally {
+            // release even if download() throws, otherwise the lock is held until process death
+            if (wifiLock != null && wifiLock.isHeld()) {
+                wifiLock.release();
+            }
+            finished = true;
         }
-
-        finished = true;
         return this;
     }
 

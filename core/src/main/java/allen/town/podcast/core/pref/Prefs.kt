@@ -691,6 +691,10 @@ object Prefs {
             allowed.remove(type)
         }
         prefs!!.edit().putStringSet(PREF_MOBILE_UPDATE, allowed).apply()
+        if (type == "feed_refresh") {
+            // the periodic worker bakes UNMETERED vs CONNECTED into its constraints
+            context?.let { AutoUpdateManager.restartUpdateAlarm(it) }
+        }
     }
 
     @JvmStatic

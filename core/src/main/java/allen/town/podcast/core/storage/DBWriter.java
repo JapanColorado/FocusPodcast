@@ -115,14 +115,27 @@ public class DBWriter {
             @NonNull Context context, @NonNull FeedMedia media) {
         Log.d(TAG, String.format(Locale.US, "requested to delete FeedMedia %d, %s, %s",
                 media.getId(), media.getEpisodeTitle(), media.isDownloaded()));
-        if (media.isDownloaded()) {
-            // delete downloaded media file
+        // Delete whenever a local file path is recorded, not only when the downloaded flag is
+        // set: partially downloaded files must be removed too. Files of local folder feeds are
+        // referenced by content:// URIs and belong to the user, so they are never touched.
+        final boolean wasDownloaded = media.isDownloaded();
+        if (media.isContentUri()) {
+            // never delete the user's own file, but keep the row consistent with the request
+            media.setDownloaded(false);
+            media.setFile_url(null);
+            Db adapter = Db.getInstance();
+            adapter.open();
+            adapter.setFeedMediaDownloadState(media);
+            adapter.close();
+        } else if (media.getFile_url() != null) {
             File mediaFile = new File(media.getFile_url());
             if (mediaFile.exists() && !mediaFile.delete()) {
                 //本来就是默默删除，删除失败提示也没用
 //                MessageEvent evt = new MessageEvent(context.getString(R.string.delete_failed));
 //                EventBus.getDefault().post(evt);
-                Log.e(TAG,"delete feed media file failed");
+                Log.e(TAG, "delete feed media file failed: " + media.getFile_url());
+                // let list rows re-read the (unchanged) state instead of assuming success
+                EventBus.getDefault().post(FeedItemEvent.updated(media.getItem()));
                 return false;
             }
             media.setDownloaded(false);
@@ -141,12 +154,14 @@ public class DBWriter {
                 nm.cancel(R.id.notification_playing);
             }
 
-            // Gpodder: queue delete action for synchronization
-            FeedItem item = media.getItem();
-            EpisodeAction action = new EpisodeAction.Builder(item, EpisodeAction.DELETE)
-                    .currentTimestamp()
-                    .build();
-            SynchronizationQueueSink.enqueueEpisodeActionIfSynchronizationIsActive(context, action);
+            if (wasDownloaded) {
+                // Gpodder: queue delete action for synchronization
+                FeedItem item = media.getItem();
+                EpisodeAction action = new EpisodeAction.Builder(item, EpisodeAction.DELETE)
+                        .currentTimestamp()
+                        .build();
+                SynchronizationQueueSink.enqueueEpisodeActionIfSynchronizationIsActive(context, action);
+            }
         }
         EventBus.getDefault().post(FeedItemEvent.updated(media.getItem()));
         return true;
@@ -241,7 +256,7 @@ public class DBWriter {
                     PlaybackPreferences.writeNoMediaPlaying();
                     IntentUtils.sendLocalBroadcast(context, PlaybackService.ACTION_SHUTDOWN_PLAYBACK_SERVICE);
                 }
-                if (item.getMedia().isDownloaded()) {
+                if (item.getMedia().getFile_url() != null && !item.getMedia().isContentUri()) {
                     deleteFeedMediaSynchronous(context, item.getMedia());
                 }
                 DownloadService.cancel(context, item.getMedia().getDownload_url());
@@ -869,6 +884,20 @@ public class DBWriter {
      *
      * @param media The FeedMedia object.
      */
+    /**
+     * Saves only the 'downloaded', 'file_url' and 'has embedded picture' attributes of a FeedMedia
+     * object. Use this instead of {@link #setFeedMedia} when un-flagging a missing file, so a
+     * concurrent playback-position write is not overwritten by a stale snapshot.
+     */
+    public static Future<?> setFeedMediaDownloadState(final FeedMedia media) {
+        return dbExec.submit(() -> {
+            Db adapter = Db.getInstance();
+            adapter.open();
+            adapter.setFeedMediaDownloadState(media);
+            adapter.close();
+        });
+    }
+
     public static Future<?> setFeedMediaPlaybackInformation(final FeedMedia media) {
         return dbExec.submit(() -> {
             Db adapter = Db.getInstance();
@@ -996,7 +1025,10 @@ public class DBWriter {
             if (GoRouter.getInstance().getService(PayService.class).isPurchase(context, false)) {
                 adapter.subscribeFeed(feed.getId());
             } else if (DBReader.getSubscribedFeedsCount() >= Feed.MAX_SUBSCRIBED_FEEDS_FOR_FREE) {
+                adapter.close();
                 EventBus.getDefault().post(new SubscribedFeedLimitEvent());
+                // still notify so an optimistic UI toggle is reverted
+                EventBus.getDefault().post(new FeedListUpdateEvent(feed));
                 return;
             } else {
                 adapter.subscribeFeed(feed.getId());

@@ -87,9 +87,11 @@ public class HttpDownloader extends Downloader {
                 }
             }
 
-            // add range header if necessary
-            if (fileExists && destination.length() > 0) {
-                request.setSoFar(destination.length());
+            // add range header if necessary. soFar must always reflect the file on disk, never
+            // a previous attempt of this same request (retries reuse the request object).
+            request.setSoFar(fileExists ? destination.length() : 0);
+            request.setProgressPercent(0);
+            if (request.getSoFar() > 0) {
                 httpReq.addHeader("Range", "bytes=" + request.getSoFar() + "-");
             }
 
@@ -131,6 +133,8 @@ public class HttpDownloader extends Downloader {
                 out = new RandomAccessFile(destination, "rw");
                 out.seek(request.getSoFar());
             } else {
+                // server ignored the Range request (or there was none): start from scratch
+                request.setSoFar(0);
                 boolean success = destination.delete();
                 success |= destination.createNewFile();
                 if (!success) {
@@ -154,15 +158,14 @@ public class HttpDownloader extends Downloader {
             }
 
             Log.d(TAG, "start download");
-            try {
-                while (!cancelled && (count = connection.read(buffer)) != -1) {
-                    out.write(buffer, 0, count);
-                    request.setSoFar(request.getSoFar() + count);
-                    int progressPercent = (int) (100.0 * request.getSoFar() / request.getSize());
-                    request.setProgressPercent(progressPercent);
-                }
-            } catch (IOException e) {
-                Log.e(TAG, Log.getStackTraceString(e));
+            // An IOException while reading the body must propagate to the outer handler and
+            // fail the download. Swallowing it here used to let a truncated body pass as a
+            // success whenever the server did not send a Content-Length.
+            while (!cancelled && (count = connection.read(buffer)) != -1) {
+                out.write(buffer, 0, count);
+                request.setSoFar(request.getSoFar() + count);
+                int progressPercent = (int) (100.0 * request.getSoFar() / request.getSize());
+                request.setProgressPercent(progressPercent);
             }
             if (cancelled) {
                 onCancelled();

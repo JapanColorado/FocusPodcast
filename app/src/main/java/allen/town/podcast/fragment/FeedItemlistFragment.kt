@@ -285,6 +285,9 @@ class FeedItemlistFragment() : Fragment(), OnItemClickListener, Toolbar.OnMenuIt
         if (adapter != null) {
             adapter!!.endSelectMode()
         }
+        // displayList() only attaches the adapter when it is null; a surviving fragment instance
+        // with a new RecyclerView would otherwise show an empty list forever
+        adapter = null
         if (updateDownloadStatus != null) {
             updateDownloadStatus!!.dispose()
         }
@@ -425,6 +428,8 @@ class FeedItemlistFragment() : Fragment(), OnItemClickListener, Toolbar.OnMenuIt
                 feed!!.download_url
             ) && isDownloadingFeed
         ) {
+            // DownloadEvents arrive on every progress tick; do not stack one query per event
+            updateDownloadStatus?.dispose()
             updateDownloadStatus = Observable.fromCallable(
                 { DBReader.getAllFeedList() })
                 .subscribeOn(Schedulers.io())
@@ -977,6 +982,7 @@ class FeedItemlistFragment() : Fragment(), OnItemClickListener, Toolbar.OnMenuIt
     fun filterFeedItems() {
         if (feed == null) {
             showSnack(activity, R.string.please_wait_for_data, Toast.LENGTH_LONG)
+            return
         }
         FeedMenuProcess.showFilterDialog(context, feed)
     }
@@ -985,6 +991,7 @@ class FeedItemlistFragment() : Fragment(), OnItemClickListener, Toolbar.OnMenuIt
     fun sortFeedItems() {
         if (feed == null) {
             showSnack(activity, R.string.please_wait_for_data, Toast.LENGTH_LONG)
+            return
         }
         FeedMenuProcess.showSortDialog(context, feed)
     }
@@ -993,6 +1000,7 @@ class FeedItemlistFragment() : Fragment(), OnItemClickListener, Toolbar.OnMenuIt
     fun searchFeedItems() {
         if (feed == null) {
             showSnack(activity, R.string.please_wait_for_data, Toast.LENGTH_LONG)
+            return
         }
         (activity as MainActivity?)!!.loadChildFragment(
             LocalSearchFragment.Companion.newInstance(

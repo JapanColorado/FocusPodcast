@@ -551,6 +551,23 @@ public class Db {
         return media.getId();
     }
 
+    /**
+     * Saves only the download-related columns (downloaded flag, file url, embedded picture)
+     * so that a stale in-memory snapshot cannot clobber playback position etc.
+     */
+    public void setFeedMediaDownloadState(FeedMedia media) {
+        if (media.getId() != 0) {
+            ContentValues values = new ContentValues();
+            values.put(KEY_DOWNLOADED, media.isDownloaded());
+            values.put(KEY_FILE_URL, media.getFile_url());
+            values.put(KEY_HAS_EMBEDDED_PICTURE, media.hasEmbeddedPicture());
+            db.update(TABLE_NAME_FEED_MEDIA, values, KEY_ID + "=?",
+                    new String[]{String.valueOf(media.getId())});
+        } else {
+            Log.e(TAG, "setFeedMediaDownloadState: ID of media was 0");
+        }
+    }
+
     public void setFeedMediaPlaybackInformation(FeedMedia media) {
         if (media.getId() != 0) {
             ContentValues values = new ContentValues();
@@ -605,7 +622,11 @@ public class Db {
                 setFeed(feed);
                 if (feed.getItems() != null) {
                     for (FeedItem item : feed.getItems()) {
-                        updateOrInsertFeedItem(item, false);
+                        // fromRefresh: the item objects were read before the (possibly long)
+                        // parse+merge, so only feed-derived columns may be written for rows
+                        // that already exist; otherwise played state, playback position and
+                        // downloaded flag changed in the meantime would be reverted.
+                        updateOrInsertFeedItem(item, false, true);
                     }
                 }
                 if (feed.getPreferences() != null) {
@@ -685,6 +706,17 @@ public class Db {
      * @return the id of the entry
      */
     private long updateOrInsertFeedItem(FeedItem item, boolean saveFeed) {
+        return updateOrInsertFeedItem(item, saveFeed, false);
+    }
+
+    /**
+     * @param fromRefresh true if the item comes from a feed refresh merge. For rows that already
+     *                    exist only feed-derived columns are written then: the read state is
+     *                    written only when the merge marked the item NEW, and the media row
+     *                    keeps its position/downloaded/file columns.
+     */
+    private long updateOrInsertFeedItem(FeedItem item, boolean saveFeed, boolean fromRefresh) {
+        final boolean existingRefreshRow = fromRefresh && item.getId() != 0;
         if (item.getId() == 0 && item.getPubDate() == null) {
             Log.e(TAG, "Newly saved item has no pubDate. Using current date as pubDate");
             item.setPubDate(new Date());
@@ -704,14 +736,14 @@ public class Db {
         values.put(KEY_FEED, item.getFeed().getId());
         if (item.isNew()) {
             values.put(KEY_READ, FeedItem.NEW);
-        } else if (item.isPlayed()) {
-            values.put(KEY_READ, FeedItem.PLAYED);
-        } else {
-            values.put(KEY_READ, FeedItem.UNPLAYED);
+        } else if (!existingRefreshRow) {
+            values.put(KEY_READ, item.isPlayed() ? FeedItem.PLAYED : FeedItem.UNPLAYED);
         }
         values.put(KEY_HAS_CHAPTERS, item.getChapters() != null || item.hasChapters());
         values.put(KEY_ITEM_IDENTIFIER, item.getItemIdentifier());
-        values.put(KEY_AUTO_DOWNLOAD_ATTEMPTS, item.getAutoDownloadAttemptsAndTime());
+        if (!existingRefreshRow) {
+            values.put(KEY_AUTO_DOWNLOAD_ATTEMPTS, item.getAutoDownloadAttemptsAndTime());
+        }
         values.put(KEY_IMAGE_URL, item.getImageUrl());
         values.put(KEY_PODCASTINDEX_CHAPTER_URL, item.getPodcastIndexChapterUrl());
 
@@ -722,12 +754,34 @@ public class Db {
                     new String[]{String.valueOf(item.getId())});
         }
         if (item.getMedia() != null) {
-            setMedia(item.getMedia());
+            if (fromRefresh && item.getMedia().getId() != 0) {
+                setMediaFeedData(item.getMedia());
+            } else {
+                setMedia(item.getMedia());
+            }
         }
         if (item.getChapters() != null) {
             setChapters(item);
         }
         return item.getId();
+    }
+
+    /**
+     * Updates only the columns of a media row that come from the feed itself.
+     */
+    private void setMediaFeedData(FeedMedia media) {
+        ContentValues values = new ContentValues();
+        values.put(KEY_SIZE, media.getSize());
+        values.put(KEY_MIME_TYPE, media.getMime_type());
+        values.put(KEY_DOWNLOAD_URL, media.getDownload_url());
+        if (media.getDuration() > 0) {
+            values.put(KEY_DURATION, media.getDuration());
+        }
+        if (media.getItem() != null) {
+            values.put(KEY_FEEDITEM, media.getItem().getId());
+        }
+        db.update(TABLE_NAME_FEED_MEDIA, values, KEY_ID + "=?",
+                new String[]{String.valueOf(media.getId())});
     }
 
     public void setFeedItemRead(int played, long itemId, long mediaId,
@@ -837,6 +891,16 @@ public class Db {
             db.delete(TABLE_NAME_DOWNLOAD_LOG, KEY_ID + "=?",
                     new String[]{String.valueOf(status.getId())});
             return status.getId();
+        }
+        if (status.getReason() == allen.town.podcast.model.download.DownloadError.ERROR_PARSER_EXCEPTION_DUPLICATE
+                && status.getId() == 0) {
+            // A duplicate-episode warning is re-reported on every refresh for as long as the
+            // podcast host keeps the duplicate in the feed. Keep a single row per episode and
+            // let it move to the top instead of accumulating one entry per refresh.
+            db.delete(TABLE_NAME_DOWNLOAD_LOG,
+                    KEY_FEEDFILE + "=? AND " + KEY_FEEDFILETYPE + "=? AND " + KEY_REASON + "=? AND " + KEY_DOWNLOADSTATUS_TITLE + "=?",
+                    new String[]{String.valueOf(status.getFeedfileId()), String.valueOf(status.getFeedfileType()),
+                            String.valueOf(status.getReason().getCode()), String.valueOf(status.getTitle())});
         }
         ContentValues values = new ContentValues();
         values.put(KEY_FEEDFILE, status.getFeedfileId());

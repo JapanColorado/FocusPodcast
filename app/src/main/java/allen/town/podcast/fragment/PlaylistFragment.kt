@@ -143,8 +143,10 @@ class PlaylistFragment : Fragment(), Toolbar.OnMenuItemClickListener, OnSelectMo
             }
             QueueEvent.Action.REMOVED, QueueEvent.Action.IRREVERSIBLE_REMOVED -> {
                 val position = FeedItemUtil.indexOfItemWithId(queue, event.item.id)
-                queue!!.removeAt(position)
-                recyclerAdapter!!.notifyItemRemoved(position)
+                if (position >= 0) {
+                    queue!!.removeAt(position)
+                    recyclerAdapter!!.notifyItemRemoved(position)
+                }
             }
             QueueEvent.Action.CLEARED -> {
                 queue!!.clear()

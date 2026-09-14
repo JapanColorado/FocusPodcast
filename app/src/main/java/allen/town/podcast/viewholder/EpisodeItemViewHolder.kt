@@ -24,6 +24,7 @@ import android.os.Build
 import android.text.Layout
 import android.text.format.Formatter
 import android.util.Log
+import io.reactivex.disposables.Disposable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -74,7 +75,16 @@ class EpisodeItemViewHolder(private val activity: MainActivity, parent: ViewGrou
     val downloadedButton: ImageView
     private val downloadProgress: CircularProgressIndicator
     private val playingLottieView: LottieAnimationView
+    /** HEAD request resolving the episode size; must not outlive the row it was started for. */
+    private var sizeDisposable: Disposable? = null
+
+    fun cancelPendingWork() {
+        sizeDisposable?.dispose()
+        sizeDisposable = null
+    }
+
     fun bind(item: FeedItem) {
+        cancelPendingWork()
         feedItem = item
         placeholder.text = item.feed.title
         title.text = item.title
@@ -99,7 +109,7 @@ class EpisodeItemViewHolder(private val activity: MainActivity, parent: ViewGrou
                 activity
             )
         }
-        setSizeTextView(item.media, activity, size, separatorSize)
+        sizeDisposable = setSizeTextView(item.media, activity, size, separatorSize)
         //        itemView.setBackgroundResource(ThemeUtils.getDrawableFromAttr(activity, R.attr.rectSelector));
 //        itemView.setBackgroundColor(ThemeUtils.getColorFromAttr(activity, R.attr.colorSurface));
 //        itemView.setSelected(false);
@@ -133,11 +143,14 @@ class EpisodeItemViewHolder(private val activity: MainActivity, parent: ViewGrou
             (itemView as MaterialCardView).isChecked = true
             playingLottieView.visibility = View.VISIBLE
         }
-        if (DownloadService.isDownloadingFile(media.download_url)) {
-            val downloadRequest = DownloadService.findRequest(
-                media.download_url
-            )
-            val percent = 0.01f * downloadRequest.progressPercent
+        // The download may finish between the isDownloadingFile() check and findRequest(),
+        // so only treat the row as "downloading" when a request was actually found.
+        val downloadRequest = if (DownloadService.isDownloadingFile(media.download_url)) {
+            DownloadService.findRequest(media.download_url)
+        } else {
+            null
+        }
+        if (downloadRequest != null) {
             //            secondaryActionProgress.setPercentage(Math.max(percent, 0.01f), item);
             cancelDownloadButtons.visibility = View.VISIBLE
             downloadedButton.visibility = View.GONE
@@ -222,18 +235,22 @@ class EpisodeItemViewHolder(private val activity: MainActivity, parent: ViewGrou
 
     companion object {
         private const val TAG = "EpisodeItemViewHolder"
+        /**
+         * @return the HEAD request resolving the size, if one was started; the caller owns it
+         *         and must dispose it when the view is rebound or recycled.
+         */
         fun setSizeTextView(
             media: FeedMedia?,
             context: Context?,
             size: TextView,
             separatorSize: TextView?
-        ) {
+        ): Disposable? {
             if (media == null) {
                 size.visibility = View.GONE
                 if (separatorSize != null) {
                     separatorSize.visibility = View.GONE
                 }
-                return
+                return null
             }
             size.visibility = if (media.size > 0) View.VISIBLE else View.GONE
             if (separatorSize != null) {
@@ -244,7 +261,7 @@ class EpisodeItemViewHolder(private val activity: MainActivity, parent: ViewGrou
             } else if (NetworkUtils.isEpisodeHeadDownloadAllowed() && !media.checkedOnSizeButUnknown()) {
                 size.text = "{fa-spinner}"
                 Iconify.addIcons(size)
-                NetworkUtils.getFeedMediaSizeObservable(media).subscribe(
+                return NetworkUtils.getFeedMediaSizeObservable(media).subscribe(
                     { sizeValue: Long ->
                         if (sizeValue > 0) {
                             size.text = Formatter.formatShortFileSize(context, sizeValue)
@@ -262,6 +279,7 @@ class EpisodeItemViewHolder(private val activity: MainActivity, parent: ViewGrou
             } else {
                 size.text = ""
             }
+            return null
         }
     }
 

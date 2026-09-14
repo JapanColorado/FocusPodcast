@@ -13,6 +13,14 @@ import java.util.Locale;
  * even if their feed explicitly says that the episodes are different.
  */
 public class FeedItemDuplicateGuesser {
+    // DateFormat is neither thread-safe nor cheap to create; one per thread is enough
+    private static final ThreadLocal<DateFormat> DATE_ONLY = new ThreadLocal<DateFormat>() {
+        @Override
+        protected DateFormat initialValue() {
+            return DateFormat.getDateInstance(DateFormat.SHORT, Locale.US); // MM/DD/YY
+        }
+    };
+
     public static boolean seemDuplicates(FeedItem item1, FeedItem item2) {
         if (sameAndNotEmpty(item1.getItemIdentifier(), item2.getItemIdentifier())) {
             return true;
@@ -25,10 +33,11 @@ public class FeedItemDuplicateGuesser {
         if (sameAndNotEmpty(media1.getStreamUrl(), media2.getStreamUrl())) {
             return true;
         }
-        return titlesLookSimilar(item1, item2)
-                && datesLookSimilar(item1, item2)
+        // cheapest checks first: this runs O(n^2) per refresh
+        return TextUtils.equals(media1.getMime_type(), media2.getMime_type())
                 && durationsLookSimilar(media1, media2)
-                && TextUtils.equals(media1.getMime_type(), media2.getMime_type());
+                && titlesLookSimilar(item1, item2)
+                && datesLookSimilar(item1, item2);
     }
 
     private static boolean sameAndNotEmpty(String string1, String string2) {
@@ -42,7 +51,7 @@ public class FeedItemDuplicateGuesser {
         if (item1.getPubDate() == null || item2.getPubDate() == null) {
             return false;
         }
-        DateFormat dateFormat = DateFormat.getDateInstance(DateFormat.SHORT, Locale.US); // MM/DD/YY
+        DateFormat dateFormat = DATE_ONLY.get();
         String dateOriginal = dateFormat.format(item2.getPubDate());
         String dateNew = dateFormat.format(item1.getPubDate());
         return TextUtils.equals(dateOriginal, dateNew); // Same date; time is ignored.

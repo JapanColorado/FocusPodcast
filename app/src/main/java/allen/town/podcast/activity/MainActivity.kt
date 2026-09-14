@@ -31,6 +31,7 @@ import allen.town.podcast.core.pref.Prefs
 import allen.town.podcast.core.pref.Prefs.BackButtonBehavior
 import allen.town.podcast.core.receiver.MediaButtonReceiver
 import allen.town.podcast.core.service.playback.PlaybackService
+import allen.town.podcast.core.storage.DBTasks
 import allen.town.podcast.core.util.StorageUtils
 import allen.town.podcast.core.util.download.AutoUpdateManager
 import allen.town.podcast.event.MessageEvent
@@ -97,6 +98,7 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetBehavior.BottomSheetCallback
 import com.google.android.material.snackbar.Snackbar
 import com.wyjson.router.GoRouter
+import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.functions.Consumer
@@ -135,6 +137,11 @@ class MainActivity : SimpleToolbarActivity(), OnSharedPreferenceChangeListener {
 //        val a = AppLovinSdk.getInstance(this).settings.testDeviceAdvertisingIds
         addEntranceActivityName(this.javaClass.simpleName)
         StorageUtils.checkStorageAvailability(this)
+        // Once per process: un-flag episodes whose downloaded file no longer exists
+        // (deleted externally, restored from a backup, storage folder changed, ...).
+        Completable.fromAction { DBTasks.checkMissingMediaFiles(applicationContext, false) }
+            .subscribeOn(Schedulers.io())
+            .subscribe({ }, { Timber.e(it, "missing media file check failed") })
         if (RetroUtil.isLandscape(this) && Prefs.shouldShowColumnInLandscape()) {
             setContentView(R.layout.main_land)
         } else {

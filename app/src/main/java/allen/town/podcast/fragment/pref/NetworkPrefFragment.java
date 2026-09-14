@@ -10,6 +10,7 @@ import androidx.preference.PreferenceManager;
 import allen.town.podcast.R;
 import allen.town.podcast.activity.SettingsActivity;
 import allen.town.podcast.core.pref.Prefs;
+import allen.town.podcast.core.util.download.AutoUpdateManager;
 import allen.town.podcast.dialog.FeedRefreshPrefDialog;
 import allen.town.podcast.dialog.ProxyDialog;
 
@@ -116,6 +117,10 @@ public class NetworkPrefFragment extends AbsSettingsFragment
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
         if (Prefs.PREF_UPDATE_INTERVAL.equals(key)) {
             setUpdateIntervalText();
+        } else if ("pref_mobile_update_types".equals(key) && getContext() != null) {
+            // the multi-select writes the pref directly; the periodic refresh worker bakes
+            // the metered/unmetered constraint in at schedule time, so reschedule it
+            AutoUpdateManager.restartUpdateAlarm(getContext().getApplicationContext());
         }
     }
 

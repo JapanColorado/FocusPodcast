@@ -84,7 +84,8 @@ public class DownloadRequestCreator {
      */
     private static boolean isFilenameAvailable(String path) {
         for (Downloader downloader : DownloadService.downloads) {
-            if (downloader.request.getDestination().equals(path)) {
+            // same definition of "in flight" as DownloadService.isDownloadingFile()
+            if (!downloader.cancelled && downloader.request.getDestination().equals(path)) {
                 return false;
             }
         }

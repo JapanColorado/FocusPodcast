@@ -266,11 +266,12 @@ public class PlaybackService extends MediaBrowserServiceCompat {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             registerReceiver(autoStateUpdated, new IntentFilter("com.google.android.gms.car.media.STATUS"), RECEIVER_EXPORTED);
             registerReceiver(headsetDisconnected, new IntentFilter(Intent.ACTION_HEADSET_PLUG), RECEIVER_EXPORTED);
-            registerReceiver(shutdownReceiver, new IntentFilter(ACTION_SHUTDOWN_PLAYBACK_SERVICE), RECEIVER_EXPORTED);
+            // app-internal actions are always sent with setPackage(); do not let other apps drive playback
+            registerReceiver(shutdownReceiver, new IntentFilter(ACTION_SHUTDOWN_PLAYBACK_SERVICE), RECEIVER_NOT_EXPORTED);
             registerReceiver(bluetoothStateUpdated, new IntentFilter(BluetoothA2dp.ACTION_CONNECTION_STATE_CHANGED), RECEIVER_EXPORTED);
             registerReceiver(audioBecomingNoisy, new IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY), RECEIVER_EXPORTED);
-            registerReceiver(skipCurrentEpisodeReceiver, new IntentFilter(ACTION_SKIP_CURRENT_EPISODE), RECEIVER_EXPORTED);
-            registerReceiver(pausePlayCurrentEpisodeReceiver, new IntentFilter(ACTION_PAUSE_PLAY_CURRENT_EPISODE), RECEIVER_EXPORTED);
+            registerReceiver(skipCurrentEpisodeReceiver, new IntentFilter(ACTION_SKIP_CURRENT_EPISODE), RECEIVER_NOT_EXPORTED);
+            registerReceiver(pausePlayCurrentEpisodeReceiver, new IntentFilter(ACTION_PAUSE_PLAY_CURRENT_EPISODE), RECEIVER_NOT_EXPORTED);
             registerReceiver(lockScreenReceiver, new IntentFilter(Intent.ACTION_SCREEN_OFF), RECEIVER_EXPORTED);
         } else {
             registerReceiver(autoStateUpdated, new IntentFilter("com.google.android.gms.car.media.STATUS"));
@@ -362,7 +363,13 @@ public class PlaybackService extends MediaBrowserServiceCompat {
         stateManager.stopForeground(!Prefs.isPersistNotify());
         isRunning = false;
         currentMediaType = MediaType.UNKNOWN;
-        castStateListener.destroy();
+        if (playableIconLoaderThread != null) {
+            // otherwise a Glide load still in flight re-posts the notification on a dead service
+            playableIconLoaderThread.interrupt();
+        }
+        if (castStateListener != null) {
+            castStateListener.destroy();
+        }
 
         cancelPositionObserver();
         PreferenceManager.getDefaultSharedPreferences(this).unregisterOnSharedPreferenceChangeListener(prefListener);
@@ -378,8 +385,12 @@ public class PlaybackService extends MediaBrowserServiceCompat {
         unregisterReceiver(skipCurrentEpisodeReceiver);
         unregisterReceiver(pausePlayCurrentEpisodeReceiver);
         unregisterReceiver(lockScreenReceiver);
-        mediaPlayer.shutdown();
-        taskManager.shutdown();
+        if (mediaPlayer != null) {
+            mediaPlayer.shutdown();
+        }
+        if (taskManager != null) {
+            taskManager.shutdown();
+        }
         EventBus.getDefault().unregister(this);
     }
 
@@ -523,7 +534,15 @@ public class PlaybackService extends MediaBrowserServiceCompat {
         super.onStartCommand(intent, flags, startId);
         Log.d(TAG, "onStartCommand");
 
-        stateManager.startForeground(R.id.notification_playing, notificationBuilder.build());
+        try {
+            stateManager.startForeground(R.id.notification_playing, notificationBuilder.build());
+        } catch (Exception e) {
+            // Android 12+: a stale media button / widget start without a background exemption
+            // throws ForegroundServiceStartNotAllowedException; do not take the process down.
+            Log.e(TAG, "startForeground failed", e);
+            stopSelf();
+            return Service.START_NOT_STICKY;
+        }
         NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
         notificationManager.cancel(R.id.notification_streaming_confirmation);
 

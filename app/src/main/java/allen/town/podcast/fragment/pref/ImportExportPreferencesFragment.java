@@ -229,7 +229,11 @@ public class ImportExportPreferencesFragment extends AbsSettingsFragment {
         }
         final Uri uri = result.getData().getData();
         progressDialog.show();
-        disposable = Completable.fromAction(() -> DatabaseExporter.importBackup(uri, getContext()))
+        final Context appContext = requireContext().getApplicationContext();
+        // Missing-file reconciliation for the imported database is deliberately NOT done here:
+        // importBackup() swaps the file under the open Db singleton and the success dialog asks
+        // for a restart; the once-per-process check in MainActivity runs after that restart.
+        disposable = Completable.fromAction(() -> DatabaseExporter.importBackup(uri, appContext))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(() -> {

@@ -62,12 +62,28 @@ public abstract class FeedFile extends FeedComponent {
         return false;
     }
 
+    private static final String CONTENT_URI_PREFIX = "content://";
+
+    /**
+     * Returns true if file_url is a content:// URI (used by local folder feeds) rather than a
+     * plain filesystem path. Such files cannot be checked or deleted through {@link File}.
+     */
+    public boolean isContentUri() {
+        return file_url != null && file_url.startsWith(CONTENT_URI_PREFIX);
+    }
+
     /**
      * Returns true if the file exists at file_url.
+     * <p>
+     * A content:// URI cannot be verified without a Context, so it is assumed to exist here;
+     * callers that need a real answer for such URIs must resolve it through the
+     * storage access framework themselves.
      */
     public boolean fileExists() {
         if (file_url == null) {
             return false;
+        } else if (isContentUri()) {
+            return true;
         } else {
             File f = new File(file_url);
             return f.exists();

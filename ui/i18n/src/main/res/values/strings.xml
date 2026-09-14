@@ -250,6 +250,7 @@
     <string name="download_error_http_data_error">HTTP Data Error</string>
     <string name="download_error_error_unknown">Unknown Error</string>
     <string name="download_error_parser_exception">Invalid podcast feed</string>
+    <string name="download_error_duplicate_episode">Duplicate episode in feed (feed still refreshed)</string>
     <string name="download_error_unsupported_type">Unsupported Feed Type</string>
     <string name="download_error_unsupported_type_html">Looks like this is a website, not a podcast</string>
     <string name="download_error_not_found">The episode may have been removed</string>

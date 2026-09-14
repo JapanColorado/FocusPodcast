@@ -5,10 +5,15 @@ import static android.content.Context.MODE_PRIVATE;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.database.Cursor;
+import android.net.Uri;
 import android.text.TextUtils;
 import android.util.Log;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.VisibleForTesting;
+import androidx.documentfile.provider.DocumentFile;
+
+import allen.town.podcast.core.util.StorageUtils;
 
 import allen.town.podcast.core.service.download.DownloadRequest;
 import allen.town.podcast.core.service.download.DownloadRequestCreator;
@@ -17,7 +22,10 @@ import allen.town.podcast.storage.db.Db;
 import allen.town.podcast.storage.db.mapper.FeedCursorMapper;
 import org.greenrobot.eventbus.EventBus;
 
+import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Iterator;
@@ -111,8 +119,11 @@ public final class DBTasks {
      * @param context  Might be used for accessing the database
      * @param initiatedByUser a boolean indicating if the refresh was triggered by user action.
      */
-    public static void refreshAllFeeds(final Context context, boolean initiatedByUser) {
-        DownloadService.refreshAllFeeds(context, initiatedByUser);
+    /** @return false if the refresh could not be started (see {@link DownloadService#refreshAllFeeds}). */
+    public static boolean refreshAllFeeds(final Context context, boolean initiatedByUser) {
+        if (!DownloadService.refreshAllFeeds(context, initiatedByUser)) {
+            return false;
+        }
 
         SharedPreferences prefs = context.getSharedPreferences(PREF_NAME, MODE_PRIVATE);
         prefs.edit().putLong(PREF_LAST_REFRESH, System.currentTimeMillis()).apply();
@@ -122,6 +133,7 @@ public final class DBTasks {
         // Instead it is done after all feeds have been refreshed (asynchronously),
         // in DownloadService.onDestroy()
         // See Issue #2577 for the details of the rationale
+        return true;
     }
 
 
@@ -174,9 +186,139 @@ public final class DBTasks {
         Log.i(TAG, "The feedmanager was notified about a missing episode. It will update its database now.");
         media.setDownloaded(false);
         media.setFile_url(null);
-        DBWriter.setFeedMedia(media);
+        DBWriter.setFeedMediaDownloadState(media);
         EventBus.getDefault().post(FeedItemEvent.updated(media.getItem()));
 //        EventBus.getDefault().post(new MessageEvent(context.getString(R.string.error_file_not_found)));
+    }
+
+    /**
+     * Answers whether a media file exists. Used by {@link #findMissingMediaFiles} so the pure
+     * decision logic can be tested without touching the filesystem.
+     */
+    public interface MediaFileChecker {
+        boolean exists(@NonNull FeedMedia media);
+    }
+
+    /**
+     * Returns true if the file referenced by the media's file_url exists. Handles both plain
+     * filesystem paths and content:// URIs (as used by local folder feeds).
+     */
+    public static boolean mediaFileExists(@NonNull Context context, @NonNull FeedMedia media) {
+        if (media.getFile_url() == null) {
+            return false;
+        }
+        if (media.isContentUri()) {
+            try {
+                DocumentFile file = DocumentFile.fromSingleUri(context, Uri.parse(media.getFile_url()));
+                return file != null && file.exists();
+            } catch (Exception e) {
+                // A revoked permission or a broken provider must not wipe the flag.
+                Log.w(TAG, "Unable to check " + media.getFile_url() + ": " + e.getMessage());
+                return true;
+            }
+        }
+        File file = new File(media.getFile_url());
+        if (file.exists()) {
+            return true;
+        }
+        File parent = file.getParentFile();
+        if (parent != null && !parent.exists()) {
+            // The whole directory is gone: an unmounted card or a previous data folder that is
+            // currently unreachable, not a deleted episode. Leave the row alone.
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Pure selection logic for {@link #checkMissingMediaFiles}: from a list of items, returns
+     * the media that are flagged as downloaded but whose file does not exist. Items of local
+     * folder feeds are skipped because {@code LocalFeedUpdater} owns their files.
+     */
+    @NonNull
+    public static List<FeedMedia> findMissingMediaFiles(@NonNull List<FeedItem> items,
+                                                        @NonNull MediaFileChecker checker) {
+        List<FeedMedia> missing = new ArrayList<>();
+        for (FeedItem item : items) {
+            FeedMedia media = item.getMedia();
+            if (media == null || !media.isDownloaded()) {
+                continue;
+            }
+            if (item.getFeed() != null && item.getFeed().isLocalFeed()) {
+                continue;
+            }
+            if (!checker.exists(media)) {
+                missing.add(media);
+            }
+        }
+        return missing;
+    }
+
+    private static volatile boolean missingMediaFilesChecked = false;
+
+    /**
+     * Reconciles the "downloaded" flag with the filesystem: every media that is flagged as
+     * downloaded but whose file is gone (deleted externally, restored from a backup made on
+     * another device, storage folder changed, ...) is reset so that it can be downloaded
+     * again and no longer shows up as downloaded.
+     * <p>
+     * Must NOT be called on the main thread. Does nothing when the storage is not available,
+     * because an unmounted SD card would otherwise look like every file was deleted.
+     *
+     * @param force run even if a check already ran in this process
+     * @return the number of media entries that were reset
+     */
+    /** Threshold above which a missing-file sweep is treated as a storage outage, not deletions. */
+    static boolean looksLikeStorageOutage(int missing, int total) {
+        return total >= 10 && missing * 2 > total;
+    }
+
+    public static int checkMissingMediaFiles(@NonNull Context context, boolean force) {
+        if (!force && missingMediaFilesChecked) {
+            return 0;
+        }
+        if (!StorageUtils.storageAvailable()) {
+            Log.w(TAG, "Storage not available, skipping missing media file check");
+            return 0;
+        }
+        final Context appContext = context.getApplicationContext();
+        List<FeedItem> downloadedItems = DBReader.getDownloadedItems();
+        List<FeedMedia> missing = findMissingMediaFiles(downloadedItems, media -> mediaFileExists(appContext, media));
+        missingMediaFilesChecked = true;
+        if (missing.isEmpty()) {
+            Log.d(TAG, "Missing media file check: all " + downloadedItems.size() + " files present");
+            return 0;
+        }
+        if (looksLikeStorageOutage(missing.size(), downloadedItems.size())) {
+            // Most files gone at once means an unmounted card / unreachable old folder rather
+            // than individual deletions; wiping the flags would make them unrecoverable.
+            Log.w(TAG, "Missing media file check: " + missing.size() + " of " + downloadedItems.size()
+                    + " files missing, assuming storage is unreachable and skipping");
+            return 0;
+        }
+
+        List<FeedItem> changedItems = new ArrayList<>();
+        List<Future<?>> writes = new ArrayList<>(missing.size());
+        for (FeedMedia media : missing) {
+            Log.i(TAG, "Downloaded file missing, resetting: " + media.getFile_url());
+            media.setDownloaded(false);
+            media.setFile_url(null);
+            writes.add(DBWriter.setFeedMediaDownloadState(media));
+            if (media.getItem() != null) {
+                changedItems.add(media.getItem());
+            }
+        }
+        for (Future<?> write : writes) {
+            try {
+                write.get();
+            } catch (InterruptedException | ExecutionException e) {
+                Log.e(TAG, "missing media file update failed", e);
+            }
+        }
+        if (!changedItems.isEmpty()) {
+            EventBus.getDefault().post(FeedItemEvent.updated(changedItems));
+        }
+        return missing.size();
     }
 
     public static List<FeedItem> enqueueFeedItemsToDownload(final Context context,
@@ -257,6 +399,22 @@ public final class DBTasks {
     }
 
     /**
+     * Index of identifying value -> first item with that value, for O(1) lookups in the
+     * merge loop of {@link #updateFeed} (which used to be O(n*m) per refresh).
+     */
+    @NonNull
+    static Map<String, FeedItem> indexByIdentifyingValue(@NonNull List<FeedItem> items) {
+        Map<String, FeedItem> index = new HashMap<>(items.size() * 2);
+        for (FeedItem item : items) {
+            String key = item.getIdentifyingValue();
+            if (key != null && !index.containsKey(key)) {
+                index.put(key, item);
+            }
+        }
+        return index;
+    }
+
+    /**
      * Guess if one of the items could actually mean the searched item, even if it uses another identifying value.
      * This is to work around podcasters breaking their GUIDs.
      */
@@ -333,6 +491,7 @@ public final class DBTasks {
             }
 
             // Look for new or updated Items
+            final Map<String, FeedItem> savedIndex = indexByIdentifyingValue(savedFeed.getItems());
             for (int idx = 0; idx < newFeed.getItems().size(); idx++) {
                 final FeedItem item = newFeed.getItems().get(idx);
 
@@ -349,7 +508,7 @@ public final class DBTasks {
                     continue;
                 }
 
-                FeedItem oldItem = searchFeedItemByIdentifyingValue(savedFeed.getItems(), item);
+                FeedItem oldItem = savedIndex.get(item.getIdentifyingValue());
                 if (!newFeed.isLocalFeed() && oldItem == null) {
                     oldItem = searchFeedItemGuessDuplicate(savedFeed.getItems(), item);
                     if (oldItem != null) {
@@ -380,6 +539,9 @@ public final class DBTasks {
                 } else {
                     Log.d(TAG, "Found new item: " + item.getTitle());
                     item.setFeed(savedFeed);
+                    if (item.getIdentifyingValue() != null) {
+                        savedIndex.put(item.getIdentifyingValue(), item);
+                    }
 
                     if (idx >= savedFeed.getItems().size()) {
                         savedFeed.getItems().add(item);
@@ -404,18 +566,23 @@ public final class DBTasks {
 
             // identify items to be removed
             if (removeUnlistedItems) {
+                final Map<String, FeedItem> newIndex = indexByIdentifyingValue(newFeed.getItems());
                 Iterator<FeedItem> it = savedFeed.getItems().iterator();
                 while (it.hasNext()) {
                     FeedItem feedItem = it.next();
-                    if (searchFeedItemByIdentifyingValue(newFeed.getItems(), feedItem) == null) {
+                    if (!newIndex.containsKey(feedItem.getIdentifyingValue())) {
                         unlistedItems.add(feedItem);
                         it.remove();
                     }
                 }
             }
 
-            // update attributes
-            savedFeed.setLastUpdate(newFeed.getLastUpdate());
+            // update attributes. A paged response (page > 0) carries the Last-Modified/ETag of
+            // that page, not of the feed itself, so it must not replace the value used for the
+            // next conditional request.
+            if (newFeed.getPageNr() == savedFeed.getPageNr()) {
+                savedFeed.setLastUpdate(newFeed.getLastUpdate());
+            }
             savedFeed.setType(newFeed.getType());
             savedFeed.setLastUpdateFailed(false);
 

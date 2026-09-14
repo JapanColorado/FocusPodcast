@@ -30,8 +30,9 @@ public class FeedUpdateWorker extends Worker {
         Log.d(TAG, "syncing " + isRunOnce);
         ClientConfig.initialize(getApplicationContext());
 
+        boolean started = true;
         if (NetworkUtils.networkAvailable() && NetworkUtils.isFeedRefreshAllowed()) {
-            DBTasks.refreshAllFeeds(getApplicationContext(), false);
+            started = DBTasks.refreshAllFeeds(getApplicationContext(), false);
         } else {
             Log.d(TAG, "not to auto update");
         }
@@ -42,6 +43,12 @@ public class FeedUpdateWorker extends Worker {
             AutoUpdateManager.restartUpdateAlarm(getApplicationContext());
         }
 
+        if (!started) {
+            // Android 12+ refused the foreground service start from the background; let
+            // WorkManager back off and try again instead of reporting a phantom success.
+            Log.w(TAG, "refresh could not be started, will retry");
+            return Result.retry();
+        }
         return Result.success();
     }
 }

@@ -68,6 +68,16 @@ public class SwipeActions extends ItemTouchHelper.SimpleCallback implements Life
         actions = getPrefs(fragment.requireContext(), tag);
     }
 
+    /**
+     * Fragments create a new SwipeActions per adapter/view; without this every old instance
+     * stayed registered on the lifecycle and attached to a dead RecyclerView.
+     */
+    @OnLifecycleEvent(Lifecycle.Event.ON_DESTROY)
+    public void onFragmentDestroyed() {
+        detach();
+        fragment.getLifecycle().removeObserver(this);
+    }
+
     public void setFilter(FeedItemFilter filter) {
         this.filter = filter;
     }

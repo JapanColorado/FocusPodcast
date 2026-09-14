@@ -1143,10 +1143,13 @@ class PlayPauseProgressButton : View, ItemActionButton {
         } else {
             //需要这行，考虑这种情况app备份数据（item文件已下载），恢复后数据库显示已下载但是文件实际不存在
             //这种情况太少见了，所以稳定起见，只是继续往下执行
-            if (!media!!.fileExists()) {
-                //TODO:本地文件需要验证下
+            // Only repair media that claims to be downloaded. Local folder feeds use content://
+            // URIs that cannot be checked here, and never-downloaded items have nothing to fix.
+            val isLocalFeed = feedItem?.feed?.isLocalFeed == true
+            if (media!!.isDownloaded && !isLocalFeed && !media.fileExists()) {
                 DBTasks.notifyMissingFeedMediaFile(context, media)
-
+            }
+            if (!media.fileExists()) {
                 //使用流式播放弹窗提醒
                 UsageStatistics.logAction(UsageStatistics.ACTION_STREAM)
                 if (!NetworkUtils.isStreamingAllowed()) {
@@ -1159,7 +1162,7 @@ class PlayPauseProgressButton : View, ItemActionButton {
             PlaybackServiceStarter(context, media)
                 .callEvenIfRunning(true)
                 .start()
-            if (media!!.mediaType == MediaType.VIDEO) {
+            if (media.mediaType == MediaType.VIDEO) {
                 context!!.startActivity(PlaybackService.getPlayerActivityIntent(context, media))
             }
         }

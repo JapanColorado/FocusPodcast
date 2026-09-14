@@ -81,6 +81,7 @@ abstract class EpisodesListFragment : Fragment(), OnSelectModeListener, DoubleCl
     @Volatile
     private var isUpdatingFeeds = false
     protected var disposable: Disposable? = null
+    private var loadMoreDisposable: Disposable? = null
     @JvmField
     protected var txtvInformation: TextView? = null
     open val prefName: String
@@ -109,6 +110,7 @@ abstract class EpisodesListFragment : Fragment(), OnSelectModeListener, DoubleCl
         if (disposable != null) {
             disposable!!.dispose()
         }
+        loadMoreDisposable?.dispose()
     }
 
     private val updateRefreshMenuItemChecker =
@@ -246,14 +248,18 @@ abstract class EpisodesListFragment : Fragment(), OnSelectModeListener, DoubleCl
     }
 
     private fun loadMoreItems() {
-        if (disposable != null) {
-            disposable!!.dispose()
-        }
+        // Separate from `disposable`: loadItems() disposing an in-flight page load used to skip
+        // the completion block below, leaving isLoadingMore stuck at true forever.
+        loadMoreDisposable?.dispose()
         isLoadingMore = true
         loadingMoreView!!.visibility = View.VISIBLE
-        disposable = Observable.fromCallable { loadMoreData() }
+        loadMoreDisposable = Observable.fromCallable { loadMoreData() }
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
+            .doFinally {
+                isLoadingMore = false
+                loadingMoreView?.visibility = View.GONE
+            }
             .subscribe({ data: List<FeedItem> ->
                 if (data.size < EPISODES_PER_PAGE) {
                     hasMoreItems = false

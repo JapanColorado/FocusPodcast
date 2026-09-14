@@ -225,6 +225,8 @@ public class CompletedDownloadsFragment extends Fragment implements DoubleClickB
             disposable.dispose();
         }
         emptyView.hide();
+        // The missing-file sweep runs once per process in MainActivity (and after a storage
+        // folder change); loadItems() fires on every player status event, far too often for it.
         disposable = Observable.fromCallable(DBReader::getDownloadedItems)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())

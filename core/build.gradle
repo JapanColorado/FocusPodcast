@@ -76,7 +76,8 @@ dependencies {
 //    fdroidApi "com.google.android.support:wearable:$wearableSupportVersion"
 //    compileOnly "com.google.android.wearable:wearable:$wearableSupportVersion"
 
-    testImplementation 'androidx.test:core:1.2.0'
+    // 1.2.0's manifest lacks android:exported and fails the merger with targetSdk >= 31
+    testImplementation 'androidx.test:core:1.5.0'
     testImplementation "org.awaitility:awaitility:$awaitilityVersion"
     testImplementation "junit:junit:$junitVersion"
     testImplementation 'org.mockito:mockito-inline:3.5.13'
