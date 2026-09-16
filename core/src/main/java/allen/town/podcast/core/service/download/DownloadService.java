@@ -193,22 +193,67 @@ public class DownloadService extends Service {
         }
     }
 
-    public static void download(Context context, boolean cleanupMedia, DownloadRequest... requests) {
-        ArrayList<DownloadRequest> requestsToSend = new ArrayList<>();
+    /**
+     * Android silently drops an intent whose payload exceeds the binder transaction limit, so a
+     * batch bigger than this is trimmed rather than risking losing every request in it.
+     */
+    @VisibleForTesting
+    static final int MAX_REQUESTS_PER_INTENT = 100;
+
+    /** Tells whether a download for the given URL is already in flight. */
+    @VisibleForTesting
+    interface InFlightCheck {
+        boolean isDownloading(String downloadUrl);
+    }
+
+    /**
+     * Drops the requests whose URL is already being downloaded, keeping the caller's order and
+     * the first of any duplicates within the batch itself.
+     */
+    @VisibleForTesting
+    static ArrayList<DownloadRequest> filterInFlight(DownloadRequest[] requests, InFlightCheck inFlight) {
+        ArrayList<DownloadRequest> accepted = new ArrayList<>();
         for (DownloadRequest request : requests) {
-            if (!isDownloadingFile(request.getSource())) {
-                Timber.i("got request " + request.getTitle());
-                requestsToSend.add(request);
+            if (inFlight.isDownloading(request.getSource())) {
+                continue;
             }
+            boolean duplicateInBatch = false;
+            for (DownloadRequest alreadyAccepted : accepted) {
+                if (alreadyAccepted.getSource().equals(request.getSource())) {
+                    duplicateInBatch = true;
+                    break;
+                }
+            }
+            if (!duplicateInBatch) {
+                accepted.add(request);
+            }
+        }
+        return accepted;
+    }
+
+    /** Trims a batch to {@link #MAX_REQUESTS_PER_INTENT} entries, keeping the first ones. */
+    @VisibleForTesting
+    static ArrayList<DownloadRequest> capToIntentLimit(List<DownloadRequest> requests) {
+        if (requests.size() <= MAX_REQUESTS_PER_INTENT) {
+            return new ArrayList<>(requests);
+        }
+        return new ArrayList<>(requests.subList(0, MAX_REQUESTS_PER_INTENT));
+    }
+
+    public static void download(Context context, boolean cleanupMedia, DownloadRequest... requests) {
+        ArrayList<DownloadRequest> requestsToSend =
+                filterInFlight(requests, DownloadService::isDownloadingFile);
+        for (DownloadRequest request : requestsToSend) {
+            Timber.i("got request " + request.getTitle());
         }
         if (requestsToSend.isEmpty()) {
             return;
-        } else if (requestsToSend.size() > 100) {
+        } else if (requestsToSend.size() > MAX_REQUESTS_PER_INTENT) {
             if (BuildConfig.DEBUG) {
                 throw new IllegalArgumentException("Android silently drops intent payloads that are too large");
             } else {
                 Log.i(TAG, "Too many download requests. Dropping some to avoid Android dropping all.");
-                requestsToSend = new ArrayList<>(requestsToSend.subList(0, 100));
+                requestsToSend = capToIntentLimit(requestsToSend);
             }
         }
 
@@ -492,7 +537,8 @@ public class DownloadService extends Service {
      * Returns true for errors that are typically transient (connection dropped, timeout, DNS
      * hiccup) and therefore worth one automatic retry.
      */
-    private static boolean isTransientError(@Nullable DownloadError reason) {
+    @VisibleForTesting
+    static boolean isTransientError(@Nullable DownloadError reason) {
         return reason == DownloadError.ERROR_CONNECTION_ERROR
                 || reason == DownloadError.ERROR_IO_ERROR
                 || reason == DownloadError.ERROR_UNKNOWN_HOST;

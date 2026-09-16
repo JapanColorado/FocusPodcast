@@ -191,7 +191,7 @@ public class DownloadRequest implements Parcelable {
         result = 31 * result + (deleteOnFailure ? 1 : 0);
         result = 31 * result + (int) (feedfileId ^ (feedfileId >>> 32));
         result = 31 * result + feedfileType;
-        result = 31 * result + arguments.hashCode();
+        // arguments is deliberately excluded: equals() ignores it and Bundle uses identity hashing.
         result = 31 * result + progressPercent;
         result = 31 * result + (int) (soFar ^ (soFar >>> 32));
         result = 31 * result + (int) (size ^ (size >>> 32));

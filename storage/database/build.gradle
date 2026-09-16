@@ -18,4 +18,8 @@ dependencies {
 
     kapt "androidx.annotation:annotation:$annotationVersion"
     implementation "commons-io:commons-io:$commonsioVersion"
+
+    testImplementation "junit:junit:$junitVersion"
+    testImplementation "org.robolectric:robolectric:$robolectricVersion"
+    testImplementation "androidx.test:core:1.5.0"
 }
