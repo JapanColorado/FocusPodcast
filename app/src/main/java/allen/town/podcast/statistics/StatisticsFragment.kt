@@ -23,7 +23,7 @@ class StatisticsFragment : PagedToolbarFragment() {
         PREF_FILTER_TYPE_PASS_MONTH, PREF_FILTER_TYPE_PASS_YEAR, PREF_FILTER_TYPE_ALL_TIME
     }
 
-    private var tabLayout: TabLayout? = null
+    private lateinit var tabLayout: TabLayout
     private var viewPager: ViewPager2? = null
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -41,7 +41,7 @@ class StatisticsFragment : PagedToolbarFragment() {
         tabLayout = rootView.findViewById(R.id.sliding_tabs)
         super.setupPagedToolbar(toolbar, viewPager)
         TabLayoutMediator(
-            tabLayout!!,
+            tabLayout,
             viewPager,
             TabConfigurationStrategy { tab: TabLayout.Tab, position: Int ->
                 when (position) {

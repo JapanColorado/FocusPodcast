@@ -47,12 +47,7 @@ open class AppWidgetText : BaseAppWidget() {
 
         @JvmStatic
         val instance: AppWidgetText
-            @Synchronized get() {
-                if (mInstance == null) {
-                    mInstance = AppWidgetText()
-                }
-                return mInstance!!
-            }
+            @Synchronized get() = mInstance ?: AppWidgetText().also { mInstance = it }
     }
 
     override fun getLayout(): Int {

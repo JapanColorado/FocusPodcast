@@ -50,8 +50,8 @@ constructor() : Fragment() {
     private var suggestionLayout: View? = null
     private lateinit var clearHistoryIv: AppCompatImageView
     private lateinit var recyclerView: RecyclerView
-    private var searchHistoryAdapter: SearchHistoryAdapter? = null
-    private var searchKeywordHistory: MutableList<String?>? = null
+    private lateinit var searchHistoryAdapter: SearchHistoryAdapter
+    private var searchKeywordHistory: MutableList<String?> = mutableListOf()
     public override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
     }
@@ -83,18 +83,18 @@ constructor() : Fragment() {
         suggestionLayout = root.findViewById(R.id.suggestion_layout)
         clearHistoryIv = root.findViewById(R.id.clear_history_iv)
         recyclerView = root.findViewById(R.id.recycler_view)
-        searchKeywordHistory = onlinePodcastSearchHistory as MutableList<String?>?
+        searchKeywordHistory = onlinePodcastSearchHistory.toMutableList()
         val chipsLayoutManager: ChipsLayoutManager = ChipsLayoutManager.newBuilder(getContext())
             .build()
         recyclerView.setLayoutManager(chipsLayoutManager)
-        recyclerView.addItemDecoration(ItemCategoryDecoration((getContext())!!, 4))
+        recyclerView.addItemDecoration(ItemCategoryDecoration(requireContext(), 4))
         searchHistoryAdapter = SearchHistoryAdapter()
-        searchHistoryAdapter!!.setHasStableIds(true)
+        searchHistoryAdapter.setHasStableIds(true)
         recyclerView.setAdapter(searchHistoryAdapter)
         showSearchLayout(false)
         clearHistoryIv.setOnClickListener(object : View.OnClickListener {
             public override fun onClick(v: View) {
-                searchKeywordHistory!!.clear()
+                searchKeywordHistory.clear()
                 clearOnlinePodcastSearchHistory()
                 showSearchLayout(false)
             }
@@ -120,17 +120,17 @@ constructor() : Fragment() {
         }
     }
 
-    var sv: SearchView? = null
+    lateinit var sv: SearchView
     private fun setupToolbar(toolbar: Toolbar) {
         toolbar.setNavigationOnClickListener(View.OnClickListener({ v: View? -> getParentFragmentManager().popBackStack() }))
         toolbar.inflateMenu(R.menu.online_search)
         val searchItem: MenuItem = toolbar.getMenu().findItem(R.id.action_search)
-        sv = searchItem.getActionView() as SearchView?
+        sv = searchItem.getActionView() as SearchView
         EditTextUtil.setCursorDrawableForSearchView(sv)
-        sv!!.setQueryHint(getString(R.string.search_podcast_hint))
-        sv!!.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+        sv.setQueryHint(getString(R.string.search_podcast_hint))
+        sv.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             public override fun onQueryTextSubmit(s: String): Boolean {
-                sv!!.clearFocus()
+                sv.clearFocus()
                 search(s)
                 return true
             }
@@ -142,7 +142,7 @@ constructor() : Fragment() {
                 return false
             }
         })
-        sv!!.setOnQueryTextFocusChangeListener(OnFocusChangeListener({ view: View, hasFocus: Boolean ->
+        sv.setOnQueryTextFocusChangeListener(OnFocusChangeListener({ view: View, hasFocus: Boolean ->
             if (hasFocus) {
                 showInputMethod(view.findFocus())
             }
@@ -167,7 +167,7 @@ constructor() : Fragment() {
             val clipboardContent: String = clipData.getItemAt(0).getText().toString()
             if (clipboardContent.trim({ it <= ' ' }).startsWith("http")) {
                 TopSnackbarUtil.showSnack(context,R.string.feed_url_copied_tip,Toast.LENGTH_LONG)
-                sv!!.setQuery(clipboardContent.trim({ it <= ' ' }), false)
+                sv.setQuery(clipboardContent.trim({ it <= ' ' }), false)
             }
         }
 
@@ -187,9 +187,7 @@ constructor() : Fragment() {
     private fun showSearchLayout(show: Boolean) {
         suggestionLayout?.visibility = if (show) View.GONE else View.VISIBLE
         tabViewPagerLayout?.visibility = if (show) View.VISIBLE else View.INVISIBLE
-        if (searchHistoryAdapter != null) {
-            searchHistoryAdapter!!.notifyDataSetChanged()
-        }
+        searchHistoryAdapter.notifyDataSetChanged()
     }
 
     private fun search(query: String) {
@@ -200,9 +198,9 @@ constructor() : Fragment() {
             addUrl(finalQuery)
             return
         }
-        if (!searchKeywordHistory!!.contains(finalQuery)) {
-            searchKeywordHistory!!.add(finalQuery)
-            onlinePodcastSearchHistory = searchKeywordHistory!!
+        if (!searchKeywordHistory.contains(finalQuery)) {
+            searchKeywordHistory.add(finalQuery)
+            onlinePodcastSearchHistory = searchKeywordHistory
         }
         showSearchLayout(true)
         EventBus.getDefault().post(SearchOnlineEvent(finalQuery))
@@ -226,26 +224,26 @@ constructor() : Fragment() {
         }
 
         public override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-            holder.chip.setText(searchKeywordHistory!!.get(position))
+            holder.chip.setText(searchKeywordHistory.get(position))
             holder.chip.setCheckedIconVisible(holder.chip.isChecked())
             holder.chip.setOnClickListener(object : View.OnClickListener {
                 public override fun onClick(v: View) {
                     // the row can be detached or the history rewritten between bind and click
                     val pos: Int = holder.bindingAdapterPosition
-                    if (pos == RecyclerView.NO_POSITION || pos >= searchKeywordHistory!!.size) {
+                    if (pos == RecyclerView.NO_POSITION || pos >= searchKeywordHistory.size) {
                         return
                     }
-                    sv!!.setQuery(searchKeywordHistory!!.get(pos), true)
+                    sv.setQuery(searchKeywordHistory.get(pos), true)
                 }
             })
         }
 
         public override fun getItemCount(): Int {
-            return searchKeywordHistory!!.size
+            return searchKeywordHistory.size
         }
 
         public override fun getItemId(position: Int): Long {
-            return searchKeywordHistory!!.get(position).hashCode().toLong()
+            return searchKeywordHistory.get(position).hashCode().toLong()
         }
 
         inner class ViewHolder internal constructor(var chip: Chip) : RecyclerView.ViewHolder(

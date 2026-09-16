@@ -38,7 +38,8 @@ class FeedItemExtraInfoFragment
 
     override fun onStart() {
         super.onStart()
-        bottomSheet = dialog!!.findViewById(com.google.android.material.R.id.design_bottom_sheet) as ViewGroup
+        bottomSheet = requireDialog()
+            .findViewById(com.google.android.material.R.id.design_bottom_sheet) as ViewGroup
         bottomSheetBehavior = BottomSheetBehavior.from(bottomSheet)
     }
 

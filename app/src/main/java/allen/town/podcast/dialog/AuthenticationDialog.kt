@@ -17,7 +17,8 @@ abstract class AuthenticationDialog(
     context: Context?, titleRes: Int, enableUsernameField: Boolean,
     usernameInitialValue: String?, passwordInitialValue: String?
 ) : AccentMaterialDialog(
-    context!!, R.style.MaterialAlertDialogTheme
+    requireNotNull(context) { "AuthenticationDialog needs a context" },
+    R.style.MaterialAlertDialogTheme
 ) {
     var passwordHidden = true
     protected open fun onCancelled() {}

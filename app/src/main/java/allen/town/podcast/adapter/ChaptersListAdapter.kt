@@ -44,8 +44,11 @@ class ChaptersListAdapter(private val context: Context, private val callback: Ca
     }
 
     override fun onBindViewHolder(holder: ChapterHolder, position: Int) {
+        val playable = media
+        val chapters = playable?.chapters
         val sc = getItem(position)
-        if (sc == null) {
+        if (sc == null || playable == null || chapters == null) {
+            // The chapter list was replaced while this row was being bound; leave the row empty.
             holder.title.text = "Error"
             return
         }
@@ -55,10 +58,10 @@ class ChaptersListAdapter(private val context: Context, private val callback: Ca
                 .start.toInt()
         )
         val duration: Long
-        duration = if (position + 1 < media!!.chapters.size) {
-            media!!.chapters[position + 1].start - sc.start
+        duration = if (position + 1 < chapters.size) {
+            chapters[position + 1].start - sc.start
         } else {
-            media!!.duration - sc.start
+            playable.duration - sc.start
         }
         holder.duration.text = context.getString(
             R.string.chapter_duration,
@@ -113,9 +116,7 @@ class ChaptersListAdapter(private val context: Context, private val callback: Ca
     }
 
     override fun getItemCount(): Int {
-        return if (media == null || media!!.chapters == null) {
-            0
-        } else media!!.chapters.size
+        return media?.chapters?.size ?: 0
     }
 
     class ChapterHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -143,7 +144,7 @@ class ChaptersListAdapter(private val context: Context, private val callback: Ca
             return
         }
         currentChapterIndex = newChapterIndex
-        currentChapterPosition = getItem(newChapterIndex).start
+        currentChapterPosition = getItem(newChapterIndex)?.start ?: return
         notifyDataSetChanged()
     }
 
@@ -158,8 +159,12 @@ class ChaptersListAdapter(private val context: Context, private val callback: Ca
         notifyItemChanged(currentChapterIndex, "foo")
     }
 
-    fun getItem(position: Int): Chapter {
-        return media!!.chapters[position]
+    fun getItem(position: Int): Chapter? {
+        val chapters = media?.chapters ?: return null
+        if (position < 0 || position >= chapters.size) {
+            return null
+        }
+        return chapters[position]
     }
 
     interface Callback {

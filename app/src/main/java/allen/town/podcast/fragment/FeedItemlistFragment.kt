@@ -86,7 +86,6 @@ import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
-import org.apache.commons.lang3.Validate
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
@@ -99,7 +98,7 @@ class FeedItemlistFragment() : Fragment(), OnItemClickListener, Toolbar.OnMenuIt
     private lateinit var binding: FeedItemListFragmentBinding
     private var adapter: FeedItemListAdapter? = null
     private var swipeActions: SwipeActions? = null
-    private var nextPageLoader: ListFooterUtil? = null
+    private lateinit var nextPageLoader: ListFooterUtil
     private lateinit var recyclerView: StorePositionRecyclerView
     private lateinit var txtvTitle: TextView
     private lateinit var txtvFailure: TextView
@@ -132,9 +131,8 @@ class FeedItemlistFragment() : Fragment(), OnItemClickListener, Toolbar.OnMenuIt
         super.onCreate(savedInstanceState)
         //keep this line: otherwise items disappear when switching to dark mode on this screen
 //        setRetainInstance(true);
-        val args = arguments
-        Validate.notNull(args)
-        feedID = args!!.getLong(ARGUMENT_FEED_ID)
+        val args = requireArguments()
+        feedID = args.getLong(ARGUMENT_FEED_ID)
         feed = args.getParcelable(ARGUMENT_FEED)
     }
 
@@ -156,10 +154,10 @@ class FeedItemlistFragment() : Fragment(), OnItemClickListener, Toolbar.OnMenuIt
         if (savedInstanceState != null) {
             displayUpArrow = savedInstanceState.getBoolean(KEY_UP_ARROW)
         }
-        (activity as MainActivity?)!!.setupToolbarToggle(toolbar, displayUpArrow)
+        (requireActivity() as MainActivity).setupToolbarToggle(toolbar, displayUpArrow)
         refreshToolbarState()
         recyclerView = binding.recyclerView
-        recyclerView.setRecycledViewPool((activity as MainActivity?)!!.recycledViewPool)
+        recyclerView.setRecycledViewPool((requireActivity() as MainActivity).recycledViewPool)
         create(recyclerView)
         skeleton = recyclerView.applySkeleton(R.layout.item_small_recyclerview_skeleton, 15)
         skeletonRecyclerDelay = SkeletonRecyclerDelay(skeleton, recyclerView)
@@ -179,15 +177,16 @@ class FeedItemlistFragment() : Fragment(), OnItemClickListener, Toolbar.OnMenuIt
         imgvBackground.setOnClickListener(View.OnClickListener { v: View? -> openAbout() })
         detailInfoViewContainer = root.findViewById(R.id.series_info_view_container)
         subscribe_button = root.findViewById(R.id.subscribe_button)
-        subscribe_button.setTickSize(dp2Px((context)!!, 18.0f))
+        subscribe_button.setTickSize(dp2Px(requireContext(), 18.0f))
         subscribe_button.setOnClickListener(View.OnClickListener { v: View? ->
+            val currentFeed = feed ?: return@OnClickListener
             if (subscribe_button.isSubscribed()) {
-                show((getContext())!!, (feed)!!, object : OnFeedRemovedListener {
+                show(requireContext(), currentFeed, object : OnFeedRemovedListener {
                     override fun onFeedRemoved() {
                         if (getParentFragmentManager().getBackStackEntryCount() > 0) {
                             getParentFragmentManager().popBackStack()
                         } else {
-                            (getActivity() as MainActivity?)!!.loadFragment(
+                            (requireActivity() as MainActivity).loadFragment(
                                 SubFeedsFragment.TAG,
                                 null
                             )
@@ -195,32 +194,38 @@ class FeedItemlistFragment() : Fragment(), OnItemClickListener, Toolbar.OnMenuIt
                     }
                 })
             } else {
-                DBWriter.subscribeFeed(feed, getContext())
+                DBWriter.subscribeFeed(currentFeed, requireContext())
             }
         })
 
         //top padding is required
-        setPaddingStatusBarTop((activity)!!, toolbar)
-        setPaddingStatusBarTop((activity)!!, header)
-        iconTintManager = FeedItemListToolbarIconTintHelper(context, toolbar, collapsingToolbar)
-        iconTintManager!!.updateTint()
-        appBar.addOnOffsetChangedListener(iconTintManager)
-        nextPageLoader = ListFooterUtil(root.findViewById(R.id.more_content_list_footer))
-        nextPageLoader!!.setClickListener({
-            if (feed != null) {
-                DBTasks.loadNextPageOfFeed(getActivity(), feed, false)
+        setPaddingStatusBarTop(requireActivity(), toolbar)
+        setPaddingStatusBarTop(requireActivity(), header)
+        val tintManager =
+            FeedItemListToolbarIconTintHelper(requireContext(), toolbar, collapsingToolbar)
+        iconTintManager = tintManager
+        tintManager.updateTint()
+        appBar.addOnOffsetChangedListener(tintManager)
+        val pageLoader = ListFooterUtil(root.findViewById(R.id.more_content_list_footer))
+        nextPageLoader = pageLoader
+        pageLoader.setClickListener({
+            val currentFeed = feed
+            if (currentFeed != null) {
+                DBTasks.loadNextPageOfFeed(getActivity(), currentFeed, false)
             }
         })
         recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrolled(view: RecyclerView, deltaX: Int, deltaY: Int) {
                 super.onScrolled(view, deltaX, deltaY)
-                val hasMorePages = (feed != null) && feed!!.isPaged && (feed!!.nextPageLink != null)
+                val currentFeed = feed
+                val hasMorePages =
+                    (currentFeed != null) && currentFeed.isPaged && (currentFeed.nextPageLink != null)
                 val pageLoaderVisible = recyclerView.isScrolledToBottom && hasMorePages
-                nextPageLoader!!.root.visibility =
+                pageLoader.root.visibility =
                     if (pageLoaderVisible) View.VISIBLE else View.GONE
                 recyclerView.setPadding(
                     recyclerView.getPaddingLeft(), 0, recyclerView.getPaddingRight(),
-                    if (pageLoaderVisible) nextPageLoader!!.root.measuredHeight else 0
+                    if (pageLoaderVisible) pageLoader.root.measuredHeight else 0
                 )
             }
         })
@@ -245,9 +250,7 @@ class FeedItemlistFragment() : Fragment(), OnItemClickListener, Toolbar.OnMenuIt
     }
 
     fun updateTint() {
-        if (iconTintManager != null) {
-            iconTintManager!!.updateTint()
-        }
+        iconTintManager?.updateTint()
     }
 
     override fun onHiddenChanged(hidden: Boolean) {
@@ -261,15 +264,13 @@ class FeedItemlistFragment() : Fragment(), OnItemClickListener, Toolbar.OnMenuIt
 //                onPagePause();
 //            }
             //restore the status bar color when leaving the screen
-            onPanelCollapsed((activity as AppCompatActivity?)!!)
+            onPanelCollapsed(requireActivity() as AppCompatActivity)
         } else {
 //            if (!isPageResume && getUserVisibleHint()) {
 //                onPageResume();
 //            }
             //reset the status bar color when entering the screen
-            if (iconTintManager != null) {
-                iconTintManager!!.updateTint()
-            }
+            iconTintManager?.updateTint()
         }
         super.onHiddenChanged(hidden)
     }
@@ -278,20 +279,14 @@ class FeedItemlistFragment() : Fragment(), OnItemClickListener, Toolbar.OnMenuIt
         super.onDestroyView()
         uiHandler.removeCallbacksAndMessages(null)
         //restore when the screen is closed
-        onPanelCollapsed((activity as AppCompatActivity?)!!)
+        onPanelCollapsed(requireActivity() as AppCompatActivity)
         EventBus.getDefault().unregister(this)
-        if (disposable != null) {
-            disposable!!.dispose()
-        }
-        if (adapter != null) {
-            adapter!!.endSelectMode()
-        }
+        disposable?.dispose()
+        adapter?.endSelectMode()
         // displayList() only attaches the adapter when it is null; a surviving fragment instance
         // with a new RecyclerView would otherwise show an empty list forever
         adapter = null
-        if (updateDownloadStatus != null) {
-            updateDownloadStatus!!.dispose()
-        }
+        updateDownloadStatus?.dispose()
 //        loadAd(requireActivity(), true)
     }
 
@@ -301,19 +296,17 @@ class FeedItemlistFragment() : Fragment(), OnItemClickListener, Toolbar.OnMenuIt
     }
 
     private val updateRefreshMenuItemChecker = UpdateRefreshMenuItemChecker {
-        DownloadService.isRunning() && DownloadService.isDownloadingFile(
-            feed!!.getDownload_url()
-        )
+        val currentFeed = feed
+        currentFeed != null && DownloadService.isRunning()
+                && DownloadService.isDownloadingFile(currentFeed.getDownload_url())
     }
 
     private fun refreshToolbarState() {
-        if (feed == null) {
-            return
-        }
-        toolbar.menu.findItem(R.id.share_link_item).isVisible = feed!!.link != null
-        toolbar.menu.findItem(R.id.visit_website_item).isVisible = feed!!.link != null
-        toolbar.menu.findItem(R.id.feed_setting).isVisible = feed!!.isSubscribed
-        toolbar.menu.findItem(R.id.rename_item).isVisible = feed!!.isSubscribed
+        val feed = this.feed ?: return
+        toolbar.menu.findItem(R.id.share_link_item).isVisible = feed.link != null
+        toolbar.menu.findItem(R.id.visit_website_item).isVisible = feed.link != null
+        toolbar.menu.findItem(R.id.feed_setting).isVisible = feed.isSubscribed
+        toolbar.menu.findItem(R.id.rename_item).isVisible = feed.isSubscribed
         isUpdatingFeed = MenuItemUtils.updateRefreshMenuItem(
             toolbar.menu,
             R.id.refresh_item, updateRefreshMenuItemChecker
@@ -325,15 +318,16 @@ class FeedItemlistFragment() : Fragment(), OnItemClickListener, Toolbar.OnMenuIt
         super.onConfigurationChanged(newConfig)
         val horizontalSpacing =
             resources.getDimension(R.dimen.additional_horizontal_spacing).toInt()
-        header!!.setPadding(
+        header.setPadding(
             horizontalSpacing,
-            header!!.paddingTop,
+            header.paddingTop,
             horizontalSpacing,
-            header!!.paddingBottom
+            header.paddingBottom
         )
     }
 
     override fun onMenuItemClick(item: MenuItem): Boolean {
+        val feed = this.feed
         if (feed == null) {
             showSnack(activity, R.string.please_wait_for_data, Toast.LENGTH_LONG)
             return true
@@ -344,37 +338,35 @@ class FeedItemlistFragment() : Fragment(), OnItemClickListener, Toolbar.OnMenuIt
         }
         val itemId = item.itemId
         if (itemId == R.id.rename_item) {
-            RenameItemDialog((activity)!!, feed).show()
+            RenameItemDialog(requireActivity(), feed).show()
             return true
         } else if (itemId == R.id.feed_setting) {
-            if (feed != null) {
-                val fragment: FeedSettingsFragment =
-                    FeedSettingsFragment.newInstance(feed!!)
-                (getActivity() as MainActivity?)!!.loadChildFragment(fragment)
-            }
+            val fragment: FeedSettingsFragment = FeedSettingsFragment.newInstance(feed)
+            (requireActivity() as MainActivity).loadChildFragment(fragment)
             return true
         }
         return false
     }
 
     override fun onContextItemSelected(item: MenuItem): Boolean {
-        val selectedItem = adapter!!.longPressedItem
+        val adapter = this.adapter ?: return super.onContextItemSelected(item)
+        val selectedItem = adapter.longPressedItem
         if (selectedItem == null) {
             Log.i(TAG, "Selected item at current position was null, ignoring selection")
             return super.onContextItemSelected(item)
         }
-        return if (adapter!!.onContextItemSelected(item)) {
+        return if (adapter.onContextItemSelected(item)) {
             true
         } else FeedItemMenuProcess.onMenuItemClicked(this, item.itemId, selectedItem)
     }
 
     override fun onItemClick(parent: AdapterView<*>?, view: View, position: Int, id: Long) {
-        if (adapter == null) {
+        val feed = this.feed
+        if (adapter == null || feed == null) {
             return
         }
-        val activity = activity as MainActivity?
-        val ids = FeedItemUtil.getIds(feed!!.items)
-        activity!!.loadChildFragment(
+        val ids = FeedItemUtil.getIds(feed.items)
+        (requireActivity() as MainActivity).loadChildFragment(
             FeedItemsViewPagerFragment.Companion.newInstance(
                 ids,
                 position
@@ -391,9 +383,12 @@ class FeedItemlistFragment() : Fragment(), OnItemClickListener, Toolbar.OnMenuIt
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     fun onEventMainThread(event: FeedItemEvent) {
-        if (feed == null || feed!!.items == null) {
+        val feed = this.feed
+        if (feed == null || feed.items == null) {
             return
-        } else if (adapter == null) {
+        }
+        val adapter = this.adapter
+        if (adapter == null) {
             loadItems()
             return
         }
@@ -401,11 +396,11 @@ class FeedItemlistFragment() : Fragment(), OnItemClickListener, Toolbar.OnMenuIt
         val size = event.items.size
         while (i < size) {
             val item = event.items[i]
-            val pos = FeedItemUtil.indexOfItemWithId(feed!!.items, item.id)
+            val pos = FeedItemUtil.indexOfItemWithId(feed.items, item.id)
             if (pos >= 0) {
-                feed!!.items.removeAt(pos)
-                feed!!.items.add(pos, item)
-                adapter!!.notifyItemChangedCompat(pos)
+                feed.items.removeAt(pos)
+                feed.items.add(pos, item)
+                adapter.notifyItemChangedCompat(pos)
             }
             i++
         }
@@ -417,16 +412,18 @@ class FeedItemlistFragment() : Fragment(), OnItemClickListener, Toolbar.OnMenuIt
         if (event.hasChangedFeedUpdateStatus(isUpdatingFeed)) {
             updateSyncProgressBarVisibility()
         }
-        if ((adapter != null) && (update.mediaIds.size > 0) && (feed != null)) {
+        val currentFeed = feed
+        val adapter = this.adapter
+        if ((adapter != null) && (update.mediaIds.size > 0) && (currentFeed != null)) {
             for (mediaId: Long in update.mediaIds) {
-                val pos = FeedItemUtil.indexOfItemWithMediaId(feed!!.items, mediaId)
+                val pos = FeedItemUtil.indexOfItemWithMediaId(currentFeed.items, mediaId)
                 if (pos >= 0) {
-                    adapter!!.notifyItemChangedCompat(pos)
+                    adapter.notifyItemChangedCompat(pos)
                 }
             }
         }
-        if ((feed != null) && !DownloadService.isDownloadingFile(
-                feed!!.download_url
+        if ((currentFeed != null) && !DownloadService.isDownloadingFile(
+                currentFeed.download_url
             ) && isDownloadingFeed
         ) {
             // DownloadEvents arrive on every progress tick; do not stack one query per event
@@ -452,15 +449,14 @@ class FeedItemlistFragment() : Fragment(), OnItemClickListener, Toolbar.OnMenuIt
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
-    fun onEventMainThread(event: PlaybackPositionEvent?) {
-        if (adapter != null) {
-            for (i in 0 until adapter!!.itemCount) {
-                val holder =
-                    recyclerView!!.findViewHolderForAdapterPosition(i) as EpisodeItemViewHolder?
-                if (holder != null && holder.isCurrentlyPlayingItem) {
-                    holder.notifyPlaybackPositionUpdated((event)!!)
-                    break
-                }
+    fun onEventMainThread(event: PlaybackPositionEvent) {
+        val adapter = this.adapter ?: return
+        for (i in 0 until adapter.itemCount) {
+            val holder =
+                recyclerView.findViewHolderForAdapterPosition(i) as? EpisodeItemViewHolder
+            if (holder != null && holder.isCurrentlyPlayingItem) {
+                holder.notifyPlaybackPositionUpdated(event)
+                break
             }
         }
     }
@@ -476,14 +472,14 @@ class FeedItemlistFragment() : Fragment(), OnItemClickListener, Toolbar.OnMenuIt
     }
 
     override fun onStartSelectMode() {
-        swipeActions!!.detach()
-        toolbar!!.visibility = View.GONE
+        swipeActions?.detach()
+        toolbar.visibility = View.GONE
         refreshToolbarState()
     }
 
     override fun onEndSelectMode() {
-        swipeActions!!.attachTo(recyclerView)
-        toolbar!!.visibility = View.VISIBLE
+        swipeActions?.attachTo(recyclerView)
+        toolbar.visibility = View.VISIBLE
     }
 
     private fun updateUi() {
@@ -514,9 +510,9 @@ class FeedItemlistFragment() : Fragment(), OnItemClickListener, Toolbar.OnMenuIt
             refreshToolbarState()
         }
         if (!DownloadService.isDownloadingFeeds()) {
-            nextPageLoader!!.root.visibility = View.GONE
+            nextPageLoader.root.visibility = View.GONE
         }
-        nextPageLoader!!.setLoadingState(DownloadService.isDownloadingFeeds())
+        nextPageLoader.setLoadingState(DownloadService.isDownloadingFeeds())
     }
 
     /**
@@ -527,27 +523,34 @@ class FeedItemlistFragment() : Fragment(), OnItemClickListener, Toolbar.OnMenuIt
             Log.e(TAG, "Required root view is not yet created. Stop binding data to UI.")
             return
         }
-        if (adapter == null) {
-            recyclerView!!.adapter = null
-            adapter = FeedItemListAdapter(activity as MainActivity?)
-            adapter!!.setOnSelectModeListener(this)
-            recyclerView!!.adapter = adapter
+        var listAdapter = adapter
+        if (listAdapter == null) {
+            recyclerView.adapter = null
+            listAdapter = FeedItemListAdapter(requireActivity() as MainActivity)
+            adapter = listAdapter
+            val boundAdapter = listAdapter
+            boundAdapter.setOnSelectModeListener(this)
+            recyclerView.adapter = boundAdapter
             swipeActions = SwipeActions(this, TAG).attachTo(recyclerView)
-            adapter!!.setOnMenuItemClickListener(object :
+            boundAdapter.setOnMenuItemClickListener(object :
                 MultiSelectAdapter.OnMenuItemClickListener {
                 override fun onMenuItemClick(item: MenuItem?) {
+                    if (item == null) {
+                        return
+                    }
                     EpisodeMultiSelectActionHandler(
-                        (activity as MainActivity?),
-                        adapter!!.selectedItems
+                        requireActivity() as MainActivity,
+                        boundAdapter.selectedItems
                     )
-                        .handleAction(item!!.itemId)
-                    adapter!!.endSelectMode()
+                        .handleAction(item.itemId)
+                    boundAdapter.endSelectMode()
                 }
             })
-            adapter!!.setonPrepareActionListener(object : OnPrepareActionModeListener {
+            boundAdapter.setonPrepareActionListener(object : OnPrepareActionModeListener {
                 override fun onPrepareActionMode(mode: ActionMode?, item: Menu?) {
-                    if (feed!!.isLocalFeed) {
-                        item!!.findItem(R.id.download_batch).isVisible = false
+                    val currentFeed = feed ?: return
+                    if (item != null && currentFeed.isLocalFeed) {
+                        item.findItem(R.id.download_batch).isVisible = false
                         item.findItem(R.id.delete_batch).isVisible = false
                     }
                 }
@@ -556,9 +559,10 @@ class FeedItemlistFragment() : Fragment(), OnItemClickListener, Toolbar.OnMenuIt
         if (skeleton.isSkeleton()) {
             skeletonRecyclerDelay.showOriginal()
         }
-        if (feed != null && feed!!.items != null) {
-            adapter!!.updateItems(feed!!.items)
-            swipeActions!!.setFilter(feed!!.itemFilter)
+        val currentFeed = feed
+        if (currentFeed != null && currentFeed.items != null) {
+            listAdapter.updateItems(currentFeed.items)
+            swipeActions?.setFilter(currentFeed.itemFilter)
         }
         refreshToolbarState()
         updateSyncProgressBarVisibility()
@@ -569,17 +573,18 @@ class FeedItemlistFragment() : Fragment(), OnItemClickListener, Toolbar.OnMenuIt
      */
     private fun refreshHeaderView() {
         setupHeaderView()
-        if (recyclerView == null || feed == null) {
+        val feed = this.feed
+        if (feed == null) {
             Log.e(TAG, "Unable to refresh header view")
             return
         }
-        loadFeedImage()
-        if (feed!!.hasLastUpdateFailed()) {
+        loadFeedImage(feed)
+        if (feed.hasLastUpdateFailed()) {
             txtvFailure.visibility = View.VISIBLE
         } else {
             txtvFailure.visibility = View.INVISIBLE
         }
-        if (feed!!.preferences != null && !feed!!.preferences.keepUpdated) {
+        if (feed.preferences != null && !feed.preferences.keepUpdated) {
             txtvUpdatesDisabled.text =
                 "{md-pause-circle-outline} " + this.getString(R.string.updates_disabled_label)
             Iconify.addIcons(txtvUpdatesDisabled)
@@ -587,14 +592,11 @@ class FeedItemlistFragment() : Fragment(), OnItemClickListener, Toolbar.OnMenuIt
         } else {
             txtvUpdatesDisabled.visibility = View.GONE
         }
-        txtvTitle.text = feed!!.title
-        txtvAuthor.text = feed!!.author
-        if (feed!!.itemFilter != null) {
-            if (feed!!.itemFilter!!.values.isNotEmpty()) {
-                binding.filterItems.setImageResource(R.drawable.ic_filter_disable)
-            } else {
-                binding.filterItems.setImageResource(R.drawable.ic_filter)
-            }
+        txtvTitle.text = feed.title
+        txtvAuthor.text = feed.author
+        val itemFilter = feed.itemFilter
+        if (itemFilter != null && itemFilter.values.isNotEmpty()) {
+            binding.filterItems.setImageResource(R.drawable.ic_filter_disable)
         } else {
             binding.filterItems.setImageResource(R.drawable.ic_filter)
         }
@@ -606,14 +608,14 @@ class FeedItemlistFragment() : Fragment(), OnItemClickListener, Toolbar.OnMenuIt
         }
 
         // https://github.com/bumptech/glide/issues/529
-        imgvBackground!!.colorFilter = LightingColorFilter(-0x99999a, 0x000000)
-        imgvCover!!.setOnClickListener({ v: View? -> openAbout() })
+        imgvBackground.colorFilter = LightingColorFilter(-0x99999a, 0x000000)
+        imgvCover.setOnClickListener({ v: View? -> openAbout() })
         headerCreated = true
     }
 
-    private fun loadFeedImage() {
+    private fun loadFeedImage(feed: Feed) {
         Glide.with(this)
-            .load(feed!!.imageUrl)
+            .load(feed.imageUrl)
             .apply(
                 RequestOptions()
                     .placeholder(R.color.image_readability_tint)
@@ -622,9 +624,9 @@ class FeedItemlistFragment() : Fragment(), OnItemClickListener, Toolbar.OnMenuIt
                     .transform(FastBlurTransformation())
                     .dontAnimate()
             )
-            .into((imgvBackground)!!)
+            .into(imgvBackground)
         Glide.with(this)
-            .load(feed!!.imageUrl)
+            .load(feed.imageUrl)
             .apply(
                 RequestOptions()
                     .placeholder(R.drawable.ic_podcast_background_round)
@@ -633,16 +635,14 @@ class FeedItemlistFragment() : Fragment(), OnItemClickListener, Toolbar.OnMenuIt
                     .centerCrop()
                     .dontAnimate()
             )
-            .into((imgvCover)!!)
+            .into(imgvCover)
     }
 
     /**
      * Load the items
      */
     private fun loadItems() {
-        if (disposable != null) {
-            disposable!!.dispose()
-        }
+        disposable?.dispose()
         disposable = Observable.fromCallable({ loadData() })
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
@@ -653,7 +653,8 @@ class FeedItemlistFragment() : Fragment(), OnItemClickListener, Toolbar.OnMenuIt
                         //while a download is in progress this UI logic is not needed
                         displayList()
                         detailInfoView.setEpisodesLoaded(true)
-                        if (feed != null && feed!!.getId() > 0) {
+                        val loadedFeed = feed
+                        if (loadedFeed != null && loadedFeed.getId() > 0) {
                             subscribe_button.setVisibility(View.VISIBLE)
                         }
                     }
@@ -667,46 +668,48 @@ class FeedItemlistFragment() : Fragment(), OnItemClickListener, Toolbar.OnMenuIt
 
     private fun initDetailView() {
         runOnUiThread({
-            if (getContext() == null) {
+            val ctx = getContext()
+            if (ctx == null) {
                 //entered from a home screen shortcut: the item gets loaded twice (one recent, one current), which leaves this null and makes neither RxJava branch run afterwards (reason unknown)
                 Timber.e(" loadItems break getContext() == null")
                 return@runOnUiThread
             }
+            val currentFeed = feed ?: return@runOnUiThread
             //must run on the main thread; called before downloading, since the feed may have to be fetched from the network if it is not in the local database
-            if (!feed!!.isLocalFeed()) {
-                mInfoViewToggleButton!!.setVisibility(View.VISIBLE)
-                mInfoViewToggleButton!!.setOnClickListener(View.OnClickListener { v: View? -> openAbout() })
-                mInfoViewToggleButton!!.setBackground(
+            if (!currentFeed.isLocalFeed()) {
+                mInfoViewToggleButton.setVisibility(View.VISIBLE)
+                mInfoViewToggleButton.setOnClickListener(View.OnClickListener { v: View? -> openAbout() })
+                mInfoViewToggleButton.setBackground(
                     getColoredDrawable(
-                        getContext(), R.drawable.shape_circle, resolveColor(
-                            (getContext())!!, android.R.attr.windowBackground
+                        ctx, R.drawable.shape_circle, resolveColor(
+                            ctx, android.R.attr.windowBackground
                         )
                     )
                 )
-                if (!feed!!.isSubscribed()) {
-                    detailInfoView!!.expandCollapseContent(false, false)
+                if (!currentFeed.isSubscribed()) {
+                    detailInfoView.expandCollapseContent(false, false)
                 } else {
-                    detailInfoView!!.setVisibility(View.GONE)
+                    detailInfoView.setVisibility(View.GONE)
                 }
             } else {
-                detailInfoView!!.setVisibility(View.GONE)
+                detailInfoView.setVisibility(View.GONE)
             }
 
             //subscribe button state
-            subscribe_button!!.setCircleRingColor(
+            subscribe_button.setCircleRingColor(
                 resolveColor(
-                    (getContext())!!,
+                    ctx,
                     android.R.attr.windowBackground
                 )
             )
-            subscribe_button!!.setSubscribedIconColor(accentColor((getContext())!!))
-            subscribe_button!!.setSubscribed(feed!!.isSubscribed())
+            subscribe_button.setSubscribedIconColor(accentColor(ctx))
+            subscribe_button.setSubscribed(currentFeed.isSubscribed())
             var circleFillColor: Int = 0
-            if (feed!!.isSubscribed()) {
-                circleFillColor = subscribe_button!!.getCircleRingColor()
+            if (currentFeed.isSubscribed()) {
+                circleFillColor = subscribe_button.getCircleRingColor()
             }
-            subscribe_button!!.setCircleFillColor(circleFillColor)
-            detailInfoView!!.setData(feed, getActivity())
+            subscribe_button.setCircleFillColor(circleFillColor)
+            detailInfoView.setData(currentFeed, getActivity())
         })
     }
 
@@ -717,80 +720,77 @@ class FeedItemlistFragment() : Fragment(), OnItemClickListener, Toolbar.OnMenuIt
             //a feedId means the feed exists in the database
             feed = DBReader.getFeed(feedID, true)
         }
-        if (feed == null) {
-            return null
-        } else {
-            initDetailView()
-            if (feed!!.id == 0L) {
-                var feedFromDb: Feed? = null
-                if (!TextUtils.isEmpty(feed!!.itunesId)) {
-                    //comes from iTunes
-                    Timber.i("feedUrl from itunes ")
-                    feedFromDb = DBReader.getFeedByItunesFeedId(feed!!.itunesId, true)
-                } else {
-                    feedFromDb = DBReader.getFeed(feed!!.download_url, true)
-                }
-                if (feedFromDb == null) {
-                    //only reached when the id is 0 and the feedUrl lookup also fails; otherwise duplicate rows would be created
-                    PodcastSearcherRegistry.lookupUrl(feed!!.download_url)
-                        .subscribeOn(Schedulers.trampoline())
-                        .observeOn(Schedulers.trampoline())
-                        .subscribe(
-                            { feedUrl: String ->
-                                Timber.i("get feedUrl from itunes " + feedUrl)
-                                feed!!.setDownload_url(feedUrl)
-                                finalGetFeedUrl = true
-                            },
-                            { error: Throwable? ->
-                                if (error is FeedUrlNotFoundException) {
-                                    finalGetFeedUrl = !TextUtils.isEmpty(
-                                        tryToRetrieveFeedUrlBySearch(
-                                            (error as FeedUrlNotFoundException?)!!
-                                        )
-                                    )
-                                } else {
-                                    feed!!.setLastUpdateFailed(true)
-                                    runOnUiThread {
-                                        //run on the main thread
-                                        txtvFailure.setText(R.string.null_value_podcast_error)
-                                    }
-                                    Log.e(TAG, Log.getStackTraceString(error))
-                                }
-                            })
-                    Log.i(TAG, "check isDownloadingFeed $isDownloadingFeed")
-                    if (finalGetFeedUrl) {
-                        if (!isDownloadingFeed) {
-                            DownloadService.download(
-                                context, false, DownloadRequestCreator.create(feed).build()
-                            )
-                            isDownloadingFeed = true
-                        } else {
-                            //loadData also runs again after a failed download, and we must not start another download then (other events can reach this branch too, so verify nothing is actually downloading) or we end up in an infinite loop
-                            if (!DownloadService.isDownloadingFile(
-                                    feed!!.download_url
+        var currentFeed = feed ?: return null
+        initDetailView()
+        if (currentFeed.id == 0L) {
+            val loadedFeed = currentFeed
+            val feedFromDb: Feed? = if (!TextUtils.isEmpty(loadedFeed.itunesId)) {
+                //comes from iTunes
+                Timber.i("feedUrl from itunes ")
+                DBReader.getFeedByItunesFeedId(loadedFeed.itunesId, true)
+            } else {
+                DBReader.getFeed(loadedFeed.download_url, true)
+            }
+            if (feedFromDb == null) {
+                //only reached when the id is 0 and the feedUrl lookup also fails; otherwise duplicate rows would be created
+                PodcastSearcherRegistry.lookupUrl(loadedFeed.download_url)
+                    .subscribeOn(Schedulers.trampoline())
+                    .observeOn(Schedulers.trampoline())
+                    .subscribe(
+                        { feedUrl: String ->
+                            Timber.i("get feedUrl from itunes " + feedUrl)
+                            loadedFeed.setDownload_url(feedUrl)
+                            finalGetFeedUrl = true
+                        },
+                        { error: Throwable? ->
+                            if (error is FeedUrlNotFoundException) {
+                                finalGetFeedUrl = !TextUtils.isEmpty(
+                                    tryToRetrieveFeedUrlBySearch(error)
                                 )
-                            ) {
-                                Log.i(TAG, "not downloading setLastUpdateFailed ")
-                                isDownloadingFeed = false
-                                feed!!.setLastUpdateFailed(true)
+                            } else {
+                                loadedFeed.setLastUpdateFailed(true)
+                                runOnUiThread {
+                                    //run on the main thread
+                                    txtvFailure.setText(R.string.null_value_podcast_error)
+                                }
+                                Log.e(TAG, Log.getStackTraceString(error))
                             }
+                        })
+                Log.i(TAG, "check isDownloadingFeed $isDownloadingFeed")
+                if (finalGetFeedUrl) {
+                    if (!isDownloadingFeed) {
+                        DownloadService.download(
+                            context, false, DownloadRequestCreator.create(loadedFeed).build()
+                        )
+                        isDownloadingFeed = true
+                    } else {
+                        //loadData also runs again after a failed download, and we must not start another download then (other events can reach this branch too, so verify nothing is actually downloading) or we end up in an infinite loop
+                        if (!DownloadService.isDownloadingFile(
+                                loadedFeed.download_url
+                            )
+                        ) {
+                            Log.i(TAG, "not downloading setLastUpdateFailed ")
+                            isDownloadingFeed = false
+                            loadedFeed.setLastUpdateFailed(true)
                         }
                     }
-                    return feed
-                } else {
-                    //the feed was found in the database, so use the stored values
-                    feed = feedFromDb
-                    feedID = feedFromDb.id
                 }
+                return loadedFeed
+            } else {
+                //the feed was found in the database, so use the stored values
+                feed = feedFromDb
+                currentFeed = feedFromDb
+                feedID = feedFromDb.id
             }
         }
-        DBReader.loadAdditionalFeedItemListData(feed!!.items)
-        if (feed!!.sortOrder != null) {
-            val feedItems = feed!!.items
-            FeedItemPermutors.getPermutor(feed!!.sortOrder!!).reorder(feedItems)
-            feed!!.items = feedItems
+        DBReader.loadAdditionalFeedItemListData(currentFeed.items)
+        val sortOrder = currentFeed.sortOrder
+        if (sortOrder != null) {
+            val feedItems = currentFeed.items
+            FeedItemPermutors.getPermutor(sortOrder).reorder(feedItems)
+            currentFeed.items = feedItems
         }
-        return feed
+        return currentFeed
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
@@ -799,17 +799,20 @@ class FeedItemlistFragment() : Fragment(), OnItemClickListener, Toolbar.OnMenuIt
             return
         }
         when (event.keyCode) {
-            KeyEvent.KEYCODE_T -> recyclerView!!.smoothScrollToPosition(0)
-            KeyEvent.KEYCODE_B -> recyclerView!!.smoothScrollToPosition(adapter!!.itemCount - 1)
+            KeyEvent.KEYCODE_T -> recyclerView.smoothScrollToPosition(0)
+            KeyEvent.KEYCODE_B -> adapter?.let {
+                recyclerView.smoothScrollToPosition(it.itemCount - 1)
+            }
             else -> {}
         }
     }
 
-    private inner class FeedItemListAdapter(mainActivity: MainActivity?) : EpisodeItemListAdapter(
-        (mainActivity)!!, R.menu.episodes_multi_menu
+    private inner class FeedItemListAdapter(mainActivity: MainActivity) : EpisodeItemListAdapter(
+        mainActivity, R.menu.episodes_multi_menu
     ) {
         override fun beforeBindViewHolder(holder: EpisodeItemViewHolder?, pos: Int) {
-            holder!!.coverHolder.visibility = if(Prefs.showEpisodeCoverInFeed) View.VISIBLE else View.GONE
+            holder?.coverHolder?.visibility =
+                if (Prefs.showEpisodeCoverInFeed) View.VISIBLE else View.GONE
         }
 
         override fun onCreateContextMenu(menu: ContextMenu, v: View, menuInfo: ContextMenuInfo?) {
@@ -824,35 +827,28 @@ class FeedItemlistFragment() : Fragment(), OnItemClickListener, Toolbar.OnMenuIt
     }
 
     fun openAbout() {
-        if (feed == null) {
-            return
-        }
-        if (!feed!!.isLocalFeed && detailInfoView!!.isAllDataLoaded) {
-            if (!feed!!.isSubscribed) {
-                detailInfoView!!.toggleCollapseMode()
+        val feed = this.feed ?: return
+        if (!feed.isLocalFeed && detailInfoView.isAllDataLoaded) {
+            if (!feed.isSubscribed) {
+                detailInfoView.toggleCollapseMode()
                 return
             }
-            if (detailInfoView!!.isCollapsed) {
-                detailInfoView!!.expandCollapseContent(true, false)
+            if (detailInfoView.isCollapsed) {
+                detailInfoView.expandCollapseContent(true, false)
             }
             animateSeriesInfoView("openAbout", null)
         }
     }
 
     /* synthetic */   fun `lambda$animateSeriesInfoView$2`(valueAnimator: ValueAnimator) {
-        val view = mInfoViewToggleButton
-        if (view != null) {
-            view.rotation = (valueAnimator.animatedValue as Float).toFloat()
-        }
+        mInfoViewToggleButton.rotation = (valueAnimator.animatedValue as Float).toFloat()
     }
 
     private fun animateSeriesInfoView(str: String, animatorListener: Animator.AnimatorListener?) {
-        if (feed == null) {
-            return
-        }
-        if (!feed!!.isLocalFeed) {
-            val z = detailInfoView!!.visibility == View.VISIBLE
-            detailInfoView!!.clearDescriptionSelection()
+        val feed = this.feed ?: return
+        if (!feed.isLocalFeed) {
+            val z = detailInfoView.visibility == View.VISIBLE
+            detailInfoView.clearDescriptionSelection()
             val fArr = FloatArray(2)
             var f = 180.0f
             fArr[0] = if (z) 180.0f else 0.0f
@@ -871,23 +867,21 @@ class FeedItemlistFragment() : Fragment(), OnItemClickListener, Toolbar.OnMenuIt
             })
             ofFloat.start()
             if (z) {
-                val viewHeight = detailInfoView!!.getViewHeight(false)
+                val viewHeight = detailInfoView.getViewHeight(false)
                 if (viewHeight > 0) {
-                    detailInfoViewContainer!!.layoutParams.height = viewHeight
-                    detailInfoViewContainer!!.pivotY = 0.0f
-                    detailInfoViewContainer!!.pivotX = 0.0f
+                    detailInfoViewContainer.layoutParams.height = viewHeight
+                    detailInfoViewContainer.pivotY = 0.0f
+                    detailInfoViewContainer.pivotX = 0.0f
                     val ofInt = ValueAnimator.ofInt(viewHeight, 0)
                     ofInt.addUpdateListener(object : AnimatorUpdateListener {
                         // from class: fm.player.ui.fragments.FeedItemlistFragment.10
                         // android.animation.ValueAnimator.AnimatorUpdateListener
                         override fun onAnimationUpdate(valueAnimator: ValueAnimator) {
-                            if (detailInfoViewContainer != null) {
-                                detailInfoViewContainer!!.scaleY =
-                                    (valueAnimator.animatedValue as Int).toFloat() / viewHeight
-                                detailInfoView!!.layoutParams.height =
-                                    (valueAnimator.animatedValue as Int)
-                                detailInfoView!!.requestLayout()
-                            }
+                            detailInfoViewContainer.scaleY =
+                                (valueAnimator.animatedValue as Int).toFloat() / viewHeight
+                            detailInfoView.layoutParams.height =
+                                (valueAnimator.animatedValue as Int)
+                            detailInfoView.requestLayout()
                         }
                     })
                     ofInt.addListener(object : Animator.AnimatorListener {
@@ -900,10 +894,7 @@ class FeedItemlistFragment() : Fragment(), OnItemClickListener, Toolbar.OnMenuIt
 
                         // android.animation.Animator.AnimatorListener
                         override fun onAnimationEnd(animator: Animator) {
-                            val seriesDetailInfoView = detailInfoView
-                            if (seriesDetailInfoView != null) {
-                                seriesDetailInfoView.visibility = View.GONE
-                            }
+                            detailInfoView.visibility = View.GONE
                             val animatorListener2 = animatorListener
                             animatorListener2?.onAnimationEnd(animator)
                         }
@@ -923,30 +914,28 @@ class FeedItemlistFragment() : Fragment(), OnItemClickListener, Toolbar.OnMenuIt
                     ofInt.duration = 250L
                     ofInt.interpolator = AccelerateDecelerateInterpolator()
                     ofInt.start()
-                    detailInfoView!!.animateFadeOverlayExpandButton(false, 250)
+                    detailInfoView.animateFadeOverlayExpandButton(false, 250)
                     return
                 }
                 return
             }
-            detailInfoView!!.measure(0, 0)
-            val viewHeight2 = detailInfoView!!.getViewHeight(true)
+            detailInfoView.measure(0, 0)
+            val viewHeight2 = detailInfoView.getViewHeight(true)
             if (viewHeight2 > 0) {
-                detailInfoViewContainer!!.layoutParams.height = viewHeight2
-                detailInfoViewContainer!!.pivotY = 0.0f
-                detailInfoViewContainer!!.pivotX = 0.0f
-                detailInfoView!!.visibility = View.VISIBLE
+                detailInfoViewContainer.layoutParams.height = viewHeight2
+                detailInfoViewContainer.pivotY = 0.0f
+                detailInfoViewContainer.pivotX = 0.0f
+                detailInfoView.visibility = View.VISIBLE
                 val ofInt2 = ValueAnimator.ofInt(0, viewHeight2)
                 ofInt2.addUpdateListener(object : AnimatorUpdateListener {
                     // from class: fm.player.ui.fragments.FeedItemlistFragment.12
                     // android.animation.ValueAnimator.AnimatorUpdateListener
                     override fun onAnimationUpdate(valueAnimator: ValueAnimator) {
-                        if (detailInfoViewContainer != null) {
-                            detailInfoViewContainer!!.scaleY =
-                                (valueAnimator.animatedValue as Int).toFloat() / viewHeight2
-                            detailInfoView!!.layoutParams.height =
-                                (valueAnimator.animatedValue as Int)
-                            detailInfoView!!.requestLayout()
-                        }
+                        detailInfoViewContainer.scaleY =
+                            (valueAnimator.animatedValue as Int).toFloat() / viewHeight2
+                        detailInfoView.layoutParams.height =
+                            (valueAnimator.animatedValue as Int)
+                        detailInfoView.requestLayout()
                     }
                 })
                 ofInt2.addListener(object : Animator.AnimatorListener {
@@ -956,14 +945,11 @@ class FeedItemlistFragment() : Fragment(), OnItemClickListener, Toolbar.OnMenuIt
 
                     // android.animation.Animator.AnimatorListener
                     override fun onAnimationEnd(animator: Animator) {
-                        val FeedItemlistFragment = this@FeedItemlistFragment
-                        if (FeedItemlistFragment.detailInfoViewContainer != null) {
-                            FeedItemlistFragment.detailInfoView!!.layoutParams.height =
-                                if (detailInfoView!!.isCollapsed) detailInfoView!!.collapsedHeight else -2
-                            detailInfoViewContainer!!.layoutParams.height = -2
-                            detailInfoViewContainer!!.requestLayout()
-                            detailInfoView!!.requestLayout()
-                        }
+                        detailInfoView.layoutParams.height =
+                            if (detailInfoView.isCollapsed) detailInfoView.collapsedHeight else -2
+                        detailInfoViewContainer.layoutParams.height = -2
+                        detailInfoViewContainer.requestLayout()
+                        detailInfoView.requestLayout()
                     }
 
                     // android.animation.Animator.AnimatorListener
@@ -975,7 +961,7 @@ class FeedItemlistFragment() : Fragment(), OnItemClickListener, Toolbar.OnMenuIt
                 ofInt2.duration = 250L
                 ofInt2.interpolator = AccelerateDecelerateInterpolator()
                 ofInt2.start()
-                detailInfoView!!.animateFadeOverlayExpandButton(true, 250)
+                detailInfoView.animateFadeOverlayExpandButton(true, 250)
             }
         }
     }
@@ -997,13 +983,14 @@ class FeedItemlistFragment() : Fragment(), OnItemClickListener, Toolbar.OnMenuIt
     }
 
     fun searchFeedItems() {
+        val feed = this.feed
         if (feed == null) {
             showSnack(activity, R.string.please_wait_for_data, Toast.LENGTH_LONG)
             return
         }
-        (activity as MainActivity?)!!.loadChildFragment(
+        (requireActivity() as MainActivity).loadChildFragment(
             LocalSearchFragment.Companion.newInstance(
-                feed!!.id, feed!!.title
+                feed.id, feed.title
             )
         )
     }

@@ -18,7 +18,7 @@ class FeedSearchResultAdapter(mainActivity: MainActivity) :
     private val data: MutableList<Feed> = ArrayList()
     fun updateData(newData: List<Feed>?) {
         data.clear()
-        data.addAll(newData!!)
+        data.addAll(newData ?: emptyList())
         notifyDataSetChanged()
     }
 
@@ -31,10 +31,12 @@ class FeedSearchResultAdapter(mainActivity: MainActivity) :
         val podcast = data[position]
         holder.imageView.contentDescription = podcast.title
         holder.imageView.setOnClickListener { v: View? ->
-            mainActivityRef.get()!!
-                .loadChildFragment(FeedItemlistFragment.newInstance(podcast.id))
+            // The activity can be gone by the time a queued click is delivered.
+            mainActivityRef.get()
+                ?.loadChildFragment(FeedItemlistFragment.newInstance(podcast.id))
         }
-        Glide.with(mainActivityRef.get()!!)
+        val mainActivity = mainActivityRef.get() ?: return
+        Glide.with(mainActivity)
             .load(podcast.imageUrl)
             .apply(
                 RequestOptions()

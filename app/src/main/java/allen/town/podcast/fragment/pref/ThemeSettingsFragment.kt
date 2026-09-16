@@ -160,7 +160,7 @@ class ThemeSettingsFragment : AbsSettingsFragment() {
                             ,R.color.white,R.drawable.ic_launcher_foreground, R.color.ic_launcher_background,
                             PackageUtils.getAppName(context)
                         ).show(
-                            activity!!.supportFragmentManager,
+                            requireActivity().supportFragmentManager,
                             null
                         )
                         return true

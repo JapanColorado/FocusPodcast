@@ -40,7 +40,7 @@ class DriveModeActivity : SimpleToolbarActivity() {
     private lateinit var binding: ActivityDriveModeBinding
     private var lastPlaybackControlsColor: Int = Color.GRAY
     private var lastDisabledPlaybackControlsColor: Int = Color.GRAY
-    private var libraryViewModel: LibraryViewModel? = null
+    private lateinit var libraryViewModel: LibraryViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -82,7 +82,7 @@ class DriveModeActivity : SimpleToolbarActivity() {
 
     private var paletteColor = Color.WHITE
     private fun updateColor() {
-        libraryViewModel!!.paletteColor.observe(this) { color: Int ->
+        libraryViewModel.paletteColor.observe(this) { color: Int ->
 /*            paletteColor = color
             val isColorLight = paletteColor.isColorLight
             setNavigationBarColor(paletteColor)

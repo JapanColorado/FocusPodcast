@@ -21,12 +21,12 @@ import com.bumptech.glide.request.RequestOptions
 /**
  * Parent Adapter for the playback and download statistics list.
  */
-abstract class StatisticsListAdapter protected constructor(protected val context: Context?) :
+abstract class StatisticsListAdapter protected constructor(protected val context: Context) :
     RecyclerView.Adapter<RecyclerView.ViewHolder>() {
-    private var statisticsData: List<StatisticsItem>? = null
+    private var statisticsData: List<StatisticsItem> = emptyList()
     protected var pieChartData: StatisticsData? = null
     override fun getItemCount(): Int {
-        return statisticsData!!.size + 1
+        return statisticsData.size + 1
     }
 
     override fun getItemViewType(position: Int): Int {
@@ -50,8 +50,8 @@ abstract class StatisticsListAdapter protected constructor(protected val context
             holder.lottieAnimationView.setAnimation(getRandomLottieFileName())
         } else {
             val holder = h as StatisticsHolder
-            val statsItem = statisticsData!![position - 1]
-            Glide.with(context!!)
+            val statsItem = statisticsData[position - 1]
+            Glide.with(context)
                 .load(statsItem.feed.imageUrl)
                 .apply(
                     RequestOptions()

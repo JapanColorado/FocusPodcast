@@ -62,12 +62,15 @@ class TopAppBarLayout @JvmOverloads constructor(
     }
 
     val toolbar: Toolbar
-        get() = if (mode == AppBarMode.COLLAPSING) {
-            collapsingAppbarBinding?.toolbar!!
-        } else if(mode == AppBarMode.FIXED){
-            fixedAppbarBinding?.toolbar!!
-        } else {
-            simpleAppbarBinding?.toolbar!!
+        get() {
+            val toolbar = if (mode == AppBarMode.COLLAPSING) {
+                collapsingAppbarBinding?.toolbar
+            } else if (mode == AppBarMode.FIXED) {
+                fixedAppbarBinding?.toolbar
+            } else {
+                simpleAppbarBinding?.toolbar
+            }
+            return checkNotNull(toolbar) { "appbar layout for mode $mode was not inflated" }
         }
 
     var title: String

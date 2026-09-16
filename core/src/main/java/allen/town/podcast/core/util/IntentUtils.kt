@@ -12,9 +12,9 @@ object IntentUtils {
      *  Checks if there is at least one exported activity that can be performed for the intent
      */
     @JvmStatic
-    fun isCallable(context: Context, intent: Intent?): Boolean {
+    fun isCallable(context: Context, intent: Intent): Boolean {
         val list = context.packageManager.queryIntentActivities(
-            intent!!,
+            intent,
             PackageManager.MATCH_DEFAULT_ONLY
         )
         for (info in list) {

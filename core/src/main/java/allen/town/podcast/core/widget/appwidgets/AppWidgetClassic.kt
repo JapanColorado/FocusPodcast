@@ -76,11 +76,6 @@ class AppWidgetClassic : BaseAppWidget() {
 
         @JvmStatic
         val instance: AppWidgetClassic
-            @Synchronized get() {
-                if (mInstance == null) {
-                    mInstance = AppWidgetClassic()
-                }
-                return mInstance!!
-            }
+            @Synchronized get() = mInstance ?: AppWidgetClassic().also { mInstance = it }
     }
 }

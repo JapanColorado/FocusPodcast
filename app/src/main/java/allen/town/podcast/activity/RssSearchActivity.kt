@@ -62,15 +62,15 @@ class RssSearchActivity : DialogActivity() {
     private var feedTitle: String? = null
     private var feedAuthor: String? = null
     private var feedCoverUrl: String? = null
-    private var viewBinding: RssSearchActivityBinding? = null
+    private lateinit var viewBinding: RssSearchActivityBinding
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         StorageUtils.checkStorageAvailability(this)
         viewBinding = RssSearchActivityBinding.inflate(
             layoutInflater
         )
-        setContentView(viewBinding!!.root)
-        viewBinding!!.transparentBackground.setOnClickListener { v: View? -> finish() }
+        setContentView(viewBinding.root)
+        viewBinding.transparentBackground.setOnClickListener { v: View? -> finish() }
         var feedUrl: String? = null
         if (intent.hasExtra(ARG_FEEDURL)) {
             feedUrl = intent.getStringExtra(ARG_FEEDURL)
@@ -132,7 +132,7 @@ class RssSearchActivity : DialogActivity() {
      * Displays a progress indicator.
      */
     private fun setLoadingLayout() {
-        viewBinding!!.progressBar.visibility = View.VISIBLE
+        viewBinding.progressBar.visibility = View.VISIBLE
     }
 
     override fun onStart() {
@@ -148,17 +148,17 @@ class RssSearchActivity : DialogActivity() {
         if (downloader != null && !downloader.isFinished) {
             downloader.cancel()
         }
-        if (dialog != null && dialog!!.isShowing) {
-            dialog!!.dismiss()
+        dialog?.let {
+            if (it.isShowing) {
+                it.dismiss()
+            }
         }
     }
 
     public override fun onDestroy() {
         super.onDestroy()
         updater?.dispose()
-        if (download != null) {
-            download!!.dispose()
-        }
+        download?.dispose()
         parser?.dispose()
     }
 
@@ -218,18 +218,18 @@ class RssSearchActivity : DialogActivity() {
      * @param url
      */
     private fun startFeedDownload(url: String) {
-        var url: String? = url
         Log.d(TAG, "prepare url")
-        url = URLChecker.prepareURL(url!!)
-        feed = Feed(url, null)
+        val preparedUrl = URLChecker.prepareURL(url)
+        val feed = Feed(preparedUrl, null)
+        this.feed = feed
         if (!TextUtils.isEmpty(feedTitle)) {
-            feed!!.title = feedTitle
+            feed.title = feedTitle
         }
         if (!TextUtils.isEmpty(feedAuthor)) {
-            feed!!.author = feedAuthor
+            feed.author = feedAuthor
         }
         if (!TextUtils.isEmpty(feedCoverUrl)) {
-            feed!!.imageUrl = feedCoverUrl
+            feed.imageUrl = feedCoverUrl
         }
         openFeed()
     }

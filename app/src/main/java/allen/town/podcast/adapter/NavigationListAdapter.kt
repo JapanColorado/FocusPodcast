@@ -119,7 +119,7 @@ class NavigationListAdapter(private val itemAccess: ItemAccess, context: Activit
     override fun getItemId(position: Int): Long {
         val viewType = getItemViewType(position)
         return if (viewType == VIEW_TYPE_SUBSCRIPTION) {
-            itemAccess.getItem(position - subscriptionOffset)!!.id
+            itemAccess.getItem(position - subscriptionOffset)?.id ?: 0
         } else if (viewType == VIEW_TYPE_NAV) {
             -Math.abs(tags[position].hashCode().toLong()) - 1 // Folder IDs are >0
         } else {
@@ -160,20 +160,27 @@ class NavigationListAdapter(private val itemAccess: ItemAccess, context: Activit
             bindSectionDivider(holder as DividerHolder)
         } else {
             val itemPos = position - subscriptionOffset
+            // The drawer list can shrink between the layout pass and this bind; leave the row
+            // blank rather than crashing on a stale position.
             val item = itemAccess.getItem(itemPos)
-            bindListItem(item!!, holder as FeedHolder)
-            if (item!!.type == DrawerItem.Type.FEED) {
-                bindFeedView(item as FeedDrawerItem, holder)
-            } else {
-                bindTagView(item as TagDrawerItem, holder)
+            if (item != null) {
+                bindListItem(item, holder as FeedHolder)
+                if (item.type == DrawerItem.Type.FEED) {
+                    bindFeedView(item as FeedDrawerItem, holder)
+                } else {
+                    bindTagView(item as TagDrawerItem, holder)
+                }
+                holder.itemView.setOnCreateContextMenuListener(itemAccess)
             }
-            holder.itemView.setOnCreateContextMenuListener(itemAccess)
         }
         if (viewType != VIEW_TYPE_SECTION_DIVIDER) {
-            val typedValue = TypedValue()
-            activity.get()!!.theme.resolveAttribute(R.attr.colorSurface, typedValue, true)
-            //only this produces the desired result; reason unknown, and other screens seem not to need it
-            holder.itemView.setBackgroundResource(typedValue.resourceId)
+            val hostActivity = activity.get()
+            if (hostActivity != null) {
+                val typedValue = TypedValue()
+                hostActivity.theme.resolveAttribute(R.attr.colorSurface, typedValue, true)
+                //only this produces the desired result; reason unknown, and other screens seem not to need it
+                holder.itemView.setBackgroundResource(typedValue.resourceId)
+            }
             //            ((MaterialCardView) holder.itemView).setCardBackgroundColor(ThemeUtils.getColorFromAttr(activity.get(), R.attr.colorSurface));
             (holder.itemView as MaterialCardView).isChecked = itemAccess.isSelected(position)
             holder.itemView.setOnClickListener { v: View? -> itemAccess.onItemClick(position) }
@@ -283,8 +290,9 @@ class NavigationListAdapter(private val itemAccess: ItemAccess, context: Activit
             holder.count.visibility = View.GONE
         }
         holder.title.text = item.title
+        val hostActivity = activity.get() ?: return
         val padding =
-            (activity.get()!!.resources.getDimension(R.dimen.thumbnail_length_navlist) / 2).toInt()
+            (hostActivity.resources.getDimension(R.dimen.thumbnail_length_navlist) / 2).toInt()
         holder.itemView.findViewById<View>(R.id.constraintLayout)
             .setPadding(item.layer * padding, 0, 0, 0)
     }

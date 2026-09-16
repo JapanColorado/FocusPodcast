@@ -15,7 +15,8 @@ import android.app.Activity
 
 class DeleteActionButton(val item: FeedItem) : ItemActionButton {
     override fun getDrawableTintColor(context: Context?): Int {
-        return accentColor(context!!)
+        // -1 is the interface's "no tint" answer when there is no context to resolve one from.
+        return if (context == null) -1 else accentColor(context)
     }
 
     @get:StringRes
@@ -27,22 +28,21 @@ class DeleteActionButton(val item: FeedItem) : ItemActionButton {
         get() = R.drawable.ic_round_check_circle_outline_24
 
     override fun onClick(context: Activity?) {
+        val activity = context ?: return
         val media: FeedMedia = item.getMedia() ?: return
         val dialog: ConfirmationDialog = object : ConfirmationDialog(
-            context,
+            activity,
             R.string.delete_label,
             R.string.confirm_delete_download_file
         ) {
             override fun onConfirmButtonPressed(clickedDialog: DialogInterface) {
                 clickedDialog.dismiss()
-                DBWriter.deleteFeedMediaOfItem(context!!, media.id)
+                DBWriter.deleteFeedMediaOfItem(activity, media.id)
             }
         }
         dialog.createNewDialog().show()
     }
 
     override val isVisibility: Int
-        get() = if (item.getMedia() != null && item.getMedia()!!
-                .isDownloaded()
-        ) View.VISIBLE else View.INVISIBLE
+        get() = if (item.getMedia()?.isDownloaded() == true) View.VISIBLE else View.INVISIBLE
 }

@@ -93,7 +93,7 @@ class PlaylistFragment : Fragment(), Toolbar.OnMenuItemClickListener, OnSelectMo
     private var disposable: Disposable? = null
     private val uiHandler = Handler(Looper.getMainLooper())
     private lateinit var swipeActions: SwipeActions
-    private var prefs: SharedPreferences? = null
+    private lateinit var prefs: SharedPreferences
     private lateinit var topAppBarLayout: TopAppBarLayout
     private lateinit var skeleton: Skeleton
     private lateinit var skeletonRecyclerDelay: SkeletonRecyclerDelay
@@ -120,51 +120,49 @@ class PlaylistFragment : Fragment(), Toolbar.OnMenuItemClickListener, OnSelectMo
     override fun onStop() {
         super.onStop()
         EventBus.getDefault().unregister(this)
-        if (disposable != null) {
-            disposable!!.dispose()
-        }
+        disposable?.dispose()
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     fun onEventMainThread(event: QueueEvent) {
-        if (queue == null) {
-            return
-        } else if (recyclerAdapter == null) {
+        val queue = this.queue ?: return
+        val adapter = recyclerAdapter
+        if (adapter == null) {
             loadItems(true)
             return
         }
         when (event.action) {
             QueueEvent.Action.ADDED -> {
-                queue!!.add(event.position, event.item)
-                recyclerAdapter!!.notifyItemInserted(event.position)
+                queue.add(event.position, event.item)
+                adapter.notifyItemInserted(event.position)
             }
             QueueEvent.Action.SET_QUEUE, QueueEvent.Action.SORTED -> {
-                queue = event.items
-                recyclerAdapter!!.notifyDataSetChanged()
+                this.queue = event.items
+                adapter.notifyDataSetChanged()
             }
             QueueEvent.Action.REMOVED, QueueEvent.Action.IRREVERSIBLE_REMOVED -> {
                 val position = FeedItemUtil.indexOfItemWithId(queue, event.item.id)
                 if (position >= 0) {
-                    queue!!.removeAt(position)
-                    recyclerAdapter!!.notifyItemRemoved(position)
+                    queue.removeAt(position)
+                    adapter.notifyItemRemoved(position)
                 }
             }
             QueueEvent.Action.CLEARED -> {
-                queue!!.clear()
-                recyclerAdapter!!.notifyDataSetChanged()
+                queue.clear()
+                adapter.notifyDataSetChanged()
             }
             QueueEvent.Action.MOVED -> return
             else -> return
         }
-        recyclerView!!.saveScrollPosition(TAG)
+        recyclerView.saveScrollPosition(TAG)
         onFragmentLoaded(false)
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     fun onEventMainThread(event: FeedItemEvent) {
-        if (queue == null) {
-            return
-        } else if (recyclerAdapter == null) {
+        val queue = this.queue ?: return
+        val adapter = recyclerAdapter
+        if (adapter == null) {
             loadItems(true)
             return
         }
@@ -174,9 +172,9 @@ class PlaylistFragment : Fragment(), Toolbar.OnMenuItemClickListener, OnSelectMo
             val item = event.items[i]
             val pos = FeedItemUtil.indexOfItemWithId(queue, item.id)
             if (pos >= 0) {
-                queue!!.removeAt(pos)
-                queue!!.add(pos, item)
-                recyclerAdapter!!.notifyItemChangedCompat(pos)
+                queue.removeAt(pos)
+                queue.add(pos, item)
+                adapter.notifyItemChangedCompat(pos)
                 refreshInfoBar()
             }
             i++
@@ -189,26 +187,26 @@ class PlaylistFragment : Fragment(), Toolbar.OnMenuItemClickListener, OnSelectMo
         if (event.hasChangedFeedUpdateStatus(isUpdatingFeeds)) {
             refreshToolbarState()
         }
-        if (recyclerAdapter != null && update.mediaIds.size > 0) {
+        val adapter = recyclerAdapter
+        if (adapter != null && update.mediaIds.size > 0) {
             for (mediaId in update.mediaIds) {
                 val pos = FeedItemUtil.indexOfItemWithMediaId(queue, mediaId)
                 if (pos >= 0) {
-                    recyclerAdapter!!.notifyItemChangedCompat(pos)
+                    adapter.notifyItemChangedCompat(pos)
                 }
             }
         }
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
-    fun onEventMainThread(event: PlaybackPositionEvent?) {
-        if (recyclerAdapter != null) {
-            for (i in 0 until recyclerAdapter!!.itemCount) {
-                val holder =
-                    recyclerView!!.findViewHolderForAdapterPosition(i) as EpisodeItemViewHolder?
-                if (holder != null && holder.isCurrentlyPlayingItem) {
-                    holder.notifyPlaybackPositionUpdated(event!!)
-                    break
-                }
+    fun onEventMainThread(event: PlaybackPositionEvent) {
+        val adapter = recyclerAdapter ?: return
+        for (i in 0 until adapter.itemCount) {
+            val holder =
+                recyclerView.findViewHolderForAdapterPosition(i) as EpisodeItemViewHolder?
+            if (holder != null && holder.isCurrentlyPlayingItem) {
+                holder.notifyPlaybackPositionUpdated(event)
+                break
             }
         }
     }
@@ -236,8 +234,10 @@ class PlaylistFragment : Fragment(), Toolbar.OnMenuItemClickListener, OnSelectMo
             return
         }
         when (event.keyCode) {
-            KeyEvent.KEYCODE_T -> recyclerView!!.smoothScrollToPosition(0)
-            KeyEvent.KEYCODE_B -> recyclerView!!.smoothScrollToPosition(recyclerAdapter!!.itemCount - 1)
+            KeyEvent.KEYCODE_T -> recyclerView.smoothScrollToPosition(0)
+            KeyEvent.KEYCODE_B -> recyclerAdapter?.let {
+                recyclerView.smoothScrollToPosition(it.itemCount - 1)
+            }
             else -> {}
         }
     }
@@ -245,14 +245,10 @@ class PlaylistFragment : Fragment(), Toolbar.OnMenuItemClickListener, OnSelectMo
     override fun onDestroyView() {
         super.onDestroyView()
         uiHandler.removeCallbacksAndMessages(null)
-        if (recyclerAdapter != null) {
-            recyclerAdapter!!.endSelectMode()
-        }
+        recyclerAdapter?.endSelectMode()
         recyclerAdapter = null
-        if (toolbar != null) {
-            toolbar.setOnMenuItemClickListener(null);
-            toolbar.setOnLongClickListener(null);
-        }
+        toolbar.setOnMenuItemClickListener(null)
+        toolbar.setOnLongClickListener(null)
     }
 
     private val updateRefreshMenuItemChecker =
@@ -260,7 +256,7 @@ class PlaylistFragment : Fragment(), Toolbar.OnMenuItemClickListener, OnSelectMo
 
     private fun refreshToolbarState() {
         isUpdatingFeeds = MenuItemUtils.updateRefreshMenuItem(
-            toolbar!!.menu,
+            toolbar.menu,
             R.id.refresh_item, updateRefreshMenuItemChecker
         )
     }
@@ -287,13 +283,13 @@ class PlaylistFragment : Fragment(), Toolbar.OnMenuItemClickListener, OnSelectMo
             conDialog.createNewDialog().show()
             return true
         } else if (itemId == R.id.action_search) {
-            (activity as MainActivity?)!!.loadChildFragment(LocalSearchFragment.Companion.newInstance())
+            (requireActivity() as MainActivity).loadChildFragment(LocalSearchFragment.Companion.newInstance())
             return true
         } else if (itemId == R.id.queue_sort) {
             EditSortDialog().openDialog()
             return true
         } else if (itemId == R.id.history) {
-            (activity as MainActivity?)!!.loadChildFragment(PlaybackHistoryFragment())
+            (requireActivity() as MainActivity).loadChildFragment(PlaybackHistoryFragment())
             return true
         }
         return false
@@ -302,9 +298,7 @@ class PlaylistFragment : Fragment(), Toolbar.OnMenuItemClickListener, OnSelectMo
     private fun setQueueLocked(locked: Boolean) {
         isPlaylistLocked = locked
         refreshToolbarState()
-        if (recyclerAdapter != null) {
-            recyclerAdapter!!.updateDragDropEnabled()
-        }
+        recyclerAdapter?.updateDragDropEnabled()
         if (locked) {
             showSnack(activity, R.string.queue_locked, Toast.LENGTH_SHORT)
         } else {
@@ -323,31 +317,33 @@ class PlaylistFragment : Fragment(), Toolbar.OnMenuItemClickListener, OnSelectMo
     }
 
     override fun onContextItemSelected(item: MenuItem): Boolean {
-        if (!isVisible || recyclerAdapter == null) {
+        val adapter = recyclerAdapter
+        if (!isVisible || adapter == null) {
             return false
         }
-        val selectedItem = recyclerAdapter!!.longPressedItem
+        val selectedItem = adapter.longPressedItem
         if (selectedItem == null) {
             Log.i(TAG, "Selected item was null, ignoring selection")
             return super.onContextItemSelected(item)
         }
+        val queue = this.queue ?: return super.onContextItemSelected(item)
         val position = FeedItemUtil.indexOfItemWithId(queue, selectedItem.id)
         if (position < 0) {
             Log.i(TAG, "Selected item no longer exist, ignoring selection")
             return super.onContextItemSelected(item)
         }
-        if (recyclerAdapter!!.onContextItemSelected(item)) {
+        if (adapter.onContextItemSelected(item)) {
             return true
         }
         val itemId = item.itemId
         if (itemId == R.id.move_to_top_item) {
-            queue!!.add(0, queue!!.removeAt(position))
-            recyclerAdapter!!.notifyItemMoved(position, 0)
+            queue.add(0, queue.removeAt(position))
+            adapter.notifyItemMoved(position, 0)
             DBWriter.moveQueueItemToTop(selectedItem.id, true)
             return true
         } else if (itemId == R.id.move_to_bottom_item) {
-            queue!!.add(queue!!.size - 1, queue!!.removeAt(position))
-            recyclerAdapter!!.notifyItemMoved(position, queue!!.size - 1)
+            queue.add(queue.size - 1, queue.removeAt(position))
+            adapter.notifyItemMoved(position, queue.size - 1)
             DBWriter.moveQueueItemToBottom(selectedItem.id, true)
             return true
         }
@@ -367,7 +363,7 @@ class PlaylistFragment : Fragment(), Toolbar.OnMenuItemClickListener, OnSelectMo
         if (savedInstanceState != null) {
             displayUpArrow = savedInstanceState.getBoolean(KEY_UP_ARROW)
         }
-        (activity as MainActivity?)!!.setupToolbarToggle(toolbar, displayUpArrow)
+        (requireActivity() as MainActivity).setupToolbarToggle(toolbar, displayUpArrow)
         toolbar.inflateMenu(R.menu.playlist_menu)
         toolbar.setOnClickListener(DoubleClickBackToContentTopListener(this) )
         showToolbarMenuIcon(toolbar)
@@ -378,7 +374,7 @@ class PlaylistFragment : Fragment(), Toolbar.OnMenuItemClickListener, OnSelectMo
         if (animator is SimpleItemAnimator) {
             animator.supportsChangeAnimations = false
         }
-        recyclerView.setRecycledViewPool((activity as MainActivity?)!!.recycledViewPool)
+        recyclerView.setRecycledViewPool((requireActivity() as MainActivity).recycledViewPool)
         registerForContextMenu(recyclerView)
         val swipeRefreshLayout = root.findViewById<SwipeRefreshLayout>(R.id.swipeRefresh)
         swipeRefreshLayout.setDistanceToTriggerSync(resources.getInteger(R.integer.swipe_refresh_distance))
@@ -409,10 +405,12 @@ class PlaylistFragment : Fragment(), Toolbar.OnMenuItemClickListener, OnSelectMo
     }
 
     private fun onFragmentLoaded(restoreScrollPosition: Boolean) {
+        val queue = this.queue
         if (queue != null) {
-            if (recyclerAdapter == null) {
-                val activity = activity as MainActivity?
-                recyclerAdapter = object : PlaylistAdapter(activity!!, swipeActions) {
+            var adapter = recyclerAdapter
+            if (adapter == null) {
+                val activity = requireActivity() as MainActivity
+                adapter = object : PlaylistAdapter(activity, swipeActions) {
                     override fun onCreateContextMenu(
                         menu: ContextMenu,
                         v: View,
@@ -426,26 +424,29 @@ class PlaylistFragment : Fragment(), Toolbar.OnMenuItemClickListener, OnSelectMo
                         }
                     }
                 }
-                recyclerAdapter!!.setOnMenuItemClickListener(object :
+                recyclerAdapter = adapter
+                adapter.setOnMenuItemClickListener(object :
                     MultiSelectAdapter.OnMenuItemClickListener {
                     override fun onMenuItemClick(item: MenuItem?) {
+                        val menuItem = item ?: return
+                        val currentAdapter = recyclerAdapter ?: return
                         EpisodeMultiSelectActionHandler(
-                            getActivity() as MainActivity?,
-                            recyclerAdapter!!.selectedItems
+                            requireActivity() as MainActivity,
+                            currentAdapter.selectedItems
                         )
-                            .handleAction(item!!.itemId)
-                        recyclerAdapter!!.endSelectMode()
+                            .handleAction(menuItem.itemId)
+                        currentAdapter.endSelectMode()
                     }
                 })
-                recyclerAdapter!!.setOnSelectModeListener(this)
-                recyclerView.adapter = recyclerAdapter
-                emptyView.updateAdapter(recyclerAdapter)
+                adapter.setOnSelectModeListener(this)
+                recyclerView.adapter = adapter
+                emptyView.updateAdapter(adapter)
                 skeleton =
                     recyclerView.applySkeleton(R.layout.item_small_recyclerview_skeleton, 15)
                 skeletonRecyclerDelay = SkeletonRecyclerDelay(skeleton,recyclerView)
                 skeletonRecyclerDelay.showSkeleton()
             }
-            recyclerAdapter!!.updateItems(queue!!)
+            adapter.updateItems(queue)
         } else {
             recyclerAdapter = null
             emptyView.updateAdapter(null)
@@ -461,41 +462,38 @@ class PlaylistFragment : Fragment(), Toolbar.OnMenuItemClickListener, OnSelectMo
     }
 
     private fun refreshInfoBar() {
+        val queue = this.queue ?: return
         var info: String? = String.format(
             Locale.getDefault(), "%d%s",
-            queue!!.size, getString(R.string.episodes_suffix)
+            queue.size, getString(R.string.episodes_suffix)
         )
-        if (queue!!.size > 0) {
+        if (queue.size > 0) {
             var timeLeft: Long = 0
-            for (item in queue!!) {
+            for (item in queue) {
+                val media = item.media ?: continue
                 var playbackSpeed = 1f
                 if (timeRespectsSpeed()) {
-                    playbackSpeed = PlaybackSpeedUtils.getCurrentPlaybackSpeed(item.media)
+                    playbackSpeed = PlaybackSpeedUtils.getCurrentPlaybackSpeed(media)
                 }
-                if (item.media != null) {
-                    val itemTimeLeft = (item.media!!
-                        .duration - item.media!!.position).toLong()
-                    timeLeft += (itemTimeLeft / playbackSpeed).toLong()
-                }
+                val itemTimeLeft = (media.duration - media.position).toLong()
+                timeLeft += (itemTimeLeft / playbackSpeed).toLong()
             }
             info += " ("
             info += Converter.getDurationStringLocalized(activity, timeLeft)
             info += ")"
-            toolbar!!.subtitle = info
+            toolbar.subtitle = info
         } else {
             //no subtitle when the playlist is empty
-            toolbar!!.subtitle = ""
+            toolbar.subtitle = ""
         }
-        toolbar!!.setSubtitleTextAppearance(
+        toolbar.setSubtitleTextAppearance(
             context,
             R.style.FocusPodcast_TextView_ListItemSecondaryTitle
         )
     }
 
     private fun loadItems(restoreScrollPosition: Boolean) {
-        if (disposable != null) {
-            disposable!!.dispose()
-        }
+        disposable?.dispose()
         if (queue == null) {
             emptyView.hide()
             skeletonRecyclerDelay.showSkeleton()
@@ -509,21 +507,19 @@ class PlaylistFragment : Fragment(), Toolbar.OnMenuItemClickListener, OnSelectMo
                 if (skeleton.isSkeleton()) {
                     skeletonRecyclerDelay.showOriginal()
                 }
-                if (recyclerAdapter != null) {
-                    recyclerAdapter!!.notifyDataSetChanged()
-                }
+                recyclerAdapter?.notifyDataSetChanged()
             }) { error: Throwable? -> Log.e(TAG, Log.getStackTraceString(error)) }
     }
 
     override fun onStartSelectMode() {
-        swipeActions!!.detach()
+        swipeActions.detach()
         refreshToolbarState()
-        toolbar!!.visibility = View.GONE
+        toolbar.visibility = View.GONE
     }
 
     override fun onEndSelectMode() {
-        swipeActions!!.attachTo(recyclerView)
-        toolbar!!.visibility = View.VISIBLE
+        swipeActions.attachTo(recyclerView)
+        toolbar.visibility = View.VISIBLE
     }
 
     private inner class QueueSwipeActions :
@@ -545,18 +541,18 @@ class PlaylistFragment : Fragment(), Toolbar.OnMenuItemClickListener, OnSelectMo
             dragTo = toPosition
             val from = viewHolder.bindingAdapterPosition
             val to = target.bindingAdapterPosition
-            if (from >= queue!!.size || to >= queue!!.size || from < 0 || to < 0) {
+            val queue = this@PlaylistFragment.queue ?: return false
+            val adapter = recyclerAdapter ?: return false
+            if (from >= queue.size || to >= queue.size || from < 0 || to < 0) {
                 return false
             }
-            queue!!.add(to, queue!!.removeAt(from))
-            recyclerAdapter!!.notifyItemMoved(from, to)
+            queue.add(to, queue.removeAt(from))
+            adapter.notifyItemMoved(from, to)
             return true
         }
 
         override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
-            if (disposable != null) {
-                disposable!!.dispose()
-            }
+            disposable?.dispose()
 
             //SwipeActions
             super.onSwiped(viewHolder, direction)
@@ -589,7 +585,7 @@ class PlaylistFragment : Fragment(), Toolbar.OnMenuItemClickListener, OnSelectMo
         var ASC_INDEX = 1
         var DESC_INDEX = 0
         var isDesc = true
-        private var adapter: OrderSelectionAdapter? = null
+        private lateinit var adapter: OrderSelectionAdapter
         lateinit var orderGroup: MaterialButtonToggleGroup
         lateinit var keepSortS: SwitchCompat
         lateinit var lockS: SwitchCompat
@@ -603,9 +599,9 @@ class PlaylistFragment : Fragment(), Toolbar.OnMenuItemClickListener, OnSelectMo
             }
             lastIsQueueKeepSorted = isPlaylistKeepSorted
             lastIsLocked = isPlaylistLocked
-            sortItems = context!!.resources.getStringArray(R.array.queue_sort_options)
+            sortItems = requireContext().resources.getStringArray(R.array.queue_sort_options)
             val commonSortStringValues =
-                context!!.resources.getStringArray(R.array.queue_sort_values)
+                requireContext().resources.getStringArray(R.array.queue_sort_values)
             sortValues = SortOrder.valuesOf(commonSortStringValues)
             val inflater = LayoutInflater.from(context)
             val layout = inflater.inflate(R.layout.edit_feed_sort_dialog_layout, null, false)
@@ -616,7 +612,7 @@ class PlaylistFragment : Fragment(), Toolbar.OnMenuItemClickListener, OnSelectMo
             keepSortS.setChecked(lastIsQueueKeepSorted)
             keepSortS.setOnCheckedChangeListener(CompoundButton.OnCheckedChangeListener { buttonView, isChecked ->
                 lockS.setEnabled(!isChecked)
-                adapter!!.notifyDataSetChanged()
+                adapter.notifyDataSetChanged()
             })
 
             //lock
@@ -630,12 +626,12 @@ class PlaylistFragment : Fragment(), Toolbar.OnMenuItemClickListener, OnSelectMo
             //https://github.com/BelooS/ChipsLayoutManager
             val chipsLayoutManager = ChipsLayoutManager.newBuilder(context).build()
             recyclerView.layoutManager = chipsLayoutManager
-            recyclerView.addItemDecoration(ItemOffsetDecoration(context!!, 4))
+            recyclerView.addItemDecoration(ItemOffsetDecoration(requireContext(), 4))
             adapter = OrderSelectionAdapter()
-            adapter!!.setHasStableIds(true)
+            adapter.setHasStableIds(true)
             recyclerView.adapter = adapter
             val dialog: AlertDialog.Builder = AccentMaterialDialog(
-                context!!,
+                requireContext(),
                 R.style.MaterialAlertDialogTheme
             )
             dialog.setView(layout)
@@ -646,24 +642,20 @@ class PlaylistFragment : Fragment(), Toolbar.OnMenuItemClickListener, OnSelectMo
                 val baseIndex =
                     if (orderGroup.getCheckedButtonId() == R.id.asc_button) ASC_INDEX else DESC_INDEX
                 setSortOrder(sortValues[selectedIndex * 2 + baseIndex])
-                if (recyclerAdapter != null) {
-                    recyclerAdapter!!.updateDragDropEnabled()
-                }
+                recyclerAdapter?.updateDragDropEnabled()
             }
             dialog.setNegativeButton(R.string.cancel_label, null)
                 .show()
         }
 
         private fun updateKeepSort() {
-            if (lastIsQueueKeepSorted == keepSortS!!.isChecked) {
+            if (lastIsQueueKeepSorted == keepSortS.isChecked) {
                 //nothing to do if it matches the last saved value
                 return
             }
-            val keepSortedNew = keepSortS!!.isChecked
+            val keepSortedNew = keepSortS.isChecked
             isPlaylistKeepSorted = keepSortedNew
-            if (recyclerAdapter != null) {
-                recyclerAdapter!!.updateDragDropEnabled()
-            }
+            recyclerAdapter?.updateDragDropEnabled()
             if (keepSortedNew) {
                 val sortOrder = queueKeepSortedOrder
                 DBWriter.reorderQueue(sortOrder, true)
@@ -671,19 +663,19 @@ class PlaylistFragment : Fragment(), Toolbar.OnMenuItemClickListener, OnSelectMo
         }
 
         private fun toggleQueueLock() {
-            if (lastIsLocked == lockS!!.isChecked) {
+            if (lastIsLocked == lockS.isChecked) {
                 //nothing to do if it matches the last saved value
                 return
             }
-            if (!lockS!!.isChecked) {
+            if (!lockS.isChecked) {
                 setQueueLocked(false)
             } else {
-                val shouldShowLockWarning = prefs!!.getBoolean(PREF_SHOW_LOCK_WARNING, true)
+                val shouldShowLockWarning = prefs.getBoolean(PREF_SHOW_LOCK_WARNING, true)
                 if (!shouldShowLockWarning) {
                     setQueueLocked(true)
                 } else {
                     val builder: AlertDialog.Builder = AccentMaterialDialog(
-                        context!!,
+                        requireContext(),
                         R.style.MaterialAlertDialogTheme
                     )
                     builder.setTitle(R.string.lock_queue)
@@ -693,7 +685,7 @@ class PlaylistFragment : Fragment(), Toolbar.OnMenuItemClickListener, OnSelectMo
                         view.findViewById<CheckBox>(R.id.checkbox_do_not_show_again)
                     builder.setView(view)
                     builder.setPositiveButton(R.string.lock_queue) { dialog: DialogInterface?, which: Int ->
-                        prefs!!.edit().putBoolean(
+                        prefs.edit().putBoolean(
                             PREF_SHOW_LOCK_WARNING, !checkDoNotShowAgain.isChecked
                         ).apply()
                         setQueueLocked(true)
@@ -713,7 +705,7 @@ class PlaylistFragment : Fragment(), Toolbar.OnMenuItemClickListener, OnSelectMo
             private get() = selectedIndex == SortOrder.RANDOM.groupIndex
 
         fun setOrderGroupVisibility() {
-            orderGroup!!.visibility =
+            orderGroup.visibility =
                 if (isRandomSelected) View.GONE else View.VISIBLE
         }
 
@@ -738,7 +730,7 @@ class PlaylistFragment : Fragment(), Toolbar.OnMenuItemClickListener, OnSelectMo
                     }
                     selectedIndex = pos
                     setOrderGroupVisibility()
-                    adapter!!.notifyDataSetChanged()
+                    adapter.notifyDataSetChanged()
                 }
             }
 

@@ -53,14 +53,14 @@ import java.util.concurrent.Callable
  * Performs a search operation on all feeds or one specific feed and displays the search result.
  */
 class LocalSearchFragment constructor() : Fragment() {
-    private var adapter: EpisodeItemListAdapter? = null
-    private var adapterFeeds: FeedSearchResultAdapter? = null
+    private lateinit var adapter: EpisodeItemListAdapter
+    private lateinit var adapterFeeds: FeedSearchResultAdapter
     private var disposable: Disposable? = null
     private lateinit var emptyViewHandler: EmptyViewHandler
     private lateinit var recyclerView: RecyclerView
     private var results: MutableList<FeedItem>? = null
     private lateinit var searchView: SearchView
-    private var automaticSearchDebouncer: Handler? = null
+    private lateinit var automaticSearchDebouncer: Handler
     private var lastQueryChange: Long = 0
     private val feedSkeleton: Skeleton? = null
     private val itemSkeleton: Skeleton? = null
@@ -74,9 +74,7 @@ class LocalSearchFragment constructor() : Fragment() {
 
     public override fun onStop() {
         super.onStop()
-        if (disposable != null) {
-            disposable!!.dispose()
-        }
+        disposable?.dispose()
     }
 
     public override fun onCreateView(
@@ -88,8 +86,9 @@ class LocalSearchFragment constructor() : Fragment() {
         prefs = requireActivity().getSharedPreferences(SubFeedsFragment.PREFS, Context.MODE_PRIVATE)
         recyclerView = layout.findViewById(R.id.recyclerView)
         recyclerView.setLayoutManager(LinearLayoutManager(getActivity()))
-        recyclerView.setRecycledViewPool((getActivity() as MainActivity?)!!.recycledViewPool)
-        adapter = object : EpisodeItemListAdapter((getActivity() as MainActivity?)!!, 0) {
+        val mainActivity = requireActivity() as MainActivity
+        recyclerView.setRecycledViewPool(mainActivity.recycledViewPool)
+        adapter = object : EpisodeItemListAdapter(mainActivity, 0) {
             public override fun onCreateContextMenu(
                 menu: ContextMenu,
                 v: View,
@@ -115,19 +114,19 @@ class LocalSearchFragment constructor() : Fragment() {
         )
         recyclerViewFeeds.addItemDecoration(GridDividerItemDecorator())
         recyclerViewFeeds.setLayoutManager(gridLayoutManager)
-        adapterFeeds = FeedSearchResultAdapter((getActivity() as MainActivity?)!!)
+        adapterFeeds = FeedSearchResultAdapter(mainActivity)
         recyclerViewFeeds.setAdapter(adapterFeeds)
         create(recyclerView)
         create(recyclerViewFeeds)
         emptyViewHandler = EmptyViewHandler(getContext())
-        emptyViewHandler!!.setIcon(R.drawable.ic_search)
-        emptyViewHandler!!.setTitle(R.string.search_status_no_results)
+        emptyViewHandler.setIcon(R.drawable.ic_search)
+        emptyViewHandler.setTitle(R.string.search_status_no_results)
         EventBus.getDefault().register(this)
         if (requireArguments().getString(ARG_QUERY, null) != null) {
-            searchView!!.setQuery(requireArguments().getString(ARG_QUERY, null), false)
+            searchView.setQuery(requireArguments().getString(ARG_QUERY, null), false)
             searchWithProgressBar()
         }
-        searchView!!.setOnQueryTextFocusChangeListener(OnFocusChangeListener({ view: View, hasFocus: Boolean ->
+        searchView.setOnQueryTextFocusChangeListener(OnFocusChangeListener({ view: View, hasFocus: Boolean ->
             if (hasFocus) {
                 showInputMethod(view.findFocus())
             }
@@ -158,7 +157,7 @@ class LocalSearchFragment constructor() : Fragment() {
 
     public override fun onDestroyView() {
         super.onDestroyView()
-        automaticSearchDebouncer?.removeCallbacksAndMessages(null)
+        automaticSearchDebouncer.removeCallbacksAndMessages(null)
         EventBus.getDefault().unregister(this)
     }
 
@@ -168,7 +167,7 @@ class LocalSearchFragment constructor() : Fragment() {
         toolbar.inflateMenu(R.menu.search)
         val item: MenuItem = toolbar.getMenu().findItem(R.id.action_search)
         item.expandActionView()
-        searchView = (item.getActionView() as SearchView?)!!
+        searchView = item.getActionView() as SearchView
         searchView.setQueryHint(getString(R.string.search_label))
         searchView.requestFocus()
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
@@ -179,11 +178,11 @@ class LocalSearchFragment constructor() : Fragment() {
             }
 
             public override fun onQueryTextChange(s: String): Boolean {
-                automaticSearchDebouncer!!.removeCallbacksAndMessages(null)
+                automaticSearchDebouncer.removeCallbacksAndMessages(null)
                 if (s.isEmpty() || s.endsWith(" ") || ((lastQueryChange != 0L && System.currentTimeMillis() > lastQueryChange + SEARCH_DEBOUNCE_INTERVAL))) {
                     search()
                 } else {
-                    automaticSearchDebouncer!!.postDelayed(Runnable({
+                    automaticSearchDebouncer.postDelayed(Runnable({
                         search()
                         lastQueryChange =
                             0 // Don't search instantly with first symbol after some pause
@@ -206,7 +205,7 @@ class LocalSearchFragment constructor() : Fragment() {
     }
 
     public override fun onContextItemSelected(item: MenuItem): Boolean {
-        val selectedItem: FeedItem? = adapter!!.longPressedItem
+        val selectedItem: FeedItem? = adapter.longPressedItem
         if (selectedItem == null) {
             Log.i(TAG, "Selected item at current position was null, ignoring selection")
             return super.onContextItemSelected(item)
@@ -221,21 +220,16 @@ class LocalSearchFragment constructor() : Fragment() {
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     fun onEventMainThread(event: FeedItemEvent) {
-        if (results == null) {
-            return
-        } else if (adapter == null) {
-            search()
-            return
-        }
+        val results = this.results ?: return
         var i: Int = 0
         val size: Int = event.items.size
         while (i < size) {
             val item: FeedItem = event.items.get(i)
             val pos: Int = FeedItemUtil.indexOfItemWithId(results, item.getId())
             if (pos >= 0) {
-                results!!.removeAt(pos)
-                results!!.add(pos, item)
-                adapter!!.notifyItemChangedCompat(pos)
+                results.removeAt(pos)
+                results.add(pos, item)
+                adapter.notifyItemChangedCompat(pos)
             }
             i++
         }
@@ -244,26 +238,24 @@ class LocalSearchFragment constructor() : Fragment() {
     @Subscribe(sticky = true, threadMode = ThreadMode.MAIN)
     fun onEventMainThread(event: DownloadEvent) {
         val update: DownloaderUpdate = event.update
-        if (adapter != null && update.mediaIds.size > 0) {
+        if (update.mediaIds.size > 0) {
             for (mediaId: Long in update.mediaIds) {
                 val pos: Int = FeedItemUtil.indexOfItemWithMediaId(results, mediaId)
                 if (pos >= 0) {
-                    adapter!!.notifyItemChangedCompat(pos)
+                    adapter.notifyItemChangedCompat(pos)
                 }
             }
         }
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
-    fun onEventMainThread(event: PlaybackPositionEvent?) {
-        if (adapter != null) {
-            for (i in 0 until adapter!!.getItemCount()) {
-                val holder: EpisodeItemViewHolder? =
-                    recyclerView!!.findViewHolderForAdapterPosition(i) as EpisodeItemViewHolder?
-                if (holder != null && holder.isCurrentlyPlayingItem) {
-                    holder.notifyPlaybackPositionUpdated((event)!!)
-                    break
-                }
+    fun onEventMainThread(event: PlaybackPositionEvent) {
+        for (i in 0 until adapter.getItemCount()) {
+            val holder: EpisodeItemViewHolder? =
+                recyclerView.findViewHolderForAdapterPosition(i) as EpisodeItemViewHolder?
+            if (holder != null && holder.isCurrentlyPlayingItem) {
+                holder.notifyPlaybackPositionUpdated(event)
+                break
             }
         }
     }
@@ -274,7 +266,7 @@ class LocalSearchFragment constructor() : Fragment() {
     }
 
     private fun searchWithProgressBar() {
-        emptyViewHandler!!.hide()
+        emptyViewHandler.hide()
         if (requireArguments().getLong(ARG_FEED, 0) == 0L) {
             //not shown when searching within a feed
 //            feedSkeleton.showSkeleton();
@@ -283,21 +275,20 @@ class LocalSearchFragment constructor() : Fragment() {
     }
 
     private fun search() {
-        if (disposable != null) {
-            disposable!!.dispose()
-        }
+        disposable?.dispose()
         disposable = Observable.fromCallable(
             Callable({ performSearch() })
         )
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
-            .subscribe({ results: Pair<List<FeedItem>?, List<Feed>?> ->
-                this.results = results.first as MutableList<FeedItem>?
-                adapter!!.updateItems((results.first)!!)
+            .subscribe({ results: Pair<List<FeedItem>, List<Feed>> ->
+                @Suppress("UNCHECKED_CAST")
+                this.results = results.first as MutableList<FeedItem>
+                adapter.updateItems(results.first)
                 if (requireArguments().getLong(ARG_FEED, 0) == 0L) {
-                    adapterFeeds!!.updateData(results.second)
+                    adapterFeeds.updateData(results.second)
                 } else {
-                    adapterFeeds!!.updateData(emptyList())
+                    adapterFeeds.updateData(emptyList())
                 }
                 if (searchView.getQuery().toString().isEmpty()) {
                     emptyViewHandler.setMessage(R.string.type_to_search)
@@ -312,14 +303,14 @@ class LocalSearchFragment constructor() : Fragment() {
             }, { error: Throwable? -> Log.e(TAG, Log.getStackTraceString(error)) })
     }
 
-    private fun performSearch(): Pair<List<FeedItem>?, List<Feed>?> {
+    private fun performSearch(): Pair<List<FeedItem>, List<Feed>> {
         val query: String = searchView.getQuery().toString()
         if (query.isEmpty()) {
             return Pair(emptyList(), emptyList<Feed>())
         }
         val feed: Long = requireArguments().getLong(ARG_FEED)
-        var items: List<FeedItem>? = ArrayList()
-        var feeds: List<Feed>? = ArrayList()
+        var items: List<FeedItem> = ArrayList()
+        var feeds: List<Feed> = ArrayList()
         if (searchFeeds) {
             feeds = FeedSearcher.searchFeeds(query)
         } else {

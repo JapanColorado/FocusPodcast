@@ -103,7 +103,7 @@ class MainActivity : SimpleToolbarActivity(), OnSharedPreferenceChangeListener {
     private var attachNavDrawer: Runnable? = null
     private var drawerToggle: ActionBarDrawerToggle? = null
     private lateinit var navDrawer: View
-    var bottomSheet: BottomSheetBehavior<View>? = null
+    lateinit var bottomSheet: BottomSheetBehavior<View>
         private set
     private var lastBackButtonPressTime: Long = 0
     val recycledViewPool = RecycledViewPool()
@@ -157,7 +157,7 @@ class MainActivity : SimpleToolbarActivity(), OnSharedPreferenceChangeListener {
             } else {
                 try {
                     //feed
-                    loadFeedFragmentById(lastFragment!!.toInt().toLong(), null)
+                    loadFeedFragmentById(lastFragment.orEmpty().toInt().toLong(), null)
                 } catch (e: NumberFormatException) {
                     // it's not a number, this happens if we removed
                     // a label from the NAV_DRAWER_TAGS
@@ -194,9 +194,9 @@ class MainActivity : SimpleToolbarActivity(), OnSharedPreferenceChangeListener {
         checkFirstLaunch()
         PreferenceUpgrader.checkUpgrades(this)
         this.bottomSheet = BottomSheetBehavior.from(findViewById<View>(R.id.audioplayerFragment))
-        bottomSheet!!.setPeekHeight(resources.getDimension(R.dimen.external_player_height).toInt())
-        bottomSheet!!.setHideable(false)
-        bottomSheet!!.setBottomSheetCallback(bottomSheetCallback)
+        bottomSheet.setPeekHeight(resources.getDimension(R.dimen.external_player_height).toInt())
+        bottomSheet.setHideable(false)
+        bottomSheet.setBottomSheetCallback(bottomSheetCallback)
         libraryViewModel = ViewModelProvider(this).get(
             LibraryViewModel::class.java
         )
@@ -248,20 +248,20 @@ class MainActivity : SimpleToolbarActivity(), OnSharedPreferenceChangeListener {
         outState.putInt(KEY_GENERATED_VIEW_ID, View.generateViewId())
     }
 
-    private var libraryViewModel: LibraryViewModel? = null
+    private lateinit var libraryViewModel: LibraryViewModel
 
     /**
      * Album cover color changed
      */
     private fun onPaletteColorChanged() {
-        if (bottomSheet!!.state == BottomSheetBehavior.STATE_EXPANDED) {
+        if (bottomSheet.state == BottomSheetBehavior.STATE_EXPANDED) {
             this.onPaletteColorChanged(paletteColor)
         }
     }
 
     private var paletteColor = Color.WHITE
     private fun updateColor() {
-        libraryViewModel!!.paletteColor.observe(this) { color: Int ->
+        libraryViewModel.paletteColor.observe(this) { color: Int ->
             paletteColor = color
             onPaletteColorChanged()
         }
@@ -307,23 +307,23 @@ class MainActivity : SimpleToolbarActivity(), OnSharedPreferenceChangeListener {
      * @param displayUpArrow
      */
     fun setupToolbarToggle(toolbar: Toolbar, displayUpArrow: Boolean) {
+        val drawerLayout = this.drawerLayout
         if (drawerLayout != null) { // Tablet layout does not have a drawer
-            if (drawerToggle != null) {
-                drawerLayout!!.removeDrawerListener(drawerToggle!!)
-            }
-            drawerToggle = DrawerCloseToggle(
+            drawerToggle?.let { drawerLayout.removeDrawerListener(it) }
+            val toggle = DrawerCloseToggle(
                 this, drawerLayout, toolbar,
                 R.string.drawer_open, R.string.drawer_close
             )
-            drawerLayout!!.addDrawerListener(drawerToggle!!)
-            drawerToggle!!.syncState()
+            drawerToggle = toggle
+            drawerLayout.addDrawerListener(toggle)
+            toggle.syncState()
             //in the original logic, true meant the system handled the menu event
-//            drawerToggle!!.isDrawerIndicatorEnabled = !displayUpArrow
-            drawerToggle!!.isDrawerIndicatorEnabled = false
+//            toggle.isDrawerIndicatorEnabled = !displayUpArrow
+            toggle.isDrawerIndicatorEnabled = false
             toolbar.setNavigationIcon(if (displayUpArrow) R.drawable.ic_keyboard_backspace_black else R.drawable.ic_homepage)
-            drawerToggle!!.toolbarNavigationClickListener =
+            toggle.toolbarNavigationClickListener =
                 View.OnClickListener { v: View? ->
-                    if (displayUpArrow) supportFragmentManager.popBackStack() else drawerLayout!!.openDrawer(
+                    if (displayUpArrow) supportFragmentManager.popBackStack() else drawerLayout.openDrawer(
                         navDrawer
                     )
                 }
@@ -361,11 +361,13 @@ class MainActivity : SimpleToolbarActivity(), OnSharedPreferenceChangeListener {
 
         override fun onDrawerClosed(drawerView: View) {
             super.onDrawerClosed(drawerView)
-            if (needtoOpenFragmentLater != null) {
-                loadFragmentInner(needtoOpenFragmentLater!!)
-            } else if (drawerCloseCallback != null) {
-                drawerCloseCallback!!();
-                drawerCloseCallback = null;
+            val pendingFragment = needtoOpenFragmentLater
+            val closeCallback = drawerCloseCallback
+            if (pendingFragment != null) {
+                loadFragmentInner(pendingFragment)
+            } else if (closeCallback != null) {
+                closeCallback()
+                drawerCloseCallback = null
             }
         }
     }
@@ -386,17 +388,15 @@ class MainActivity : SimpleToolbarActivity(), OnSharedPreferenceChangeListener {
     }
 
     val isDrawerOpen: Boolean
-        get() = drawerLayout != null && navDrawer != null && drawerLayout!!.isDrawerOpen(
-            navDrawer!!
-        )
+        get() = drawerLayout?.isDrawerOpen(navDrawer) == true
 
 
     fun setPlayerVisible(visible: Boolean) {
         if (visible) {
             //the first argument is unused but must not be null, so anything is passed
-            bottomSheetCallback.onStateChanged(navDrawer, bottomSheet!!.state) // Update toolbar visibility
+            bottomSheetCallback.onStateChanged(navDrawer, bottomSheet.state) // Update toolbar visibility
         } else {
-            bottomSheet!!.setState(BottomSheetBehavior.STATE_COLLAPSED)
+            bottomSheet.setState(BottomSheetBehavior.STATE_COLLAPSED)
         }
 
         val mainView = findViewById<FragmentContainerView>(R.id.main_view)
@@ -463,7 +463,7 @@ class MainActivity : SimpleToolbarActivity(), OnSharedPreferenceChangeListener {
     private fun loadFragment(fragment: Fragment) {
         if (isDrawerOpen) {
             needtoOpenFragmentLater = fragment
-            drawerLayout!!.closeDrawer(navDrawer!!)
+            drawerLayout?.closeDrawer(navDrawer)
         } else {
             loadFragmentInner(fragment)
         }
@@ -528,8 +528,8 @@ class MainActivity : SimpleToolbarActivity(), OnSharedPreferenceChangeListener {
                 R.anim.fade_out
             )
         }
+        supportFragmentManager.findFragmentByTag(MAIN_FRAGMENT_TAG)?.let { transaction.hide(it) }
         transaction
-            .hide(supportFragmentManager.findFragmentByTag(MAIN_FRAGMENT_TAG)!!)
             .add(R.id.main_view, fragment, MAIN_FRAGMENT_TAG)
             .addToBackStack(null)
             .commit()
@@ -541,16 +541,14 @@ class MainActivity : SimpleToolbarActivity(), OnSharedPreferenceChangeListener {
 
     override fun onPostCreate(savedInstanceState: Bundle?) {
         super.onPostCreate(savedInstanceState)
-        if (drawerToggle != null) { // Tablet layout does not have a drawer
-            drawerToggle!!.syncState()
-        }
+        // Tablet layout does not have a drawer
+        drawerToggle?.syncState()
     }
 
     override fun onConfigurationChanged(newConfig: Configuration) {
         super.onConfigurationChanged(newConfig)
-        if (drawerToggle != null) { // Tablet layout does not have a drawer
-            drawerToggle!!.onConfigurationChanged(newConfig)
-        }
+        // Tablet layout does not have a drawer
+        drawerToggle?.onConfigurationChanged(newConfig)
         setNavDrawerSize()
     }
 
@@ -561,7 +559,7 @@ class MainActivity : SimpleToolbarActivity(), OnSharedPreferenceChangeListener {
         val screenPercent = resources.getInteger(R.integer.nav_drawer_screen_size_percent) * 0.01f
         val width = (screenWidth * screenPercent).toInt()
         val maxWidth = resources.getDimension(R.dimen.nav_drawer_max_screen_size).toInt()
-        navDrawer!!.layoutParams.width = Math.min(width, maxWidth)
+        navDrawer.layoutParams.width = Math.min(width, maxWidth)
     }
 
     private val screenWidth: Int
@@ -573,7 +571,7 @@ class MainActivity : SimpleToolbarActivity(), OnSharedPreferenceChangeListener {
 
     override fun onRestoreInstanceState(savedInstanceState: Bundle) {
         super.onRestoreInstanceState(savedInstanceState)
-        if (bottomSheet!!.state == BottomSheetBehavior.STATE_EXPANDED) {
+        if (bottomSheet.state == BottomSheetBehavior.STATE_EXPANDED) {
             //re-open
             bottomSheetCallback.onSlide(navDrawer, 1.0f)
         }
@@ -595,9 +593,7 @@ class MainActivity : SimpleToolbarActivity(), OnSharedPreferenceChangeListener {
         super.onDestroy()
         attachNavDrawer?.let { navDrawer.removeCallbacks(it) }
         attachNavDrawer = null
-        if (drawerLayout != null) {
-            drawerLayout!!.removeDrawerListener(drawerToggle!!)
-        }
+        drawerToggle?.let { drawerLayout?.removeDrawerListener(it) }
         EventBus.getDefault().unregister(this)
         PreferenceManager.getDefaultSharedPreferences(this)
             .unregisterOnSharedPreferenceChangeListener(this)
@@ -613,7 +609,7 @@ class MainActivity : SimpleToolbarActivity(), OnSharedPreferenceChangeListener {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return if (drawerToggle != null && drawerToggle!!.onOptionsItemSelected(item)) { // Tablet layout does not have a drawer
+        return if (drawerToggle?.onOptionsItemSelected(item) == true) { // Tablet layout does not have a drawer
             true
         } else if (item.itemId == android.R.id.home) {
             if (supportFragmentManager.backStackEntryCount > 0) {
@@ -632,7 +628,7 @@ class MainActivity : SimpleToolbarActivity(), OnSharedPreferenceChangeListener {
             callback?.run {
                 drawerCloseCallback = this
             }
-            drawerLayout!!.closeDrawer(navDrawer)
+            drawerLayout?.closeDrawer(navDrawer)
         } else {
             callback?.run {
                 callback()
@@ -642,16 +638,15 @@ class MainActivity : SimpleToolbarActivity(), OnSharedPreferenceChangeListener {
 
     override fun onBackPressed() {
         if (isDrawerOpen) {
-            drawerLayout!!.closeDrawer(navDrawer)
-        } else if (bottomSheet!!.state == BottomSheetBehavior.STATE_EXPANDED) {
-            bottomSheet!!.setState(BottomSheetBehavior.STATE_COLLAPSED)
+            drawerLayout?.closeDrawer(navDrawer)
+        } else if (bottomSheet.state == BottomSheetBehavior.STATE_EXPANDED) {
+            bottomSheet.setState(BottomSheetBehavior.STATE_COLLAPSED)
         } else if (supportFragmentManager.backStackEntryCount != 0) {
             super.onBackPressed()
         } else {
             when (Prefs.backButtonBehavior) {
-                BackButtonBehavior.OPEN_DRAWER -> if (drawerLayout != null) { // Tablet layout does not have drawer
-                    drawerLayout!!.openDrawer(navDrawer)
-                }
+                // Tablet layout does not have drawer
+                BackButtonBehavior.OPEN_DRAWER -> drawerLayout?.openDrawer(navDrawer)
                 BackButtonBehavior.SHOW_PROMPT -> AccentMaterialDialog(
                     this,
                     R.style.MaterialAlertDialogTheme
@@ -676,8 +671,9 @@ class MainActivity : SimpleToolbarActivity(), OnSharedPreferenceChangeListener {
     fun onEventMainThread(event: MessageEvent) {
         Log.d(TAG, "onEvent -> $event")
         val snackbar = showSnackbarAbovePlayer(event.message, Snackbar.LENGTH_LONG)
-        if (event.action != null) {
-            snackbar.setAction(getString(R.string.undo)) { v: View? -> event.action!!.run() }
+        val action = event.action
+        if (action != null) {
+            snackbar.setAction(getString(R.string.undo)) { v: View? -> action.run() }
         }
     }
 
@@ -703,9 +699,9 @@ class MainActivity : SimpleToolbarActivity(), OnSharedPreferenceChangeListener {
             } else if (feed != null) {
                 loadChildFragment(FeedItemlistFragment.newInstance(feed))
             }
-            bottomSheet!!.setState(BottomSheetBehavior.STATE_COLLAPSED)
+            bottomSheet.setState(BottomSheetBehavior.STATE_COLLAPSED)
         } else if (intent.getBooleanExtra(MainActivityStarter.EXTRA_OPEN_PLAYER, false)) {
-            bottomSheet!!.state = BottomSheetBehavior.STATE_EXPANDED
+            bottomSheet.state = BottomSheetBehavior.STATE_EXPANDED
             bottomSheetCallback.onSlide(navDrawer, 1.0f)
         } else if (Intent.ACTION_VIEW == intent.action) {
             handleDeeplink(intent.data)
@@ -727,14 +723,15 @@ class MainActivity : SimpleToolbarActivity(), OnSharedPreferenceChangeListener {
      * @return
      */
     fun showSnackbarAbovePlayer(text: CharSequence?, duration: Int): Snackbar {
+        val message = text ?: ""
         val s: Snackbar
-        if (bottomSheet!!.state == BottomSheetBehavior.STATE_COLLAPSED) {
-            s = Snackbar.make(findViewById(R.id.main_view), text!!, duration)
+        if (bottomSheet.state == BottomSheetBehavior.STATE_COLLAPSED) {
+            s = Snackbar.make(findViewById(R.id.main_view), message, duration)
             if (findViewById<View>(R.id.audioplayerFragment).visibility == View.VISIBLE) {
                 s.anchorView = findViewById(R.id.audioplayerFragment)
             }
         } else {
-            s = Snackbar.make(findViewById(android.R.id.content), text!!, duration)
+            s = Snackbar.make(findViewById(android.R.id.content), message, duration)
         }
         if (!materialYou) {
             s.setActionTextColor(accentColor(this))

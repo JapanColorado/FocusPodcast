@@ -70,7 +70,7 @@ import java.util.concurrent.Callable
 class SubFeedsFragment : Fragment(), Toolbar.OnMenuItemClickListener, OnSelectModeListener,
     DoubleClickBackToContentTopListener.IBackToContentTopView {
     private lateinit var subscriptionRecycler: RecyclerView
-    private var subscriptionAdapter: SubFeedsAdapter? = null
+    private lateinit var subscriptionAdapter: SubFeedsAdapter
     private lateinit var subscriptionAddButton: FloatingActionButton
     private lateinit var emptyView: EmptyViewHandler
     private lateinit var toolbar: Toolbar
@@ -84,7 +84,7 @@ class SubFeedsFragment : Fragment(), Toolbar.OnMenuItemClickListener, OnSelectMo
     private val uiHandler = Handler(Looper.getMainLooper())
     private lateinit var prefs: SharedPreferences
     private lateinit var skeleton: Skeleton
-    private var listItems: List<DrawerItem>? = null
+    private var listItems: List<DrawerItem> = emptyList()
     private lateinit var skeletonRecyclerDelay: SkeletonRecyclerDelay
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -104,7 +104,7 @@ class SubFeedsFragment : Fragment(), Toolbar.OnMenuItemClickListener, OnSelectMo
         if (savedInstanceState != null) {
             displayUpArrow = savedInstanceState.getBoolean(KEY_UP_ARROW)
         }
-        (activity as MainActivity?)!!.setupToolbarToggle(toolbar, displayUpArrow)
+        (requireActivity() as MainActivity).setupToolbarToggle(toolbar, displayUpArrow)
         toolbar.inflateMenu(R.menu.subscriptions)
         showToolbarMenuIcon(toolbar)
         for (i in COLUMN_CHECKBOX_IDS.indices) {
@@ -189,10 +189,10 @@ class SubFeedsFragment : Fragment(), Toolbar.OnMenuItemClickListener, OnSelectMo
             setColumnNumber(5)
             return true
         } else if (itemId == R.id.action_search) {
-            (activity as MainActivity?)!!.loadChildFragment(LocalSearchFragment.newFeedSearchInstance())
+            (requireActivity() as MainActivity).loadChildFragment(LocalSearchFragment.newFeedSearchInstance())
             return true
         } else if (itemId == R.id.action_statistics) {
-            (activity as MainActivity?)!!.loadChildFragment(StatisticsFragment())
+            (requireActivity() as MainActivity).loadChildFragment(StatisticsFragment())
             return true
         }
         return false
@@ -224,7 +224,7 @@ class SubFeedsFragment : Fragment(), Toolbar.OnMenuItemClickListener, OnSelectMo
             AnimationUtils.loadLayoutAnimation(context, R.anim.grid_layout_animation_from_bottom)
         subscriptionRecycler.layoutAnimation = loadLayoutAnimation
 
-        subscriptionAdapter = object : SubFeedsAdapter((activity as MainActivity?)!!) {
+        subscriptionAdapter = object : SubFeedsAdapter(requireActivity() as MainActivity) {
             override fun onCreateContextMenu(
                 menu: ContextMenu,
                 v: View,
@@ -238,24 +238,23 @@ class SubFeedsFragment : Fragment(), Toolbar.OnMenuItemClickListener, OnSelectMo
                 }
             }
         }
-        subscriptionAdapter!!.setOnSelectModeListener(this)
+        subscriptionAdapter.setOnSelectModeListener(this)
         subscriptionRecycler.adapter = subscriptionAdapter
 
-        subscriptionAdapter!!.setOnMenuItemClickListener(object :
+        subscriptionAdapter.setOnMenuItemClickListener(object :
             MultiSelectAdapter.OnMenuItemClickListener {
             override fun onMenuItemClick(item: MenuItem?) {
+                val menuItem = item ?: return
                 FeedMultiSelectActionHandler(
-                    activity as MainActivity?,
-                    subscriptionAdapter!!.selectedItems
+                    requireActivity() as MainActivity,
+                    subscriptionAdapter.selectedItems
                 )
-                    .handleAction(item!!.itemId)
+                    .handleAction(menuItem.itemId)
             }
         })
         setupEmptyView()
         subscriptionAddButton.setOnClickListener { view: View? ->
-            if (activity is MainActivity) {
-                (activity as MainActivity?)!!.loadChildFragment(DiscoverFragment())
-            }
+            (activity as? MainActivity)?.loadChildFragment(DiscoverFragment())
         }
         skeleton =
             subscriptionRecycler.applySkeleton(R.layout.item_grid_recyclerview_skeleton, 30)
@@ -273,18 +272,12 @@ class SubFeedsFragment : Fragment(), Toolbar.OnMenuItemClickListener, OnSelectMo
     override fun onStop() {
         super.onStop()
         EventBus.getDefault().unregister(this)
-        if (disposable != null) {
-            disposable!!.dispose()
-        }
-        if (subscriptionAdapter != null) {
-            subscriptionAdapter!!.endSelectMode()
-        }
+        disposable?.dispose()
+        subscriptionAdapter.endSelectMode()
     }
 
     private fun loadSubscriptions() {
-        if (disposable != null) {
-            disposable!!.dispose()
-        }
+        disposable?.dispose()
         emptyView.hide()
         disposable = Observable.fromCallable {
             val data = DBReader.getNavDrawerData(true)
@@ -307,13 +300,13 @@ class SubFeedsFragment : Fragment(), Toolbar.OnMenuItemClickListener, OnSelectMo
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe(
                 { result: List<DrawerItem> ->
-                    if (listItems != null && listItems!!.size > result.size) {
+                    if (listItems.size > result.size) {
                         // We have fewer items. This can result in items being selected that are no longer visible.
-                        subscriptionAdapter!!.endSelectMode()
+                        subscriptionAdapter.endSelectMode()
                     }
                     listItems = result
-                    subscriptionAdapter!!.setItems(result)
-                    subscriptionAdapter!!.notifyDataSetChanged()
+                    subscriptionAdapter.setItems(result)
+                    subscriptionAdapter.notifyDataSetChanged()
                     if (skeleton.isSkeleton()) {
                         skeletonRecyclerDelay.showOriginal()
                     }
@@ -330,7 +323,7 @@ class SubFeedsFragment : Fragment(), Toolbar.OnMenuItemClickListener, OnSelectMo
         private get() = resources.getInteger(R.integer.subscriptions_default_num_of_columns)
 
     override fun onContextItemSelected(item: MenuItem): Boolean {
-        val drawerItem = subscriptionAdapter!!.selectedItem ?: return false
+        val drawerItem = subscriptionAdapter.selectedItem ?: return false
         val itemId = item.itemId
         if (drawerItem.type == DrawerItem.Type.TAG && itemId == R.id.rename_folder_item) {
             RenameItemDialog(requireActivity(), drawerItem).show()
@@ -351,7 +344,7 @@ class SubFeedsFragment : Fragment(), Toolbar.OnMenuItemClickListener, OnSelectMo
             show(requireContext(), feed)
             return true
         } else if (itemId == R.id.multi_select) {
-            return subscriptionAdapter!!.onContextItemSelected(item)
+            return subscriptionAdapter.onContextItemSelected(item)
         }
         return super.onContextItemSelected(item)
     }
@@ -398,21 +391,21 @@ class SubFeedsFragment : Fragment(), Toolbar.OnMenuItemClickListener, OnSelectMo
         UpdateRefreshMenuItemChecker { DownloadService.isRunning() && DownloadService.isDownloadingFeeds() }
 
     override fun onEndSelectMode() {
-        subscriptionAdapter!!.setItems(listItems!!)
-        subscriptionAdapter!!.notifyDataSetChanged()
+        subscriptionAdapter.setItems(listItems)
+        subscriptionAdapter.notifyDataSetChanged()
         toolbar.visibility = View.VISIBLE
     }
 
     override fun onStartSelectMode() {
         toolbar.visibility = View.GONE
         val feedsOnly: MutableList<DrawerItem> = ArrayList()
-        for (item in listItems!!) {
+        for (item in listItems) {
             if (item.type == DrawerItem.Type.FEED) {
                 feedsOnly.add(item)
             }
         }
-        subscriptionAdapter!!.setItems(feedsOnly)
-        subscriptionAdapter!!.notifyDataSetChanged()
+        subscriptionAdapter.setItems(feedsOnly)
+        subscriptionAdapter.notifyDataSetChanged()
     }
 
     companion object {

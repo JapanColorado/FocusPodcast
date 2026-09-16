@@ -20,8 +20,8 @@ class CancelDownloadActionButton(val item: FeedItem) : ItemActionButton {
         get() = R.drawable.ic_cancel
 
     override fun onClick(context: Activity?) {
-        val media = item.media
-        DownloadService.cancel(context, media!!.download_url)
+        val media = item.media ?: return
+        DownloadService.cancel(context, media.download_url)
         if (Prefs.isEnableAutodownload) {
             item.disableAutoDownload()
             DBWriter.setFeedItem(item)

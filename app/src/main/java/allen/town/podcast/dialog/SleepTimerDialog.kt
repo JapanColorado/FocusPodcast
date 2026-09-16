@@ -9,6 +9,7 @@ import allen.town.podcast.core.pref.SleepTimerPreferences
 import allen.town.podcast.core.service.playback.PlaybackService
 import allen.town.podcast.core.util.Converter
 import allen.town.podcast.core.util.playback.PlaybackController
+import allen.town.podcast.databinding.TimeDialogBinding
 import allen.town.podcast.event.playback.SleepTimerUpdatedEvent
 import android.app.Activity
 import android.app.Dialog
@@ -19,7 +20,6 @@ import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import android.widget.*
 import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.widget.SwitchCompat
 import androidx.fragment.app.DialogFragment
 import androidx.recyclerview.widget.RecyclerView
 import com.beloo.widget.chipslayoutmanager.ChipsLayoutManager
@@ -30,10 +30,8 @@ import org.greenrobot.eventbus.ThreadMode
 
 class SleepTimerDialog : DialogFragment() {
     private var controller: PlaybackController? = null
-    private var timeSetup: LinearLayout? = null
-    private var timeDisplay: LinearLayout? = null
-    private var time: TextView? = null
-    private var adapter: TimesAdapter? = null
+    private var _binding: TimeDialogBinding? = null
+    private lateinit var adapter: TimesAdapter
     var spinnerContent = arrayOf(
         "5",
         "10",
@@ -46,100 +44,83 @@ class SleepTimerDialog : DialogFragment() {
 
     override fun onStart() {
         super.onStart()
-        controller = object : PlaybackController(requireActivity()) {
+        val playbackController = object : PlaybackController(requireActivity()) {
             override fun loadMediaInfo() {}
         }
-        controller!!.init()
+        controller = playbackController
+        playbackController.init()
         EventBus.getDefault().register(this)
     }
 
     override fun onStop() {
         super.onStop()
-        if (controller != null) {
-            controller!!.release()
-        }
+        controller?.release()
         EventBus.getDefault().unregister(this)
     }
 
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
+
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        val content = View.inflate(context, R.layout.time_dialog, null)
+        val binding = TimeDialogBinding.inflate(layoutInflater)
+        _binding = binding
         val builder: AlertDialog.Builder = AccentMaterialDialog(
             requireContext(),
             R.style.MaterialAlertDialogTheme
         )
         builder.setTitle(R.string.sleep_timer_label)
-        builder.setView(content)
+        builder.setView(binding.root)
         builder.setPositiveButton(R.string.close_label, null)
-        timeSetup = content.findViewById(R.id.timeSetup)
-        timeDisplay = content.findViewById(R.id.timeDisplay)
-        timeDisplay!!.setVisibility(View.GONE)
-        time = content.findViewById(R.id.time)
-        val extendSleepFiveMinutesButton =
-            content.findViewById<Button>(R.id.extendSleepFiveMinutesButton)
-        extendSleepFiveMinutesButton.text = getString(R.string.extend_sleep_timer_label, 5)
-        val extendSleepTenMinutesButton =
-            content.findViewById<Button>(R.id.extendSleepTenMinutesButton)
-        extendSleepTenMinutesButton.text = getString(R.string.extend_sleep_timer_label, 10)
-        val extendSleepTwentyMinutesButton =
-            content.findViewById<Button>(R.id.extendSleepTwentyMinutesButton)
-        extendSleepTwentyMinutesButton.text = getString(R.string.extend_sleep_timer_label, 20)
-        extendSleepFiveMinutesButton.setOnClickListener { v: View? ->
-            if (controller != null) {
-                controller!!.extendSleepTimer((5 * 1000 * 60).toLong())
-            }
+        binding.timeDisplay.visibility = View.GONE
+        binding.extendSleepFiveMinutesButton.text = getString(R.string.extend_sleep_timer_label, 5)
+        binding.extendSleepTenMinutesButton.text = getString(R.string.extend_sleep_timer_label, 10)
+        binding.extendSleepTwentyMinutesButton.text =
+            getString(R.string.extend_sleep_timer_label, 20)
+        binding.extendSleepFiveMinutesButton.setOnClickListener {
+            controller?.extendSleepTimer((5 * 1000 * 60).toLong())
         }
-        extendSleepTenMinutesButton.setOnClickListener { v: View? ->
-            if (controller != null) {
-                controller!!.extendSleepTimer((10 * 1000 * 60).toLong())
-            }
+        binding.extendSleepTenMinutesButton.setOnClickListener {
+            controller?.extendSleepTimer((10 * 1000 * 60).toLong())
         }
-        extendSleepTwentyMinutesButton.setOnClickListener { v: View? ->
-            if (controller != null) {
-                controller!!.extendSleepTimer((20 * 1000 * 60).toLong())
-            }
+        binding.extendSleepTwentyMinutesButton.setOnClickListener {
+            controller?.extendSleepTimer((20 * 1000 * 60).toLong())
         }
         for (i in spinnerContent.indices) {
             if (spinnerContent[i] == SleepTimerPreferences.lastTimerValue()) {
                 selectedIndex = i
             }
         }
-        val recyclerView = content.findViewById<RecyclerView>(R.id.times_recycler_view)
         //https://github.com/BelooS/ChipsLayoutManager
         val chipsLayoutManager = ChipsLayoutManager.newBuilder(context).build()
-        recyclerView.layoutManager = chipsLayoutManager
-        recyclerView.addItemDecoration(ItemOffsetDecoration(requireContext(), 4))
+        binding.timesRecyclerView.layoutManager = chipsLayoutManager
+        binding.timesRecyclerView.addItemDecoration(ItemOffsetDecoration(requireContext(), 4))
         adapter = TimesAdapter()
-        adapter!!.setHasStableIds(true)
-        recyclerView.adapter = adapter
-        val cbShakeToReset = content.findViewById<SwitchCompat>(R.id.cbShakeToReset)
-        val cbVibrate = content.findViewById<SwitchCompat>(R.id.cbVibrate)
-        val chAutoEnable = content.findViewById<SwitchCompat>(R.id.chAutoEnable)
-        cbShakeToReset.isChecked = SleepTimerPreferences.shakeToReset()
-        cbVibrate.isChecked = SleepTimerPreferences.vibrate()
-        chAutoEnable.isChecked = SleepTimerPreferences.autoEnable()
-        cbShakeToReset.setOnCheckedChangeListener { buttonView: CompoundButton?, isChecked: Boolean ->
+        adapter.setHasStableIds(true)
+        binding.timesRecyclerView.adapter = adapter
+        binding.cbShakeToReset.isChecked = SleepTimerPreferences.shakeToReset()
+        binding.cbVibrate.isChecked = SleepTimerPreferences.vibrate()
+        binding.chAutoEnable.isChecked = SleepTimerPreferences.autoEnable()
+        binding.cbShakeToReset.setOnCheckedChangeListener { _: CompoundButton?, isChecked: Boolean ->
             SleepTimerPreferences.setShakeToReset(
                 isChecked
             )
         }
-        cbVibrate.setOnCheckedChangeListener { buttonView: CompoundButton?, isChecked: Boolean ->
+        binding.cbVibrate.setOnCheckedChangeListener { _: CompoundButton?, isChecked: Boolean ->
             SleepTimerPreferences.setVibrate(
                 isChecked
             )
         }
-        chAutoEnable.setOnCheckedChangeListener { compoundButton: CompoundButton?, isChecked: Boolean ->
+        binding.chAutoEnable.setOnCheckedChangeListener { _: CompoundButton?, isChecked: Boolean ->
             SleepTimerPreferences.setAutoEnable(
                 isChecked
             )
         }
-        val disableButton = content.findViewById<Button>(R.id.disableSleeptimerButton)
-        disableButton.setOnClickListener { v: View? ->
-            if (controller != null) {
-                controller!!.disableSleepTimer()
-            }
+        binding.disableSleeptimerButton.setOnClickListener {
+            controller?.disableSleepTimer()
         }
-        val setButton = content.findViewById<Button>(R.id.setSleeptimerButton)
-        setButton.setOnClickListener { v: View? ->
+        binding.setSleeptimerButton.setOnClickListener {
             if (!PlaybackService.isRunning) {
                 showSnack(activity, R.string.no_media_playing_label, Toast.LENGTH_LONG)
                 return@setOnClickListener
@@ -150,10 +131,8 @@ class SleepTimerDialog : DialogFragment() {
                     throw NumberFormatException("Timer must not be zero")
                 }
                 SleepTimerPreferences.setLastTimer(spinnerContent[selectedIndex])
-                if (controller != null) {
-                    controller!!.setSleepTimer(SleepTimerPreferences.timerMillis())
-                }
-                closeKeyboard(content)
+                controller?.setSleepTimer(SleepTimerPreferences.timerMillis())
+                closeKeyboard(binding.root)
             } catch (e: NumberFormatException) {
                 Timber.w(e, "the sleep timer input is not a usable number")
                 showSnack(activity, R.string.time_dialog_invalid_input, Toast.LENGTH_LONG)
@@ -164,11 +143,12 @@ class SleepTimerDialog : DialogFragment() {
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     fun timerUpdated(event: SleepTimerUpdatedEvent) {
-        timeDisplay!!.visibility =
+        val binding = _binding ?: return
+        binding.timeDisplay.visibility =
             if (event.isOver || event.isCancelled) View.GONE else View.VISIBLE
-        timeSetup!!.visibility =
+        binding.timeSetup.visibility =
             if (event.isOver || event.isCancelled) View.VISIBLE else View.GONE
-        time!!.text =
+        binding.time.text =
             Converter.getDurationStringLong(event.timeLeft.toInt())
     }
 
@@ -198,7 +178,7 @@ class SleepTimerDialog : DialogFragment() {
                     return@setOnClickListener
                 }
                 selectedIndex = pos
-                adapter!!.notifyDataSetChanged()
+                notifyDataSetChanged()
             }
         }
 

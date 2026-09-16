@@ -94,15 +94,16 @@ class CoverFragment : Fragment {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        root = inflater.inflate(layoutWithPlayerTheme, container, false)
-        txtvPodcastTitle = root!!.findViewById(R.id.txtvPodcastTitle)
-        txtvEpisodeTitle = root!!.findViewById(R.id.txtvEpisodeTitle)
-        imgvCover = root!!.findViewById(R.id.imgvCover)
-        episodeDetails = root!!.findViewById(R.id.episode_details)
-        chapterControl = root!!.findViewById(R.id.chapterButton)
-        butPrevChapter = root!!.findViewById(R.id.butPrevChapter)
-        butNextChapter = root!!.findViewById(R.id.butNextChapter)
-        chapterTitleTv = root!!.findViewById(R.id.chapters_label)
+        val root = inflater.inflate(layoutWithPlayerTheme, container, false)
+        this.root = root
+        txtvPodcastTitle = root.findViewById(R.id.txtvPodcastTitle)
+        txtvEpisodeTitle = root.findViewById(R.id.txtvEpisodeTitle)
+        imgvCover = root.findViewById(R.id.imgvCover)
+        episodeDetails = root.findViewById(R.id.episode_details)
+        chapterControl = root.findViewById(R.id.chapterButton)
+        butPrevChapter = root.findViewById(R.id.butPrevChapter)
+        butNextChapter = root.findViewById(R.id.butNextChapter)
+        chapterTitleTv = root.findViewById(R.id.chapters_label)
         coverViewHolder = CoverViewHolder()
         coverViewHolder.chapterTv = chapterTitleTv
         coverViewHolder.preChapterIv = butPrevChapter
@@ -122,14 +123,14 @@ class CoverFragment : Fragment {
         butPrevChapter.setColorFilter(colorFilter)
         butPrevChapter.setOnClickListener(View.OnClickListener({ v: View? -> seekToPrevChapter() }))
         butNextChapter.setOnClickListener(View.OnClickListener({ v: View? -> seekToNextChapter() }))
-        albumCoverOverlay = root!!.findViewById(R.id.album_cover_overlay)
-        imgvCoverVinyl = root!!.findViewById(R.id.imgvCoverVinyl)
-        return root!!
+        albumCoverOverlay = root.findViewById(R.id.album_cover_overlay)
+        imgvCoverVinyl = root.findViewById(R.id.imgvCoverVinyl)
+        return root
     }
 
     public override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         if (layoutWithPlayerTheme == R.layout.circle_cover_fragment) {
-            albumCoverOverlay!!.setBackground(
+            albumCoverOverlay?.setBackground(
                 ColorDrawable(
                     getPrimaryTextColor(
                         requireContext(),
@@ -150,11 +151,9 @@ class CoverFragment : Fragment {
     }
 
     private fun loadMediaInfo(includingChapters: Boolean) {
-        if (disposable != null) {
-            disposable!!.dispose()
-        }
+        disposable?.dispose()
         disposable = Maybe.create(MaybeOnSubscribe({ emitter: MaybeEmitter<Playable> ->
-            val media: Playable? = controller!!.getMedia()
+            val media: Playable? = controller?.getMedia()
             if (media != null) {
                 if (includingChapters) {
                     ChapterUtils.loadChapters(media, getContext())
@@ -176,38 +175,39 @@ class CoverFragment : Fragment {
 
     private fun displayMediaInfo(media: Playable) {
         val pubDateStr: String = DateFormatter.formatAbbrev(getActivity(), media.getPubDate())
-        txtvPodcastTitle!!.setText(
+        txtvPodcastTitle.setText(
             StringUtils.stripToEmpty(media.getFeedTitle()) /*+ "\u00A0"
                 + "・"
                 + "\u00A0"
                 + StringUtils.replace(StringUtils.stripToEmpty(pubDateStr), " ", "\u00A0")*/
         )
-        if (media is FeedMedia) {
+        val feedItem = if (media is FeedMedia) media.getItem() else null
+        if (feedItem != null) {
             val openFeed: Intent = getIntentToOpenFeedWithId(
                 requireContext(),
-                media.getItem()!!.getFeedId()
+                feedItem.getFeedId()
             )
-            txtvPodcastTitle!!.setOnClickListener(View.OnClickListener({ v: View? ->
+            txtvPodcastTitle.setOnClickListener(View.OnClickListener({ v: View? ->
                 startActivity(
                     openFeed
                 )
             }))
         } else {
-            txtvPodcastTitle!!.setOnClickListener(null)
+            txtvPodcastTitle.setOnClickListener(null)
         }
-        txtvPodcastTitle!!.setOnLongClickListener(OnLongClickListener({ v: View? -> copyText(media.getFeedTitle()) }))
-        txtvEpisodeTitle!!.setText(media.getEpisodeTitle())
-        txtvEpisodeTitle!!.setOnLongClickListener(OnLongClickListener({ v: View? -> copyText(media.getEpisodeTitle()) }))
-        txtvEpisodeTitle!!.setOnClickListener(View.OnClickListener({ v: View? ->
-            val lines: Int = txtvEpisodeTitle!!.getLineCount()
+        txtvPodcastTitle.setOnLongClickListener(OnLongClickListener({ v: View? -> copyText(media.getFeedTitle()) }))
+        txtvEpisodeTitle.setText(media.getEpisodeTitle())
+        txtvEpisodeTitle.setOnLongClickListener(OnLongClickListener({ v: View? -> copyText(media.getEpisodeTitle()) }))
+        txtvEpisodeTitle.setOnClickListener(View.OnClickListener({ v: View? ->
+            val lines: Int = txtvEpisodeTitle.getLineCount()
             val animUnit: Int = 1000
-            if (lines > txtvEpisodeTitle!!.getMaxLines()) {
+            if (lines > txtvEpisodeTitle.getMaxLines()) {
                 val verticalMarquee: ObjectAnimator = ObjectAnimator.ofInt(
                     txtvEpisodeTitle,
                     "scrollY",
                     0,
-                    (lines - txtvEpisodeTitle!!.getMaxLines()) * (((txtvEpisodeTitle!!.getHeight() - txtvEpisodeTitle!!.getPaddingTop()
-                            - txtvEpisodeTitle!!.getPaddingBottom())) / txtvEpisodeTitle!!.getMaxLines())
+                    (lines - txtvEpisodeTitle.getMaxLines()) * (((txtvEpisodeTitle.getHeight() - txtvEpisodeTitle.getPaddingTop()
+                            - txtvEpisodeTitle.getPaddingBottom())) / txtvEpisodeTitle.getMaxLines())
                 )
                     .setDuration((lines * animUnit).toLong())
                 val fadeOut: ObjectAnimator = ObjectAnimator.ofFloat(
@@ -216,7 +216,7 @@ class CoverFragment : Fragment {
                 fadeOut.setStartDelay(animUnit.toLong())
                 fadeOut.addListener(object : AnimatorListenerAdapter() {
                     public override fun onAnimationEnd(animation: Animator) {
-                        txtvEpisodeTitle!!.scrollTo(0, 0)
+                        txtvEpisodeTitle.scrollTo(0, 0)
                     }
                 })
                 val fadeBackIn: ObjectAnimator = ObjectAnimator.ofFloat(
@@ -241,13 +241,14 @@ class CoverFragment : Fragment {
         if (isDriveMode) {
             return
         }
+        val media = this.media ?: return
         var chapterControlVisible: Boolean = false
-        if (media!!.getChapters() != null) {
-            chapterControlVisible = media!!.getChapters().size > 0
+        val chapters = media.getChapters()
+        if (chapters != null) {
+            chapterControlVisible = chapters.size > 0
         } else if (media is FeedMedia) {
-            val fm: FeedMedia = (media as FeedMedia)
             // If an item has chapters but they are not loaded yet, still display the button.
-            chapterControlVisible = fm.getItem() != null && fm.getItem()!!.hasChapters()
+            chapterControlVisible = media.getItem()?.hasChapters() == true
         }
         val newVisibility: Int = if (chapterControlVisible) View.VISIBLE else View.GONE
         if (chapterControl.getVisibility() != newVisibility) {
@@ -263,15 +264,17 @@ class CoverFragment : Fragment {
     }
 
     private fun refreshChapterData(chapterIndex: Int) {
-        if (chapterIndex > -1) {
-            if (media!!.getPosition() > media!!.getDuration() || chapterIndex >= media!!.getChapters().size - 1) {
-                displayedChapterIndex = media!!.getChapters().size - 1
+        val media = this.media
+        val chapters = media?.getChapters()
+        if (chapterIndex > -1 && media != null && chapters != null) {
+            if (media.getPosition() > media.getDuration() || chapterIndex >= chapters.size - 1) {
+                displayedChapterIndex = chapters.size - 1
                 butNextChapter.setVisibility(View.INVISIBLE)
             } else {
                 displayedChapterIndex = chapterIndex
                 butNextChapter.setVisibility(View.VISIBLE)
             }
-            val chapterTitle: String = media!!.getChapters().get(displayedChapterIndex).getTitle()
+            val chapterTitle: String? = chapters.get(displayedChapterIndex).getTitle()
             if (!TextUtils.isEmpty(chapterTitle)) {
                 chapterTitleTv.setText(chapterTitle)
             }
@@ -281,37 +284,41 @@ class CoverFragment : Fragment {
 
     private val currentChapter: Chapter?
         private get() {
-            if ((media == null) || (media!!.getChapters() == null) || (displayedChapterIndex == -1)) {
+            val chapters = media?.getChapters()
+            if (chapters == null || displayedChapterIndex == -1) {
                 return null
             }
-            return media!!.getChapters().get(displayedChapterIndex)
+            return chapters.get(displayedChapterIndex)
         }
 
     private fun seekToPrevChapter() {
+        val controller = this.controller
         val curr: Chapter? = currentChapter
         if ((controller == null) || (curr == null) || (displayedChapterIndex == -1)) {
             return
         }
         if (displayedChapterIndex < 1) {
-            controller!!.seekTo(0)
-        } else if (((controller!!.getPosition() - 10000 * controller!!.getCurrentPlaybackSpeedMultiplier())
+            controller.seekTo(0)
+        } else if (((controller.getPosition() - 10000 * controller.getCurrentPlaybackSpeedMultiplier())
                     < curr.getStart())
         ) {
             refreshChapterData(displayedChapterIndex - 1)
-            controller!!.seekTo(media!!.getChapters().get(displayedChapterIndex).getStart().toInt())
+            currentChapter?.let { controller.seekTo(it.getStart().toInt()) }
         } else {
-            controller!!.seekTo(curr.getStart().toInt())
+            controller.seekTo(curr.getStart().toInt())
         }
     }
 
     private fun seekToNextChapter() {
-        if ((controller == null) || (media == null) || (media!!.getChapters() == null
-                    ) || (displayedChapterIndex == -1) || (displayedChapterIndex + 1 >= media!!.getChapters().size)
+        val controller = this.controller
+        val chapters = media?.getChapters()
+        if ((controller == null) || (chapters == null
+                    ) || (displayedChapterIndex == -1) || (displayedChapterIndex + 1 >= chapters.size)
         ) {
             return
         }
         refreshChapterData(displayedChapterIndex + 1)
-        controller!!.seekTo(media!!.getChapters().get(displayedChapterIndex).getStart().toInt())
+        currentChapter?.let { controller.seekTo(it.getStart().toInt()) }
     }
 
     public override fun onDestroy() {
@@ -322,40 +329,39 @@ class CoverFragment : Fragment {
 
     public override fun onStart() {
         super.onStart()
-        controller = object : PlaybackController((getActivity())!!) {
+        val controller = object : PlaybackController(requireActivity()) {
             public override fun loadMediaInfo() {
                 this@CoverFragment.loadMediaInfo(false)
             }
 
             override fun updatePlayButtonShowsPlay(showPlay: Boolean) {
                 if (layoutWithPlayerTheme == R.layout.circle_cover_fragment) {
-                    if (rotateAnimator != null) {
+                    if (this@CoverFragment::rotateAnimator.isInitialized) {
                         if (!showPlay) {
-                            if (rotateAnimator!!.isStarted()) rotateAnimator!!.resume() else rotateAnimator!!.start()
+                            if (rotateAnimator.isStarted()) rotateAnimator.resume() else rotateAnimator.start()
                         } else {
-                            rotateAnimator!!.pause()
+                            rotateAnimator.pause()
                         }
                     }
                 } else if (layoutWithPlayerTheme == R.layout.vinyl_cover_fragment) {
                     if (!showPlay) {
-                        imgvCoverVinyl!!.start()
+                        imgvCoverVinyl?.start()
                     } else {
-                        imgvCoverVinyl!!.pause()
+                        imgvCoverVinyl?.pause()
                     }
                 }
             }
         }
-        controller!!.init()
+        this.controller = controller
+        controller.init()
         loadMediaInfo(false)
         EventBus.getDefault().register(this)
     }
 
     public override fun onStop() {
         super.onStop()
-        if (disposable != null) {
-            disposable!!.dispose()
-        }
-        controller!!.release()
+        disposable?.dispose()
+        controller?.release()
         controller = null
         EventBus.getDefault().unregister(this)
     }
@@ -369,6 +375,7 @@ class CoverFragment : Fragment {
     }
 
     private fun displayCoverImage() {
+        val media = this.media ?: return
         val options: RequestOptions
         if (layoutWithPlayerTheme == R.layout.full_cover_fragment) {
             //no rounded rect needed
@@ -388,19 +395,19 @@ class CoverFragment : Fragment {
         val cover: RequestBuilder<BitmapPaletteWrapper> = Glide.with(this).`as`(
             BitmapPaletteWrapper::class.java
         )
-            .load(media!!.getImageLocation())
+            .load(media.getImageLocation())
             .error(
                 Glide.with(this).`as`(BitmapPaletteWrapper::class.java)
-                    .load(ImageResourceUtils.getFallbackImageLocation((media)!!))
+                    .load(ImageResourceUtils.getFallbackImageLocation(media))
                     .apply(options)
             )
             .apply(options)
-        if ((displayedChapterIndex == -1) || (media == null) || (media!!.getChapters() == null
-                    ) || TextUtils.isEmpty(
-                media!!.getChapters().get(displayedChapterIndex).getImageUrl()
+        val chapters = media.getChapters()
+        if ((displayedChapterIndex == -1) || (chapters == null) || TextUtils.isEmpty(
+                chapters.get(displayedChapterIndex).getImageUrl()
             )
         ) {
-            cover.into(object : RetroMusicColoredTarget((imgvCover)!!) {
+            cover.into(object : RetroMusicColoredTarget(imgvCover) {
                 public override fun onColorReady(
                     colors: MediaNotificationProcessor,
                     bitmap: Bitmap?
@@ -414,7 +421,7 @@ class CoverFragment : Fragment {
                         )
                     )
                     if (layoutWithPlayerTheme == R.layout.vinyl_cover_fragment) {
-                        imgvCoverVinyl!!.setCoverBitmap(bitmap)
+                        imgvCoverVinyl?.setCoverBitmap(bitmap)
                     }
                 }
             })
@@ -424,7 +431,7 @@ class CoverFragment : Fragment {
                 .apply(options)
                 .thumbnail(cover)
                 .error(cover)
-                .into(object : RetroMusicColoredTarget((imgvCover)!!) {
+                .into(object : RetroMusicColoredTarget(imgvCover) {
                     public override fun onColorReady(
                         colors: MediaNotificationProcessor,
                         bitmap: Bitmap?
@@ -437,7 +444,7 @@ class CoverFragment : Fragment {
                             )
                         )
                         if (layoutWithPlayerTheme == R.layout.vinyl_cover_fragment) {
-                            imgvCoverVinyl!!.setCoverBitmap(bitmap)
+                            imgvCoverVinyl?.setCoverBitmap(bitmap)
                         }
                     }
                 })
@@ -455,10 +462,7 @@ class CoverFragment : Fragment {
     }
 
     fun onPlayPause() {
-        if (controller == null) {
-            return
-        }
-        controller!!.playPause()
+        controller?.playPause()
     }
 
     private fun copyText(text: String): Boolean {

@@ -73,9 +73,9 @@ class EpisodesFragment : EpisodesListFragment() {
     private fun showFilterDialog() {
         val filterDialog: FilterDialog = object : FilterDialog(requireContext(), feedItemFilter) {
             override fun updateFilter(filterValues: Set<String>?) {
-                feedItemFilter = FeedItemFilter(filterValues!!.toTypedArray())
+                feedItemFilter = FeedItemFilter(filterValues.orEmpty().toTypedArray())
                 val prefs =
-                    activity!!.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
+                    requireActivity().getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
                 prefs.edit().putString(PREF_FILTER, StringUtils.join(filterValues, ",")).apply()
                 loadItems()
             }
@@ -86,7 +86,7 @@ class EpisodesFragment : EpisodesListFragment() {
     override fun shouldUpdatedItemRemainInList(item: FeedItem): Boolean {
         val prefs = requireActivity().getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
         val feedItemFilter = FeedItemFilter(prefs.getString(PREF_FILTER, ""))
-        return if (feedItemFilter.isShowDownloaded && (!item.hasMedia() || !item.media!!.isDownloaded)) {
+        return if (feedItemFilter.isShowDownloaded && (!item.hasMedia() || item.media?.isDownloaded != true)) {
             false
         } else true
     }

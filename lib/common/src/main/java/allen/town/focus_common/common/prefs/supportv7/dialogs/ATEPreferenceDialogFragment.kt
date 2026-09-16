@@ -38,13 +38,12 @@ open class ATEPreferenceDialogFragment : DialogFragment(), DialogInterface.OnCli
 //        check(rawFragment is TargetFragment) { "Target fragment must implement TargetFragment interface" }
         val fragment = rawFragment as? TargetFragment
         val key = this.arguments?.getString(ARG_KEY)
-        preference = fragment?.findPreference(key!!)
+        preference = if (key == null) null else fragment?.findPreference(key)
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        val context = this.activity
         val builder = AccentMaterialDialog(
-            context!!,
+            requireActivity(),
             com.google.android.material.R.style.ThemeOverlay_MaterialComponents_Dialog_Alert
         )
             .setTitle(if (TextUtils.isEmpty(getTitleStr()))preference?.dialogTitle else getTitleStr())
@@ -74,8 +73,7 @@ open class ATEPreferenceDialogFragment : DialogFragment(), DialogInterface.OnCli
     }
 
     private fun requestInputMethod(dialog: Dialog) {
-        val window = dialog.window
-        window!!.setSoftInputMode(5)
+        dialog.window?.setSoftInputMode(5)
     }
 
     override fun onDismiss(dialog: DialogInterface) {

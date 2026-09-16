@@ -38,9 +38,7 @@ abstract class MultiSelectAdapter<T : RecyclerView.ViewHolder?>(
         if (inActionMode()) {
             endSelectMode()
         }
-        if (onSelectModeListener != null) {
-            onSelectModeListener!!.onStartSelectMode()
-        }
+        onSelectModeListener?.onStartSelectMode()
         selectedIds.clear()
         selectedIds.add(getItemId(pos))
         notifyDataSetChanged()
@@ -60,9 +58,7 @@ abstract class MultiSelectAdapter<T : RecyclerView.ViewHolder?>(
                     menu.findItem(R.id.select_toggle),
                     selectedIds.size == itemCount
                 )
-                if (onPrepareActionModeListener != null) {
-                    onPrepareActionModeListener!!.onPrepareActionMode(mode, menu)
-                }
+                onPrepareActionModeListener?.onPrepareActionMode(mode, menu)
                 return false
             }
 
@@ -74,9 +70,7 @@ abstract class MultiSelectAdapter<T : RecyclerView.ViewHolder?>(
                     updateTitle()
                     return true
                 } else {
-                    if (onMenuItemClickListener != null) {
-                        onMenuItemClickListener!!.onMenuItemClick(item)
-                    }
+                    onMenuItemClickListener?.onMenuItemClick(item)
                 }
                 return false
             }
@@ -97,7 +91,7 @@ abstract class MultiSelectAdapter<T : RecyclerView.ViewHolder?>(
     fun endSelectMode() {
         if (inActionMode()) {
             callOnEndSelectMode()
-            actionMode!!.finish()
+            actionMode?.finish()
         }
     }
 
@@ -173,10 +167,8 @@ abstract class MultiSelectAdapter<T : RecyclerView.ViewHolder?>(
     }
 
     private fun updateTitle() {
-        if (actionMode == null) {
-            return
-        }
-        actionMode!!.title = selectedIds.size.toString() + ""
+        val mode = actionMode ?: return
+        mode.title = selectedIds.size.toString() + ""
     }
 
     fun setOnSelectModeListener(onSelectModeListener: OnSelectModeListener?) {
@@ -188,9 +180,7 @@ abstract class MultiSelectAdapter<T : RecyclerView.ViewHolder?>(
     }
 
     private fun callOnEndSelectMode() {
-        if (onSelectModeListener != null) {
-            onSelectModeListener!!.onEndSelectMode()
-        }
+        onSelectModeListener?.onEndSelectMode()
     }
 
     interface OnSelectModeListener {

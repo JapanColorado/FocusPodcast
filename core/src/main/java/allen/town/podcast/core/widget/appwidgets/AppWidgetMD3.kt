@@ -58,12 +58,7 @@ class AppWidgetMD3 : AppWidgetMD() {
 
         @JvmStatic
         val instance: AppWidgetMD3
-            @Synchronized get() {
-                if (mInstance == null) {
-                    mInstance = AppWidgetMD3()
-                }
-                return mInstance!!
-            }
+            @Synchronized get() = mInstance ?: AppWidgetMD3().also { mInstance = it }
     }
 
     override fun getLayout(): Int {

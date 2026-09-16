@@ -21,12 +21,13 @@ class PlayLocalActionButton(val item: FeedItem) : ItemActionButton {
         get() = R.drawable.ic_play_24dp
 
     override fun onClick(context: Activity?) {
+        val activity = context ?: return
         val media: FeedMedia = item.getMedia() ?: return
-        PlaybackServiceStarter(context, media)
+        PlaybackServiceStarter(activity, media)
             .callEvenIfRunning(true)
             .start()
         if (media.mediaType == MediaType.VIDEO) {
-            context!!.startActivity(PlaybackService.getPlayerActivityIntent(context, media))
+            activity.startActivity(PlaybackService.getPlayerActivityIntent(activity, media))
         }
     }
 }

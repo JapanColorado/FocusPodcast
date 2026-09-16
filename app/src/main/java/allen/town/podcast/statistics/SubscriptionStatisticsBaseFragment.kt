@@ -60,9 +60,7 @@ abstract class SubscriptionStatisticsBaseFragment : Fragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
-        if (disposable != null) {
-            disposable!!.dispose()
-        }
+        disposable?.dispose()
     }
 
     override fun onPrepareOptionsMenu(menu: Menu) {
@@ -81,9 +79,7 @@ abstract class SubscriptionStatisticsBaseFragment : Fragment() {
     abstract val timeTo: Long
     abstract val headStrRes: Int
     private fun loadStatistics() {
-        if (disposable != null) {
-            disposable!!.dispose()
-        }
+        disposable?.dispose()
         val prefs = requireContext().getSharedPreferences(
             StatisticsFragment.Companion.PREF_NAME,
             Context.MODE_PRIVATE
@@ -105,8 +101,8 @@ abstract class SubscriptionStatisticsBaseFragment : Fragment() {
             .subscribe({ result: StatisticsResult ->
                 statisticsResult = result
                 // When "from" is "today", set it to today
-                listAdapter!!.setTimeFilter(headStrRes)
-                listAdapter!!.update(result.feedTime)
+                listAdapter?.setTimeFilter(headStrRes)
+                listAdapter?.update(result.feedTime)
                 if (skeleton.isSkeleton()) {
                     skeletonRecyclerDelay.showOriginal()
                 }

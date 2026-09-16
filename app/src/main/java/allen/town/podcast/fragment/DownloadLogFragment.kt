@@ -38,12 +38,12 @@ import org.greenrobot.eventbus.ThreadMode
 class DownloadLogFragment : Fragment(), IBackToContentTopView {
     private var downloadLog: List<DownloadStatus> = ArrayList()
     private var runningDownloads: List<Downloader> = ArrayList()
-    private var adapter: DownloadLogAdapter? = null
+    private lateinit var adapter: DownloadLogAdapter
     private var disposable: Disposable? = null
     private var isUpdatingFeeds = false
     private lateinit var recyclerView: RecyclerView
-    private var skeleton: Skeleton? = null
-    var emptyView: EmptyViewHandler? = null
+    private lateinit var skeleton: Skeleton
+    lateinit var emptyView: EmptyViewHandler
     override fun onStart() {
         super.onStart()
         loadDownloadLog()
@@ -51,9 +51,7 @@ class DownloadLogFragment : Fragment(), IBackToContentTopView {
 
     override fun onStop() {
         super.onStop()
-        if (disposable != null) {
-            disposable!!.dispose()
-        }
+        disposable?.dispose()
     }
 
     override fun onCreateView(
@@ -62,17 +60,18 @@ class DownloadLogFragment : Fragment(), IBackToContentTopView {
     ): View? {
         val root = inflater.inflate(R.layout.simple_list_fragment, container, false)
         recyclerView = root.findViewById(R.id.recyclerView)
-        recyclerView.setRecycledViewPool((activity as MainActivity?)!!.recycledViewPool)
-        adapter = DownloadLogAdapter((activity as MainActivity?)!!)
+        val mainActivity = requireActivity() as MainActivity
+        recyclerView.setRecycledViewPool(mainActivity.recycledViewPool)
+        adapter = DownloadLogAdapter(mainActivity)
         recyclerView.setAdapter(adapter)
         create(recyclerView)
         emptyView = EmptyViewHandler(activity)
-        emptyView!!.setIcon(R.drawable.ic_download)
-        emptyView!!.setTitle(R.string.no_log_downloads_head_label)
-        emptyView!!.attachToRecyclerView(recyclerView)
+        emptyView.setIcon(R.drawable.ic_download)
+        emptyView.setTitle(R.string.no_log_downloads_head_label)
+        emptyView.attachToRecyclerView(recyclerView)
         EventBus.getDefault().register(this)
         skeleton = recyclerView.applySkeleton(R.layout.item_small_recyclerview_skeleton, 15)
-        skeleton!!.showSkeleton()
+        skeleton.showSkeleton()
         return root
     }
 
@@ -111,7 +110,7 @@ class DownloadLogFragment : Fragment(), IBackToContentTopView {
     @Subscribe(sticky = true, threadMode = ThreadMode.MAIN)
     fun onEventMainThread(event: DownloadEvent) {
         if (event.hasChangedFeedUpdateStatus(isUpdatingFeeds)) {
-            (parentFragment as PagedToolbarFragment?)!!.invalidateOptionsMenuIfActive(this)
+            (parentFragment as? PagedToolbarFragment)?.invalidateOptionsMenuIfActive(this)
         }
     }
 
@@ -119,28 +118,26 @@ class DownloadLogFragment : Fragment(), IBackToContentTopView {
     fun onEvent(event: DownloadEvent) {
         val update = event.update
         runningDownloads = update.downloaders
-        adapter!!.setRunningDownloads(runningDownloads)
+        adapter.setRunningDownloads(runningDownloads)
     }
 
     private val updateRefreshMenuItemChecker =
         UpdateRefreshMenuItemChecker { DownloadService.isRunning() && DownloadService.isDownloadingFeeds() }
 
     private fun loadDownloadLog() {
-        if (disposable != null) {
-            disposable!!.dispose()
-        }
-        emptyView!!.hide()
+        disposable?.dispose()
+        emptyView.hide()
         disposable = Observable.fromCallable { DBReader.getDownloadLog() }
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe({ result: List<DownloadStatus>? ->
                 if (result != null) {
                     downloadLog = result
-                    if (skeleton!!.isSkeleton()) {
-                        skeleton!!.showOriginal()
+                    if (skeleton.isSkeleton()) {
+                        skeleton.showOriginal()
                     }
-                    adapter!!.setDownloadLog(downloadLog)
-                    (parentFragment as PagedToolbarFragment?)!!.invalidateOptionsMenuIfActive(this)
+                    adapter.setDownloadLog(downloadLog)
+                    (parentFragment as? PagedToolbarFragment)?.invalidateOptionsMenuIfActive(this)
                 }
             }) { error: Throwable? -> Log.e(TAG, Log.getStackTraceString(error)) }
     }

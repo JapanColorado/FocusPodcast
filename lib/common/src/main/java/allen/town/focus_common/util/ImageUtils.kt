@@ -24,7 +24,9 @@ object ImageUtils {
     fun getSampleSize(context: Context, uri: Uri, i: Int, i2: Int): Int {
 
         val parcelFileDescriptor: ParcelFileDescriptor =
-                context.contentResolver.openFileDescriptor(uri, "r")!!
+                checkNotNull(context.contentResolver.openFileDescriptor(uri, "r")) {
+                    "could not open the image at $uri"
+                }
         val fileDescriptor: FileDescriptor = parcelFileDescriptor.fileDescriptor
 
         val options = BitmapFactory.Options()
@@ -43,7 +45,9 @@ object ImageUtils {
     fun getSampleBitmap(context: Context, uri: Uri, i: Int): Bitmap {
 
         val parcelFileDescriptor: ParcelFileDescriptor =
-                context.contentResolver.openFileDescriptor(uri, "r")!!
+                checkNotNull(context.contentResolver.openFileDescriptor(uri, "r")) {
+                    "could not open the image at $uri"
+                }
         val fileDescriptor: FileDescriptor = parcelFileDescriptor.fileDescriptor
 
         val options = BitmapFactory.Options()
@@ -76,7 +80,10 @@ object ImageUtils {
     }
 
     fun drawableToBitmap(drawable: Drawable?, i: Int, i2: Int): Bitmap? {
-        val createBitmap = Bitmap.createBitmap(i, i2, if (drawable!!.opacity != -1) Bitmap.Config.ARGB_8888 else Bitmap.Config.RGB_565)
+        if (drawable == null) {
+            return null
+        }
+        val createBitmap = Bitmap.createBitmap(i, i2, if (drawable.opacity != -1) Bitmap.Config.ARGB_8888 else Bitmap.Config.RGB_565)
         val canvas = Canvas(createBitmap)
         drawable.setBounds(0, 0, i, i2)
         drawable.draw(canvas)
@@ -194,9 +201,12 @@ object ImageUtils {
 
     @JvmStatic
     fun getColoredDrawable(context: Context?, drawableRes: Int, mul: Int): Drawable? {
-        val drawable = ContextCompat.getDrawable(context!!, drawableRes)
+        if (context == null) {
+            return null
+        }
+        val drawable = ContextCompat.getDrawable(context, drawableRes) ?: return null
         if (mul != -1) {
-            drawable!!.mutate().colorFilter = LightingColorFilter(mul, 0)
+            drawable.mutate().colorFilter = LightingColorFilter(mul, 0)
             drawable.alpha = Color.alpha(mul)
         }
         return drawable
@@ -223,8 +233,8 @@ object ImageUtils {
 
     @JvmStatic
     fun getColoredVectorDrawable(context: Context, i: Int, i2: Int): Drawable? {
-        val create = VectorDrawableCompat.create(context.resources, i, context.theme)
-        create!!.mutate().colorFilter = LightingColorFilter(i2, 0)
+        val create = VectorDrawableCompat.create(context.resources, i, context.theme) ?: return null
+        create.mutate().colorFilter = LightingColorFilter(i2, 0)
         create.alpha = Color.alpha(i2)
         return create
     }
@@ -240,14 +250,18 @@ object ImageUtils {
     }
 
     private fun maskSub(context: Context, bitmap: Bitmap?, i: Int, px: Int): Bitmap? {
-        val drawableToBitmap = drawableToBitmap(ContextCompat.getDrawable(context, i), px, px)
+        if (bitmap == null) {
+            return null
+        }
+        val drawableToBitmap =
+            drawableToBitmap(ContextCompat.getDrawable(context, i), px, px) ?: return null
         val paint = Paint(1)
         paint.isDither = true
         val createBitmap = Bitmap.createBitmap(px, px, Bitmap.Config.ARGB_8888)
         val canvas = Canvas(createBitmap)
-        canvas.drawBitmap(drawableToBitmap!!, Matrix(), paint)
+        canvas.drawBitmap(drawableToBitmap, Matrix(), paint)
         paint.xfermode = PorterDuffXfermode(PorterDuff.Mode.SRC_IN)
-        canvas.drawBitmap(bitmap!!, Matrix(), paint)
+        canvas.drawBitmap(bitmap, Matrix(), paint)
         return createBitmap
     }
 

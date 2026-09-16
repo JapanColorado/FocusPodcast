@@ -192,8 +192,10 @@ object EntityDateUtils {
     @JvmStatic
     fun isYesterday(timeStamp: Long?): Boolean {
         val todayCalendar = Calendar.getInstance()
+        // No timestamp cannot be yesterday.
+        val millis = timeStamp ?: return false
         val calendar = Calendar.getInstance()
-        calendar.timeInMillis = timeStamp!!
+        calendar.timeInMillis = millis
         if (calendar[Calendar.YEAR] == todayCalendar[Calendar.YEAR]) {
             val diffDay = todayCalendar[Calendar.DAY_OF_YEAR] - calendar[Calendar.DAY_OF_YEAR]
             return diffDay == 1
@@ -258,10 +260,12 @@ object EntityDateUtils {
     fun inTime(str: String, str2: String?): Boolean {
         // Compared lexically against caller-supplied "HH:mm" strings, so the digits must not
         // be localised.
+        // Without an end of the range there is no window to be inside of.
+        val end = str2 ?: return false
         val format = SimpleDateFormat("HH:mm", Locale.ROOT).format(Date())
-        return if (str.compareTo(str2!!) >= 0) {
-            format.compareTo(str) >= 0 || format.compareTo(str2) <= 0
-        } else !(format.compareTo(str) < 0 || format.compareTo(str2) > 0)
+        return if (str.compareTo(end) >= 0) {
+            format.compareTo(str) >= 0 || format.compareTo(end) <= 0
+        } else !(format.compareTo(str) < 0 || format.compareTo(end) > 0)
     }
 
 

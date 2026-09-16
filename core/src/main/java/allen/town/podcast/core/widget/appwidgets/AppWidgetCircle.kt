@@ -60,12 +60,7 @@ class AppWidgetCircle : AppWidgetMD() {
 
         @JvmStatic
         val instance: AppWidgetCircle
-            @Synchronized get() {
-                if (mInstance == null) {
-                    mInstance = AppWidgetCircle()
-                }
-                return mInstance!!
-            }
+            @Synchronized get() = mInstance ?: AppWidgetCircle().also { mInstance = it }
     }
 
     override fun getLayout(): Int {

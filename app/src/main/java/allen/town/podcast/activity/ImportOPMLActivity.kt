@@ -52,12 +52,12 @@ import java.io.*
  */
 class ImportOPMLActivity : SimpleToolbarActivity() {
     private var uri: Uri? = null
-    var viewBinding: OpmlSelectionBinding? = null
+    lateinit var viewBinding: OpmlSelectionBinding
     private var listAdapter: FeedAdapter? = null
     private var selectAll: MenuItem? = null
     private var deselectAll: MenuItem? = null
-    private var readElements: ArrayList<OpmlElement>? = null
-    private val checked: ArrayList<Boolean?> = ArrayList<Boolean?>()
+    private var readElements: List<OpmlElement> = emptyList()
+    private val checked: ArrayList<Boolean> = ArrayList()
 
     /** Parse and import runs; both touch the view binding, so they die with the activity. */
     private val pendingWork = CompositeDisposable()
@@ -70,19 +70,19 @@ class ImportOPMLActivity : SimpleToolbarActivity() {
         setTheme(Prefs.theme)
         super.onCreate(savedInstanceState)
         viewBinding = OpmlSelectionBinding.inflate(layoutInflater)
-        setContentView(viewBinding!!.root)
-        setSupportActionBar(viewBinding!!.appBarLayout.toolbar)
-        supportActionBar!!.setDisplayHomeAsUpEnabled(true)
-        create(viewBinding!!.scrollView)
-        viewBinding!!.butConfirm.setOnClickListener { v: View? ->
-            viewBinding!!.progressBar.visibility = View.VISIBLE
+        setContentView(viewBinding.root)
+        setSupportActionBar(viewBinding.appBarLayout.toolbar)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        create(viewBinding.scrollView)
+        viewBinding.butConfirm.setOnClickListener { v: View? ->
+            viewBinding.progressBar.visibility = View.VISIBLE
             pendingWork.add(Completable.fromAction {
                 val toAdd: MutableList<DownloadRequest> = ArrayList()
                 for (i in checked.indices) {
-                    if (!checked[i]!!) {
+                    if (!checked[i]) {
                         continue
                     }
-                    val element = readElements!![i]
+                    val element = readElements[i]
                     val feed = Feed(element.xmlUrl, null, element.text)
                     feed.isNeedAutoSubscribe = true
                     toAdd.add(DownloadRequestCreator.create(feed).build())
@@ -95,14 +95,14 @@ class ImportOPMLActivity : SimpleToolbarActivity() {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
                     {
-                        viewBinding!!.progressBar.visibility = View.GONE
+                        viewBinding.progressBar.visibility = View.GONE
                         val intent = Intent(this@ImportOPMLActivity, MainActivity::class.java)
                         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
                         startActivity(intent)
                         finish()
                     }) { e: Throwable ->
                     Log.e(TAG, "importing the selected feeds failed", e)
-                    viewBinding!!.progressBar.visibility = View.GONE
+                    viewBinding.progressBar.visibility = View.GONE
                     showSnack(this, e.message, Toast.LENGTH_LONG)
                 })
         }
@@ -110,14 +110,12 @@ class ImportOPMLActivity : SimpleToolbarActivity() {
         if (uri != null && uri.toString().startsWith("/")) {
             uri = Uri.parse("file://$uri")
         } else {
-            var itemAt: ClipData.Item? = null
             val extraText = intent.getStringExtra(Intent.EXTRA_TEXT)
+            val clipData = intent.clipData
             if (extraText != null) {
                 uri = Uri.parse(extraText)
-            } else if (intent.clipData != null && intent.clipData!!.getItemAt(0)
-                    .also { itemAt = it } != null
-            ) {
-                uri = itemAt?.uri
+            } else if (clipData != null) {
+                uri = clipData.getItemAt(0)?.uri
             }
         }
         importUri(uri)
@@ -153,10 +151,8 @@ class ImportOPMLActivity : SimpleToolbarActivity() {
     val titleList: List<String>
         get() {
             val result: MutableList<String> = ArrayList()
-            if (readElements != null) {
-                for (element in readElements!!) {
-                    result.add(element.text)
-                }
+            for (element in readElements) {
+                result.add(element.text)
             }
             return result
         }
@@ -165,23 +161,24 @@ class ImportOPMLActivity : SimpleToolbarActivity() {
         super.onCreateOptionsMenu(menu)
         val inflater = menuInflater
         inflater.inflate(R.menu.opml_selection_options, menu)
-        selectAll = menu.findItem(R.id.select_all_item)
+        val selectAllItem = menu.findItem(R.id.select_all_item)
+        selectAll = selectAllItem
         deselectAll = menu.findItem(R.id.deselect_all_item)
-        selectAll!!.setVisible(false)
+        selectAllItem.setVisible(false)
         return true
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         val itemId = item.itemId
         if (itemId == R.id.select_all_item) {
-            selectAll!!.isVisible = false
+            selectAll?.isVisible = false
             selectAllItems(true)
-            deselectAll!!.isVisible = true
+            deselectAll?.isVisible = true
             return true
         } else if (itemId == R.id.deselect_all_item) {
-            deselectAll!!.isVisible = false
+            deselectAll?.isVisible = false
             selectAllItems(false)
-            selectAll!!.isVisible = true
+            selectAll?.isVisible = true
             return true
         } else if (itemId == android.R.id.home) {
             finish()
@@ -190,13 +187,14 @@ class ImportOPMLActivity : SimpleToolbarActivity() {
     }
 
     private fun selectAllItems(b: Boolean) {
-        val itemCount = listAdapter!!.itemCount
+        val adapter = listAdapter ?: return
+        val itemCount = adapter.itemCount
         checked.clear()
         for (i in 0 until itemCount) {
             checked.add(i, b)
         }
         updateSum()
-        listAdapter!!.notifyDataSetChanged()
+        adapter.notifyDataSetChanged()
     }
 
     private fun requestPermission() {
@@ -227,13 +225,14 @@ class ImportOPMLActivity : SimpleToolbarActivity() {
      * Starts the import process.
      */
     private fun startImport() {
-        viewBinding!!.progressBar.visibility = View.VISIBLE
+        val uri = requireNotNull(this.uri) { "startImport() called before an OPML uri was set" }
+        viewBinding.progressBar.visibility = View.VISIBLE
         pendingWork.add(Observable.fromCallable {
             val opmlFileStream: InputStream?
-            opmlFileStream = if ("content" != uri!!.scheme) {
-                FileInputStream(File(uri!!.encodedPath))
+            opmlFileStream = if ("content" != uri.scheme) {
+                FileInputStream(File(uri.encodedPath))
             } else {
-                contentResolver.openInputStream(uri!!)
+                contentResolver.openInputStream(uri)
             }
             val bomInputStream = BOMInputStream(opmlFileStream)
             val bom = bomInputStream.bom
@@ -252,19 +251,20 @@ class ImportOPMLActivity : SimpleToolbarActivity() {
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe(
                 { result: ArrayList<OpmlElement>? ->
-                    viewBinding!!.progressBar.visibility = View.GONE
+                    viewBinding.progressBar.visibility = View.GONE
                     Log.d(TAG, "parse successful")
-                    readElements = result
-                    listAdapter = FeedAdapter(this@ImportOPMLActivity)
-                    listAdapter!!.call(titleList)
-                    viewBinding!!.feedlist.layoutManager =
+                    readElements = result ?: emptyList()
+                    val adapter = FeedAdapter(this@ImportOPMLActivity)
+                    listAdapter = adapter
+                    adapter.call(titleList)
+                    viewBinding.feedlist.layoutManager =
                         LinearLayoutManager(this@ImportOPMLActivity)
-                    viewBinding!!.feedlist.adapter = listAdapter
+                    viewBinding.feedlist.adapter = listAdapter
                     //select all by default
                     selectAllItems(true)
                 }) { e: Throwable ->
                 Log.e(TAG, "reading the OPML file failed", e)
-                viewBinding!!.progressBar.visibility = View.GONE
+                viewBinding.progressBar.visibility = View.GONE
                 val alert: AlertDialog.Builder = AccentMaterialDialog(
                     this,
                     R.style.MaterialAlertDialogTheme
@@ -289,8 +289,8 @@ class ImportOPMLActivity : SimpleToolbarActivity() {
     }
 
     fun updateSum() {
-        viewBinding!!.opmlSumTv.visibility = View.VISIBLE
-        viewBinding!!.opmlSumTv.setText(R.string.opml_sum_pro)
+        viewBinding.opmlSumTv.visibility = View.VISIBLE
+        viewBinding.opmlSumTv.setText(R.string.opml_sum_pro)
     }
 
     inner class FeedViewHolder(view: View) : BindableViewHolder<String?>(view) {
@@ -302,7 +302,7 @@ class ImportOPMLActivity : SimpleToolbarActivity() {
             if (boundPosition == RecyclerView.NO_POSITION || boundPosition >= checked.size) {
                 return
             }
-            cb.isChecked = checked[boundPosition]!!
+            cb.isChecked = checked[boundPosition]
             itemView.setOnClickListener {
                 // the list is rebuilt on every parse, so re-read the position at click time
                 val pos = bindingAdapterPosition
@@ -314,16 +314,16 @@ class ImportOPMLActivity : SimpleToolbarActivity() {
                 updateSum()
                 var checkedCount = 0
                 for (i in checked.indices) {
-                    if (checked[i]!!) {
+                    if (checked[i]) {
                         checkedCount++
                     }
                 }
-                if (checkedCount == listAdapter!!.itemCount) {
-                    selectAll!!.isVisible = false
-                    deselectAll!!.isVisible = true
+                if (checkedCount == listAdapter?.itemCount) {
+                    selectAll?.isVisible = false
+                    deselectAll?.isVisible = true
                 } else {
-                    deselectAll!!.isVisible = false
-                    selectAll!!.isVisible = true
+                    deselectAll?.isVisible = false
+                    selectAll?.isVisible = true
                 }
             }
         }

@@ -33,18 +33,18 @@ class CreateSubscriptionShortcutActivity : DialogActivity() {
 
     @Volatile
     private var listItems: List<Feed>? = null
-    private var viewBinding: SubscriptionSelectionActivityBinding? = null
+    private lateinit var viewBinding: SubscriptionSelectionActivityBinding
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         viewBinding = SubscriptionSelectionActivityBinding.inflate(
             layoutInflater
         )
-        setContentView(viewBinding!!.root)
-        setSupportActionBar(viewBinding!!.toolbar)
+        setContentView(viewBinding.root)
+        setSupportActionBar(viewBinding.toolbar)
         setTitle(R.string.shortcut_select_subscription)
-        viewBinding!!.transparentBackground.setOnClickListener { v: View? -> finish() }
-        viewBinding!!.list.layoutManager = LinearLayoutManager(this)
-        create(viewBinding!!.list)
+        viewBinding.transparentBackground.setOnClickListener { v: View? -> finish() }
+        viewBinding.list.layoutManager = LinearLayoutManager(this)
+        create(viewBinding.list)
         loadSubscriptions()
     }
 
@@ -76,9 +76,7 @@ class CreateSubscriptionShortcutActivity : DialogActivity() {
     }
 
     private fun loadSubscriptions() {
-        if (disposable != null) {
-            disposable!!.dispose()
-        }
+        disposable?.dispose()
         disposable = Observable.fromCallable {
             val data = DBReader.getNavDrawerData(true)
             getFeedItems(data.items, ArrayList())
@@ -94,7 +92,7 @@ class CreateSubscriptionShortcutActivity : DialogActivity() {
                     }
                     val listAdapter: FeedAdapter =
                         FeedAdapter(this@CreateSubscriptionShortcutActivity)
-                    viewBinding!!.list.adapter = listAdapter
+                    viewBinding.list.adapter = listAdapter
                     listAdapter.call(titles as List<String?>?)
                 }) { error: Throwable? -> Log.e(TAG, Log.getStackTraceString(error)) }
     }

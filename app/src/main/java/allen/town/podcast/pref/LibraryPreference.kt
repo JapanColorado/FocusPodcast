@@ -62,7 +62,7 @@ class LibraryPreferenceDialog : DialogFragment() {
             .setNeutralButton(
                 R.string.reset_action
             ) { _, _ ->
-                updateCategories(BasePreferenceUtil.defaultCategories!!)
+                updateCategories(BasePreferenceUtil.defaultCategories)
             }
             .setNegativeButton(android.R.string.cancel, null)
             .setPositiveButton(R.string.done) { _, _ -> updateCategories(categoryAdapter.categoryInfos) }

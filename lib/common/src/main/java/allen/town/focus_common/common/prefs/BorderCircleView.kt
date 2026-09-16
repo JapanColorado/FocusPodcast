@@ -90,22 +90,20 @@ class BorderCircleView @JvmOverloads constructor(
         )
 
         if (isActivated) {
-            val offset = canvasSize / 2 - mCheck!!.intrinsicWidth / 2
-            if (paintCheck == null) {
-                paintCheck = Paint()
-                paintCheck!!.isAntiAlias = true
+            // Without the check drawable there is nothing left to draw on top of the circle.
+            val check = mCheck ?: return
+            val offset = canvasSize / 2 - check.intrinsicWidth / 2
+            val checkPaint = paintCheck ?: Paint().also {
+                it.isAntiAlias = true
+                paintCheck = it
             }
             if (whiteFilter == null || blackFilter == null) {
                 blackFilter = PorterDuffColorFilter(Color.BLACK, PorterDuff.Mode.SRC_IN)
                 whiteFilter = PorterDuffColorFilter(Color.WHITE, PorterDuff.Mode.SRC_IN)
             }
-            if (paint.color == Color.WHITE) {
-                paintCheck!!.colorFilter = blackFilter
-            } else {
-                paintCheck!!.colorFilter = whiteFilter
-            }
-            mCheck.setBounds(offset, offset, mCheck.intrinsicWidth - offset, mCheck.intrinsicHeight - offset)
-            mCheck.draw(canvas)
+            checkPaint.colorFilter = if (paint.color == Color.WHITE) blackFilter else whiteFilter
+            check.setBounds(offset, offset, check.intrinsicWidth - offset, check.intrinsicHeight - offset)
+            check.draw(canvas)
         }
     }
 }

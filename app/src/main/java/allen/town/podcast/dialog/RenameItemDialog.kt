@@ -30,9 +30,11 @@ class RenameItemDialog {
 
     fun show() {
         val activity = activityRef.get() ?: return
+        val feed = this.feed
+        val drawerItem = this.drawerItem
         val content = View.inflate(activity, R.layout.edit_text_dialog, null)
         val alertViewBinding = EditTextDialogBinding.bind(content)
-        val title = if (feed != null) feed!!.title else drawerItem!!.title
+        val title: String? = feed?.title ?: drawerItem?.title
         alertViewBinding.urlEditText.setText(title)
         val dialog = AccentMaterialDialog(
             activity,
@@ -43,10 +45,10 @@ class RenameItemDialog {
             .setPositiveButton(android.R.string.ok) { d: DialogInterface?, input: Int ->
                 val newTitle = alertViewBinding.urlEditText.text.toString()
                 if (feed != null) {
-                    feed!!.customTitle = newTitle
+                    feed.customTitle = newTitle
                     DBWriter.setFeedCustomTitle(feed)
-                } else {
-                    renameTag(newTitle)
+                } else if (drawerItem != null) {
+                    renameTag(newTitle, drawerItem)
                 }
             }
             .setNeutralButton(allen.town.podcast.core.R.string.reset, null)
@@ -58,14 +60,14 @@ class RenameItemDialog {
             .setOnClickListener { view: View? -> alertViewBinding.urlEditText.setText(title) }
     }
 
-    private fun renameTag(title: String) {
-        if (DrawerItem.Type.TAG == drawerItem!!.type) {
+    private fun renameTag(title: String, drawerItem: DrawerItem) {
+        if (DrawerItem.Type.TAG == drawerItem.type) {
             val feedPreferences: MutableList<FeedPreferences> = ArrayList()
-            for (item in (drawerItem as TagDrawerItem?)!!.children) {
+            for (item in (drawerItem as TagDrawerItem).children) {
                 feedPreferences.add((item as FeedDrawerItem).feed.preferences)
             }
             for (preferences in feedPreferences) {
-                preferences.tags.remove(drawerItem!!.title)
+                preferences.tags.remove(drawerItem.title)
                 preferences.tags.add(title)
                 DBWriter.setFeedPreferences(preferences)
             }

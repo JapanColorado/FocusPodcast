@@ -72,10 +72,10 @@ abstract class EpisodesListFragment : Fragment(), OnSelectModeListener, DoubleCl
     var progLoading: ProgressBar? = null
     var loadingMoreView: View? = null
     lateinit var emptyView: EmptyViewHandler
-    private var swipeActions: SwipeActions? = null
+    private lateinit var swipeActions: SwipeActions
     protected lateinit var toolbar: Toolbar
     private var displayUpArrow = false
-    private var skeleton: Skeleton? = null
+    private lateinit var skeleton: Skeleton
     private lateinit var skeletonRecyclerDelay: SkeletonRecyclerDelay
     var episodes: MutableList<FeedItem> = ArrayList()
 
@@ -109,9 +109,7 @@ abstract class EpisodesListFragment : Fragment(), OnSelectModeListener, DoubleCl
     override fun onStop() {
         super.onStop()
         EventBus.getDefault().unregister(this)
-        if (disposable != null) {
-            disposable!!.dispose()
-        }
+        disposable?.dispose()
         loadMoreDisposable?.dispose()
     }
 
@@ -149,25 +147,27 @@ abstract class EpisodesListFragment : Fragment(), OnSelectModeListener, DoubleCl
             markAllReadConfirmationDialog.createNewDialog().show()
             return true
         }  else if (itemId == R.id.action_search) {
-            (activity as MainActivity?)!!.loadChildFragment(newInstance())
+            (requireActivity() as MainActivity).loadChildFragment(newInstance())
             return true
         }
         return false
     }
 
     override fun onContextItemSelected(item: MenuItem): Boolean {
-        if (!userVisibleHint || !isVisible || !isMenuVisible) {
+        val adapter = listAdapter
+        if (!userVisibleHint || !isVisible || !isMenuVisible || adapter == null) {
             // The method is called on all fragments in a ViewPager, so this needs to be ignored in invisible ones.
             // Apparently, none of the visibility check method works reliably on its own, so we just use all.
             return false
-        } else if (listAdapter!!.longPressedItem == null) {
+        }
+        val selectedItem = adapter.longPressedItem
+        if (selectedItem == null) {
             Log.i(TAG, "selected item was null")
             return super.onContextItemSelected(item)
-        } else if (listAdapter!!.onContextItemSelected(item)) {
+        } else if (adapter.onContextItemSelected(item)) {
             return true
         }
-        val selectedItem = listAdapter!!.longPressedItem
-        return FeedItemMenuProcess.onMenuItemClicked(this, item.itemId, selectedItem!!)
+        return FeedItemMenuProcess.onMenuItemClicked(this, item.itemId, selectedItem)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -197,9 +197,10 @@ abstract class EpisodesListFragment : Fragment(), OnSelectModeListener, DoubleCl
         if (savedInstanceState != null) {
             displayUpArrow = savedInstanceState.getBoolean(KEY_UP_ARROW)
         }
-        (activity as MainActivity?)!!.setupToolbarToggle(toolbar, displayUpArrow)
+        val mainActivity = requireActivity() as MainActivity
+        mainActivity.setupToolbarToggle(toolbar, displayUpArrow)
         recyclerView = root.findViewById(android.R.id.list)
-        recyclerView.setRecycledViewPool((activity as MainActivity?)!!.recycledViewPool)
+        recyclerView.setRecycledViewPool(mainActivity.recycledViewPool)
         create(recyclerView)
         setupLoadMoreScrollListener()
         val animator = recyclerView.getItemAnimator()
@@ -224,7 +225,7 @@ abstract class EpisodesListFragment : Fragment(), OnSelectModeListener, DoubleCl
         createRecycleAdapter(recyclerView, emptyView)
         emptyView.hide()
         skeleton = recyclerView.applySkeleton(R.layout.item_small_recyclerview_skeleton, 15)
-        skeletonRecyclerDelay = SkeletonRecyclerDelay(skeleton!!, recyclerView)
+        skeletonRecyclerDelay = SkeletonRecyclerDelay(skeleton, recyclerView)
         skeletonRecyclerDelay.showSkeleton()
         return root
     }
@@ -253,7 +254,7 @@ abstract class EpisodesListFragment : Fragment(), OnSelectModeListener, DoubleCl
         // the completion block below, leaving isLoadingMore stuck at true forever.
         loadMoreDisposable?.dispose()
         isLoadingMore = true
-        loadingMoreView!!.visibility = View.VISIBLE
+        loadingMoreView?.visibility = View.VISIBLE
         loadMoreDisposable = Observable.fromCallable { loadMoreData() }
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
@@ -272,22 +273,23 @@ abstract class EpisodesListFragment : Fragment(), OnSelectModeListener, DoubleCl
                 recyclerView.post {
                     isLoadingMore = false
                 } // Make sure to not always load 2 pages at once
-                if (skeleton!!.isSkeleton()) {
+                if (skeleton.isSkeleton()) {
                     skeletonRecyclerDelay.showOriginal()
                 }
-                loadingMoreView!!.visibility = View.GONE
+                loadingMoreView?.visibility = View.GONE
             }
     }
 
     protected open fun onFragmentLoaded(episodes: List<FeedItem>) {
-        val restoreScrollPosition = listAdapter!!.itemCount == 0
+        val adapter = listAdapter ?: return
+        val restoreScrollPosition = adapter.itemCount == 0
         if (episodes.size == 0) {
             createRecycleAdapter(recyclerView, emptyView)
         } else {
-            listAdapter!!.updateItems(episodes)
+            adapter.updateItems(episodes)
         }
         if (restoreScrollPosition) {
-            recyclerView.restoreScrollPosition(prefName!!)
+            recyclerView.restoreScrollPosition(prefName)
         }
         if (isUpdatingFeeds != updateRefreshMenuItemChecker.isRefreshing) {
             onPrepareOptionsMenu(toolbar.menu)
@@ -305,12 +307,12 @@ abstract class EpisodesListFragment : Fragment(), OnSelectModeListener, DoubleCl
      * snackbar. See #3084 for details.
      */
     private fun createRecycleAdapter(
-        recyclerView: RecyclerView?,
-        emptyViewHandler: EmptyViewHandler?
+        recyclerView: RecyclerView,
+        emptyViewHandler: EmptyViewHandler
     ) {
-        val mainActivity = activity as MainActivity?
-        listAdapter = object :
-            EpisodeItemListAdapter(mainActivity!!, getMultiMenu()) {
+        val mainActivity = requireActivity() as MainActivity
+        val listAdapter = object :
+            EpisodeItemListAdapter(mainActivity, getMultiMenu()) {
             override fun onCreateContextMenu(
                 menu: ContextMenu,
                 v: View,
@@ -327,54 +329,55 @@ abstract class EpisodesListFragment : Fragment(), OnSelectModeListener, DoubleCl
                 }
             }
         }
-        listAdapter!!.setOnSelectModeListener(this)
-        listAdapter!!.setOnMenuItemClickListener(object : MultiSelectAdapter.OnMenuItemClickListener {
+        this.listAdapter = listAdapter
+        listAdapter.setOnSelectModeListener(this)
+        listAdapter.setOnMenuItemClickListener(object : MultiSelectAdapter.OnMenuItemClickListener {
             override fun onMenuItemClick(item: MenuItem?) {
+                val menuItem = item ?: return
                 EpisodeMultiSelectActionHandler(
-                    activity as MainActivity?,
-                    listAdapter!!.selectedItems
+                    requireActivity() as MainActivity,
+                    listAdapter.selectedItems
                 )
-                    .handleAction(item!!.itemId)
-                listAdapter!!.endSelectMode()
+                    .handleAction(menuItem.itemId)
+                listAdapter.endSelectMode()
             }
         })
-        listAdapter!!.updateItems(episodes)
-        recyclerView!!.adapter = listAdapter
-        emptyViewHandler!!.updateAdapter(listAdapter)
+        listAdapter.updateItems(episodes)
+        recyclerView.adapter = listAdapter
+        emptyViewHandler.updateAdapter(listAdapter)
         swipeActions = SwipeActions(this, swipeTag).attachTo(recyclerView)
-        swipeActions!!.setFilter(FeedItemFilter.unfiltered())
+        swipeActions.setFilter(FeedItemFilter.unfiltered())
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
         uiHandler.removeCallbacksAndMessages(null)
-        if (listAdapter != null) {
-            listAdapter!!.endSelectMode()
-        }
+        listAdapter?.endSelectMode()
         listAdapter = null
     }
 
     override fun onStartSelectMode() {
         toolbar.visibility = View.GONE
-        swipeActions!!.detach()
+        swipeActions.detach()
     }
 
     override fun onEndSelectMode() {
         toolbar.visibility = View.VISIBLE
-        swipeActions!!.attachTo(recyclerView)
+        swipeActions.attachTo(recyclerView)
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     fun onEventMainThread(event: FeedItemEvent) {
+        val adapter = listAdapter ?: return
         for (item in event.items) {
             val pos = FeedItemUtil.indexOfItemWithId(episodes, item.id)
             if (pos >= 0) {
                 episodes.removeAt(pos)
                 if (shouldUpdatedItemRemainInList(item)) {
                     episodes.add(pos, item)
-                    listAdapter!!.notifyItemChangedCompat(pos)
+                    adapter.notifyItemChangedCompat(pos)
                 } else {
-                    listAdapter!!.notifyItemRemoved(pos)
+                    adapter.notifyItemRemoved(pos)
                 }
             }
         }
@@ -382,14 +385,13 @@ abstract class EpisodesListFragment : Fragment(), OnSelectModeListener, DoubleCl
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     fun onEventMainThread(event: PlaybackPositionEvent) {
-        if (listAdapter != null) {
-            for (i in 0 until listAdapter!!.itemCount) {
-                val holder =
-                    recyclerView.findViewHolderForAdapterPosition(i) as EpisodeItemViewHolder?
-                if (holder != null && holder.isCurrentlyPlayingItem) {
-                    holder.notifyPlaybackPositionUpdated(event)
-                    break
-                }
+        val adapter = listAdapter ?: return
+        for (i in 0 until adapter.itemCount) {
+            val holder =
+                recyclerView.findViewHolderForAdapterPosition(i) as EpisodeItemViewHolder?
+            if (holder != null && holder.isCurrentlyPlayingItem) {
+                holder.notifyPlaybackPositionUpdated(event)
+                break
             }
         }
     }
@@ -401,7 +403,9 @@ abstract class EpisodesListFragment : Fragment(), OnSelectModeListener, DoubleCl
         }
         when (event.keyCode) {
             KeyEvent.KEYCODE_T -> recyclerView.smoothScrollToPosition(0)
-            KeyEvent.KEYCODE_B -> recyclerView.smoothScrollToPosition(listAdapter!!.itemCount - 1)
+            KeyEvent.KEYCODE_B -> listAdapter?.let {
+                recyclerView.smoothScrollToPosition(it.itemCount - 1)
+            }
             else -> {}
         }
     }
@@ -416,11 +420,12 @@ abstract class EpisodesListFragment : Fragment(), OnSelectModeListener, DoubleCl
         if (event.hasChangedFeedUpdateStatus(isUpdatingFeeds)) {
             onPrepareOptionsMenu(toolbar.menu)
         }
-        if (update.mediaIds.size > 0) {
+        val adapter = listAdapter
+        if (adapter != null && update.mediaIds.size > 0) {
             for (mediaId in update.mediaIds) {
                 val pos = FeedItemUtil.indexOfItemWithMediaId(episodes, mediaId)
                 if (pos >= 0) {
-                    listAdapter!!.notifyItemChangedCompat(pos)
+                    adapter.notifyItemChangedCompat(pos)
                 }
             }
         }
@@ -449,18 +454,16 @@ abstract class EpisodesListFragment : Fragment(), OnSelectModeListener, DoubleCl
     }
 
     fun loadItems() {
-        if (disposable != null) {
-            disposable!!.dispose()
-        }
+        disposable?.dispose()
         disposable = Observable.fromCallable(
             { loadData() })
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe({ data: MutableList<FeedItem> ->
-                if (skeleton!!.isSkeleton()) {
+                if (skeleton.isSkeleton()) {
                     skeletonRecyclerDelay.showOriginal()
                 }
-                loadingMoreView!!.visibility = View.GONE
+                loadingMoreView?.visibility = View.GONE
                 hasMoreItems = true
                 episodes = data
                 onFragmentLoaded(episodes)

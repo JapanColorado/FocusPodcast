@@ -32,7 +32,10 @@ class PodcastIndexPodcastSearcher : PodcastSearcher {
                 val apiHeaderTime = secondsSinceEpoch.toString()
                 val data4Hash =
                     BuildConfig.PODCASTINDEX_API_KEY + BuildConfig.PODCASTINDEX_API_SECRET + apiHeaderTime
-                val hashString = sha1(data4Hash)
+                val hashString = sha1(data4Hash) ?: run {
+                    subscriber.onError(IOException("could not sign the Podcast Index request"))
+                    return@SingleOnSubscribe
+                }
                 val encodedQuery: String?
                 encodedQuery = try {
                     URLEncoder.encode(query, "UTF-8")
@@ -45,14 +48,18 @@ class PodcastIndexPodcastSearcher : PodcastSearcher {
                 val httpReq = Request.Builder()
                     .addHeader("X-Auth-Date", apiHeaderTime)
                     .addHeader("X-Auth-Key", BuildConfig.PODCASTINDEX_API_KEY)
-                    .addHeader("Authorization", hashString!!)
+                    .addHeader("Authorization", hashString)
                     .addHeader("User-Agent", ClientConfig.USER_AGENT)
                     .url(formattedUrl)
                 val podcasts: MutableList<PodcastSearchResult?> = ArrayList()
                 try {
                     val response = client.newCall(httpReq.build()).execute()
                     if (response.isSuccessful) {
-                        val resultString = response.body!!.string()
+                        val body = response.body ?: run {
+                            subscriber.onError(IOException("no response body for $formattedUrl"))
+                            return@SingleOnSubscribe
+                        }
+                        val resultString = body.string()
                         val result = JSONObject(resultString)
                         val j = result.getJSONArray("feeds")
                         for (i in 0 until j.length()) {

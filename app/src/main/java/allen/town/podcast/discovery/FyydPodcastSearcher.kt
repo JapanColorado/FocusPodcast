@@ -11,10 +11,12 @@ import io.reactivex.schedulers.Schedulers
 class FyydPodcastSearcher : PodcastSearcher {
     private val client = FyydClient(PodcastHttpClient.getHttpClient())
     override fun search(query: String?): Single<List<PodcastSearchResult?>?>? {
+        // Nothing to search for, so answer with no hits rather than calling the API.
+        val searchQuery = query ?: return Single.just<List<PodcastSearchResult?>?>(emptyList())
         return Single.create(
             SingleOnSubscribe { subscriber: SingleEmitter<List<PodcastSearchResult?>?> ->
                 val (_, _, _, data) = client.searchPodcasts(
-                    query!!, 10
+                    searchQuery, 10
                 )
                     .subscribeOn(Schedulers.io())
                     .blockingGet()

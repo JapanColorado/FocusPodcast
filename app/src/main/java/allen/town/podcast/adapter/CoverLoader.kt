@@ -62,10 +62,12 @@ class CoverLoader(private val activity: MainActivity?) {
     }
 
     fun load() {
-        val coverTarget = CoverTarget(txtvPlaceholder, imgvCover, textAndImageCombined)
+        // Without a cover view there is nothing to load the image into.
+        val coverView = imgvCover ?: return
+        val coverTarget = CoverTarget(txtvPlaceholder, coverView, textAndImageCombined)
         if (resource != 0) {
-            Glide.with(imgvCover!!).clear(coverTarget)
-            imgvCover!!.setImageResource(resource)
+            Glide.with(coverView).clear(coverTarget)
+            coverView.setImageResource(resource)
             CoverTarget.setPlaceholderVisibility(txtvPlaceholder, textAndImageCombined, null)
             return
         }
@@ -73,14 +75,14 @@ class CoverLoader(private val activity: MainActivity?) {
             .diskCacheStrategy(ApGlideSettings.AP_DISK_CACHE_STRATEGY) //switching this to centerCrop makes the background of the bottom title permanently gray (reason unknown)
             .fitCenter()
             .dontAnimate()
-        var builder = Glide.with(imgvCover!!)
+        var builder = Glide.with(coverView)
             .`as`(PaletteBitmap::class.java)
             .placeholder(R.color.light_gray)
             .load(uri)
             .apply(options)
-        if (fallbackUri != null && txtvPlaceholder != null && imgvCover != null) {
+        if (fallbackUri != null && txtvPlaceholder != null) {
             builder = builder.error(
-                Glide.with(imgvCover!!)
+                Glide.with(coverView)
                     .`as`(PaletteBitmap::class.java)
                     .load(fallbackUri)
                     .apply(options)
@@ -91,10 +93,10 @@ class CoverLoader(private val activity: MainActivity?) {
 
     internal class CoverTarget(
         txtvPlaceholder: TextView?,
-        imgvCover: ImageView?,
+        imgvCover: ImageView,
         textAndImageCombined: Boolean
     ) : CustomViewTarget<ImageView?, PaletteBitmap?>(
-        imgvCover!!
+        imgvCover
     ) {
         private val placeholder: WeakReference<TextView?>
         private val cover: WeakReference<ImageView?>
@@ -107,14 +109,14 @@ class CoverLoader(private val activity: MainActivity?) {
             resource: PaletteBitmap,
             transition: Transition<in PaletteBitmap?>?
         ) {
-            val ivCover = cover.get()
-            ivCover!!.setImageBitmap(resource.bitmap)
+            val ivCover = cover.get() ?: return
+            ivCover.setImageBitmap(resource.bitmap)
             setPlaceholderVisibility(placeholder.get(), textAndImageCombined, resource.palette)
         }
 
         override fun onResourceCleared(placeholder: Drawable?) {
-            val ivCover = cover.get()
-            ivCover!!.setImageDrawable(placeholder)
+            val ivCover = cover.get() ?: return
+            ivCover.setImageDrawable(placeholder)
             setPlaceholderVisibility(this.placeholder.get(), textAndImageCombined, null)
         }
 

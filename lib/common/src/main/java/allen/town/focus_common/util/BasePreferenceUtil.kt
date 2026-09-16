@@ -40,10 +40,19 @@ import com.google.gson.reflect.TypeToken
 object BasePreferenceUtil {
     var sharedPreferences: SharedPreferences? = null
 
-    var defaultCategories: List<CategoryInfo>? = null
+    var defaultCategories: List<CategoryInfo> = emptyList()
+
+    /**
+     * The shared preferences, which [instance] installs from the Application's onCreate before any
+     * other code in the app can read a preference.
+     */
+    private val prefs: SharedPreferences
+        get() = checkNotNull(sharedPreferences) {
+            "BasePreferenceUtil.instance(context) has not been called yet"
+        }
 
     @JvmStatic
-    val languageCode: String get() = sharedPreferences!!.getString(LANGUAGE_NAME, "auto") ?: "auto"
+    val languageCode: String get() = prefs.getString(LANGUAGE_NAME, "auto") ?: "auto"
 
     @JvmStatic
     var libraryCategory: List<CategoryInfo>
@@ -51,7 +60,7 @@ object BasePreferenceUtil {
             val gson = Gson()
             val collectionType = object : TypeToken<List<CategoryInfo>>() {}.type
 
-            val data = sharedPreferences!!.getStringOrDefault(
+            val data = prefs.getStringOrDefault(
                 LIBRARY_CATEGORIES,
                 gson.toJson(defaultCategories, collectionType)
             )
@@ -61,12 +70,12 @@ object BasePreferenceUtil {
                 // Stored categories are from an older/incompatible build: fall back to the
                 // defaults rather than leaving the library screen empty.
                 Timber.e(e, "could not read the stored library categories")
-                return defaultCategories!!
+                return defaultCategories
             }
         }
         set(value) {
             val collectionType = object : TypeToken<List<CategoryInfo?>?>() {}.type
-            sharedPreferences!!.edit {
+            prefs.edit {
                 putString(LIBRARY_CATEGORIES, Gson().toJson(value, collectionType))
             }
         }
@@ -76,73 +85,73 @@ object BasePreferenceUtil {
         if (sharedPreferences == null) {
             sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
         }
-        return sharedPreferences!!
+        return prefs
     }
 
     private val isBlackMode
-        get() = sharedPreferences!!.getBoolean(
+        get() = prefs.getBoolean(
             BLACK_THEME, false
         )
 
     @JvmStatic
     val isScreenOnEnabled
-        get() = sharedPreferences!!.getBoolean(KEEP_SCREEN_ON, false)
+        get() = prefs.getBoolean(KEEP_SCREEN_ON, false)
 
     @JvmStatic
     val isFullScreenMode
-        get() = sharedPreferences!!.getBoolean(
+        get() = prefs.getBoolean(
             TOGGLE_FULL_SCREEN, false
         )
 
     @JvmStatic
     val materialYou
-        get() = ThemeStoreHack.isMaterialYou && sharedPreferences!!.getBoolean(MATERIAL_YOU, VersionUtils.hasS())
+        get() = ThemeStoreHack.isMaterialYou && prefs.getBoolean(MATERIAL_YOU, VersionUtils.hasS())
 
     @JvmStatic
     var wallpaperAccent
-        get() = sharedPreferences!!.getBoolean(
+        get() = prefs.getBoolean(
             WALLPAPER_ACCENT,
             VersionUtils.hasOreoMR1() && !VersionUtils.hasS()
         )
-        set(value) = sharedPreferences!!.edit {
+        set(value) = prefs.edit {
             putBoolean(WALLPAPER_ACCENT, value)
         }
 
     @JvmStatic
     var appOpenCount
-        get() = sharedPreferences!!.getInt(
+        get() = prefs.getInt(
             APP_OPEN_COUNT,
             0
         )
-        set(value) = sharedPreferences!!.edit {
+        set(value) = prefs.edit {
             putInt(APP_OPEN_COUNT, value)
         }
 
     var isColoredAppShortcuts
-        get() = sharedPreferences!!.getBoolean(
+        get() = prefs.getBoolean(
             COLORED_APP_SHORTCUTS, true
         )
-        set(value) = sharedPreferences!!.edit {
+        set(value) = prefs.edit {
             putBoolean(COLORED_APP_SHORTCUTS, value)
         }
 
     @JvmStatic
     var isDesaturatedColor
-        get() = sharedPreferences!!.getBoolean(
+        get() = prefs.getBoolean(
             DESATURATED_COLOR, false
         )
-        set(value) = sharedPreferences!!.edit {
+        set(value) = prefs.edit {
             putBoolean(DESATURATED_COLOR, value)
         }
 
     @JvmStatic
     val circlePlayButton
-        get() = sharedPreferences!!.getBoolean(CIRCLE_PLAY_BUTTON, false)
+        get() = prefs.getBoolean(CIRCLE_PLAY_BUTTON, false)
 
     @JvmStatic
     fun getGeneralThemeValue(isSystemDark: Boolean): ThemeMode {
         val themeMode: String =
-            sharedPreferences!!.getStringOrDefault(GENERAL_THEME, THEME_AUTO_VALUE)
+            prefs.getStringOrDefault(GENERAL_THEME, THEME_AUTO_VALUE)
         return if (isBlackMode && isSystemDark && themeMode != THEME_LIGHT_VALUE) {
             ThemeMode.BLACK
         } else {
@@ -161,21 +170,21 @@ object BasePreferenceUtil {
 
     @JvmStatic
     fun getGeneralThemeValueOriginal(): String {
-        return  sharedPreferences!!.getStringOrDefault(GENERAL_THEME, THEME_AUTO_VALUE)
+        return  prefs.getStringOrDefault(GENERAL_THEME, THEME_AUTO_VALUE)
     }
 
     @JvmStatic
     var interstitialAdTimeValid: Boolean = false
         get() {
             // Valid once more than 20 minutes have passed, i.e. the interstitial shows at most once per 20 minutes
-            return System.currentTimeMillis() - sharedPreferences!!.getLong(
+            return System.currentTimeMillis() - prefs.getLong(
                 INTERSTITIAL_AD_TIME,
                 0
             ) > 20 * 60 * 1000
         }
 
     fun setInterstitialAdTime(time: Long) {
-        sharedPreferences!!.edit()
+        prefs.edit()
             .putLong(INTERSTITIAL_AD_TIME, time)
             .commit()
     }
@@ -183,10 +192,10 @@ object BasePreferenceUtil {
     @JvmStatic
     var firstInstallAndLaunch: Boolean
         get() {
-            return sharedPreferences!!.getBoolean(FIRST_INSTALL_AND_LAUNCH, true)
+            return prefs.getBoolean(FIRST_INSTALL_AND_LAUNCH, true)
         }
         set(value) {
-            sharedPreferences!!.edit()
+            prefs.edit()
                 .putBoolean(FIRST_INSTALL_AND_LAUNCH, value)
                 .commit()
         }
@@ -194,10 +203,10 @@ object BasePreferenceUtil {
     @JvmStatic
     var webDevUrl: String?
         get() {
-            return sharedPreferences!!.getString(WEBDEV_SERVER_URL, "")
+            return prefs.getString(WEBDEV_SERVER_URL, "")
         }
         set(value) {
-            sharedPreferences!!.edit()
+            prefs.edit()
                 .putString(WEBDEV_SERVER_URL, value)
                 .commit()
         }
@@ -205,10 +214,10 @@ object BasePreferenceUtil {
     @JvmStatic
     var webDevUser: String?
         get() {
-            return sharedPreferences!!.getString(WEBDEV_SERVER_USER, "")
+            return prefs.getString(WEBDEV_SERVER_USER, "")
         }
         set(value) {
-            sharedPreferences!!.edit()
+            prefs.edit()
                 .putString(WEBDEV_SERVER_USER, value)
                 .commit()
         }
@@ -216,17 +225,17 @@ object BasePreferenceUtil {
     @JvmStatic
     var webDevPass: String?
         get() {
-            return sharedPreferences!!.getString(WEBDEV_SERVER_PASS, "")
+            return prefs.getString(WEBDEV_SERVER_PASS, "")
         }
         set(value) {
-            sharedPreferences!!.edit()
+            prefs.edit()
                 .putString(WEBDEV_SERVER_PASS, value)
                 .commit()
         }
 
     @JvmStatic
     fun setStringValue(key: String, value: String) {
-        sharedPreferences!!.edit()
+        prefs.edit()
             .putString(key, value)
             .commit()
     }
@@ -234,7 +243,7 @@ object BasePreferenceUtil {
     @JvmStatic
     val tabTitleMode: Int
         get() {
-            return when (sharedPreferences!!.getStringOrDefault(
+            return when (prefs.getStringOrDefault(
                 TAB_TEXT_MODE, "0"
             ).toInt()) {
                 0 -> BottomNavigationView.LABEL_VISIBILITY_AUTO

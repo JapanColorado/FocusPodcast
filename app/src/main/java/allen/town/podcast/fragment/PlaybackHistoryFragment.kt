@@ -39,7 +39,7 @@ class PlaybackHistoryFragment constructor() : EpisodesListFragment(),
         if (savedInstanceState != null) {
             displayUpArrow = savedInstanceState.getBoolean(KEY_UP_ARROW)
         }
-        (getActivity() as MainActivity?)!!.setupToolbarToggle(toolbar, displayUpArrow)
+        (requireActivity() as MainActivity).setupToolbarToggle(toolbar, displayUpArrow)
         toolbar.getMenu().clear()
         toolbar.inflateMenu(R.menu.playback_history)
         refreshToolbarState()
@@ -99,7 +99,7 @@ class PlaybackHistoryFragment constructor() : EpisodesListFragment(),
 
     override fun onFragmentLoaded(episodes: List<FeedItem>) {
         super.onFragmentLoaded(episodes)
-        listAdapter!!.notifyDataSetChanged()
+        listAdapter?.notifyDataSetChanged()
         refreshToolbarState()
     }
 

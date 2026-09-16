@@ -28,8 +28,8 @@ class FeedsSortDialog : DialogFragment() {
     protected lateinit var feedOrderMethod: String
     var selectedIndex: Int = 0
 
-    private var viewBinding: EditFeedSortDialogLayoutBinding? = null
-    private var adapter: OrderSelectionAdapter? = null
+    private lateinit var viewBinding: EditFeedSortDialogLayoutBinding
+    private lateinit var adapter: OrderSelectionAdapter
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         feedOrder = Prefs.feedOrder
         feedOrderMethod = Prefs.feedOrderMethod
@@ -43,25 +43,25 @@ class FeedsSortDialog : DialogFragment() {
             layoutInflater
         )
 
-        viewBinding!!.orderGroup.check(if (Prefs.ORDER_ASC.equals(feedOrderMethod)) R.id.asc_button else R.id.desc_button)
+        viewBinding.orderGroup.check(if (Prefs.ORDER_ASC.equals(feedOrderMethod)) R.id.asc_button else R.id.desc_button)
 
         //https://github.com/BelooS/ChipsLayoutManager
         val chipsLayoutManager = ChipsLayoutManager.newBuilder(context).build()
-        viewBinding!!.orders.layoutManager = chipsLayoutManager
-        viewBinding!!.orders.addItemDecoration(
+        viewBinding.orders.layoutManager = chipsLayoutManager
+        viewBinding.orders.addItemDecoration(
             ItemOffsetDecoration(
                 requireContext(),
                 4
             )
         )
         adapter = OrderSelectionAdapter()
-        adapter!!.setHasStableIds(true)
-        viewBinding!!.orders.adapter = adapter
+        adapter.setHasStableIds(true)
+        viewBinding.orders.adapter = adapter
         val dialog: AlertDialog.Builder = AccentMaterialDialog(
             requireContext(),
             R.style.MaterialAlertDialogTheme
         )
-        dialog.setView(viewBinding!!.root)
+        dialog.setView(viewBinding.root)
         dialog.setTitle(R.string.pref_nav_drawer_feed_order_title)
         dialog.setPositiveButton(android.R.string.ok) { d: DialogInterface?, input: Int ->
             updatePreferences()
@@ -74,7 +74,7 @@ class FeedsSortDialog : DialogFragment() {
     private fun updatePreferences(
     ) {
         Prefs.setFeedOrder(orderValues[selectedIndex])
-        Prefs.feedOrderMethod = (if (viewBinding!!.orderGroup.checkedButtonId == R.id.asc_button) Prefs.ORDER_ASC else Prefs.ORDER_DESC)
+        Prefs.feedOrderMethod = (if (viewBinding.orderGroup.checkedButtonId == R.id.asc_button) Prefs.ORDER_ASC else Prefs.ORDER_DESC)
         //Update subscriptions
         EventBus.getDefault().post(UnreadItemsUpdateEvent())
     }
@@ -93,7 +93,7 @@ class FeedsSortDialog : DialogFragment() {
             holder.chip.isCheckedIconVisible = holder.chip.isChecked
             holder.chip.setOnClickListener {
                 selectedIndex = position
-                adapter!!.notifyDataSetChanged()
+                notifyDataSetChanged()
             }
         }
 

@@ -9,7 +9,7 @@ because it is deleted outright.
 | Metric | Baseline | Now |
 |---|---:|---:|
 | First-party source lines (java + kt) | 71,121 | 65,483 |
-| Kotlin `!!` assertions (app, core, lib) | 1,865 | 1,687 |
+| Kotlin `!!` assertions (app, core, lib) | 1,865 | 0 |
 | `printStackTrace()` calls | 135 | 0 |
 | Chinese (CJK) lines outside translation resources | 626 | 0 |
 | Rx `subscribe(` with no error handler | ~11 | 0 |

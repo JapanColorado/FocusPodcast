@@ -33,8 +33,8 @@ class TagEditDialog : DialogFragment() {
 
     //all tags
     private var allTags: ArrayList<String> = ArrayList()
-    private var viewBinding: EditTagsDialogLayoutBinding? = null
-    private var adapter: TagSelectionAdapter? = null
+    private lateinit var viewBinding: EditTagsDialogLayoutBinding
+    private lateinit var adapter: TagSelectionAdapter
     private var loadTagsDisposable: Disposable? = null
 
     override fun onDestroy() {
@@ -42,10 +42,14 @@ class TagEditDialog : DialogFragment() {
         super.onDestroy()
     }
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+        @Suppress("UNCHECKED_CAST")
         val feedPreferencesList =
-            requireArguments().getSerializable(ARG_FEED_PREFERENCES) as ArrayList<FeedPreferences>?
+            requireArguments().getSerializable(ARG_FEED_PREFERENCES) as? ArrayList<FeedPreferences>
+        check(!feedPreferencesList.isNullOrEmpty()) {
+            "TagEditDialog was created without a non-empty $ARG_FEED_PREFERENCES argument"
+        }
         val commonTags: MutableSet<String> = HashSet(
-            feedPreferencesList!![0].tags
+            feedPreferencesList[0].tags
         )
         for (preference in feedPreferencesList) {
             commonTags.retainAll(preference.tags)
@@ -57,19 +61,19 @@ class TagEditDialog : DialogFragment() {
         )
         //https://github.com/BelooS/ChipsLayoutManager
         val chipsLayoutManager = ChipsLayoutManager.newBuilder(context).build()
-        viewBinding!!.tagsRecycler.layoutManager = chipsLayoutManager
-        viewBinding!!.tagsRecycler.addItemDecoration(
+        viewBinding.tagsRecycler.layoutManager = chipsLayoutManager
+        viewBinding.tagsRecycler.addItemDecoration(
             ItemOffsetDecoration(
                 requireContext(),
                 4
             )
         )
         adapter = TagSelectionAdapter()
-        adapter!!.setHasStableIds(true)
-        viewBinding!!.tagsRecycler.adapter = adapter
-        viewBinding!!.newTagButton.setOnClickListener { v: View? ->
+        adapter.setHasStableIds(true)
+        viewBinding.tagsRecycler.adapter = adapter
+        viewBinding.newTagButton.setOnClickListener { v: View? ->
             addTag(
-                viewBinding!!.newTagEditText.text.toString().trim { it <= ' ' })
+                viewBinding.newTagEditText.text.toString().trim { it <= ' ' })
         }
         loadTags()
         if (feedPreferencesList.size > 1) {
@@ -78,7 +82,7 @@ class TagEditDialog : DialogFragment() {
             requireContext(),
             R.style.MaterialAlertDialogTheme
         )
-        dialog.setView(viewBinding!!.root)
+        dialog.setView(viewBinding.root)
         dialog.setTitle(R.string.feed_tags_label)
         dialog.setPositiveButton(android.R.string.ok) { d: DialogInterface?, input: Int ->
             updatePreferencesTags(feedPreferencesList, commonTags)
@@ -105,7 +109,7 @@ class TagEditDialog : DialogFragment() {
             .subscribe(
                 { result: ArrayList<String> ->
                     allTags = result
-                    adapter!!.notifyDataSetChanged()
+                    adapter.notifyDataSetChanged()
                 }) { error: Throwable? -> Log.e(TAG, Log.getStackTraceString(error)) }
     }
 
@@ -115,17 +119,17 @@ class TagEditDialog : DialogFragment() {
         }
         selectedTags.add(name)
         allTags.add(name)
-        viewBinding!!.newTagEditText.setText("")
-        adapter!!.notifyDataSetChanged()
+        viewBinding.newTagEditText.setText("")
+        adapter.notifyDataSetChanged()
     }
 
     private fun updatePreferencesTags(
-        feedPreferencesList: List<FeedPreferences>?,
+        feedPreferencesList: List<FeedPreferences>,
         commonTags: Set<String>
     ) {
         //always include the root tag
         selectedTags.add(FeedPreferences.TAG_ROOT)
-        for (preferences in feedPreferencesList!!) {
+        for (preferences in feedPreferencesList) {
             preferences.tags.removeAll(commonTags)
             preferences.tags.addAll(selectedTags)
             DBWriter.setFeedPreferences(preferences)
@@ -151,7 +155,7 @@ class TagEditDialog : DialogFragment() {
                 } else {
                     selectedTags.add(tag)
                 }
-                adapter!!.notifyDataSetChanged()
+                notifyDataSetChanged()
             }
         }
 

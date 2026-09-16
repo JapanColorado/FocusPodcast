@@ -1,6 +1,5 @@
 package allen.town.podcast.discovery
 
-import allen.town.podcast.discovery.CombinedSearcher
 import android.util.Log
 import io.reactivex.Single
 import io.reactivex.SingleEmitter
@@ -13,23 +12,32 @@ import java.util.concurrent.CountDownLatch
 
 class CombinedSearcher : PodcastSearcher {
     override fun search(query: String?): Single<List<PodcastSearchResult?>?>? {
+        // Read the registry once: it rebuilds its list on every access and the result indices
+        // have to line up with singleResults.
+        val providers = PodcastSearcherRegistry.searchProviders
         val disposables = ArrayList<Disposable>()
         val singleResults: MutableList<List<PodcastSearchResult?>?> = ArrayList(
             Collections.nCopies<List<PodcastSearchResult?>?>(
-                PodcastSearcherRegistry.searchProviders!!.size,
+                providers.size,
                 null
             )
         )
-        val latch = CountDownLatch(PodcastSearcherRegistry.searchProviders!!.size)
-        for (i in PodcastSearcherRegistry.searchProviders!!.indices) {
-            val searchProviderInfo = PodcastSearcherRegistry.searchProviders!![i]
-            val searcher = searchProviderInfo!!.searcher
-            if (searchProviderInfo!!.weight <= 0.00001f || searcher!!.javaClass == CombinedSearcher::class.java) {
+        val latch = CountDownLatch(providers.size)
+        for (i in providers.indices) {
+            val searchProviderInfo = providers[i]
+            val searcher = searchProviderInfo.searcher
+            if (searchProviderInfo.weight <= 0.00001f || searcher.javaClass == CombinedSearcher::class.java) {
+                latch.countDown()
+                continue
+            }
+            val singleSearch = searcher.search(query)
+            if (singleSearch == null) {
+                // The searcher declined the query; it just contributes no results.
                 latch.countDown()
                 continue
             }
             disposables.add(
-                searcher!!.search(query)!!.subscribe({ e: List<PodcastSearchResult?>? ->
+                singleSearch.subscribe({ e: List<PodcastSearchResult?>? ->
                     singleResults[i] = e
                     latch.countDown()
                 }
@@ -41,31 +49,31 @@ class CombinedSearcher : PodcastSearcher {
         return Single.create(
             SingleOnSubscribe { subscriber: SingleEmitter<List<PodcastSearchResult?>?> ->
                 latch.await()
-                val results = weightSearchResults(singleResults)
+                val results = weightSearchResults(singleResults, providers)
                 subscriber.onSuccess(results)
             })
             .doOnDispose {
                 for (disposable in disposables) {
-                    disposable?.dispose()
+                    disposable.dispose()
                 }
             }
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
     }
 
-    private fun weightSearchResults(singleResults: List<List<PodcastSearchResult?>?>): List<PodcastSearchResult?> {
+    private fun weightSearchResults(
+        singleResults: List<List<PodcastSearchResult?>?>,
+        providers: List<PodcastSearcherRegistry.SearcherInfo>
+    ): List<PodcastSearchResult?> {
         val resultRanking = HashMap<String?, Float>()
         val urlToResult = HashMap<String?, PodcastSearchResult?>()
         for (i in singleResults.indices) {
-            val providerPriority = PodcastSearcherRegistry.searchProviders!![i]!!.weight
+            val providerPriority = providers[i].weight
             val providerResults = singleResults[i] ?: continue
             for (position in providerResults.indices) {
-                val result = providerResults[position]
-                urlToResult[result!!.feedUrl] = result
-                var ranking = 0f
-                if (resultRanking.containsKey(result.feedUrl)) {
-                    ranking = resultRanking[result.feedUrl]!!
-                }
+                val result = providerResults[position] ?: continue
+                urlToResult[result.feedUrl] = result
+                var ranking = resultRanking[result.feedUrl] ?: 0f
                 ranking += 1f / (position + 1f)
                 resultRanking[result.feedUrl] = ranking * providerPriority
             }

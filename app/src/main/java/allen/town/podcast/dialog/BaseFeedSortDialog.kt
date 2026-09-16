@@ -24,7 +24,7 @@ abstract class BaseFeedSortDialog(
     private var sortValues: Array<SortOrder> = arrayOf()
     var selectedIndex: Int = 0
     var isDesc = true
-    private var adapter: OrderSelectionAdapter? = null
+    private lateinit var adapter: OrderSelectionAdapter
     fun openDialog() {
 
         sortItems = context.resources.getStringArray(R.array.feed_episodes_sort_options)
@@ -55,7 +55,7 @@ abstract class BaseFeedSortDialog(
             )
         )
         adapter = OrderSelectionAdapter()
-        adapter!!.setHasStableIds(true)
+        adapter.setHasStableIds(true)
         recyclerView.adapter = adapter
         val dialog: AlertDialog.Builder = AccentMaterialDialog(
             context,
@@ -90,7 +90,7 @@ abstract class BaseFeedSortDialog(
             holder.chip.isCheckedIconVisible = holder.chip.isChecked
             holder.chip.setOnClickListener {
                 selectedIndex = position
-                adapter!!.notifyDataSetChanged()
+                notifyDataSetChanged()
             }
         }
 

@@ -12,9 +12,10 @@ import androidx.recyclerview.widget.RecyclerView
 object ChooseStorageFolderDialog {
     @JvmStatic
     fun showDialog(context: Context?, handlerFunc: Consumer<String?>) {
-        val content = View.inflate(context, R.layout.choose_data_folder_dialog, null)
+        val ctx = requireNotNull(context) { "ChooseStorageFolderDialog needs a context" }
+        val content = View.inflate(ctx, R.layout.choose_data_folder_dialog, null)
         val dialog = AccentMaterialDialog(
-            context!!,
+            ctx,
             R.style.MaterialAlertDialogTheme
         )
             .setView(content)
@@ -22,8 +23,8 @@ object ChooseStorageFolderDialog {
             .setNegativeButton(R.string.cancel_label, null)
             .create()
         (content.findViewById<View>(R.id.recyclerView) as RecyclerView).layoutManager =
-            LinearLayoutManager(context)
-        val adapter = ChooseStorageFolderAdapter(context) { path: String? ->
+            LinearLayoutManager(ctx)
+        val adapter = ChooseStorageFolderAdapter(ctx) { path: String? ->
             dialog.dismiss()
             handlerFunc.accept(path)
         }
@@ -32,7 +33,7 @@ object ChooseStorageFolderDialog {
             dialog.show()
         } else {
             AccentMaterialDialog(
-                context,
+                ctx,
                 R.style.MaterialAlertDialogTheme
             )
                 .setTitle(R.string.error_label)

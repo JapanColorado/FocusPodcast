@@ -111,8 +111,9 @@ class EpisodeItemViewHolder(private val activity: MainActivity, parent: ViewGrou
         sizeDisposable = setSizeTextView(item.media, activity, size, separatorSize)
         (itemView as MaterialCardView).isChecked = false
         playingLottieView.visibility = View.GONE
-        if (item.media != null) {
-            bind(item.media)
+        val itemMedia = item.media
+        if (itemMedia != null) {
+            bind(itemMedia)
         } else {
             progressLayout.visibility = View.GONE
             cancelDownloadButtons.visibility = View.GONE
@@ -130,8 +131,8 @@ class EpisodeItemViewHolder(private val activity: MainActivity, parent: ViewGrou
         }
     }
 
-    private fun bind(media: FeedMedia?) {
-        isVideo.visibility = if (media!!.mediaType == MediaType.VIDEO) View.VISIBLE else View.GONE
+    private fun bind(media: FeedMedia) {
+        isVideo.visibility = if (media.mediaType == MediaType.VIDEO) View.VISIBLE else View.GONE
         duration.visibility = if (media.duration > 0) View.VISIBLE else View.GONE
         progressLayout.visibility = View.VISIBLE
         if (FeedItemUtil.isCurrentlyPlaying(media)) {
@@ -161,10 +162,11 @@ class EpisodeItemViewHolder(private val activity: MainActivity, parent: ViewGrou
             R.string.chapter_duration,
             Converter.getDurationStringLocalized(activity, media.duration.toLong())
         )
-        if (FeedItemUtil.isPlaying(feedItem!!.media) || feedItem!!.isInProgress) {
+        val boundItem = feedItem
+        if (boundItem != null && (FeedItemUtil.isPlaying(boundItem.media) || boundItem.isInProgress)) {
             val progress = (100.0 * media.position / media.duration).toInt()
             val remainingTime = Math.max(media.duration - media.position, 0)
-            Timber.d(feedItem!!.title + " : " + progress + " " + feedItem.toString())
+            Timber.d(boundItem.title + " : " + progress + " " + boundItem.toString())
             playPauseProgressButton.progress = progress
             if (Prefs.shouldShowRemainingTime()) {
                 duration.text =
@@ -184,7 +186,7 @@ class EpisodeItemViewHolder(private val activity: MainActivity, parent: ViewGrou
     }
 
     private fun updateDuration(event: PlaybackPositionEvent) {
-        feedItem!!.media?.run{
+        feedItem?.media?.run{
             position = event.position
             duration = event.duration
         }
@@ -207,7 +209,10 @@ class EpisodeItemViewHolder(private val activity: MainActivity, parent: ViewGrou
     }
 
     val isCurrentlyPlayingItem: Boolean
-        get() = feedItem!!.media != null && FeedItemUtil.isCurrentlyPlaying(feedItem!!.media)
+        get() {
+            val media = feedItem?.media ?: return false
+            return FeedItemUtil.isCurrentlyPlaying(media)
+        }
 
     fun notifyPlaybackPositionUpdated(event: PlaybackPositionEvent) {
         playPauseProgressButton.progress = (100.0 * event.position / event.duration).toInt()

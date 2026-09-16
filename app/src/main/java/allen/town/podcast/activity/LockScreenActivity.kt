@@ -37,7 +37,7 @@ import com.r0adkll.slidr.model.SlidrPosition
 
 class LockScreenActivity : SimpleToolbarActivity() {
     private lateinit var binding: ActivityLockScreenBinding
-    private var libraryViewModel: LibraryViewModel? = null
+    private lateinit var libraryViewModel: LibraryViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -91,7 +91,7 @@ class LockScreenActivity : SimpleToolbarActivity() {
 
     private var paletteColor = Color.WHITE
     private fun updateColor() {
-        libraryViewModel!!.paletteColor.observe(this) { color: Int ->
+        libraryViewModel.paletteColor.observe(this) { color: Int ->
             paletteColor = color
             onPaletteColorChanged(paletteColor)
         }

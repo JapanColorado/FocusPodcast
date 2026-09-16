@@ -79,11 +79,15 @@ fun Fragment.showToast(message: String) {
 }
 
 fun Context.getDrawableCompat(@DrawableRes drawableRes: Int): Drawable {
-    return AppCompatResources.getDrawable(this, drawableRes)!!
+    return checkNotNull(AppCompatResources.getDrawable(this, drawableRes)) {
+        "no drawable for resource $drawableRes"
+    }
 }
 
 fun Fragment.getDrawableCompat(@DrawableRes drawableRes: Int): Drawable {
-    return AppCompatResources.getDrawable(requireContext(), drawableRes)!!
+    return checkNotNull(AppCompatResources.getDrawable(requireContext(), drawableRes)) {
+        "no drawable for resource $drawableRes"
+    }
 }
 
 fun Fragment.applyToolbar(toolbar: MaterialToolbar) {

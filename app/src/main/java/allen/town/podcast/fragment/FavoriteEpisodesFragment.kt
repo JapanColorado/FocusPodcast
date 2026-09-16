@@ -67,13 +67,11 @@ class FavoriteEpisodesFragment constructor() : EpisodesListFragment() {
 
                 public override fun onSwiped(viewHolder: RecyclerView.ViewHolder, swipeDir: Int) {
                     val holder: EpisodeItemViewHolder = viewHolder as EpisodeItemViewHolder
-                    if (disposable != null) {
-                        disposable!!.dispose()
-                    }
+                    disposable?.dispose()
                     val item: FeedItem? = holder.feedItem
                     if (item != null) {
                         DBWriter.removeFavoriteItem(item)
-                        (getActivity() as MainActivity?)!!.showSnackbarAbovePlayer(
+                        (requireActivity() as MainActivity).showSnackbarAbovePlayer(
                             R.string.removed_item,
                             Snackbar.LENGTH_LONG
                         )

@@ -58,7 +58,8 @@ open class PlaylistAdapter(
     }
 
     override fun onCreateContextMenu(menu: ContextMenu, v: View, menuInfo: ContextMenuInfo?) {
-        val inflater = activity!!.menuInflater
+        val hostActivity = activity ?: return
+        val inflater = hostActivity.menuInflater
         inflater.inflate(R.menu.queue_context, menu)
         super.onCreateContextMenu(menu, v, menuInfo)
         val pressed = longPressedItem

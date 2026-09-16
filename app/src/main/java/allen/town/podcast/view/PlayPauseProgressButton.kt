@@ -42,16 +42,16 @@ import java.util.*
 /* renamed from: fm.player.ui.customviews.PlayPauseProgressButton */ /* loaded from: classes2.dex */
 class PlayPauseProgressButton : View, ItemActionButton {
     private var mBackgroundBitmap: Bitmap? = null
-    private var mBackgroundBitmapOverlayPaint: Paint? = null
-    private var mBackgroundBitmapPaint: Paint? = null
-    var mBufferingPaint: Paint? = null
+    private val mBackgroundBitmapOverlayPaint = Paint()
+    private val mBackgroundBitmapPaint = Paint()
+    val mBufferingPaint = Paint()
     private var mCircleFillPaint: Paint? = null
     private var mCircleProgressObjectAnimator: ObjectAnimator? = null
-    private var mCircleRingPaint: Paint? = null
-    private var mCircleRingProgressPaint: Paint? = null
+    private val mCircleRingPaint = Paint()
+    private val mCircleRingProgressPaint = Paint()
     private var mCircleRingWidth = 0
     private var mDrawableSize = 0
-    private var mInnerPaint: Paint? = null
+    private val mInnerPaint = Paint()
     private var mInnerSize = 0
     private var mIsAnimatedPlayPauseDrawable = false
     private var mIsBuffering = false
@@ -66,20 +66,20 @@ class PlayPauseProgressButton : View, ItemActionButton {
     private var mPauseDrawable: Drawable? = null
     var mPercenateTextSize = 0
     var mPercenateTextSize100 = 0
-    private var mPercentageTextPaint: Paint? = null
+    private val mPercentageTextPaint = Paint()
     private var mPlayDrawable: Drawable? = null
     private var mPlayPauseAnimator: Animator? = null
     private var mPlayPauseDrawable: PlayPauseDrawable? = null
     private var mPlayedDrawable: Drawable? = null
-    private var mProgressPaint: Paint? = null
-    private var mProgressRingPaint: Paint? = null
-    private var mPulseRingPaint: Paint? = null
-    private var mSelectorPaint: Paint? = null
+    private val mProgressPaint = Paint()
+    private val mProgressRingPaint = Paint()
+    private val mPulseRingPaint = Paint()
+    private val mSelectorPaint = Paint()
     private var mShadowPaint: Paint? = null
     private var mShowCircleShadow = false
     private var mShowInnerBorder = false
     private var mStopDrawable: Drawable? = null
-    private var mThrobPaint: Paint? = null
+    private val mThrobPaint = Paint()
     private val mMax = 100
     private var mProgress = 0
     private var mAnimationFrame = 0.0f
@@ -119,12 +119,12 @@ class PlayPauseProgressButton : View, ItemActionButton {
             0.0f,
             0.0f,
             ((0.5f - d.toFloat() * 0.5f) * 0.23000002f + 1.0f) * f,
-            mThrobPaint!!
+            mThrobPaint
         )
         val cos =
             0.5f - Math.cos(mAnimationFrame % 80.0f * 3.141592653589793 / 79.0).toFloat() * 0.5f
-        mPulseRingPaint!!.alpha = ((1.0f - cos) * 255.0f).toInt()
-        canvas.drawCircle(0.0f, 0.0f, (0.43f * cos + 0.9f) * f, mPulseRingPaint!!)
+        mPulseRingPaint.alpha = ((1.0f - cos) * 255.0f).toInt()
+        canvas.drawCircle(0.0f, 0.0f, (0.43f * cos + 0.9f) * f, mPulseRingPaint)
         canvas.restore()
         val rectF = mTempRectF
         val i = mInnerSize
@@ -144,10 +144,11 @@ class PlayPauseProgressButton : View, ItemActionButton {
     }
 
     private fun drawCircleFill(canvas: Canvas, f: Float) {
+        val circleFillPaint = mCircleFillPaint ?: return
         if (mIsShowProgressOnRing || mIsDrawFullCircleFill) {
-            canvas.drawArc(mTempRectF, -90.0f, 360.0f, true, mCircleFillPaint!!)
+            canvas.drawArc(mTempRectF, -90.0f, 360.0f, true, circleFillPaint)
         } else {
-            canvas.drawArc(mTempRectF, f - 90.0f, 360.0f - f, true, mCircleFillPaint!!)
+            canvas.drawArc(mTempRectF, f - 90.0f, 360.0f - f, true, circleFillPaint)
         }
     }
 
@@ -171,21 +172,22 @@ class PlayPauseProgressButton : View, ItemActionButton {
                 (getWidth() / 2).toFloat(),
                 (getHeight() / 2).toFloat(),
                 (mInnerSize / 2).toFloat(),
-                mCircleRingPaint!!
+                mCircleRingPaint
             )
         }
         canvas.save()
         canvas.translate(width / 2.0f, height / 2.0f)
         val rect = Rect()
         val l = m30854l(StringBuilder(), mProgress, "%")
-        mPercentageTextPaint!!.setTextSize((if (mProgress < 100) mPercenateTextSize else mPercenateTextSize100.toFloat()) as Float)
-        mPercentageTextPaint!!.getTextBounds(l, 0, l.length, rect)
+        mPercentageTextPaint.textSize =
+            (if (mProgress < 100) mPercenateTextSize else mPercenateTextSize100).toFloat()
+        mPercentageTextPaint.getTextBounds(l, 0, l.length, rect)
         canvas.drawText(
             l,
             (0 - (rect.right - rect.left) / 2).toFloat(),
-            ((mPercentageTextPaint!!.ascent() + mPercentageTextPaint!!.descent()) * -1.0f / 2.0f).toInt()
+            ((mPercentageTextPaint.ascent() + mPercentageTextPaint.descent()) * -1.0f / 2.0f).toInt()
                 .toFloat(),
-            mPercentageTextPaint!!
+            mPercentageTextPaint
         )
         canvas.restore()
     }
@@ -223,12 +225,12 @@ class PlayPauseProgressButton : View, ItemActionButton {
             0.0f,
             0.0f,
             ((0.5f - d.toFloat() * 0.5f) * 0.23000002f + 1.0f) * f,
-            mThrobPaint!!
+            mThrobPaint
         )
         val cos =
             0.5f - Math.cos(mAnimationFrame % 80.0f * 3.141592653589793 / 79.0).toFloat() * 0.5f
-        mPulseRingPaint!!.alpha = ((1.0f - cos) * 255.0f).toInt()
-        canvas.drawCircle(0.0f, 0.0f, (0.43f * cos + 0.9f) * f, mPulseRingPaint!!)
+        mPulseRingPaint.alpha = ((1.0f - cos) * 255.0f).toInt()
+        canvas.drawCircle(0.0f, 0.0f, (0.43f * cos + 0.9f) * f, mPulseRingPaint)
         canvas.restore()
         val rectF = mTempRectF
         val i = mInnerSize
@@ -265,7 +267,7 @@ class PlayPauseProgressButton : View, ItemActionButton {
     private fun drawProgress(canvas: Canvas, f: Float) {
         if (mIsShowProgressOnRing) {
             if (f > 0.0f) {
-                val iArr = intArrayOf(0, mProgressRingPaint!!.color)
+                val iArr = intArrayOf(0, mProgressRingPaint.color)
                 val f2 = f / 360.0f
                 var f3 = 0.25f
                 if (f2 < 0.25f) {
@@ -280,14 +282,14 @@ class PlayPauseProgressButton : View, ItemActionButton {
                 val matrix = Matrix()
                 matrix.setRotate(-90.0f, mTempRectF.centerX(), mTempRectF.centerY())
                 sweepGradient.setLocalMatrix(matrix)
-                mProgressRingPaint!!.shader = sweepGradient
+                mProgressRingPaint.shader = sweepGradient
             } else {
-                mProgressRingPaint!!.shader = null
+                mProgressRingPaint.shader = null
             }
-            canvas.drawArc(mTempRectF, -90.0f, -(360.0f - f), false, mProgressRingPaint!!)
+            canvas.drawArc(mTempRectF, -90.0f, -(360.0f - f), false, mProgressRingPaint)
             return
         }
-        canvas.drawArc(mTempRectF, -90.0f, f, true, mProgressPaint!!)
+        canvas.drawArc(mTempRectF, -90.0f, f, true, mProgressPaint)
     }
 
     /* JADX WARN: Finally extract failed */
@@ -332,7 +334,7 @@ class PlayPauseProgressButton : View, ItemActionButton {
             )
             mPlayPauseDrawable = playPauseDrawable
             playPauseDrawable.callback = this
-            mPlayPauseDrawable!!.setSource(TAG)
+            playPauseDrawable.setSource(TAG)
             val color = resources.getColor(R.color.gray_3)
             val accentColor = accentColor(context)
             val themedColor =
@@ -350,12 +352,8 @@ class PlayPauseProgressButton : View, ItemActionButton {
                 mPauseDrawable =
                     obtainStyledAttributes.getDrawable(R.styleable.PlayPauseProgressButton_pauseIconSrc)
                 if (color2 != -1) {
-                    mPlayDrawable = getColoredDrawable(
-                        mPlayDrawable!!, color2
-                    )
-                    mPauseDrawable = getColoredDrawable(
-                        mPauseDrawable!!, color2
-                    )
+                    mPlayDrawable = mPlayDrawable?.let { getColoredDrawable(it, color2) }
+                    mPauseDrawable = mPauseDrawable?.let { getColoredDrawable(it, color2) }
                 }
                 var dimensionPixelSize4 = obtainStyledAttributes.getDimensionPixelSize(
                     R.styleable.PlayPauseProgressButton_iconSize,
@@ -426,86 +424,67 @@ class PlayPauseProgressButton : View, ItemActionButton {
                     i = accentColor
                     mLastTime = SystemClock.elapsedRealtime() * 1000000
                 }
-                mPlayDrawable!!.callback = this
-                mPauseDrawable!!.callback = this
+                mPlayDrawable?.callback = this
+                mPauseDrawable?.callback = this
                 val drawable = resources.getDrawable(R.drawable.ic_played)
                 mPlayedDrawable = drawable
                 drawable.callback = this
                 mStopDrawable = mPauseDrawable
                 if (dimensionPixelSize4 <= 0) {
-                    dimensionPixelSize4 = mPlayDrawable!!.intrinsicWidth
+                    dimensionPixelSize4 = mPlayDrawable?.intrinsicWidth ?: 0
                 }
                 mDrawableSize = dimensionPixelSize4
-                val paint = Paint()
-                mSelectorPaint = paint
-                paint.color = color6
-                mSelectorPaint!!.isAntiAlias = true
-                val paint2 = Paint()
-                mCircleRingPaint = paint2
-                paint2.color = mCircleRingColor
-                mCircleRingPaint!!.isAntiAlias = true
-                mCircleRingPaint!!.strokeWidth = mCircleRingWidth.toFloat()
-                mCircleRingPaint!!.style = Paint.Style.STROKE
-                val paint3 = Paint()
-                mCircleRingProgressPaint = paint3
-                paint3.color = adjustAlpha(
+                mSelectorPaint.color = color6
+                mSelectorPaint.isAntiAlias = true
+                mCircleRingPaint.color = mCircleRingColor
+                mCircleRingPaint.isAntiAlias = true
+                mCircleRingPaint.strokeWidth = mCircleRingWidth.toFloat()
+                mCircleRingPaint.style = Paint.Style.STROKE
+                mCircleRingProgressPaint.color = adjustAlpha(
                     mCircleRingColor, if (isWindowBackgroundDark(
                             context
                         )
                     ) 0.5f else 0.3f
                 )
-                mCircleRingProgressPaint!!.isAntiAlias = true
-                mCircleRingProgressPaint!!.strokeWidth = mCircleRingWidth.toFloat()
-                mCircleRingProgressPaint!!.style = Paint.Style.STROKE
+                mCircleRingProgressPaint.isAntiAlias = true
+                mCircleRingProgressPaint.strokeWidth = mCircleRingWidth.toFloat()
+                mCircleRingProgressPaint.style = Paint.Style.STROKE
                 if (mShowCircleShadow) {
-                    mCircleRingPaint!!.setShadowLayer(2.0f, 0.0f, 0.0f, -16777216)
+                    mCircleRingPaint.setShadowLayer(2.0f, 0.0f, 0.0f, -16777216)
                     val paint4 = Paint()
                     mShadowPaint = paint4
                     paint4.style = Paint.Style.FILL
-                    mShadowPaint!!.color = 0
-                    mShadowPaint!!.setShadowLayer(f, 0.0f, 0.0f, Color.argb(integer, 0, 0, 0))
+                    paint4.color = 0
+                    paint4.setShadowLayer(f, 0.0f, 0.0f, Color.argb(integer, 0, 0, 0))
                     setLayerType(LAYER_TYPE_SOFTWARE, null)
                 }
-                val paint5 = Paint()
-                mBufferingPaint = paint5
-                paint5.isAntiAlias = true
-                mBufferingPaint!!.color = i
-                val paint6 = Paint()
-                mProgressPaint = paint6
-                paint6.color = color3
-                mProgressPaint!!.isAntiAlias = true
-                mProgressRingPaint = Paint()
+                mBufferingPaint.isAntiAlias = true
+                mBufferingPaint.color = i
+                mProgressPaint.color = color3
+                mProgressPaint.isAntiAlias = true
                 setProgressRingColor(mCircleRingColor)
-                mProgressRingPaint!!.isAntiAlias = true
-                mProgressRingPaint!!.strokeWidth = mCircleRingWidth.toFloat()
-                mProgressRingPaint!!.strokeCap = Paint.Cap.SQUARE
-                mProgressRingPaint!!.style = Paint.Style.STROKE
-                val paint7 = Paint()
-                mThrobPaint = paint7
-                paint7.color = color4
-                mThrobPaint!!.isAntiAlias = true
-                val paint8 = Paint()
-                mPulseRingPaint = paint8
-                paint8.color = color5
-                mPulseRingPaint!!.isAntiAlias = true
-                mPulseRingPaint!!.strokeWidth = 6.0f
-                mPulseRingPaint!!.style = Paint.Style.STROKE
+                mProgressRingPaint.isAntiAlias = true
+                mProgressRingPaint.strokeWidth = mCircleRingWidth.toFloat()
+                mProgressRingPaint.strokeCap = Paint.Cap.SQUARE
+                mProgressRingPaint.style = Paint.Style.STROKE
+                mThrobPaint.color = color4
+                mThrobPaint.isAntiAlias = true
+                mPulseRingPaint.color = color5
+                mPulseRingPaint.isAntiAlias = true
+                mPulseRingPaint.strokeWidth = 6.0f
+                mPulseRingPaint.style = Paint.Style.STROKE
                 mTempPaint.isAntiAlias = true
-                mPercentageTextPaint = Paint()
                 mPercenateTextSize = resources.getDimensionPixelSize(R.dimen.text_size_micro)
                 mPercenateTextSize100 =
                     resources.getDimensionPixelSize(R.dimen.text_size_xsuper_micro)
-                mPercentageTextPaint!!.textSize = mPercenateTextSize.toFloat()
-                mPercentageTextPaint!!.isFakeBoldText = true
-                mPercentageTextPaint!!.isAntiAlias = true
-                mPercentageTextPaint!!.isFakeBoldText = true
-                val paint9 = Paint()
-                mInnerPaint = paint9
-                paint9.style = Paint.Style.STROKE
-                mInnerPaint!!.isDither = true
-                mInnerPaint!!.isAntiAlias = true
-                mInnerPaint!!.color = Color.parseColor("#44222222")
-                mInnerPaint!!.strokeWidth = mInnerStrokeWitdh.toFloat()
+                mPercentageTextPaint.textSize = mPercenateTextSize.toFloat()
+                mPercentageTextPaint.isFakeBoldText = true
+                mPercentageTextPaint.isAntiAlias = true
+                mInnerPaint.style = Paint.Style.STROKE
+                mInnerPaint.isDither = true
+                mInnerPaint.isAntiAlias = true
+                mInnerPaint.color = Color.parseColor("#44222222")
+                mInnerPaint.strokeWidth = mInnerStrokeWitdh.toFloat()
                 isClickable = z
                 isFocusable = z2
                 setButtonContentDescription()
@@ -522,7 +501,7 @@ class PlayPauseProgressButton : View, ItemActionButton {
     }
 
     private fun setProgressRingColor(i: Int) {
-        mProgressRingPaint!!.color = i
+        mProgressRingPaint.color = i
     }
 
     fun cancelCircleProgressAnimation() {
@@ -542,18 +521,10 @@ class PlayPauseProgressButton : View, ItemActionButton {
     public override fun drawableStateChanged() {
         super.drawableStateChanged()
         if (!isInEditMode) {
-            if (mPlayDrawable!!.isStateful) {
-                mPlayDrawable!!.state = drawableState
-            }
-            if (mPauseDrawable!!.isStateful) {
-                mPauseDrawable!!.state = drawableState
-            }
-            if (mPlayedDrawable!!.isStateful) {
-                mPlayedDrawable!!.state = drawableState
-            }
-            if (mStopDrawable!!.isStateful) {
-                mStopDrawable!!.state = drawableState
-            }
+            mPlayDrawable?.let { if (it.isStateful) it.state = drawableState }
+            mPauseDrawable?.let { if (it.isStateful) it.state = drawableState }
+            mPlayedDrawable?.let { if (it.isStateful) it.state = drawableState }
+            mStopDrawable?.let { if (it.isStateful) it.state = drawableState }
             invalidate()
         }
     }
@@ -643,7 +614,7 @@ class PlayPauseProgressButton : View, ItemActionButton {
                     ((width - mInnerSize) / 2).toFloat(),
                     ((height - mInnerSize) / 2).toFloat()
                 )
-                canvas.drawArc(mTempRectF, 0.0f, 360.0f, true, mShadowPaint!!)
+                mShadowPaint?.let { canvas.drawArc(mTempRectF, 0.0f, 360.0f, true, it) }
             }
             if (mIsDownloading) {
                 drawDownloading(canvas)
@@ -666,7 +637,7 @@ class PlayPauseProgressButton : View, ItemActionButton {
                     (width / 2).toFloat(),
                     (height / 2).toFloat(),
                     (mInnerSize / 2).toFloat(),
-                    mBackgroundBitmapOverlayPaint!!
+                    mBackgroundBitmapOverlayPaint
                 )
             }
             if (isPlaying) {
@@ -690,21 +661,21 @@ class PlayPauseProgressButton : View, ItemActionButton {
                             mStartAngle.toFloat(),
                             -(360.0f - f),
                             false,
-                            mCircleRingProgressPaint!!
+                            mCircleRingProgressPaint
                         )
                     } else {
                         canvas.drawCircle(
                             (width / 2).toFloat(),
                             (height / 2).toFloat(),
                             (mInnerSize / 2).toFloat(),
-                            mCircleRingProgressPaint!!
+                            mCircleRingProgressPaint
                         )
                         canvas.drawArc(
                             mTempRectF,
                             mStartAngle.toFloat(),
                             f,
                             false,
-                            mCircleRingPaint!!
+                            mCircleRingPaint
                         )
                     }
                 } else if (!mIsShowProgressOnRing) {
@@ -712,7 +683,7 @@ class PlayPauseProgressButton : View, ItemActionButton {
                         (width / 2).toFloat(),
                         (height / 2).toFloat(),
                         (mInnerSize / 2).toFloat(),
-                        mCircleRingPaint!!
+                        mCircleRingPaint
                     )
                 }
             }
@@ -724,14 +695,14 @@ class PlayPauseProgressButton : View, ItemActionButton {
                     ((width - mInnerSize) / 2).toFloat(),
                     ((height - mInnerSize) / 2).toFloat()
                 )
-                canvas.drawArc(mTempRectF, 0.0f, 360.0f, true, mSelectorPaint!!)
+                canvas.drawArc(mTempRectF, 0.0f, 360.0f, true, mSelectorPaint)
             }
             if (mShowInnerBorder) {
                 canvas.drawCircle(
                     (width / 2).toFloat(),
                     (height / 2).toFloat(),
                     (mInnerSize / 2 - mInnerStrokeWitdh / 2).toFloat(),
-                    mInnerPaint!!
+                    mInnerPaint
                 )
             }
             if (mPulsingAnimation && mIsBuffering) {
@@ -751,17 +722,18 @@ class PlayPauseProgressButton : View, ItemActionButton {
                 ViewCompat.postInvalidateOnAnimation(this)
             }
             if (mIsAnimatedPlayPauseDrawable) {
-                mPlayPauseDrawable!!.draw(canvas)
+                mPlayPauseDrawable?.draw(canvas)
                 return
             }
             drawable = if (isPlaying || mForceDrawPause) {
                 mPauseDrawable
             } else {
-                val z2 = isPlayed
                 mPlayDrawable
             }
-            drawable!!.bounds = mTempRect
-            drawable.draw(canvas)
+            if (drawable != null) {
+                drawable.bounds = mTempRect
+                drawable.draw(canvas)
+            }
         }
     }
 
@@ -769,7 +741,7 @@ class PlayPauseProgressButton : View, ItemActionButton {
     public override fun onSizeChanged(i: Int, i2: Int, i3: Int, i4: Int) {
         super.onSizeChanged(i, i2, i3, i4)
         if (!isInEditMode) {
-            mPlayPauseDrawable!!.setBounds(0, 0, i, i2)
+            mPlayPauseDrawable?.setBounds(0, 0, i, i2)
         }
     }
 
@@ -783,15 +755,11 @@ class PlayPauseProgressButton : View, ItemActionButton {
 
     fun setBackgroundImage(bitmap: Bitmap) {
         mBackgroundBitmap = getRoundedShape(bitmap)
-        val paint = Paint()
-        mBackgroundBitmapPaint = paint
-        paint.isAntiAlias = true
-        mBackgroundBitmapPaint!!.isFilterBitmap = true
-        mBackgroundBitmapPaint!!.isDither = true
-        val paint2 = Paint()
-        mBackgroundBitmapOverlayPaint = paint2
-        paint2.color = Color.parseColor("#99444444")
-        mBackgroundBitmapOverlayPaint!!.isAntiAlias = true
+        mBackgroundBitmapPaint.isAntiAlias = true
+        mBackgroundBitmapPaint.isFilterBitmap = true
+        mBackgroundBitmapPaint.isDither = true
+        mBackgroundBitmapOverlayPaint.color = Color.parseColor("#99444444")
+        mBackgroundBitmapOverlayPaint.isAntiAlias = true
         invalidate()
     }
 
@@ -801,11 +769,11 @@ class PlayPauseProgressButton : View, ItemActionButton {
             mCircleFillPaint = paint
             paint.isAntiAlias = true
         }
-        mCircleFillPaint!!.color = i
-        mProgressPaint!!.color = i2
+        mCircleFillPaint?.color = i
+        mProgressPaint.color = i2
         val parseColor = Color.parseColor("#eeeeee")
-        mPlayDrawable = getColoredDrawable(mPlayDrawable!!, parseColor)
-        mPauseDrawable = getColoredDrawable(mPauseDrawable!!, parseColor)
+        mPlayDrawable = mPlayDrawable?.let { getColoredDrawable(it, parseColor) }
+        mPauseDrawable = mPauseDrawable?.let { getColoredDrawable(it, parseColor) }
         invalidate()
     }
 
@@ -815,12 +783,12 @@ class PlayPauseProgressButton : View, ItemActionButton {
             mCircleFillPaint = paint
             paint.isAntiAlias = true
         }
-        mCircleFillPaint!!.color = i
+        mCircleFillPaint?.color = i
         if (mCircleRingColor != i2) {
             mCircleRingColor = i2
             setProgressRingColor(i2)
-            mCircleRingPaint!!.color = mCircleRingColor
-            mCircleRingProgressPaint!!.color = adjustAlpha(
+            mCircleRingPaint.color = mCircleRingColor
+            mCircleRingProgressPaint.color = adjustAlpha(
                 mCircleRingColor,
                 if (isWindowBackgroundDark(context)) 0.5f else 0.3f
             )
@@ -835,7 +803,7 @@ class PlayPauseProgressButton : View, ItemActionButton {
             mCircleFillPaint = paint
             paint.isAntiAlias = true
         }
-        mCircleFillPaint!!.color = i
+        mCircleFillPaint?.color = i
         invalidate()
     }
 
@@ -845,17 +813,17 @@ class PlayPauseProgressButton : View, ItemActionButton {
             mCircleFillPaint = paint
             paint.isAntiAlias = true
         }
-        mCircleFillPaint!!.color = i
+        mCircleFillPaint?.color = i
         if (mCircleRingColor != i) {
             mCircleRingColor = i
             setProgressRingColor(i)
-            mCircleRingPaint!!.color = mCircleRingColor
-            mCircleRingProgressPaint!!.color = adjustAlpha(
+            mCircleRingPaint.color = mCircleRingColor
+            mCircleRingProgressPaint.color = adjustAlpha(
                 mCircleRingColor,
                 if (isWindowBackgroundDark(context)) 0.5f else 0.3f
             )
         }
-        mPlayPauseDrawable!!.setColorFilter(i2, PorterDuff.Mode.SRC_IN)
+        mPlayPauseDrawable?.setColorFilter(i2, PorterDuff.Mode.SRC_IN)
         invalidate()
     }
 
@@ -871,16 +839,16 @@ class PlayPauseProgressButton : View, ItemActionButton {
         val ofFloat = ObjectAnimator.ofFloat(this, "circleProgress", f)
         mCircleProgressObjectAnimator = ofFloat
         ofFloat.duration = j
-        mCircleProgressObjectAnimator!!.interpolator = DecelerateInterpolator()
-        mCircleProgressObjectAnimator!!.start()
+        ofFloat.interpolator = DecelerateInterpolator()
+        ofFloat.start()
     }
 
     fun setCircleRingColor(i: Int) {
         if (mCircleRingColor != i) {
             mCircleRingColor = i
             setProgressRingColor(i)
-            mCircleRingPaint!!.color = mCircleRingColor
-            mCircleRingProgressPaint!!.color =
+            mCircleRingPaint.color = mCircleRingColor
+            mCircleRingProgressPaint.color =
                 adjustAlpha(
                     mCircleRingColor,
                     if (isWindowBackgroundDark(context)) 0.5f else 0.3f
@@ -892,9 +860,9 @@ class PlayPauseProgressButton : View, ItemActionButton {
 
     fun setCircleRingWidth(i: Int) {
         mCircleRingWidth = i
-        mCircleRingPaint!!.strokeWidth = i.toFloat()
-        mCircleRingProgressPaint!!.strokeWidth = mCircleRingWidth.toFloat()
-        mProgressRingPaint!!.strokeWidth = mCircleRingWidth.toFloat()
+        mCircleRingPaint.strokeWidth = i.toFloat()
+        mCircleRingProgressPaint.strokeWidth = mCircleRingWidth.toFloat()
+        mProgressRingPaint.strokeWidth = mCircleRingWidth.toFloat()
         ViewCompat.postInvalidateOnAnimation(this)
     }
 
@@ -933,11 +901,11 @@ class PlayPauseProgressButton : View, ItemActionButton {
     }
 
     fun setPercentageTextColor(i: Int) {
-        mPercentageTextPaint!!.color = i
+        mPercentageTextPaint.color = i
     }
 
     fun setPlayPauseColor(i: Int) {
-        mPlayPauseDrawable!!.setColorFilter(i, PorterDuff.Mode.SRC_IN)
+        mPlayPauseDrawable?.setColorFilter(i, PorterDuff.Mode.SRC_IN)
         invalidate()
     }
 
@@ -961,7 +929,8 @@ class PlayPauseProgressButton : View, ItemActionButton {
             val z5 = z4 != z
             isPlaying = z
             if (z5) {
-                mPlayPauseDrawable!!.setIsPlay(z)
+                val playPauseDrawable = mPlayPauseDrawable
+                playPauseDrawable?.setIsPlay(z)
                 val animator = mPlayPauseAnimator
                 if ((animator == null || !animator.isStarted || z3) && mPlayPauseRedrawsEnabled) {
                     if (z3) {
@@ -970,9 +939,9 @@ class PlayPauseProgressButton : View, ItemActionButton {
                         val animator2 = mPlayPauseAnimator
                         if (animator2 == null || !animator2.isStarted) {
                             if (isPlaying) {
-                                mPlayPauseDrawable!!.drawPause()
+                                playPauseDrawable?.drawPause()
                             } else {
-                                mPlayPauseDrawable!!.drawPlay()
+                                playPauseDrawable?.drawPlay()
                             }
                         }
                     }
@@ -985,7 +954,7 @@ class PlayPauseProgressButton : View, ItemActionButton {
     }
 
     fun setProgressColor(i: Int) {
-        mProgressPaint!!.color = i
+        mProgressPaint.color = i
         invalidate()
     }
 
@@ -994,12 +963,12 @@ class PlayPauseProgressButton : View, ItemActionButton {
     }
 
     fun setSelectorColor(i: Int) {
-        mSelectorPaint!!.color = i
+        mSelectorPaint.color = i
     }
 
     fun setSelectorColorAutoAdjust(i: Int) {
         if (!isInEditMode) {
-            mSelectorPaint!!.color = adjustAlpha(i, 0.12f)
+            mSelectorPaint.color = adjustAlpha(i, 0.12f)
         }
     }
 
@@ -1010,20 +979,20 @@ class PlayPauseProgressButton : View, ItemActionButton {
 
     fun showCircleRingWithProgressOnly(i: Int) {
         mIsShowCircleRingWithProgressOnly = true
-        mCircleRingProgressPaint!!.color = i
+        mCircleRingProgressPaint.color = i
         invalidate()
     }
 
     fun showShadow(i: Int, f: Float, f2: Float, f3: Float, z: Boolean) {
         mShowCircleShadow = true
         if (z) {
-            mCircleRingPaint!!.setShadowLayer(2.0f, 0.0f, 0.0f, i)
+            mCircleRingPaint.setShadowLayer(2.0f, 0.0f, 0.0f, i)
         }
         val paint = Paint()
         mShadowPaint = paint
         paint.style = Paint.Style.FILL
-        mShadowPaint!!.color = 0
-        mShadowPaint!!.setShadowLayer(f2, 0.0f, f3, adjustAlpha(i, f))
+        paint.color = 0
+        paint.setShadowLayer(f2, 0.0f, f3, adjustAlpha(i, f))
         setLayerType(LAYER_TYPE_SOFTWARE, null)
     }
 
@@ -1037,14 +1006,14 @@ class PlayPauseProgressButton : View, ItemActionButton {
         val animator = mPlayPauseAnimator
         if (animator != null) {
             animator.removeAllListeners()
-            mPlayPauseAnimator!!.end()
-            mPlayPauseAnimator!!.cancel()
+            animator.end()
+            animator.cancel()
         }
-        val pausePlayAnimator = mPlayPauseDrawable!!.pausePlayAnimator
+        val pausePlayAnimator = mPlayPauseDrawable?.pausePlayAnimator ?: return
         mPlayPauseAnimator = pausePlayAnimator
         pausePlayAnimator.interpolator = LinearInterpolator()
-        mPlayPauseAnimator!!.duration = j
-        mPlayPauseAnimator!!.start()
+        pausePlayAnimator.duration = j
+        pausePlayAnimator.start()
     }
 
     fun setCircleProgress(f: Float, z: Boolean) {
@@ -1119,7 +1088,7 @@ class PlayPauseProgressButton : View, ItemActionButton {
 
     override val isVisibility: Int
         get() = if (noMedia(feedItem)) {
-            if (feedItem!!.isPlayed) {
+            if (feedItem?.isPlayed == true) {
                 GONE
             } else {
                 VISIBLE
@@ -1127,33 +1096,34 @@ class PlayPauseProgressButton : View, ItemActionButton {
         } else VISIBLE
 
     override fun onClick(context: Activity?) {
-        if(feedItem == null){
+        val feedItem = this.feedItem ?: return
+        if (context == null) {
             return
         }
-        val media: FeedMedia? = feedItem!!.media
+        val media: FeedMedia? = feedItem.media
 
-        if (noMedia(feedItem)) {
-            if (!feedItem!!.isPlayed()) {
+        if (media == null) {
+            if (!feedItem.isPlayed()) {
                 DBWriter.markItemPlayed(feedItem, FeedItem.PLAYED, true)
             }
         } else if (isPlaying) {
             if (FeedItemUtil.isCurrentlyPlaying(media)) {
-                sendLocalBroadcast(context!!, PlaybackService.ACTION_PAUSE_PLAY_CURRENT_EPISODE)
+                sendLocalBroadcast(context, PlaybackService.ACTION_PAUSE_PLAY_CURRENT_EPISODE)
             }
         } else {
             //this is needed for the case where the app backs up its data (with the item already downloaded) and, after restoring, the database says downloaded while the file is actually gone
             //that case is rare enough that, for stability, we just carry on
             // Only repair media that claims to be downloaded. Local folder feeds use content://
             // URIs that cannot be checked here, and never-downloaded items have nothing to fix.
-            val isLocalFeed = feedItem?.feed?.isLocalFeed == true
-            if (media!!.isDownloaded && !isLocalFeed && !media.fileExists()) {
+            val isLocalFeed = feedItem.feed?.isLocalFeed == true
+            if (media.isDownloaded && !isLocalFeed && !media.fileExists()) {
                 DBTasks.notifyMissingFeedMediaFile(context, media)
             }
             if (!media.fileExists()) {
                 //prompt before falling back to streaming
                 UsageStatistics.logAction(UsageStatistics.ACTION_STREAM)
                 if (!NetworkUtils.isStreamingAllowed()) {
-                    UseStreamConfirmDialog(context!!, media).show()
+                    UseStreamConfirmDialog(context, media).show()
                     return
                 }
             }
@@ -1163,7 +1133,7 @@ class PlayPauseProgressButton : View, ItemActionButton {
                 .callEvenIfRunning(true)
                 .start()
             if (media.mediaType == MediaType.VIDEO) {
-                context!!.startActivity(PlaybackService.getPlayerActivityIntent(context, media))
+                context.startActivity(PlaybackService.getPlayerActivityIntent(context, media))
             }
         }
     }

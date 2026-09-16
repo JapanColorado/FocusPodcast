@@ -14,7 +14,8 @@ abstract class FeedSkipPreDialog(
     context: Context?, skipIntroInitialValue: Int,
     skipEndInitialValue: Int
 ) : AccentMaterialDialog(
-    context!!, R.style.MaterialAlertDialogTheme
+    requireNotNull(context) { "FeedSkipPreDialog needs a context" },
+    R.style.MaterialAlertDialogTheme
 ) {
     protected abstract fun onConfirmed(skipIntro: Int, skipEndig: Int)
 

@@ -19,7 +19,8 @@ class VisitWebsiteActionButton(val item: FeedItem) : ItemActionButton {
         get() = R.drawable.ic_web
 
     override fun onClick(context: Activity?) {
-        openInBrowser(context!!, item.getLink())
+        val activity = context ?: return
+        openInBrowser(activity, item.getLink())
     }
 
     override val isVisibility: Int

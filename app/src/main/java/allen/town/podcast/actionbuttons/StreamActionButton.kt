@@ -24,17 +24,18 @@ class StreamActionButton(val item: FeedItem) : ItemActionButton {
         get() = R.drawable.ic_play_48dp
 
     override fun onClick(context: Activity?) {
+        val activity = context ?: return
         val media: FeedMedia = item.getMedia() ?: return
         UsageStatistics.logAction(UsageStatistics.ACTION_STREAM)
         if (!NetworkUtils.isStreamingAllowed()) {
-            UseStreamConfirmDialog(context!!, media).show()
+            UseStreamConfirmDialog(activity, media).show()
             return
         }
-        PlaybackServiceStarter(context, media)
+        PlaybackServiceStarter(activity, media)
             .callEvenIfRunning(true)
             .start()
         if (media.mediaType == MediaType.VIDEO) {
-            context!!.startActivity(PlaybackService.getPlayerActivityIntent(context, media))
+            activity.startActivity(PlaybackService.getPlayerActivityIntent(activity, media))
         }
     }
 }

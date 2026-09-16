@@ -78,7 +78,7 @@ class ItunesAdapter(
 
     fun addAll(newData: List<PodcastSearchResult>?) {
         data.clear()
-        data.addAll(newData!!)
+        data.addAll(newData ?: emptyList())
         notifyDataSetChanged()
     }
 
@@ -206,9 +206,14 @@ class ItunesAdapter(
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe({ feed ->
+                            // fromCallable turns a null row into onError, so this only runs with
+                            // a real Feed; the check keeps the compiler happy about the platform type.
+                            if (feed == null) {
+                                return@subscribe
+                            }
                             //the feed exists but not this episode, so insert the episode
                             Timber.v("we got Feed in db , but not found episode {${episodeSearchResult.title}}")
-                            val feedItemToInsert = getFeedItemToInsert(episodeSearchResult, feed!!)
+                            val feedItemToInsert = getFeedItemToInsert(episodeSearchResult, feed)
                             DBWriter.setFeedItemExcludeFeed(feedItemToInsert)
                             feedItems.add(feedItemToInsert)
                             viewHolder.bindFeedItem(feedItemToInsert)
@@ -233,7 +238,7 @@ class ItunesAdapter(
                             feedItems.add(itemToInsert)
                             viewHolder.bindFeedItem(itemToInsert)
 
-                            Timber.v("we found nothing in db , insert feed and item !! {${episodeSearchResult.title}}")
+                            Timber.v("we found nothing in db , insert feed and item {${episodeSearchResult.title}}")
                             //no feed in the database for this item, so build one
 //                            notifyItemChanged(viewHolder.bindingAdapterPosition, "search_episodes")
                         }))
@@ -249,7 +254,7 @@ class ItunesAdapter(
             it.setDescriptionIfLonger(episodeSearchResult.description)
             it.imageUrl = episodeSearchResult.imageUrl
             it.itemIdentifier = episodeSearchResult.episodeUuid
-            it.feedId = feed!!.id
+            it.feedId = feed.id
             it.feed = feed
         }
         val itemMediaToInsert = FeedMedia(
@@ -455,23 +460,23 @@ class ItunesAdapter(
             subscribe_button.setFeedItem(item)
             var isVideo = false
             ivIsVideo.visibility = View.GONE
-            if (item.media != null) {
-                isVideo = item.media!!.mediaType == MediaType.VIDEO
+            val media = item.media
+            if (media != null) {
+                isVideo = media.mediaType == MediaType.VIDEO
                 if (isVideo) {
                     ivIsVideo.visibility = View.VISIBLE
                 }
-                if (FeedItemUtil.isPlaying(item.media) || item.isInProgress) {
-                    val progress = (100.0 * item.media!!.position / item.media!!.duration).toInt()
-                    val remainingTime = Math.max(item.media!!.duration - item.media!!.position, 0)
+                if (FeedItemUtil.isPlaying(media) || item.isInProgress) {
+                    val progress = (100.0 * media.position / media.duration).toInt()
                     Timber.d(item.title + " : " + progress + " " + item.toString())
                     subscribe_button.progress = progress
                 }
-                if (FeedItemUtil.isCurrentlyPlaying(item.media)) {
+                if (FeedItemUtil.isCurrentlyPlaying(media)) {
                     subscribe_button.setPlayingAndPlayed(true, false, false)
                 } else {
                     subscribe_button.setPlayingAndPlayed(false, false, false)
                 }
-                if (FeedItemUtil.isCurrentlyPlaying(item.media!!)) {
+                if (FeedItemUtil.isCurrentlyPlaying(media)) {
                     (itemView as MaterialCardView).isChecked = true
                     playing_lottie.visibility = View.VISIBLE
                 }

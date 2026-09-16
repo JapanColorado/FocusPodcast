@@ -3,6 +3,7 @@ package allen.town.podcast.dialog
 import allen.town.focus_common.views.AccentMaterialDialog
 import allen.town.podcast.R
 import allen.town.podcast.core.util.ShareUtils
+import allen.town.podcast.databinding.ShareEpisodeDialogBinding
 import allen.town.podcast.model.feed.FeedItem
 import android.app.Dialog
 import android.content.Context
@@ -10,66 +11,58 @@ import android.content.DialogInterface
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.View
-import android.widget.RadioButton
 import android.widget.RadioGroup
 import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.widget.SwitchCompat
 import androidx.fragment.app.DialogFragment
 
 class ShareDialog : DialogFragment() {
-    private var ctx: Context? = null
-    private var item: FeedItem? = null
-    private var prefs: SharedPreferences? = null
-    private var radioMediaFile: RadioButton? = null
-    private var radioLinkToEpisode: RadioButton? = null
-    private var checkBoxStartAt: SwitchCompat? = null
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        if (arguments != null) {
-            ctx = activity
-            item = requireArguments().getSerializable(ARGUMENT_FEED_ITEM) as FeedItem?
-            prefs = requireActivity().getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
+        val ctx: Context = requireActivity()
+        val item = checkNotNull(requireArguments().getSerializable(ARGUMENT_FEED_ITEM) as FeedItem?) {
+            "ShareDialog was created without a $ARGUMENT_FEED_ITEM argument"
         }
-        val content = View.inflate(ctx, R.layout.share_episode_dialog, null)
+        val prefs = ctx.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
+        val binding = ShareEpisodeDialogBinding.inflate(layoutInflater)
         val builder: AlertDialog.Builder = AccentMaterialDialog(
-            ctx!!,
+            ctx,
             R.style.MaterialAlertDialogTheme
         )
         builder.setTitle(R.string.share_label)
-        builder.setView(content)
-        val radioGroup = content.findViewById<RadioGroup>(R.id.share_dialog_radio_group)
-        radioGroup.setOnCheckedChangeListener { group: RadioGroup?, checkedId: Int ->
-            checkBoxStartAt!!.isEnabled = checkedId != R.id.share_media_file_radio
+        builder.setView(binding.root)
+        binding.shareDialogRadioGroup.setOnCheckedChangeListener { _: RadioGroup?, checkedId: Int ->
+            binding.shareStartAtTimerDialog.isEnabled = checkedId != R.id.share_media_file_radio
         }
-        radioLinkToEpisode = content.findViewById(R.id.share_link_to_episode_radio)
-        radioMediaFile = content.findViewById(R.id.share_media_file_radio)
-        checkBoxStartAt = content.findViewById(R.id.share_start_at_timer_dialog)
-        setupOptions()
-        builder.setPositiveButton(R.string.share_label) { dialog: DialogInterface?, id: Int ->
-            val includePlaybackPosition = checkBoxStartAt!!.isChecked()
-            if (radioLinkToEpisode!!.isChecked()) {
+        setupOptions(binding, item, prefs)
+        builder.setPositiveButton(R.string.share_label) { _: DialogInterface?, _: Int ->
+            val includePlaybackPosition = binding.shareStartAtTimerDialog.isChecked
+            if (binding.shareLinkToEpisodeRadio.isChecked) {
                 ShareUtils.shareFeedItemLinkWithDownloadLink(ctx, item, includePlaybackPosition)
-            } else if (radioMediaFile!!.isChecked()) {
-                ShareUtils.shareFeedItemFile(ctx, item!!.media)
+            } else if (binding.shareMediaFileRadio.isChecked) {
+                ShareUtils.shareFeedItemFile(ctx, item.media)
             } else {
                 throw IllegalStateException("Unknown share method")
             }
-            prefs!!.edit().putBoolean(PREF_SHARE_EPISODE_START_AT, includePlaybackPosition).apply()
+            prefs.edit().putBoolean(PREF_SHARE_EPISODE_START_AT, includePlaybackPosition).apply()
         }
-            .setNegativeButton(R.string.cancel_label) { dialog: DialogInterface, id: Int -> dialog.dismiss() }
+            .setNegativeButton(R.string.cancel_label) { dialog: DialogInterface, _: Int -> dialog.dismiss() }
         return builder.create()
     }
 
-    private fun setupOptions() {
-        val hasMedia = item!!.media != null
-        val downloaded = hasMedia && item!!.media!!.isDownloaded
-        radioMediaFile!!.visibility = if (downloaded) View.VISIBLE else View.GONE
-        val hasDownloadUrl = hasMedia && item!!.media!!.download_url != null
+    private fun setupOptions(
+        binding: ShareEpisodeDialogBinding,
+        item: FeedItem,
+        prefs: SharedPreferences
+    ) {
+        val media = item.media
+        val downloaded = media != null && media.isDownloaded
+        binding.shareMediaFileRadio.visibility = if (downloaded) View.VISIBLE else View.GONE
+        val hasDownloadUrl = media != null && media.download_url != null
         if (!ShareUtils.hasLinkToShare(item) && !hasDownloadUrl) {
-            radioLinkToEpisode!!.visibility = View.GONE
+            binding.shareLinkToEpisodeRadio.visibility = View.GONE
         }
-        radioMediaFile!!.isChecked = false
-        val switchIsChecked = prefs!!.getBoolean(PREF_SHARE_EPISODE_START_AT, false)
-        checkBoxStartAt!!.isChecked = switchIsChecked
+        binding.shareMediaFileRadio.isChecked = false
+        binding.shareStartAtTimerDialog.isChecked =
+            prefs.getBoolean(PREF_SHARE_EPISODE_START_AT, false)
     }
 
     companion object {

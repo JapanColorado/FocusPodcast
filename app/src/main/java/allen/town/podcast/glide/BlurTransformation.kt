@@ -16,7 +16,8 @@ import java.security.MessageDigest
 
 class BlurTransformation : BitmapTransformation {
 
-    private var context: Context? = null
+    /** Set by [init], which both constructors call before the transformation is used. */
+    private lateinit var context: Context
     private var blurRadius = 0f
     private var sampling = 0
 
@@ -67,8 +68,9 @@ class BlurTransformation : BitmapTransformation {
         }
 
         fun build(): BlurTransformation {
-            return if (bitmapPool != null) {
-                BlurTransformation(this, bitmapPool!!)
+            val pool = bitmapPool
+            return if (pool != null) {
+                BlurTransformation(this, pool)
             } else BlurTransformation(this)
         }
     }
@@ -96,7 +98,7 @@ class BlurTransformation : BitmapTransformation {
         canvas.drawBitmap(toTransform, 0f, 0f, paint)
 
         try {
-            val rs = RenderScript.create(context!!.applicationContext)
+            val rs = RenderScript.create(context.applicationContext)
             val input = Allocation.createFromBitmap(
                 rs,
                 out,

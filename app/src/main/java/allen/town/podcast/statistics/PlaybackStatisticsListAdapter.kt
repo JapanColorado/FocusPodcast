@@ -12,7 +12,7 @@ import androidx.fragment.app.Fragment
  * Adapter for the playback statistics list.
  */
 class PlaybackStatisticsListAdapter(private val fragment: Fragment) : StatisticsListAdapter(
-    fragment.context
+    fragment.requireContext()
 ) {
     private var headStrRes = 0
     fun setTimeFilter(headStrRes: Int) {
@@ -20,9 +20,9 @@ class PlaybackStatisticsListAdapter(private val fragment: Fragment) : Statistics
     }
 
     protected override val headerCaption: String
-        protected get() = context!!.getString(headStrRes)
+        protected get() = context.getString(headStrRes)
     protected override val headerValue: Pair<String, String>
-        protected get() = Converter.shortLocalizedDuration(context, pieChartData!!.sum.toLong())
+        protected get() = Converter.shortLocalizedDuration(context, (pieChartData?.sum ?: 0f).toLong())
 
     override fun generateChartData(statisticsData: List<StatisticsItem>): StatisticsData {
         val dataValues = FloatArray(statisticsData.size)

@@ -69,6 +69,10 @@ class SyncPrefFragment : AbsSettingsFragment() {
         }
     }
 
+    /** Preferences declared in `pref_sync.xml`; a missing key is a programming error. */
+    private fun requirePreference(key: String): Preference =
+        checkNotNull(findPreference(key)) { "missing preference $key in pref_sync.xml" }
+
     private fun setupScreen() {
         val activity: Activity? = activity
         findPreference<Preference>(PREFERENCE_GPODNET_SETLOGIN_INFORMATION)
@@ -85,17 +89,17 @@ class SyncPrefFragment : AbsSettingsFragment() {
                 dialog.show()
                 true
             })
-        findPreference<Preference>(PREFERENCE_SYNC)!!.onPreferenceClickListener =
+        requirePreference(PREFERENCE_SYNC).onPreferenceClickListener =
             Preference.OnPreferenceClickListener { preference: Preference? ->
                 SyncService.syncImmediately(context)
                 true
             }
-        findPreference<Preference>(PREFERENCE_FORCE_FULL_SYNC)!!.onPreferenceClickListener =
+        requirePreference(PREFERENCE_FORCE_FULL_SYNC).onPreferenceClickListener =
             Preference.OnPreferenceClickListener { preference: Preference? ->
                 SyncService.fullSync(context)
                 true
             }
-        findPreference<Preference>(PREFERENCE_LOGOUT)!!.onPreferenceClickListener =
+        requirePreference(PREFERENCE_LOGOUT).onPreferenceClickListener =
             Preference.OnPreferenceClickListener { preference: Preference? ->
                 SynchronizationCredentials.clear(context)
                 showSnack(
@@ -111,20 +115,20 @@ class SyncPrefFragment : AbsSettingsFragment() {
 
     private fun updateScreen() {
         val loggedIn = SynchronizationSettings.isProviderConnected
-        val preferenceHeader = findPreference<Preference>(PREFERENCE_SYNCHRONIZATION_DESCRIPTION)
+        val preferenceHeader = requirePreference(PREFERENCE_SYNCHRONIZATION_DESCRIPTION)
         if (loggedIn) {
             val selectedProvider = SynchronizationProviderViewData.fromIdentifier(
                 selectedSyncProviderKey
             )
-            preferenceHeader!!.title = ""
+            preferenceHeader.title = ""
             preferenceHeader.setSummary(selectedProvider.summaryResource)
             preferenceHeader.setIcon(selectedProvider.iconResource)
             preferenceHeader.onPreferenceClickListener = null
         } else {
-            preferenceHeader!!.setTitle(R.string.synchronization_choose_title)
+            preferenceHeader.setTitle(R.string.synchronization_choose_title)
             preferenceHeader.setSummary(R.string.synchronization_summary_unchoosen)
             val drawable = ContextCompat.getDrawable(requireContext(), R.drawable.ic_cloud)
-            drawable!!.colorFilter = BlendModeColorFilterCompat.createBlendModeColorFilterCompat(
+            drawable?.colorFilter = BlendModeColorFilterCompat.createBlendModeColorFilterCompat(
                 accentColor(requireContext()), BlendModeCompat.SRC_IN
             )
             preferenceHeader.icon = drawable
@@ -134,22 +138,22 @@ class SyncPrefFragment : AbsSettingsFragment() {
                     true
                 }
         }
-        val gpodnetSetLoginPreference = findPreference<Preference>(
+        val gpodnetSetLoginPreference = requirePreference(
             PREFERENCE_GPODNET_SETLOGIN_INFORMATION
         )
-        gpodnetSetLoginPreference!!.isVisible =
+        gpodnetSetLoginPreference.isVisible =
             isProviderSelected(SynchronizationProviderViewData.GPODDER_NET)
         gpodnetSetLoginPreference.isEnabled = loggedIn
-        findPreference<Preference>(PREFERENCE_SYNC)!!.isEnabled = loggedIn
-        findPreference<Preference>(PREFERENCE_FORCE_FULL_SYNC)!!.isEnabled = loggedIn
-        findPreference<Preference>(PREFERENCE_LOGOUT)!!.isEnabled = loggedIn
+        requirePreference(PREFERENCE_SYNC).isEnabled = loggedIn
+        requirePreference(PREFERENCE_FORCE_FULL_SYNC).isEnabled = loggedIn
+        requirePreference(PREFERENCE_LOGOUT).isEnabled = loggedIn
         if (loggedIn) {
             val summary = getString(
                 R.string.synchronization_login_status,
                 SynchronizationCredentials.getUsername(), SynchronizationCredentials.getHosturl()
             )
             val formattedSummary = HtmlCompat.fromHtml(summary, HtmlCompat.FROM_HTML_MODE_LEGACY)
-            findPreference<Preference>(PREFERENCE_LOGOUT)!!.summary = formattedSummary
+            requirePreference(PREFERENCE_LOGOUT).summary = formattedSummary
             updateLastSyncReport(
                 SynchronizationSettings.isLastSyncSuccessful,
                 SynchronizationSettings.lastSyncAttempt
@@ -170,31 +174,29 @@ class SyncPrefFragment : AbsSettingsFragment() {
         val adapter: ListAdapter = object : ArrayAdapter<SynchronizationProviderViewData?>(
             requireContext(), R.layout.alertdialog_sync_provider_chooser, providers
         ) {
-            var holder: ViewHolder? = null
-
-            inner class ViewHolder {
-                var icon: ImageView? = null
-                var title: TextView? = null
-            }
+            inner class ViewHolder(val icon: ImageView, val title: TextView)
 
             override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
-                var convertView = convertView
-                val inflater = LayoutInflater.from(context)
+                val view: View
+                val holder: ViewHolder
                 if (convertView == null) {
-                    convertView = inflater.inflate(
-                        R.layout.alertdialog_sync_provider_chooser, null
+                    val inflater = LayoutInflater.from(context)
+                    view = inflater.inflate(R.layout.alertdialog_sync_provider_chooser, null)
+                    holder = ViewHolder(
+                        view.findViewById<View>(R.id.icon) as ImageView,
+                        view.findViewById<View>(R.id.title) as TextView
                     )
-                    holder = ViewHolder()
-                    holder!!.icon = convertView.findViewById<View>(R.id.icon) as ImageView
-                    holder!!.title = convertView.findViewById<View>(R.id.title) as TextView
-                    convertView.tag = holder
+                    view.tag = holder
                 } else {
+                    view = convertView
                     holder = convertView.tag as ViewHolder
                 }
                 val synchronizationProviderViewData = getItem(position)
-                holder!!.title!!.setText(synchronizationProviderViewData!!.summaryResource)
-                holder!!.icon!!.setImageResource(synchronizationProviderViewData.iconResource)
-                return convertView!!
+                if (synchronizationProviderViewData != null) {
+                    holder.title.setText(synchronizationProviderViewData.summaryResource)
+                    holder.icon.setImageResource(synchronizationProviderViewData.iconResource)
+                }
+                return view
             }
         }
         builder.setAdapter(adapter) { dialog: DialogInterface?, which: Int ->

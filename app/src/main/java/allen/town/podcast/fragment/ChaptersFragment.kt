@@ -35,9 +35,9 @@ class ChaptersFragment constructor() : Fragment() {
     private var disposable: Disposable? = null
     private var focusedChapter: Int = -1
     private var media: Playable? = null
-    private var layoutManager: LinearLayoutManager? = null
-    private var progressBar: ProgressBar? = null
-    private var skeleton: Skeleton? = null
+    private lateinit var layoutManager: LinearLayoutManager
+    private lateinit var progressBar: ProgressBar
+    private lateinit var skeleton: Skeleton
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -50,11 +50,12 @@ class ChaptersFragment constructor() : Fragment() {
         create(recyclerView)
         adapter = ChaptersListAdapter(requireContext(),object : ChaptersListAdapter.Callback{
             override fun onPlayChapterButtonClicked(position: Int) {
-                if (controller!!.status != PlayerStatus.PLAYING) {
-                    controller!!.playPause()
+                val controller = this@ChaptersFragment.controller ?: return
+                if (controller.status != PlayerStatus.PLAYING) {
+                    controller.playPause()
                 }
-                val chapter: Chapter = adapter!!.getItem(position)
-                controller!!.seekTo(chapter.start.toInt())
+                val chapter: Chapter = adapter?.getItem(position) ?: return
+                controller.seekTo(chapter.start.toInt())
                 updateChapterSelection(position, true)
             }
 
@@ -62,33 +63,32 @@ class ChaptersFragment constructor() : Fragment() {
         recyclerView.adapter = adapter
         //switching to item_small_recyclerview_skeleton here only shows 3 rows (reason unknown)
         skeleton = recyclerView.applySkeleton(R.layout.simplechapter_item, 15)
-        skeleton!!.showSkeleton()
+        skeleton.showSkeleton()
 
         return root
     }
 
     override fun onStart() {
         super.onStart()
-        controller = object : PlaybackController((getActivity())!!) {
+        val controller = object : PlaybackController(requireActivity()) {
             override fun loadMediaInfo() {
                 this@ChaptersFragment.loadMediaInfo()
             }
 
             override fun onPositionObserverUpdate() {
-                adapter!!.notifyDataSetChanged()
+                adapter?.notifyDataSetChanged()
             }
         }
-        controller!!.init()
+        this.controller = controller
+        controller.init()
         EventBus.getDefault().register(this)
         loadMediaInfo()
     }
 
     override fun onStop() {
         super.onStop()
-        if (disposable != null) {
-            disposable!!.dispose()
-        }
-        controller!!.release()
+        disposable?.dispose()
+        controller?.release()
         controller = null
         EventBus.getDefault().unregister(this)
     }
@@ -96,22 +96,18 @@ class ChaptersFragment constructor() : Fragment() {
     @Subscribe(threadMode = ThreadMode.MAIN)
     fun onEventMainThread(event: PlaybackPositionEvent) {
         updateChapterSelection(getCurrentChapter(media), false)
-        adapter!!.notifyTimeChanged(event.getPosition().toLong())
+        adapter?.notifyTimeChanged(event.getPosition().toLong())
     }
 
     private fun getCurrentChapter(media: Playable?): Int {
-        if (controller == null) {
-            return -1
-        }
-        return ChapterUtils.getCurrentChapterIndex(media, controller!!.getPosition())
+        val controller = this.controller ?: return -1
+        return ChapterUtils.getCurrentChapterIndex(media, controller.getPosition())
     }
 
     private fun loadMediaInfo() {
-        if (disposable != null) {
-            disposable!!.dispose()
-        }
+        disposable?.dispose()
         disposable = Maybe.create { emitter: MaybeEmitter<Any> ->
-            val media: Playable? = controller!!.media
+            val media: Playable? = controller?.media
             if (media != null) {
                 ChapterUtils.loadChapters(media, context)
                 emitter.onSuccess(media)
@@ -130,32 +126,28 @@ class ChaptersFragment constructor() : Fragment() {
     private fun onMediaChanged(media: Playable) {
         this.media = media
         focusedChapter = -1
-        if (adapter == null) {
-            return
-        }
+        val adapter = this.adapter ?: return
         if (media.chapters != null && media.chapters.size <= 0) {
-            progressBar!!.visibility = View.GONE
-            skeleton!!.showOriginal()
+            progressBar.visibility = View.GONE
+            skeleton.showOriginal()
         } else {
-            progressBar!!.visibility = View.GONE
-            skeleton!!.showOriginal()
+            progressBar.visibility = View.GONE
+            skeleton.showOriginal()
         }
-        adapter!!.setMedia(media)
+        adapter.setMedia(media)
         val positionOfCurrentChapter: Int = getCurrentChapter(media)
         updateChapterSelection(positionOfCurrentChapter, true)
     }
 
     private fun updateChapterSelection(position: Int, scrollTo: Boolean) {
-        if (adapter == null) {
-            return
-        }
+        val adapter = this.adapter ?: return
         if (position != -1 && focusedChapter != position) {
             focusedChapter = position
-            adapter!!.notifyChapterChanged(focusedChapter)
-            if (scrollTo && ((layoutManager!!.findFirstCompletelyVisibleItemPosition() >= position
-                        || layoutManager!!.findLastCompletelyVisibleItemPosition() <= position))
+            adapter.notifyChapterChanged(focusedChapter)
+            if (scrollTo && ((layoutManager.findFirstCompletelyVisibleItemPosition() >= position
+                        || layoutManager.findLastCompletelyVisibleItemPosition() <= position))
             ) {
-                layoutManager!!.scrollToPositionWithOffset(position, 100)
+                layoutManager.scrollToPositionWithOffset(position, 100)
             }
         }
     }

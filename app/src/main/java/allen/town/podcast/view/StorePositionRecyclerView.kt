@@ -11,28 +11,27 @@ import android.content.res.Configuration
 import android.util.AttributeSet
 
 class StorePositionRecyclerView : RecyclerView {
-    private var layoutManager: LinearLayoutManager? = null
+    private val linearLayoutManager = LinearLayoutManager(context)
 
-    constructor(context: Context?) : super(context!!) {
+    constructor(context: Context) : super(context) {
         setup()
     }
 
-    constructor(context: Context?, attrs: AttributeSet?) : super(
-        context!!, attrs
+    constructor(context: Context, attrs: AttributeSet?) : super(
+        context, attrs
     ) {
         setup()
     }
 
-    constructor(context: Context?, attrs: AttributeSet?, defStyleAttr: Int) : super(
-        context!!, attrs, defStyleAttr
+    constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(
+        context, attrs, defStyleAttr
     ) {
         setup()
     }
 
     private fun setup() {
-        layoutManager = LinearLayoutManager(context)
-        layoutManager!!.recycleChildrenOnDetach = true
-        setLayoutManager(layoutManager)
+        linearLayoutManager.recycleChildrenOnDetach = true
+        setLayoutManager(linearLayoutManager)
         setHasFixedSize(true)
         clipToPadding = false
     }
@@ -45,8 +44,8 @@ class StorePositionRecyclerView : RecyclerView {
     }
 
     fun saveScrollPosition(tag: String) {
-        val firstItem = layoutManager!!.findFirstVisibleItemPosition()
-        val firstItemView = layoutManager!!.findViewByPosition(firstItem)
+        val firstItem = linearLayoutManager.findFirstVisibleItemPosition()
+        val firstItemView = linearLayoutManager.findViewByPosition(firstItem)
         val topOffset: Float
         topOffset = firstItemView?.top?.toFloat() ?: 0f
         Timber.v("save for ${tag} $firstItem $topOffset ")
@@ -62,15 +61,15 @@ class StorePositionRecyclerView : RecyclerView {
         val offset = prefs.getInt(PREF_PREFIX_SCROLL_OFFSET + tag, 0)
         Timber.v("restore for ${tag} $position $offset ")
         if (position > 0 || offset > 0) {
-            layoutManager!!.scrollToPositionWithOffset(position, offset)
+            linearLayoutManager.scrollToPositionWithOffset(position, offset)
         }
     }
 
     val isScrolledToBottom: Boolean
         get() {
             val visibleEpisodeCount = childCount
-            val totalEpisodeCount = layoutManager!!.itemCount
-            val firstVisibleEpisode = layoutManager!!.findFirstVisibleItemPosition()
+            val totalEpisodeCount = linearLayoutManager.itemCount
+            val firstVisibleEpisode = linearLayoutManager.findFirstVisibleItemPosition()
             return totalEpisodeCount - visibleEpisodeCount <= firstVisibleEpisode + 3
         }
 

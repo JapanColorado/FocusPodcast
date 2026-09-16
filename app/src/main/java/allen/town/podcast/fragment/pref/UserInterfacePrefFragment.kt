@@ -24,8 +24,12 @@ class UserInterfacePrefFragment : AbsSettingsFragment() {
 
     override fun onStart() {
         super.onStart()
-        (activity as SettingsActivity?)!!.setTitle(R.string.user_interface_label)
+        (requireActivity() as SettingsActivity).setTitle(R.string.user_interface_label)
     }
+
+    /** Preferences declared in `pref_user_interface.xml`; a missing key is a programming error. */
+    private fun requirePreference(key: String): Preference =
+        checkNotNull(findPreference(key)) { "missing preference $key in pref_user_interface.xml" }
 
     private fun setupInterfaceScreen() {
 
@@ -49,18 +53,18 @@ class UserInterfacePrefFragment : AbsSettingsFragment() {
                 )
                 true
             }
-        findPreference<Preference>(PREF_THEME_INTERFACE)!!.onPreferenceClickListener =
+        requirePreference(PREF_THEME_INTERFACE).onPreferenceClickListener =
             Preference.OnPreferenceClickListener { preference: Preference? ->
-                (activity as SettingsActivity?)!!.openScreen(R.xml.pref_theme)
+                (requireActivity() as SettingsActivity).openScreen(R.xml.pref_theme)
                 true
             }
-        findPreference<Preference>(LANGUAGE_NAME)!!.onPreferenceChangeListener =
+        requirePreference(LANGUAGE_NAME).onPreferenceChangeListener =
             Preference.OnPreferenceChangeListener { preference, newValue ->
                 setSummary(preference, newValue.toString())
                 requireActivity().installLanguageAndRecreate(newValue.toString())
                 true
             }
-        findPreference<Preference>(PREF_HOME_PAGE)!!.onPreferenceChangeListener =
+        requirePreference(PREF_HOME_PAGE).onPreferenceChangeListener =
             Preference.OnPreferenceChangeListener { preference, newValue ->
                 restartActivity()
                 true

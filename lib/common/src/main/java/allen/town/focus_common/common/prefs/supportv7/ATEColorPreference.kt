@@ -57,15 +57,14 @@ class ATEColorPreference @JvmOverloads constructor(
     }
 
     private fun invalidateColor() {
-        if (mView != null) {
-            val circle = mView!!.findViewById<View>(R.id.circle) as BorderCircleView
-            if (this.color != 0) {
-                circle.visibility = View.VISIBLE
-                circle.setBackgroundColor(color)
-                circle.setBorderColor(border)
-            } else {
-                circle.visibility = View.GONE
-            }
+        val view = mView ?: return
+        val circle = view.findViewById<View>(R.id.circle) as BorderCircleView
+        if (this.color != 0) {
+            circle.visibility = View.VISIBLE
+            circle.setBackgroundColor(color)
+            circle.setBorderColor(border)
+        } else {
+            circle.visibility = View.GONE
         }
     }
 }

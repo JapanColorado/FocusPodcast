@@ -50,8 +50,8 @@ class FeedItemDescriptionFragment : Fragment() {
         nestedScrollView.isNestedScrollingEnabled = false
         create(nestedScrollView)
         webvDescription.setTimecodeSelectedListener(Consumer { time: Int? ->
-            if (controller != null) {
-                controller!!.seekTo(time!!)
+            if (time != null) {
+                controller?.seekTo(time)
             }
         })
         webvDescription.setWebChromeClient(object : WebChromeClient() {
@@ -94,12 +94,11 @@ class FeedItemDescriptionFragment : Fragment() {
     }
 
     private fun load() {
-        if (webViewLoader != null) {
-            webViewLoader!!.dispose()
-        }
+        webViewLoader?.dispose()
         val context = context ?: return
+        val playbackController = controller ?: return
         webViewLoader = Maybe.create { emitter: MaybeEmitter<String?> ->
-            val media = controller!!.media
+            val media = playbackController.media
             if (media == null) {
                 emitter.onComplete()
                 return@create
@@ -117,8 +116,8 @@ class FeedItemDescriptionFragment : Fragment() {
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe({ data: String? ->
-                webvDescription!!.loadDataWithBaseURL(
-                    "https://127.0.0.1", data!!, "text/html",
+                webvDescription.loadDataWithBaseURL(
+                    "https://127.0.0.1", data.orEmpty(), "text/html",
                     "utf-8", "about:blank"
                 )
             }) { error: Throwable? -> Log.e(TAG, Log.getStackTraceString(error)) }
@@ -132,10 +131,11 @@ class FeedItemDescriptionFragment : Fragment() {
     private fun savePreference() {
         val prefs = requireActivity().getSharedPreferences(PREF, Activity.MODE_PRIVATE)
         val editor = prefs.edit()
-        if (controller != null && controller!!.media != null && webvDescription != null) {
-            editor.putInt(PREF_SCROLL_Y, webvDescription!!.scrollY)
+        val media = controller?.media
+        if (media != null) {
+            editor.putInt(PREF_SCROLL_Y, webvDescription.scrollY)
             editor.putString(
-                PREF_PLAYABLE_ID, controller!!.media.identifier
+                PREF_PLAYABLE_ID, media.identifier
                     .toString()
             )
         } else {
@@ -151,7 +151,8 @@ class FeedItemDescriptionFragment : Fragment() {
             val prefs = activity.getSharedPreferences(PREF, Activity.MODE_PRIVATE)
             val id = prefs.getString(PREF_PLAYABLE_ID, "")
             val scrollY = prefs.getInt(PREF_SCROLL_Y, -1)
-            if (controller != null && scrollY != -1 && controller!!.media != null && id == controller!!.media.identifier.toString()) {
+            val media = controller?.media
+            if (scrollY != -1 && media != null && id == media.identifier.toString()) {
                 webvDescription.scrollTo(webvDescription.scrollX, scrollY)
                 return true
             }
@@ -162,21 +163,20 @@ class FeedItemDescriptionFragment : Fragment() {
 
     override fun onStart() {
         super.onStart()
-        controller = object : PlaybackController(requireActivity()) {
+        val playbackController = object : PlaybackController(requireActivity()) {
             override fun loadMediaInfo() {
                 load()
             }
         }
-        controller!!.init()
+        controller = playbackController
+        playbackController.init()
         load()
     }
 
     override fun onStop() {
         super.onStop()
-        if (webViewLoader != null) {
-            webViewLoader!!.dispose()
-        }
-        controller!!.release()
+        webViewLoader?.dispose()
+        controller?.release()
         controller = null
     }
 

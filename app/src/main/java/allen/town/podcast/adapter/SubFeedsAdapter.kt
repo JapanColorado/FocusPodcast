@@ -117,17 +117,19 @@ open class SubFeedsAdapter(mainActivity: MainActivity) :
             false
         }
         holder.itemView.setOnClickListener { v: View? ->
+            // The activity can be gone by the time a queued click is delivered.
+            val mainActivity = mainActivityRef.get() ?: return@setOnClickListener
             if (isFeed) {
                 if (inActionMode()) {
                     holder.selectCheckbox.isChecked = !isSelected(holder.bindingAdapterPosition)
                 } else {
                     val fragment: Fragment = FeedItemlistFragment
                         .newInstance((drawerItem as FeedDrawerItem).feed.id)
-                    mainActivityRef.get()!!.loadChildFragment(fragment)
+                    mainActivity.loadChildFragment(fragment)
                 }
             } else if (!inActionMode()) {
                 val fragment: Fragment = SubFeedsFragment.newInstance(drawerItem.title)
-                mainActivityRef.get()!!.loadChildFragment(fragment)
+                mainActivity.loadChildFragment(fragment)
             }
         }
     }
@@ -141,18 +143,20 @@ open class SubFeedsAdapter(mainActivity: MainActivity) :
     }
 
     override fun onCreateContextMenu(menu: ContextMenu, v: View, menuInfo: ContextMenuInfo?) {
-        if (inActionMode() || selectedItem == null) {
+        val item = selectedItem
+        val mainActivity = mainActivityRef.get()
+        if (inActionMode() || item == null || mainActivity == null) {
             return
         }
-        val inflater = mainActivityRef.get()!!.menuInflater
-        if (selectedItem!!.type == DrawerItem.Type.FEED) {
+        val inflater = mainActivity.menuInflater
+        if (item.type == DrawerItem.Type.FEED) {
             inflater.inflate(R.menu.nav_feed_context, menu)
             menu.findItem(R.id.multi_select).isVisible = true
             showContextMenuIcon(menu)
         } else {
             inflater.inflate(R.menu.nav_folder_context, menu)
         }
-        menu.setHeaderTitle(selectedItem!!.title)
+        menu.setHeaderTitle(item.title)
     }
 
     fun onContextItemSelected(item: MenuItem): Boolean {

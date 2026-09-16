@@ -51,7 +51,8 @@ import java.util.*
 class FeedSettingsFragment : Fragment() {
     private var disposable: Disposable? = null
     fun setTitle(@StringRes titleId: Int) {
-        collapsingToolbarLayout!!.title = getString(titleId)
+        // the event can arrive before onCreateView or after onDestroyView
+        collapsingToolbarLayout?.title = getString(titleId)
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
@@ -98,11 +99,14 @@ class FeedSettingsFragment : Fragment() {
         EventBus.getDefault().register(this)
     }
 
+    override fun onDestroyView() {
+        super.onDestroyView()
+        collapsingToolbarLayout = null
+    }
+
     override fun onDestroy() {
         super.onDestroy()
-        if (disposable != null) {
-            disposable!!.dispose()
-        }
+        disposable?.dispose()
         EventBus.getDefault().unregister(this)
     }
 
@@ -128,10 +132,14 @@ class FeedSettingsFragment : Fragment() {
             return view
         }
 
+        /** Every key used here is declared in res/xml/feed_settings.xml. */
+        private fun <T : Preference> requirePreference(key: CharSequence): T =
+            checkNotNull(findPreference(key)) { "feed_settings.xml has no preference '$key'" }
+
         override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
             addPreferencesFromResource(R.xml.feed_settings)
             // To prevent displaying partially loaded data
-            findPreference<Preference>(PREF_SCREEN)!!.isVisible = false
+            requirePreference<Preference>(PREF_SCREEN).isVisible = false
             val feedId = requireArguments().getLong(EXTRA_FEED_ID)
             disposable = Maybe.create(
                 MaybeOnSubscribe { emitter: MaybeEmitter<Feed?> ->
@@ -145,8 +153,14 @@ class FeedSettingsFragment : Fragment() {
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({ result: Feed? ->
-                    feed = result
-                    feedPreferences = feed!!.preferences
+                    val loadedFeed = result
+                    val loadedPreferences = loadedFeed?.preferences
+                    if (loadedFeed == null || loadedPreferences == null) {
+                        Log.e(TAG, "feed $feedId has no preferences, keeping the screen hidden")
+                        return@subscribe
+                    }
+                    feed = loadedFeed
+                    feedPreferences = loadedPreferences
                     setupAutoDownloadGlobalPreference()
                     setupAutoDownloadPreference()
                     setupKeepUpdatedPreference()
@@ -161,41 +175,41 @@ class FeedSettingsFragment : Fragment() {
                     updateAutoDeleteSummary()
                     updateVolumeReductionValue()
                     updateAutoDownloadEnabled()
-                    setupAudioEffectPreference(feedPreferences, feed)
-                    if (feed!!.isLocalFeed) {
-                        findPreference<Preference>(PREF_AUTHENTICATION)!!.isVisible = false
-                        findPreference<Preference>(PREF_AUTO_DELETE)!!.isVisible = false
-                        findPreference<Preference>(PREF_CATEGORY_AUTO_DOWNLOAD)!!.isVisible = false
+                    setupAudioEffectPreference(loadedPreferences, loadedFeed)
+                    if (loadedFeed.isLocalFeed) {
+                        requirePreference<Preference>(PREF_AUTHENTICATION).isVisible = false
+                        requirePreference<Preference>(PREF_AUTO_DELETE).isVisible = false
+                        requirePreference<Preference>(PREF_CATEGORY_AUTO_DOWNLOAD).isVisible = false
                     }
-                    findPreference<Preference>(PREF_SCREEN)!!.isVisible = true
+                    requirePreference<Preference>(PREF_SCREEN).isVisible = true
                 }, { error: Throwable? -> Log.d(TAG, Log.getStackTraceString(error)) }) {}
         }
 
         override fun onDestroy() {
             super.onDestroy()
-            if (disposable != null) {
-                disposable!!.dispose()
-            }
+            disposable?.dispose()
             preferenceWrites.dispose()
         }
 
         private fun setupFeedAutoSkipPreference() {
-            findPreference<Preference>(PREF_AUTO_SKIP)!!.onPreferenceClickListener =
+            val feedPreferences = this.feedPreferences ?: return
+            val feed = this.feed ?: return
+            requirePreference<Preference>(PREF_AUTO_SKIP).onPreferenceClickListener =
                 Preference.OnPreferenceClickListener { preference: Preference? ->
                     object : FeedSkipPreDialog(
                         context,
-                        feedPreferences!!.feedSkipIntro,
-                        feedPreferences!!.feedSkipEnding
+                        feedPreferences.feedSkipIntro,
+                        feedPreferences.feedSkipEnding
                     ) {
                         override fun onConfirmed(skipIntro: Int, skipEnding: Int) {
-                            feedPreferences!!.feedSkipIntro = skipIntro
-                            feedPreferences!!.feedSkipEnding = skipEnding
+                            feedPreferences.feedSkipIntro = skipIntro
+                            feedPreferences.feedSkipEnding = skipEnding
                             DBWriter.setFeedPreferences(feedPreferences)
                             EventBus.getDefault().post(
                                 SkipIntroEndingChangedEvent(
-                                    feedPreferences!!.feedSkipIntro,
-                                    feedPreferences!!.feedSkipEnding,
-                                    feed!!.id
+                                    feedPreferences.feedSkipIntro,
+                                    feedPreferences.feedSkipEnding,
+                                    feed.id
                                 )
                             )
                         }
@@ -205,8 +219,11 @@ class FeedSettingsFragment : Fragment() {
         }
 
         private fun setupPlaybackSpeedPreference() {
-            val feedPlaybackSpeedPreference = findPreference<Preference>(PREF_FEED_PLAYBACK_SPEED)
-            feedPlaybackSpeedPreference!!.onPreferenceClickListener =
+            val feedPreferences = this.feedPreferences ?: return
+            val feed = this.feed ?: return
+            val feedPlaybackSpeedPreference =
+                requirePreference<Preference>(PREF_FEED_PLAYBACK_SPEED)
+            feedPlaybackSpeedPreference.onPreferenceClickListener =
                 Preference.OnPreferenceClickListener { preference: Preference? ->
                     val viewBinding = PlaybackSpeedFeedSettingDialogBinding.inflate(
                         layoutInflater
@@ -216,7 +233,7 @@ class FeedSettingsFragment : Fragment() {
                             Locale.getDefault(), "%.1fx", speed
                         )
                     }
-                    val speed = feedPreferences!!.feedPlaybackSpeed
+                    val speed = feedPreferences.feedPlaybackSpeed
                     viewBinding.useGlobalCheckbox.setOnCheckedChangeListener { buttonView: CompoundButton?, isChecked: Boolean ->
                         viewBinding.seekBar.isEnabled = !isChecked
                         viewBinding.seekBar.alpha = if (isChecked) 0.4f else 1f
@@ -234,12 +251,12 @@ class FeedSettingsFragment : Fragment() {
                         .setPositiveButton(android.R.string.ok) { dialog: DialogInterface?, which: Int ->
                             val newSpeed =
                                 if (viewBinding.useGlobalCheckbox.isChecked) FeedPreferences.SPEED_USE_GLOBAL else viewBinding.seekBar.currentSpeed
-                            feedPreferences!!.feedPlaybackSpeed = newSpeed
+                            feedPreferences.feedPlaybackSpeed = newSpeed
                             DBWriter.setFeedPreferences(feedPreferences)
                             EventBus.getDefault().post(
                                 SpeedPresetChangedEvent(
-                                    feedPreferences!!.feedPlaybackSpeed,
-                                    feed!!.id
+                                    feedPreferences.feedPlaybackSpeed,
+                                    feed.id
                                 )
                             )
                         }
@@ -250,11 +267,12 @@ class FeedSettingsFragment : Fragment() {
         }
 
         private fun setupEpisodeFilterPreference() {
-            findPreference<Preference>(PREF_EPISODE_FILTER)!!.onPreferenceClickListener =
+            val feedPreferences = this.feedPreferences ?: return
+            requirePreference<Preference>(PREF_EPISODE_FILTER).onPreferenceClickListener =
                 Preference.OnPreferenceClickListener { preference: Preference? ->
-                    object : EpisodeFilterDialog(context, feedPreferences!!.filter) {
+                    object : EpisodeFilterDialog(context, feedPreferences.filter) {
                         override fun onConfirmed(filter: FeedFilter?) {
-                            feedPreferences!!.filter = filter!!
+                            feedPreferences.filter = filter ?: return
                             DBWriter.setFeedPreferences(feedPreferences)
                         }
                     }.show()
@@ -263,16 +281,17 @@ class FeedSettingsFragment : Fragment() {
         }
 
         private fun setupAuthentificationPreference() {
-            findPreference<Preference>(PREF_AUTHENTICATION)!!.onPreferenceClickListener =
+            val feedPreferences = this.feedPreferences ?: return
+            requirePreference<Preference>(PREF_AUTHENTICATION).onPreferenceClickListener =
                 Preference.OnPreferenceClickListener { preference: Preference? ->
                     object : AuthenticationDialog(
                         context,
                         R.string.authentication_label, true,
-                        feedPreferences!!.username, feedPreferences!!.password
+                        feedPreferences.username, feedPreferences.password
                     ) {
                         override fun onConfirmed(username: String?, password: String?) {
-                            feedPreferences!!.username = username
-                            feedPreferences!!.password = password
+                            feedPreferences.username = username
+                            feedPreferences.password = password
                             val setPreferencesFuture = DBWriter.setFeedPreferences(feedPreferences)
                             // the refresh has to wait for the new credentials to be written,
                             // otherwise it authenticates with the old ones
@@ -301,12 +320,13 @@ class FeedSettingsFragment : Fragment() {
         }
 
         private fun setupAutoDeletePreference() {
-            findPreference<Preference>(PREF_AUTO_DELETE)!!.onPreferenceChangeListener =
+            val feedPreferences = this.feedPreferences ?: return
+            requirePreference<Preference>(PREF_AUTO_DELETE).onPreferenceChangeListener =
                 Preference.OnPreferenceChangeListener { preference: Preference?, newValue: Any? ->
                     when (newValue as String?) {
-                        "global" -> feedPreferences!!.autoDeleteAction = AutoDeleteAction.GLOBAL
-                        "always" -> feedPreferences!!.autoDeleteAction = AutoDeleteAction.YES
-                        "never" -> feedPreferences!!.autoDeleteAction = AutoDeleteAction.NO
+                        "global" -> feedPreferences.autoDeleteAction = AutoDeleteAction.GLOBAL
+                        "always" -> feedPreferences.autoDeleteAction = AutoDeleteAction.YES
+                        "never" -> feedPreferences.autoDeleteAction = AutoDeleteAction.NO
                     }
                     DBWriter.setFeedPreferences(feedPreferences)
                     updateAutoDeleteSummary()
@@ -315,40 +335,43 @@ class FeedSettingsFragment : Fragment() {
         }
 
         private fun updateAutoDeleteSummary() {
-            val autoDeletePreference = findPreference<ListPreference>(PREF_AUTO_DELETE)
-            when (feedPreferences!!.autoDeleteAction) {
+            val feedPreferences = this.feedPreferences ?: return
+            val autoDeletePreference = requirePreference<ListPreference>(PREF_AUTO_DELETE)
+            when (feedPreferences.autoDeleteAction) {
                 AutoDeleteAction.GLOBAL -> {
-                    autoDeletePreference!!.setSummary(R.string.feed_auto_download_global)
+                    autoDeletePreference.setSummary(R.string.feed_auto_download_global)
                     autoDeletePreference.value = "global"
                 }
                 AutoDeleteAction.YES -> {
-                    autoDeletePreference!!.setSummary(R.string.feed_auto_download_always)
+                    autoDeletePreference.setSummary(R.string.feed_auto_download_always)
                     autoDeletePreference.value = "always"
                 }
                 AutoDeleteAction.NO -> {
-                    autoDeletePreference!!.setSummary(R.string.feed_auto_download_never)
+                    autoDeletePreference.setSummary(R.string.feed_auto_download_never)
                     autoDeletePreference.value = "never"
                 }
             }
         }
 
         private fun setupVolumeReductionPreferences() {
-            val volumeReductionPreference = findPreference<ListPreference>("volumeReduction")
-            volumeReductionPreference!!.onPreferenceChangeListener =
+            val feedPreferences = this.feedPreferences ?: return
+            val feed = this.feed ?: return
+            val volumeReductionPreference = requirePreference<ListPreference>(PREF_VOLUME_REDUCTION)
+            volumeReductionPreference.onPreferenceChangeListener =
                 Preference.OnPreferenceChangeListener { preference: Preference?, newValue: Any? ->
                     when (newValue as String?) {
-                        "off" -> feedPreferences!!.volumeAdaptionSetting = VolumeAdaptionSetting.OFF
-                        "light" -> feedPreferences!!.volumeAdaptionSetting =
+                        "off" -> feedPreferences.volumeAdaptionSetting = VolumeAdaptionSetting.OFF
+                        "light" -> feedPreferences.volumeAdaptionSetting =
                             VolumeAdaptionSetting.LIGHT_REDUCTION
-                        "heavy" -> feedPreferences!!.volumeAdaptionSetting =
+                        "heavy" -> feedPreferences.volumeAdaptionSetting =
                             VolumeAdaptionSetting.HEAVY_REDUCTION
                     }
                     DBWriter.setFeedPreferences(feedPreferences)
                     updateVolumeReductionValue()
                     EventBus.getDefault().post(
                         VolumeAdaptionChangedEvent(
-                            feedPreferences!!.volumeAdaptionSetting,
-                            feed!!.id
+                            feedPreferences.volumeAdaptionSetting,
+                            feed.id
                         )
                     )
                     false
@@ -356,21 +379,23 @@ class FeedSettingsFragment : Fragment() {
         }
 
         private fun updateVolumeReductionValue() {
-            val volumeReductionPreference = findPreference<ListPreference>("volumeReduction")
-            when (feedPreferences!!.volumeAdaptionSetting) {
-                VolumeAdaptionSetting.OFF -> volumeReductionPreference!!.value = "off"
-                VolumeAdaptionSetting.LIGHT_REDUCTION -> volumeReductionPreference!!.value = "light"
-                VolumeAdaptionSetting.HEAVY_REDUCTION -> volumeReductionPreference!!.value = "heavy"
+            val feedPreferences = this.feedPreferences ?: return
+            val volumeReductionPreference = requirePreference<ListPreference>(PREF_VOLUME_REDUCTION)
+            when (feedPreferences.volumeAdaptionSetting) {
+                VolumeAdaptionSetting.OFF -> volumeReductionPreference.value = "off"
+                VolumeAdaptionSetting.LIGHT_REDUCTION -> volumeReductionPreference.value = "light"
+                VolumeAdaptionSetting.HEAVY_REDUCTION -> volumeReductionPreference.value = "heavy"
             }
         }
 
         private fun setupKeepUpdatedPreference() {
-            val pref = findPreference<ATESwitchPreference>("keepUpdated")
-            pref!!.isChecked = feedPreferences!!.keepUpdated
+            val feedPreferences = this.feedPreferences ?: return
+            val pref = requirePreference<ATESwitchPreference>(PREF_KEEP_UPDATED)
+            pref.isChecked = feedPreferences.keepUpdated
             pref.onPreferenceChangeListener =
                 Preference.OnPreferenceChangeListener { preference: Preference?, newValue: Any ->
                     val checked = newValue === java.lang.Boolean.TRUE
-                    feedPreferences!!.keepUpdated = checked
+                    feedPreferences.keepUpdated = checked
                     DBWriter.setFeedPreferences(feedPreferences)
                     pref.isChecked = checked
                     false
@@ -378,7 +403,7 @@ class FeedSettingsFragment : Fragment() {
         }
 
         private fun setupAudioEffectPreference(feedPreferences: FeedPreferences?, feed: Feed?) {
-            findPreference<Preference>(PREF_AUDIO_EFFECT)!!.onPreferenceClickListener =
+            requirePreference<Preference>(PREF_AUDIO_EFFECT).onPreferenceClickListener =
                 Preference.OnPreferenceClickListener {
                     getParentFragmentManager().beginTransaction()
                         .setCustomAnimations(
@@ -398,19 +423,20 @@ class FeedSettingsFragment : Fragment() {
 
         private fun setupAutoDownloadGlobalPreference() {
             if (!isEnableAutodownload) {
-                val autodl = findPreference<ATESwitchPreference>("autoDownload")
-                autodl!!.isChecked = false
+                val autodl = requirePreference<ATESwitchPreference>(PREF_AUTO_DOWNLOAD)
+                autodl.isChecked = false
                 autodl.isEnabled = false
                 autodl.setSummary(R.string.auto_download_disabled_globally)
-                findPreference<Preference>(PREF_EPISODE_FILTER)!!.isEnabled = false
+                requirePreference<Preference>(PREF_EPISODE_FILTER).isEnabled = false
             }
         }
 
         private fun setupAutoDownloadPreference() {
-            val pref = findPreference<ATESwitchPreference>("autoDownload")
-            pref!!.isEnabled = isEnableAutodownload
+            val feedPreferences = this.feedPreferences ?: return
+            val pref = requirePreference<ATESwitchPreference>(PREF_AUTO_DOWNLOAD)
+            pref.isEnabled = isEnableAutodownload
             if (isEnableAutodownload) {
-                pref.isChecked = feedPreferences!!.autoDownload
+                pref.isChecked = feedPreferences.autoDownload
             } else {
                 pref.isChecked = false
                 pref.setSummary(R.string.auto_download_disabled_globally)
@@ -418,7 +444,7 @@ class FeedSettingsFragment : Fragment() {
             pref.onPreferenceChangeListener =
                 Preference.OnPreferenceChangeListener { preference: Preference?, newValue: Any ->
                     val checked = newValue === java.lang.Boolean.TRUE
-                    feedPreferences!!.autoDownload = checked
+                    feedPreferences.autoDownload = checked
                     DBWriter.setFeedPreferences(feedPreferences)
                     updateAutoDownloadEnabled()
                     pref.isChecked = checked
@@ -427,29 +453,29 @@ class FeedSettingsFragment : Fragment() {
         }
 
         private fun updateAutoDownloadEnabled() {
-            if (feed != null && feed!!.preferences != null) {
-                val enabled = feed!!.preferences.autoDownload && isEnableAutodownload
-                findPreference<Preference>(PREF_EPISODE_FILTER)!!.isEnabled =
-                    enabled
-            }
+            val preferences = feed?.preferences ?: return
+            val enabled = preferences.autoDownload && isEnableAutodownload
+            requirePreference<Preference>(PREF_EPISODE_FILTER).isEnabled = enabled
         }
 
         private fun setupTags() {
-            findPreference<Preference>(PREF_TAGS)!!.onPreferenceClickListener =
+            val feedPreferences = this.feedPreferences ?: return
+            requirePreference<Preference>(PREF_TAGS).onPreferenceClickListener =
                 Preference.OnPreferenceClickListener { preference: Preference ->
-                    TagEditDialog.newInstance(listOf(feedPreferences!!))
+                    TagEditDialog.newInstance(listOf(feedPreferences))
                         .show(childFragmentManager, TagEditDialog.TAG)
                     true
                 }
         }
 
         private fun setupEpisodeNotificationPreference() {
-            val pref = findPreference<ATESwitchPreference>("episodeNotification")
-            pref!!.isChecked = feedPreferences!!.showEpisodeNotification
+            val feedPreferences = this.feedPreferences ?: return
+            val pref = requirePreference<ATESwitchPreference>(PREF_EPISODE_NOTIFICATION)
+            pref.isChecked = feedPreferences.showEpisodeNotification
             pref.onPreferenceChangeListener =
                 Preference.OnPreferenceChangeListener { preference: Preference?, newValue: Any ->
                     val checked = newValue === java.lang.Boolean.TRUE
-                    feedPreferences!!.showEpisodeNotification = checked
+                    feedPreferences.showEpisodeNotification = checked
                     DBWriter.setFeedPreferences(feedPreferences)
                     pref.isChecked = checked
                     false
@@ -468,6 +494,10 @@ class FeedSettingsFragment : Fragment() {
             private const val PREF_AUTO_SKIP = "feedAutoSkip"
             private const val PREF_AUDIO_EFFECT = "feed_audio_effect_pref"
             private const val PREF_TAGS = "tags"
+            private const val PREF_VOLUME_REDUCTION = "volumeReduction"
+            private const val PREF_KEEP_UPDATED = "keepUpdated"
+            private const val PREF_AUTO_DOWNLOAD = "autoDownload"
+            private const val PREF_EPISODE_NOTIFICATION = "episodeNotification"
             fun newInstance(feedId: Long): FeedSettingsPreferenceFragment {
                 val fragment = FeedSettingsPreferenceFragment()
                 val arguments = Bundle()

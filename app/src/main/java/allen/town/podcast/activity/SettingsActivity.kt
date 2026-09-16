@@ -23,13 +23,13 @@ import com.bytehamster.lib.preferencesearch.SearchPreferenceResultListener
  * PreferenceController.
  */
 open class SettingsActivity : SimpleToolbarActivity(), SearchPreferenceResultListener {
-    var binding: SettingsActivityBinding? = null
+    lateinit var binding: SettingsActivityBinding
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = SettingsActivityBinding.inflate(layoutInflater)
-        setContentView(binding!!.root)
-        applyToolbar(binding!!.toolbar)
-        binding!!.toolbar.setNavigationOnClickListener { v -> onOptionsItemSelected() }
+        setContentView(binding.root)
+        applyToolbar(binding.toolbar)
+        binding.toolbar.setNavigationOnClickListener { v -> onOptionsItemSelected() }
         if (supportFragmentManager.findFragmentByTag(FRAGMENT_TAG) == null) {
             supportFragmentManager.beginTransaction()
                 .replace(R.id.settingsContainer,
@@ -43,15 +43,15 @@ open class SettingsActivity : SimpleToolbarActivity(), SearchPreferenceResultLis
     }
 
     override fun setTitle(titleId: Int) {
-        binding!!.collapsingToolbarLayout.title = getString(titleId)
+        binding.collapsingToolbarLayout.title = getString(titleId)
     }
 
     open fun setSubtitle(titleId: Int) {
-        binding!!.subTitle.text = getString(titleId)
+        binding.subTitle.text = getString(titleId)
     }
 
     open fun setSubtitle(title: String) {
-        binding!!.subTitle.text = title
+        binding.subTitle.text = title
     }
 
     private fun getPreferenceScreen(screen: Int): PreferenceFragmentCompat? {
@@ -104,12 +104,12 @@ open class SettingsActivity : SimpleToolbarActivity(), SearchPreferenceResultLis
             intent.action = Settings.ACTION_APP_NOTIFICATION_SETTINGS
             intent.putExtra(Settings.EXTRA_APP_PACKAGE, packageName)
             startActivity(intent)
-        } else {
+        } else if (fragment != null) {
             supportFragmentManager.beginTransaction().setCustomAnimations(
                     R.anim.retro_fragment_open_enter,
             R.anim.retro_fragment_open_exit,
             R.anim.retro_fragment_close_enter,
-            R.anim.retro_fragment_close_exit).replace(R.id.settingsContainer, fragment!!)
+            R.anim.retro_fragment_close_exit).replace(R.id.settingsContainer, fragment)
                 .addToBackStack(getString(getTitleOfPage(screen))).commit()
         }
         return fragment

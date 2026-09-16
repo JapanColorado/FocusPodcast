@@ -31,11 +31,11 @@ import org.greenrobot.eventbus.Subscribe
  */
 class FeedItemsViewPagerFragment : Fragment(), Toolbar.OnMenuItemClickListener {
     private lateinit var pager: ViewPager2
-    private var feedItems: LongArray?= null
+    private var feedItems: LongArray = LongArray(0)
     private var item: FeedItem? = null
     private var disposable: Disposable? = null
     private lateinit var toolbar: Toolbar
-    var extendedFloatingActionButton: ExtendedFloatingActionButton? = null
+    lateinit var extendedFloatingActionButton: ExtendedFloatingActionButton
         private set
 
     override fun onCreateView(
@@ -51,7 +51,7 @@ class FeedItemsViewPagerFragment : Fragment(), Toolbar.OnMenuItemClickListener {
         toolbar.setOnMenuItemClickListener(this)
         showToolbarMenuIcon(toolbar)
         extendedFloatingActionButton = layout.findViewById(R.id.play_float_button)
-        feedItems = requireArguments().getLongArray(ARG_FEEDITEMS)
+        feedItems = requireArguments().getLongArray(ARG_FEEDITEMS) ?: LongArray(0)
         val feedItemPos = Math.max(0, requireArguments().getInt(ARG_FEEDITEM_POS))
         pager = layout.findViewById(R.id.pager)
         // FragmentStatePagerAdapter documentation:
@@ -67,10 +67,10 @@ class FeedItemsViewPagerFragment : Fragment(), Toolbar.OnMenuItemClickListener {
         pager.setAdapter(ItemPagerAdapter(this))
         pager.setCurrentItem(feedItemPos, false)
         pager.setOffscreenPageLimit(1)
-        loadItem(feedItems!![feedItemPos])
+        feedItems.getOrNull(feedItemPos)?.let { loadItem(it) }
         pager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
             override fun onPageSelected(position: Int) {
-                loadItem(feedItems!![position])
+                feedItems.getOrNull(position)?.let { loadItem(it) }
             }
         })
         EventBus.getDefault().register(this)
@@ -79,21 +79,17 @@ class FeedItemsViewPagerFragment : Fragment(), Toolbar.OnMenuItemClickListener {
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        outState.putInt(KEY_PAGER_ID, pager!!.id)
+        outState.putInt(KEY_PAGER_ID, pager.id)
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
         EventBus.getDefault().unregister(this)
-        if (disposable != null) {
-            disposable!!.dispose()
-        }
+        disposable?.dispose()
     }
 
     private fun loadItem(itemId: Long) {
-        if (disposable != null) {
-            disposable!!.dispose()
-        }
+        disposable?.dispose()
         disposable = Observable.fromCallable { DBReader.getFeedItem(itemId) }
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
@@ -104,28 +100,28 @@ class FeedItemsViewPagerFragment : Fragment(), Toolbar.OnMenuItemClickListener {
     }
 
     fun refreshToolbarState() {
-        if (item == null) {
-            return
-        }
-        if (item!!.hasMedia()) {
-            FeedItemMenuProcess.onPrepareMenu(toolbar!!.menu, item)
+        val item = this.item ?: return
+        if (item.hasMedia()) {
+            FeedItemMenuProcess.onPrepareMenu(toolbar.menu, item)
         } else {
             // these are already available via button1 and button2
             FeedItemMenuProcess.onPrepareMenu(
-                toolbar!!.menu, item,
+                toolbar.menu, item,
                 R.id.mark_read_item, R.id.visit_website_item
             )
         }
     }
 
     override fun onMenuItemClick(menuItem: MenuItem): Boolean {
-        return FeedItemMenuProcess.onMenuItemClicked(this, menuItem.itemId, item!!)
+        val item = this.item ?: return false
+        return FeedItemMenuProcess.onMenuItemClicked(this, menuItem.itemId, item)
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     fun onEventMainThread(event: FeedItemEvent) {
+        val currentId = this.item?.id ?: return
         for (item in event.items) {
-            if (this.item != null && this.item!!.id == item.id) {
+            if (currentId == item.id) {
                 this.item = item
                 refreshToolbarState()
                 return
@@ -139,20 +135,21 @@ class FeedItemsViewPagerFragment : Fragment(), Toolbar.OnMenuItemClickListener {
     }
 
     private fun openPodcast() {
+        val item = this.item ?: return
         val fragment: Fragment = FeedItemlistFragment.Companion.newInstance(
-            item!!.feedId
+            item.feedId
         )
-        (activity as MainActivity?)!!.loadChildFragment(fragment)
+        (requireActivity() as MainActivity).loadChildFragment(fragment)
     }
 
     private inner class ItemPagerAdapter internal constructor(fragment: Fragment) :
         FragmentStateAdapter(fragment) {
         override fun createFragment(position: Int): Fragment {
-            return newInstance(feedItems!![position])
+            return newInstance(feedItems[position])
         }
 
         override fun getItemCount(): Int {
-            return feedItems!!.size
+            return feedItems.size
         }
     }
 

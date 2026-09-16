@@ -3,28 +3,27 @@ package allen.town.podcast.dialog
 import allen.town.focus_common.util.Timber
 import allen.town.focus_common.views.AccentMaterialDialog
 import allen.town.podcast.R
-import android.widget.EditText
-import android.widget.ArrayAdapter
 import allen.town.podcast.core.pref.Prefs
-import android.widget.TextView
-import android.widget.Spinner
-import io.reactivex.disposables.Disposable
 import allen.town.podcast.core.service.download.PodcastHttpClient
+import allen.town.podcast.databinding.ProxySettingsBinding
 import allen.town.podcast.model.download.ProxyConfig
-import android.widget.AdapterView
-import android.text.TextWatcher
-import android.text.Editable
-import androidx.core.content.ContextCompat
 import android.app.Dialog
 import android.content.Context
 import android.os.Build
+import android.text.Editable
 import android.text.TextUtils
+import android.text.TextWatcher
 import android.util.Patterns
+import android.view.LayoutInflater
 import android.view.View
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
 import androidx.appcompat.app.AlertDialog
+import androidx.core.content.ContextCompat
 import io.reactivex.Completable
 import io.reactivex.CompletableEmitter
 import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import okhttp3.Credentials
 import okhttp3.Request
@@ -39,44 +38,39 @@ import java.util.ArrayList
 import java.util.concurrent.TimeUnit
 
 class ProxyDialog(private val context: Context) {
-    private var dialog: AlertDialog? = null
-    private var spType: Spinner? = null
-    private var etHost: EditText? = null
-    private var etPort: EditText? = null
-    private var etUsername: EditText? = null
-    private var etPassword: EditText? = null
+    private lateinit var binding: ProxySettingsBinding
+    private lateinit var dialog: AlertDialog
     private var testSuccessful = false
-    private var txtvMessage: TextView? = null
     private var disposable: Disposable? = null
-    fun show(): Dialog? {
-        val content = View.inflate(context, R.layout.proxy_settings, null)
-        spType = content.findViewById(R.id.spType)
+
+    fun show(): Dialog {
+        binding = ProxySettingsBinding.inflate(LayoutInflater.from(context))
         dialog = AccentMaterialDialog(
             context,
             R.style.MaterialAlertDialogTheme
         )
             .setTitle(R.string.pref_proxy_title)
-            .setView(content)
+            .setView(binding.root)
             .setNegativeButton(R.string.cancel_label, null)
             .setPositiveButton(R.string.proxy_test_label, null)
             .setNeutralButton(R.string.reset, null)
             .show()
         // To prevent cancelling the dialog on button click
-        dialog!!.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener { view: View? ->
+        dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
             if (!testSuccessful) {
-                dialog!!.getButton(AlertDialog.BUTTON_POSITIVE).isEnabled = false
+                dialog.getButton(AlertDialog.BUTTON_POSITIVE).isEnabled = false
                 test()
                 return@setOnClickListener
             }
             setProxyConfig()
             PodcastHttpClient.reinit()
-            dialog!!.dismiss()
+            dialog.dismiss()
         }
-        dialog!!.getButton(AlertDialog.BUTTON_NEUTRAL).setOnClickListener { view: View? ->
-            etHost!!.text.clear()
-            etPort!!.text.clear()
-            etUsername!!.text.clear()
-            etPassword!!.text.clear()
+        dialog.getButton(AlertDialog.BUTTON_NEUTRAL).setOnClickListener {
+            binding.etHost.text?.clear()
+            binding.etPort.text?.clear()
+            binding.etUsername.text?.clear()
+            binding.etPassword.text?.clear()
             setProxyConfig()
         }
         val types: MutableList<String> = ArrayList()
@@ -90,34 +84,30 @@ class ProxyDialog(private val context: Context) {
             android.R.layout.simple_spinner_item, types
         )
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        spType!!.setAdapter(adapter)
+        binding.spType.adapter = adapter
         val proxyConfig = Prefs.proxyConfig
-        spType!!.setSelection(adapter.getPosition(proxyConfig.type.name))
-        etHost = content.findViewById(R.id.etHost)
+        binding.spType.setSelection(adapter.getPosition(proxyConfig.type.name))
         if (!TextUtils.isEmpty(proxyConfig.host)) {
-            etHost!!.setText(proxyConfig.host)
+            binding.etHost.setText(proxyConfig.host)
         }
-        etHost!!.addTextChangedListener(requireTestOnChange)
-        etPort = content.findViewById(R.id.etPort)
+        binding.etHost.addTextChangedListener(requireTestOnChange)
         if (proxyConfig.port > 0) {
-            etPort!!.setText(proxyConfig.port.toString())
+            binding.etPort.setText(proxyConfig.port.toString())
         }
-        etPort!!.addTextChangedListener(requireTestOnChange)
-        etUsername = content.findViewById(R.id.etUsername)
+        binding.etPort.addTextChangedListener(requireTestOnChange)
         if (!TextUtils.isEmpty(proxyConfig.username)) {
-            etUsername!!.setText(proxyConfig.username)
+            binding.etUsername.setText(proxyConfig.username)
         }
-        etUsername!!.addTextChangedListener(requireTestOnChange)
-        etPassword = content.findViewById(R.id.etPassword)
+        binding.etUsername.addTextChangedListener(requireTestOnChange)
         if (!TextUtils.isEmpty(proxyConfig.password)) {
-            etPassword!!.setText(proxyConfig.password)
+            binding.etPassword.setText(proxyConfig.password)
         }
-        etPassword!!.addTextChangedListener(requireTestOnChange)
+        binding.etPassword.addTextChangedListener(requireTestOnChange)
         if (proxyConfig.type == Proxy.Type.DIRECT) {
             enableSettings(false)
             setTestRequired(false)
         }
-        spType!!.setOnItemSelectedListener(object : AdapterView.OnItemSelectedListener {
+        binding.spType.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(
                 parent: AdapterView<*>?,
                 view: View,
@@ -125,9 +115,9 @@ class ProxyDialog(private val context: Context) {
                 id: Long
             ) {
                 if (position == 0) {
-                    dialog!!.getButton(AlertDialog.BUTTON_NEUTRAL).visibility = View.GONE
+                    dialog.getButton(AlertDialog.BUTTON_NEUTRAL).visibility = View.GONE
                 } else {
-                    dialog!!.getButton(AlertDialog.BUTTON_NEUTRAL).visibility = View.VISIBLE
+                    dialog.getButton(AlertDialog.BUTTON_NEUTRAL).visibility = View.VISIBLE
                 }
                 enableSettings(position > 0)
                 setTestRequired(position > 0)
@@ -136,22 +126,21 @@ class ProxyDialog(private val context: Context) {
             override fun onNothingSelected(parent: AdapterView<*>?) {
                 enableSettings(false)
             }
-        })
-        txtvMessage = content.findViewById(R.id.txtvMessage)
+        }
         checkValidity()
         return dialog
     }
 
     private fun setProxyConfig() {
-        val type = spType!!.selectedItem as String
+        val type = binding.spType.selectedItem as String
         val typeEnum = Proxy.Type.valueOf(type)
-        val host = etHost!!.text.toString()
-        val port = etPort!!.text.toString()
-        var username: String? = etUsername!!.text.toString()
+        val host = binding.etHost.text?.toString().orEmpty()
+        val port = binding.etPort.text?.toString().orEmpty()
+        var username: String? = binding.etUsername.text?.toString().orEmpty()
         if (TextUtils.isEmpty(username)) {
             username = null
         }
-        var password: String? = etPassword!!.text.toString()
+        var password: String? = binding.etPassword.text?.toString().orEmpty()
         if (TextUtils.isEmpty(password)) {
             password = null
         }
@@ -173,15 +162,15 @@ class ProxyDialog(private val context: Context) {
     }
 
     private fun enableSettings(enable: Boolean) {
-        etHost!!.isEnabled = enable
-        etPort!!.isEnabled = enable
-        etUsername!!.isEnabled = enable
-        etPassword!!.isEnabled = enable
+        binding.etHost.isEnabled = enable
+        binding.etPort.isEnabled = enable
+        binding.etUsername.isEnabled = enable
+        binding.etPassword.isEnabled = enable
     }
 
     private fun checkValidity(): Boolean {
         var valid = true
-        if (spType!!.selectedItemPosition > 0) {
+        if (binding.spType.selectedItemPosition > 0) {
             valid = checkHost()
         }
         valid = valid and checkPort()
@@ -189,13 +178,13 @@ class ProxyDialog(private val context: Context) {
     }
 
     private fun checkHost(): Boolean {
-        val host = etHost!!.text.toString()
+        val host = binding.etHost.text?.toString().orEmpty()
         if (host.length == 0) {
-            etHost!!.error = context.getString(R.string.proxy_host_empty_error)
+            binding.etHost.error = context.getString(R.string.proxy_host_empty_error)
             return false
         }
         if ("localhost" != host && !Patterns.DOMAIN_NAME.matcher(host).matches()) {
-            etHost!!.error = context.getString(R.string.proxy_host_invalid_error)
+            binding.etHost.error = context.getString(R.string.proxy_host_invalid_error)
             return false
         }
         return true
@@ -204,7 +193,7 @@ class ProxyDialog(private val context: Context) {
     private fun checkPort(): Boolean {
         val port = port
         if (port < 0 || port > 65535) {
-            etPort!!.error = context.getString(R.string.proxy_port_invalid_error)
+            binding.etPort.error = context.getString(R.string.proxy_port_invalid_error)
             return false
         }
         return true
@@ -213,7 +202,7 @@ class ProxyDialog(private val context: Context) {
     // ignore
     private val port: Int
         private get() {
-            val port = etPort!!.text.toString()
+            val port = binding.etPort.text?.toString().orEmpty()
             if (port.length > 0) {
                 try {
                     return port.toInt()
@@ -228,18 +217,16 @@ class ProxyDialog(private val context: Context) {
     private fun setTestRequired(required: Boolean) {
         if (required) {
             testSuccessful = false
-            dialog!!.getButton(AlertDialog.BUTTON_POSITIVE).setText(R.string.proxy_test_label)
+            dialog.getButton(AlertDialog.BUTTON_POSITIVE).setText(R.string.proxy_test_label)
         } else {
             testSuccessful = true
-            dialog!!.getButton(AlertDialog.BUTTON_POSITIVE).setText(android.R.string.ok)
+            dialog.getButton(AlertDialog.BUTTON_POSITIVE).setText(android.R.string.ok)
         }
-        dialog!!.getButton(AlertDialog.BUTTON_POSITIVE).isEnabled = true
+        dialog.getButton(AlertDialog.BUTTON_POSITIVE).isEnabled = true
     }
 
     private fun test() {
-        if (disposable != null) {
-            disposable!!.dispose()
-        }
+        disposable?.dispose()
         if (!checkValidity()) {
             setTestRequired(true)
             return
@@ -248,15 +235,15 @@ class ProxyDialog(private val context: Context) {
         val textColorPrimary = res.getColor(0, 0)
         res.recycle()
         val checking = context.getString(R.string.proxy_checking)
-        txtvMessage!!.setTextColor(textColorPrimary)
-        txtvMessage!!.text = "{fa-circle-o-notch spin} $checking"
-        txtvMessage!!.visibility = View.VISIBLE
+        binding.txtvMessage.setTextColor(textColorPrimary)
+        binding.txtvMessage.text = "{fa-circle-o-notch spin} $checking"
+        binding.txtvMessage.visibility = View.VISIBLE
         disposable = Completable.create { emitter: CompletableEmitter ->
-            val type = spType!!.selectedItem as String
-            val host = etHost!!.text.toString()
-            val port = etPort!!.text.toString()
-            val username = etUsername!!.text.toString()
-            val password = etPassword!!.text.toString()
+            val type = binding.spType.selectedItem as String
+            val host = binding.etHost.text?.toString().orEmpty()
+            val port = binding.etPort.text?.toString().orEmpty()
+            val username = binding.etUsername.text?.toString().orEmpty()
+            val password = binding.etPassword.text?.toString().orEmpty()
             var portValue = 8080
             if (!TextUtils.isEmpty(port)) {
                 portValue = port.toInt()
@@ -292,7 +279,7 @@ class ProxyDialog(private val context: Context) {
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe(
                 {
-                    txtvMessage!!.setTextColor(
+                    binding.txtvMessage.setTextColor(
                         ContextCompat.getColor(
                             context,
                             R.color.download_success_green
@@ -302,12 +289,12 @@ class ProxyDialog(private val context: Context) {
                         "%s %s", "{fa-check}",
                         context.getString(R.string.proxy_test_successful)
                     )
-                    txtvMessage!!.text = message
+                    binding.txtvMessage.text = message
                     setTestRequired(false)
                 }
             ) { error: Throwable ->
                 Timber.e(error, "the proxy test failed")
-                txtvMessage!!.setTextColor(
+                binding.txtvMessage.setTextColor(
                     ContextCompat.getColor(
                         context,
                         R.color.download_failed_red
@@ -317,7 +304,7 @@ class ProxyDialog(private val context: Context) {
                     "%s %s: %s", "{fa-close}",
                     context.getString(R.string.proxy_test_failed), error.message
                 )
-                txtvMessage!!.text = message
+                binding.txtvMessage.text = message
                 setTestRequired(true)
             }
     }

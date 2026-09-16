@@ -256,7 +256,9 @@ abstract class BaseAppWidget : AppWidgetProvider() {
 
     fun getAlbumArtDrawable(context: Context, bitmap: Bitmap?): Drawable {
         return if (bitmap == null) {
-            ContextCompat.getDrawable(context, R.drawable.default_audio_art)!!
+            checkNotNull(ContextCompat.getDrawable(context, R.drawable.default_audio_art)) {
+                "missing drawable R.drawable.default_audio_art"
+            }
         } else {
             BitmapDrawable(context.resources, bitmap)
         }

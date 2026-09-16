@@ -44,16 +44,16 @@ import org.greenrobot.eventbus.ThreadMode
  * Fragment which is supposed to be displayed outside of the MediaplayerActivity.
  */
 class MiniPlayerFragment : Fragment() {
-    private var imgvCover: ImageView? = null
-    private var txtvTitle: TextView? = null
-    private var butPlay: PlayButton? = null
-    private var feedName: TextView? = null
-    private var progressBar: CircularProgressIndicator? = null
+    private lateinit var imgvCover: ImageView
+    private lateinit var txtvTitle: TextView
+    private lateinit var butPlay: PlayButton
+    private lateinit var feedName: TextView
+    private lateinit var progressBar: CircularProgressIndicator
     private var controller: PlaybackController? = null
     private var disposable: Disposable? = null
-    private var queueIv: AppCompatImageView? = null
-    private var rewIv: AppCompatImageView? = null
-    private var forwardIv: AppCompatImageView? = null
+    private lateinit var queueIv: AppCompatImageView
+    private lateinit var rewIv: AppCompatImageView
+    private lateinit var forwardIv: AppCompatImageView
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -67,65 +67,65 @@ class MiniPlayerFragment : Fragment() {
         rewIv = root.findViewById(R.id.butRev)
         forwardIv = root.findViewById(R.id.butFF)
         progressBar = root.findViewById(R.id.episodeProgress)
-        progressBar!!.accentColor()
-        butPlay!!.applyAccentColor()
+        progressBar.accentColor()
+        butPlay.applyAccentColor()
         (root.rootView as? MaterialCardView)?.accentBackgroundColor()
 
         root.findViewById<View>(R.id.fragmentLayout).setOnClickListener { v: View? ->
-            if (controller != null && controller!!.media != null) {
-                if (controller!!.media.mediaType == MediaType.AUDIO) {
-                    (activity as MainActivity?)!!.bottomSheet!!.setState(BottomSheetBehavior.STATE_EXPANDED)
+            val media = controller?.media
+            if (media != null) {
+                if (media.mediaType == MediaType.AUDIO) {
+                    (requireActivity() as MainActivity).bottomSheet.setState(BottomSheetBehavior.STATE_EXPANDED)
                 } else {
                     val intent =
-                        PlaybackService.getPlayerActivityIntent(activity, controller!!.media)
+                        PlaybackService.getPlayerActivityIntent(activity, media)
                     startActivity(intent)
                 }
             }
         }
-        queueIv!!.setOnClickListener{
-            (activity as MainActivity?)!!.loadChildFragment(PlaylistFragment())
+        queueIv.setOnClickListener{
+            (requireActivity() as MainActivity).loadChildFragment(PlaylistFragment())
         }
         return root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        butPlay!!.setOnClickListener { v: View? ->
-            if (controller == null) {
-                return@setOnClickListener
-            }
-            if (controller!!.media != null && controller!!.media.mediaType == MediaType.VIDEO && controller!!.status != PlayerStatus.PLAYING) {
-                controller!!.playPause()
+        butPlay.setOnClickListener { v: View? ->
+            val controller = this.controller ?: return@setOnClickListener
+            val media = controller.media
+            if (media != null && media.mediaType == MediaType.VIDEO && controller.status != PlayerStatus.PLAYING) {
+                controller.playPause()
                 requireContext().startActivity(
                     PlaybackService
-                        .getPlayerActivityIntent(context, controller!!.media)
+                        .getPlayerActivityIntent(context, media)
                 )
             } else {
-                controller!!.playPause()
+                controller.playPause()
             }
         }
 
-        rewIv!!.setOnClickListener {
-            if (controller != null) {
-                val curr = controller!!.position
-                controller!!.seekTo(curr - Prefs.rewindSecs * 1000)
+        rewIv.setOnClickListener {
+            controller?.let { controller ->
+                val curr = controller.position
+                controller.seekTo(curr - Prefs.rewindSecs * 1000)
             }
         }
 
-        forwardIv!!.setOnClickListener {
-            if (controller != null) {
-                val curr = controller!!.position
-                controller!!.seekTo(curr + Prefs.fastForwardSecs * 1000)
+        forwardIv.setOnClickListener {
+            controller?.let { controller ->
+                val curr = controller.position
+                controller.seekTo(curr + Prefs.fastForwardSecs * 1000)
             }
         }
 
         if (RetroUtil.isTablet(context)) {
-            forwardIv!!.show()
-            rewIv!!.show()
+            forwardIv.show()
+            rewIv.show()
         } else {
-            forwardIv!!.visibility =
+            forwardIv.visibility =
                 if (Prefs.showExtraMiniButtons()) View.VISIBLE else View.GONE
-            rewIv!!.visibility =
+            rewIv.visibility =
                 if (Prefs.showExtraMiniButtons()) View.VISIBLE else View.GONE
         }
 
@@ -135,7 +135,7 @@ class MiniPlayerFragment : Fragment() {
     private fun setupPlaybackController(): PlaybackController {
         return object : PlaybackController(requireActivity()) {
             override fun updatePlayButtonShowsPlay(showPlay: Boolean) {
-                butPlay!!.setIsShowPlay(showPlay)
+                butPlay.setIsShowPlay(showPlay)
             }
 
             override fun loadMediaInfo() {
@@ -143,86 +143,79 @@ class MiniPlayerFragment : Fragment() {
             }
 
             override fun onPlaybackEnd() {
-                (activity as MainActivity?)!!.setPlayerVisible(false)
+                (activity as? MainActivity)?.setPlayerVisible(false)
             }
         }
     }
 
     override fun onStart() {
         super.onStart()
-        controller = setupPlaybackController()
-        controller!!.init()
+        val controller = setupPlaybackController()
+        this.controller = controller
+        controller.init()
         loadMediaInfo()
         EventBus.getDefault().register(this)
     }
 
     override fun onStop() {
         super.onStop()
-        if (controller != null) {
-            controller!!.release()
-            controller = null
-        }
+        controller?.release()
+        controller = null
         EventBus.getDefault().unregister(this)
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     fun onPositionObserverUpdate(event: PlaybackPositionEvent?) {
-        if (controller == null) {
-            return
-        } else if (controller!!.position == PlaybackService.INVALID_TIME
-            || controller!!.duration == PlaybackService.INVALID_TIME
+        val controller = this.controller ?: return
+        if (controller.position == PlaybackService.INVALID_TIME
+            || controller.duration == PlaybackService.INVALID_TIME
         ) {
             return
         }
-        progressBar!!.progress =
-            (controller!!.position.toDouble() / controller!!.duration * 100).toInt()
+        progressBar.progress =
+            (controller.position.toDouble() / controller.duration * 100).toInt()
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     fun onPlaybackServiceChanged(event: PlaybackServiceEvent) {
         if (event.action == PlaybackServiceEvent.Action.SERVICE_SHUT_DOWN) {
-            (activity as MainActivity?)!!.setPlayerVisible(false)
+            (activity as? MainActivity)?.setPlayerVisible(false)
         }
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        if (disposable != null) {
-            disposable!!.dispose()
-        }
+        disposable?.dispose()
     }
 
     override fun onPause() {
         super.onPause()
-        if (controller != null) {
-            controller!!.pause()
-        }
+        controller?.pause()
     }
 
     private fun loadMediaInfo() {
+        val controller = this.controller
         if (controller == null) {
             Log.w(TAG, "loadMediaInfo was called while PlaybackController was null!")
             return
         }
-        if (disposable != null) {
-            disposable!!.dispose()
-        }
-        disposable = Maybe.fromCallable { controller!!.media }
+        disposable?.dispose()
+        disposable = Maybe.fromCallable { controller.media }
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe(
                 { media: Playable? -> updateUi(media) },
                 { error: Throwable? -> Log.e(TAG, Log.getStackTraceString(error)) }
-            ) { (activity as MainActivity?)!!.setPlayerVisible(false) }
+            ) { (activity as? MainActivity)?.setPlayerVisible(false) }
     }
 
     private fun updateUi(media: Playable?) {
         if (media == null) {
             return
         }
-        (activity as MainActivity?)!!.setPlayerVisible(true)
-        txtvTitle!!.text = media.episodeTitle
-        feedName!!.text = media.feedTitle
+        (activity as? MainActivity)?.setPlayerVisible(true)
+        txtvTitle.text = media.episodeTitle
+        feedName.text = media.feedTitle
         onPositionObserverUpdate(PlaybackPositionEvent(media.position, media.duration))
         val options = RequestOptions()
             .placeholder(R.drawable.ic_podcast_background_round)
@@ -238,11 +231,13 @@ class MiniPlayerFragment : Fragment() {
                     .apply(options)
             )
             .apply(options)
-            .into(imgvCover!!)
-        if (controller != null && controller!!.isPlayingVideoLocally) {
-            (activity as MainActivity?)!!.bottomSheet!!.setState(BottomSheetBehavior.STATE_COLLAPSED)
+            .into(imgvCover)
+        if (controller?.isPlayingVideoLocally == true) {
+            (activity as? MainActivity)?.let {
+                it.bottomSheet.setState(BottomSheetBehavior.STATE_COLLAPSED)
+            }
         } else {
-            butPlay!!.visibility = View.VISIBLE
+            butPlay.visibility = View.VISIBLE
         }
     }
 

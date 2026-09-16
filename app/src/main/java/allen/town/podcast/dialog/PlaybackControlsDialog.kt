@@ -1,14 +1,13 @@
 package allen.town.podcast.dialog
 
-import allen.town.focus_common.util.Timber
 import allen.town.focus_common.views.AccentMaterialDialog
 import allen.town.podcast.R
 import allen.town.podcast.core.pref.Prefs
 import allen.town.podcast.core.storage.DBReader
 import allen.town.podcast.core.storage.DBWriter
 import allen.town.podcast.core.util.playback.PlaybackController
+import allen.town.podcast.databinding.AudioControlsBinding
 import allen.town.podcast.model.feed.Feed
-import allen.town.podcast.model.feed.FeedPreferences
 import allen.town.podcast.util.NavigationUtil
 import android.app.Dialog
 import android.os.Bundle
@@ -16,10 +15,8 @@ import android.os.Handler
 import android.os.Looper
 import android.util.Log
 import android.view.View
-import android.widget.Button
 import android.widget.CompoundButton
 import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.widget.SwitchCompat
 import androidx.fragment.app.DialogFragment
 import io.reactivex.Maybe
 import io.reactivex.MaybeEmitter
@@ -29,27 +26,27 @@ import io.reactivex.schedulers.Schedulers
 
 class PlaybackControlsDialog : DialogFragment() {
     private var controller: PlaybackController? = null
-    private var dialog: AlertDialog? = null
+    private var _binding: AudioControlsBinding? = null
+    private val binding get() = _binding ?: error("binding accessed outside of view lifecycle")
     private var feedId = 0L
     private val uiHandler = Handler(Looper.getMainLooper())
     private var disposable: Disposable? = null
     private var feed: Feed? = null
-        set(value) {
-            field = value
-        }
 
     override fun onStart() {
         super.onStart()
-        controller = object : PlaybackController(requireActivity()) {
+        val playbackController = object : PlaybackController(requireActivity()) {
             override fun loadMediaInfo() {
             }
         }
-        controller!!.init()
+        controller = playbackController
+        playbackController.init()
 
-        disposable = Maybe.create { emitter: MaybeEmitter<Feed?> ->
-            feed = DBReader.getFeed(feedId)
-            if (feed != null) {
-                emitter.onSuccess(feed!!)
+        disposable = Maybe.create { emitter: MaybeEmitter<Feed> ->
+            val loadedFeed = DBReader.getFeed(feedId)
+            feed = loadedFeed
+            if (loadedFeed != null) {
+                emitter.onSuccess(loadedFeed)
             } else {
                 emitter.onComplete()
             }
@@ -57,9 +54,7 @@ class PlaybackControlsDialog : DialogFragment() {
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe(
-                { result: Feed? ->
-                    setupUi()
-                },
+                { setupUi() },
                 { error: Throwable? ->
                     Log.d(
                         TAG,
@@ -73,117 +68,110 @@ class PlaybackControlsDialog : DialogFragment() {
         uiHandler.removeCallbacksAndMessages(null)
         disposable?.dispose()
         disposable = null
-        controller!!.release()
+        controller?.release()
         controller = null
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        val content = View.inflate(context, R.layout.audio_controls, null)
-        dialog = AccentMaterialDialog(
+        val binding = AudioControlsBinding.inflate(layoutInflater)
+        _binding = binding
+        return AccentMaterialDialog(
             requireContext(),
             R.style.MaterialAlertDialogTheme
         )
             .setTitle( /*R.string.audio_controls*/R.string.audio_effects) //odd issue: writing R.layout.audio_controls directly here gives the switch the wrong color in its off state
-            .setView(content)
+            .setView(binding.root)
             .setPositiveButton(R.string.close_label, null).create()
-        return dialog!!
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
     /**
      * Only call once the database has been queried for whether the feed uses per-feed settings; otherwise the state is wrong and onCheckedChanged leaves things inconsistent.
      */
     private fun setupUi() {
+        val binding = _binding ?: return
 
+        val loadedFeed = feed
+        val feedPreferences = loadedFeed?.preferences
         var useFeedEffect = false
-        var feedPreferences: FeedPreferences? = null
-        feed?.run {
-            feedPreferences = this.preferences
-
-            val customEffectLayout = dialog!!.findViewById<View>(R.id.custom_effect_l)
-            val customEffectClear = dialog!!.findViewById<View>(R.id.custom_effect_clear)
-            customEffectClear!!.setOnClickListener {
-                feedPreferences!!.isUseFeedEffect = false
+        if (loadedFeed != null && feedPreferences != null) {
+            binding.customEffectClear.setOnClickListener {
+                feedPreferences.isUseFeedEffect = false
                 DBWriter.setFeedPreferences(feedPreferences)
                 setupUi()
             }
 
-            if (isSubscribed && feedPreferences!!.isUseFeedEffect) {
-                customEffectLayout!!.visibility = View.VISIBLE
+            if (loadedFeed.isSubscribed && feedPreferences.isUseFeedEffect) {
+                binding.customEffectL.visibility = View.VISIBLE
                 useFeedEffect = true
             } else {
-                customEffectLayout!!.visibility = View.GONE
-                useFeedEffect = false
+                binding.customEffectL.visibility = View.GONE
             }
         }
+        // non-null exactly when the per-feed effect settings are the ones in use
+        val effectPreferences = if (useFeedEffect) feedPreferences else null
 
         //skip silence
-        val skipSilence = dialog!!.findViewById<SwitchCompat>(R.id.skipSilence)
-        skipSilence!!.isChecked =
-            if (useFeedEffect) feedPreferences!!.isSkipSilence else Prefs.isSkipSilence
-        skipSilence.setOnCheckedChangeListener { buttonView: CompoundButton?, isChecked: Boolean ->
-            if (useFeedEffect) {
-                feedPreferences!!.isSkipSilence = isChecked
-                DBWriter.setFeedPreferences(feedPreferences)
+        binding.skipSilence.isChecked = effectPreferences?.isSkipSilence ?: Prefs.isSkipSilence
+        binding.skipSilence.setOnCheckedChangeListener { _: CompoundButton?, isChecked: Boolean ->
+            if (effectPreferences != null) {
+                effectPreferences.isSkipSilence = isChecked
+                DBWriter.setFeedPreferences(effectPreferences)
             } else {
                 Prefs.isSkipSilence = isChecked
             }
 
-            if (controller != null) {
-                controller!!.setSkipSilence(isChecked)
-            }
+            controller?.setSkipSilence(isChecked)
         }
 
         //mono
-        val stereoToMono = dialog!!.findViewById<SwitchCompat>(R.id.stereo_to_mono)
-        stereoToMono!!.isChecked =
-            if (useFeedEffect) feedPreferences!!.isMono else Prefs.stereoToMono()
-        stereoToMono.setOnCheckedChangeListener { buttonView: CompoundButton?, isChecked: Boolean ->
-            if (useFeedEffect) {
-                feedPreferences!!.isMono = isChecked
-                DBWriter.setFeedPreferences(feedPreferences)
+        binding.stereoToMono.isChecked = effectPreferences?.isMono ?: Prefs.stereoToMono()
+        binding.stereoToMono.setOnCheckedChangeListener { _: CompoundButton?, isChecked: Boolean ->
+            if (effectPreferences != null) {
+                effectPreferences.isMono = isChecked
+                DBWriter.setFeedPreferences(effectPreferences)
             } else {
                 Prefs.stereoToMono(isChecked)
             }
 
-            if (controller != null) {
-                controller!!.setDownmix(isChecked)
-            }
+            controller?.setDownmix(isChecked)
         }
 
         //vocal enhancement
-        val vocal_enhancement = dialog!!.findViewById<SwitchCompat>(R.id.vocal_enhancement)
-        vocal_enhancement!!.isChecked =
-            if (useFeedEffect) feedPreferences!!.isLoudness else Prefs.audioLoudness()
-        vocal_enhancement.setOnCheckedChangeListener { buttonView: CompoundButton?, isChecked: Boolean ->
-            if (useFeedEffect) {
-                feedPreferences!!.isLoudness = isChecked
-                DBWriter.setFeedPreferences(feedPreferences)
+        binding.vocalEnhancement.isChecked = effectPreferences?.isLoudness ?: Prefs.audioLoudness()
+        binding.vocalEnhancement.setOnCheckedChangeListener { _: CompoundButton?, isChecked: Boolean ->
+            if (effectPreferences != null) {
+                effectPreferences.isLoudness = isChecked
+                DBWriter.setFeedPreferences(effectPreferences)
             } else {
                 Prefs.setAudioLoudness(isChecked)
             }
 
-            if (controller != null) {
-                controller!!.setLoudness(isChecked)
-            }
+            controller?.setLoudness(isChecked)
         }
-        val equalizer = dialog!!.findViewById<View>(R.id.equalizer)
-        equalizer!!.setOnClickListener { NavigationUtil.openEqualizer(requireActivity()) }
+        binding.equalizer.setOnClickListener { NavigationUtil.openEqualizer(requireActivity()) }
     }
 
 
     private fun setupAudioTracks() {
         //unclear what this is for; this branch is never reached
-        val audioTracks = controller!!.audioTracks
-        val selectedAudioTrack = controller!!.selectedAudioTrack
-        val butAudioTracks = dialog!!.findViewById<Button>(R.id.audio_tracks)
+        val playbackController = controller ?: return
+        val binding = _binding ?: return
+        val audioTracks = playbackController.audioTracks
+        val selectedAudioTrack = playbackController.selectedAudioTrack
+        val butAudioTracks = binding.audioTracks
         if (audioTracks.size < 2 || selectedAudioTrack < 0) {
-            butAudioTracks!!.visibility = View.GONE
+            butAudioTracks.visibility = View.GONE
             return
         }
-        butAudioTracks!!.visibility = View.VISIBLE
+        butAudioTracks.visibility = View.VISIBLE
         butAudioTracks.text = audioTracks[selectedAudioTrack]
-        butAudioTracks.setOnClickListener { v: View? ->
-            controller!!.setAudioTrack((selectedAudioTrack + 1) % audioTracks.size)
+        butAudioTracks.setOnClickListener {
+            playbackController.setAudioTrack((selectedAudioTrack + 1) % audioTracks.size)
             uiHandler.postDelayed({ setupAudioTracks() }, 500)
         }
     }

@@ -27,9 +27,12 @@ object RetrieveFeedUtil {
     fun searchFeedUrlByTrackName(trackName: String, artistName: String): String? {
         val searcher = CombinedSearcher()
         val query = "$trackName $artistName"
-        val results = searcher.search(query)!!.blockingGet()
-        for (result in results!!) {
-            if (result!!.feedUrl != null && result.author != null && result.author.equals(
+        val results = searcher.search(query)?.blockingGet() ?: return null
+        for (result in results) {
+            if (result == null) {
+                continue
+            }
+            if (result.feedUrl != null && result.author != null && result.author.equals(
                     artistName,
                     ignoreCase = true
                 ) && result.title.equals(trackName, ignoreCase = true)

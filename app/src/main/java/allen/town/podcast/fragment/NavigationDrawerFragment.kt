@@ -63,13 +63,13 @@ import org.greenrobot.eventbus.ThreadMode
 
 class NavigationDrawerFragment : Fragment(), OnSharedPreferenceChangeListener {
     private var navDrawerData: NavDrawerData? = null
-    private var flatItemList: List<DrawerItem>? = null
+    private var flatItemList: List<DrawerItem> = emptyList()
     private var contextPressedItem: DrawerItem? = null
-    private var navAdapter: NavigationListAdapter? = null
+    private lateinit var navAdapter: NavigationListAdapter
     private var disposable: Disposable? = null
-    private var progressBar: ProgressBar? = null
+    private lateinit var progressBar: ProgressBar
     private var openFolders: MutableSet<String> = HashSet()
-    private var lottieAnimationView: LottieAnimationView? = null
+    private lateinit var lottieAnimationView: LottieAnimationView
 
 
     override fun onCreateView(
@@ -88,20 +88,21 @@ class NavigationDrawerFragment : Fragment(), OnSharedPreferenceChangeListener {
             itemAccess,
             requireActivity()
         )
-        navAdapter!!.setHasStableIds(true)
+        navAdapter.setHasStableIds(true)
         navList.adapter = navAdapter
         navList.layoutManager = LinearLayoutManager(context)
         root.findViewById<View>(R.id.nav_settings).setOnClickListener { v: View? ->
-            (activity as MainActivity?)!!.closeDrawer {
-                startActivity(Intent(activity, SettingsActivity::class.java))
-                (activity as MainActivity?)!!.overridePendingTransition(
+            val mainActivity = requireActivity() as MainActivity
+            mainActivity.closeDrawer {
+                startActivity(Intent(mainActivity, SettingsActivity::class.java))
+                mainActivity.overridePendingTransition(
                     R.anim.retro_fragment_open_enter,
                     R.anim.anim_activity_stay
                 )
             }
         }
         lottieAnimationView = root.findViewById(R.id.lottie_play_item)
-        lottieAnimationView!!.setAnimation(getRandomLottieFileName())
+        lottieAnimationView.setAnimation(getRandomLottieFileName())
         preferences.registerOnSharedPreferenceChangeListener(this)
         return root
     }
@@ -114,18 +115,17 @@ class NavigationDrawerFragment : Fragment(), OnSharedPreferenceChangeListener {
     override fun onDestroyView() {
         super.onDestroyView()
         EventBus.getDefault().unregister(this)
-        if (disposable != null) {
-            disposable!!.dispose()
-        }
+        disposable?.dispose()
         requireContext().getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
             .unregisterOnSharedPreferenceChangeListener(this)
     }
 
     override fun onCreateContextMenu(menu: ContextMenu, v: View, menuInfo: ContextMenuInfo?) {
         super.onCreateContextMenu(menu, v, menuInfo)
+        val pressedItem = contextPressedItem ?: return
         val inflater = requireActivity().menuInflater
-        menu.setHeaderTitle(contextPressedItem!!.title)
-        if (contextPressedItem!!.type == DrawerItem.Type.FEED) {
+        menu.setHeaderTitle(pressedItem.title)
+        if (pressedItem.type == DrawerItem.Type.FEED) {
             inflater.inflate(R.menu.nav_feed_context, menu)
             // episodes are not loaded, so we cannot check if the podcast has new or unplayed ones!
         } else {
@@ -161,7 +161,7 @@ class NavigationDrawerFragment : Fragment(), OnSharedPreferenceChangeListener {
             RenameItemDialog(requireActivity(), feed).show()
             return true
         } else if (itemId == R.id.remove_feed) {
-            (activity as MainActivity?)!!.loadFragment(EpisodesFragment.TAG, null)
+            (requireActivity() as MainActivity).loadFragment(EpisodesFragment.TAG, null)
             RemoveFeedDialog.show(requireContext(), feed)
             return true
         }
@@ -203,15 +203,11 @@ class NavigationDrawerFragment : Fragment(), OnSharedPreferenceChangeListener {
 
     private val itemAccess: ItemAccess = object : ItemAccess {
         override val count: Int
-            get() = if (flatItemList != null) {
-                flatItemList!!.size
-            } else {
-                0
-            }
+            get() = flatItemList.size
 
         override fun getItem(position: Int): DrawerItem? {
-            return if (flatItemList != null && 0 <= position && position < flatItemList!!.size) {
-                flatItemList!![position]
+            return if (0 <= position && position < flatItemList.size) {
+                flatItemList[position]
             } else {
                 null
             }
@@ -219,12 +215,13 @@ class NavigationDrawerFragment : Fragment(), OnSharedPreferenceChangeListener {
 
         override fun isSelected(position: Int): Boolean {
             val lastNavFragment = getLastNavFragment(requireContext())
-            if (position < navAdapter!!.subscriptionOffset) {
-                return navAdapter!!.getFragmentTags()[position] == lastNavFragment
-            } else if (StringUtils.isNumeric(lastNavFragment)) { // last fragment was not a list, but a feed
-                val feedId = lastNavFragment!!.toLong()
+            if (position < navAdapter.subscriptionOffset) {
+                return navAdapter.getFragmentTags()[position] == lastNavFragment
+            } else if (lastNavFragment != null && StringUtils.isNumeric(lastNavFragment)) {
+                // last fragment was not a list, but a feed
+                val feedId = lastNavFragment.toLong()
                 if (navDrawerData != null) {
-                    val itemToCheck = flatItemList!![position - navAdapter!!.subscriptionOffset]
+                    val itemToCheck = flatItemList[position - navAdapter.subscriptionOffset]
                     if (itemToCheck.type == DrawerItem.Type.FEED) {
                         // When the same feed is displayed multiple times, it should be highlighted multiple times.
                         return (itemToCheck as FeedDrawerItem).feed.id == feedId
@@ -235,20 +232,18 @@ class NavigationDrawerFragment : Fragment(), OnSharedPreferenceChangeListener {
         }
 
         override val queueSize: Int
-            get() = if (navDrawerData != null) navDrawerData!!.queueSize else 0
+            get() = navDrawerData?.queueSize ?: 0
         override val numberOfNewItems: Int
-            get() = if (navDrawerData != null) navDrawerData!!.numNewItems else 0
+            get() = navDrawerData?.numNewItems ?: 0
         override val numberOfDownloadedItems: Int
-            get() = if (navDrawerData != null) navDrawerData!!.numDownloadedItems else 0
+            get() = navDrawerData?.numDownloadedItems ?: 0
         override val reclaimableItems: Int
-            get() = if (navDrawerData != null) navDrawerData!!.reclaimableSpace else 0
+            get() = navDrawerData?.reclaimableSpace ?: 0
         override val feedCounterSum: Int
             get() {
-                if (navDrawerData == null) {
-                    return 0
-                }
+                val navDrawerData = navDrawerData ?: return 0
                 var sum = 0
-                for (counter in navDrawerData!!.feedCounters.values()) {
+                for (counter in navDrawerData.feedCounters.values()) {
                     sum += counter
                 }
                 return sum
@@ -256,19 +251,20 @@ class NavigationDrawerFragment : Fragment(), OnSharedPreferenceChangeListener {
 
 
         override fun onItemClick(position: Int) {
-            val viewType = navAdapter!!.getItemViewType(position)
+            val viewType = navAdapter.getItemViewType(position)
             if (viewType != NavigationListAdapter.VIEW_TYPE_SECTION_DIVIDER) {
-                if (position < navAdapter!!.subscriptionOffset) {
-                    val tag = navAdapter!!.getFragmentTags()[position]
-                    (activity as MainActivity?)!!.loadFragment(tag, null)
-                    (activity as MainActivity?)!!.bottomSheet!!.setState(BottomSheetBehavior.STATE_COLLAPSED)
+                val mainActivity = requireActivity() as MainActivity
+                if (position < navAdapter.subscriptionOffset) {
+                    val tag = navAdapter.getFragmentTags()[position]
+                    mainActivity.loadFragment(tag, null)
+                    mainActivity.bottomSheet.setState(BottomSheetBehavior.STATE_COLLAPSED)
                 } else {
-                    val pos = position - navAdapter!!.subscriptionOffset
-                    val clickedItem = flatItemList!![pos]
+                    val pos = position - navAdapter.subscriptionOffset
+                    val clickedItem = flatItemList[pos]
                     if (clickedItem.type == DrawerItem.Type.FEED) {
                         val feedId = (clickedItem as FeedDrawerItem).feed.id
-                        (activity as MainActivity?)!!.loadFeedFragmentById(feedId, null)
-                        (activity as MainActivity?)!!.bottomSheet!!
+                        mainActivity.loadFeedFragmentById(feedId, null)
+                        mainActivity.bottomSheet
                             .setState(BottomSheetBehavior.STATE_COLLAPSED)
                     } else {
                         val folder = clickedItem as TagDrawerItem
@@ -281,17 +277,18 @@ class NavigationDrawerFragment : Fragment(), OnSharedPreferenceChangeListener {
                             .edit()
                             .putStringSet(PREF_OPEN_FOLDERS, openFolders)
                             .apply()
+                        val drawerData = navDrawerData ?: return
                         disposable = Observable.fromCallable {
                             makeFlatDrawerData(
-                                navDrawerData!!.items, 0
+                                drawerData.items, 0
                             )
                         }
                             .subscribeOn(Schedulers.computation())
                             .observeOn(AndroidSchedulers.mainThread())
                             .subscribe(
-                                { result: List<DrawerItem>? ->
+                                { result: List<DrawerItem> ->
                                     flatItemList = result
-                                    navAdapter!!.notifyDataSetChanged()
+                                    navAdapter.notifyDataSetChanged()
                                 }) { error: Throwable? ->
                                 Log.e(
                                     TAG,
@@ -301,17 +298,17 @@ class NavigationDrawerFragment : Fragment(), OnSharedPreferenceChangeListener {
                     }
                 }
             } else if (Prefs.subscriptionsFilter.isEnabled
-                && navAdapter!!.showSubscriptionList
+                && navAdapter.showSubscriptionList
             ) {
                 SubsFilterDialog.showDialog(requireContext())
             }
         }
 
         override fun onItemLongClick(position: Int): Boolean {
-            return if (position < navAdapter!!.getFragmentTags().size) {
+            return if (position < navAdapter.getFragmentTags().size) {
                 true
             } else {
-                contextPressedItem = flatItemList!![position - navAdapter!!.subscriptionOffset]
+                contextPressedItem = flatItemList[position - navAdapter.subscriptionOffset]
                 false
             }
         }
@@ -332,12 +329,12 @@ class NavigationDrawerFragment : Fragment(), OnSharedPreferenceChangeListener {
                 { result: Pair<NavDrawerData, List<DrawerItem>> ->
                     navDrawerData = result.first
                     flatItemList = result.second
-                    navAdapter!!.notifyDataSetChanged()
-                    progressBar!!.visibility =
+                    navAdapter.notifyDataSetChanged()
+                    progressBar.visibility =
                         View.GONE // Stays hidden once there is something in the list
                 }) { error: Throwable? ->
                 Log.e(TAG, Log.getStackTraceString(error))
-                progressBar!!.visibility = View.GONE
+                progressBar.visibility = View.GONE
             }
     }
 
@@ -359,7 +356,7 @@ class NavigationDrawerFragment : Fragment(), OnSharedPreferenceChangeListener {
 
     override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences, key: String?) {
         if (PREF_LAST_FRAGMENT_TAG == key) {
-            navAdapter!!.notifyDataSetChanged() // Update selection
+            navAdapter.notifyDataSetChanged() // Update selection
         }
     }
 

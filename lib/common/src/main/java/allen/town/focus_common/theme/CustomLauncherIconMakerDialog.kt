@@ -1,6 +1,7 @@
 package allen.town.focus_common.theme
 
 import allen.town.focus_common.R
+import allen.town.focus_common.databinding.DialogCustomLauncherIconMakerBinding
 import allen.town.focus_common.util.ImageUtils.mask
 import allen.town.focus_common.util.PhotoSelectUtil
 import allen.town.focus_common.util.ShortCutUtils
@@ -21,12 +22,9 @@ import android.text.TextUtils
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
 import android.widget.SeekBar
 import android.widget.SeekBar.OnSeekBarChangeListener
-import android.widget.TextView
 import androidx.appcompat.app.AppCompatDialogFragment
-import androidx.appcompat.widget.AppCompatSeekBar
 import androidx.core.content.ContextCompat
 import code.name.monkey.appthemehelper.util.ATHUtil.resolveColor
 import allen.town.focus_common.extensions.addAccentColor
@@ -40,9 +38,8 @@ class CustomLauncherIconMakerDialog(
     private val backgroundLogo: Int,
     private val appName: String
 ) : AppCompatDialogFragment(), OnSeekBarChangeListener {
-    private var SquareMaskView: ImageView? = null
+    private var binding: DialogCustomLauncherIconMakerBinding? = null
     private var b = 0
-    private var bSeekView: AppCompatSeekBar? = null
 
     /* access modifiers changed from: private */
     var background: Drawable? = null
@@ -53,17 +50,10 @@ class CustomLauncherIconMakerDialog(
     /* access modifiers changed from: private */
     var foreground: Drawable? = null
     private var g = 0
-    private var gSeekView: AppCompatSeekBar? = null
-
-    /* access modifiers changed from: private */
-    var iconView: ImageView? = null
     private var maskResId = 0
     private var path: Uri? = null
     var photoSelectUtil: PhotoSelectUtil? = null
     private var r = 0
-    private var rSeekView: AppCompatSeekBar? = null
-    private var roundMaskView: ImageView? = null
-    private var roundedSquareMaskView: ImageView? = null
 
     /* access modifiers changed from: private */
     var shape = 3
@@ -75,21 +65,15 @@ class CustomLauncherIconMakerDialog(
         layoutInflater: LayoutInflater, viewGroup: ViewGroup?,
         bundle: Bundle?
     ): View? {
-        dialog!!.setCanceledOnTouchOutside(true)
+        requireDialog().setCanceledOnTouchOutside(true)
         return super.onCreateView(layoutInflater, viewGroup, bundle)
     }
 
-    var imageView: ImageView? = null
-    var imageView2: ImageView? = null
-    var imageView3: ImageView? = null
-    var imageView4: ImageView? = null
-    var shapeView: View? = null
-    var colorView: View? = null
-
     // android.support.v7.app.AppCompatDialogFragment, android.support.v4.app.DialogFragment
     override fun onCreateDialog(bundle: Bundle?): Dialog {
-        val rootView = LayoutInflater.from(activity)
-            .inflate(R.layout.dialog_custom_launcher_icon_maker, null as ViewGroup?)
+        val views = DialogCustomLauncherIconMakerBinding
+            .inflate(LayoutInflater.from(requireActivity()))
+        binding = views
         val alertDialog = AccentMaterialDialog(requireActivity(), R.style.MaterialAlertDialogTheme)
             .setTitle(custom_launcher_title)
             .setPositiveButton(android.R.string.ok) { dialogInterface: DialogInterface, i: Int ->
@@ -98,28 +82,25 @@ class CustomLauncherIconMakerDialog(
                     i
                 )
             }
-            .setView(rootView).create()
-        imageView = rootView.findViewById(R.id.iconView)
-        imageView2 = rootView.findViewById(R.id.roundMaskView)
-        imageView3 = rootView.findViewById(R.id.roundedSquareMaskView)
-        imageView4 = rootView.findViewById(R.id.SquareMaskView)
-        rSeekView = rootView.findViewById(R.id.rSeekView)
-        rSeekView!!.addAccentColor()
-        gSeekView = rootView.findViewById(R.id.gSeekView)
-        gSeekView!!.addAccentColor()
-        bSeekView = rootView.findViewById(R.id.bSeekView)
-        bSeekView!!.addAccentColor()
-        shapeView = rootView.findViewById(R.id.shapeLayout)
-        colorView = rootView.findViewById(R.id.colorLayout)
-        (rootView.findViewById<View>(R.id.nameView) as TextView).text = appName
+            .setView(views.root).create()
+        views.rSeekView.addAccentColor()
+        views.gSeekView.addAccentColor()
+        views.bSeekView.addAccentColor()
+        views.nameView.text = appName
         onCreateContentLayout()
         return alertDialog
     }
 
+    override fun onDestroyView() {
+        binding = null
+        super.onDestroyView()
+    }
+
     fun onConfirmDialog(dialogInterface: DialogInterface, i: Int) {
-        var drawable: Drawable? = null
-        val obj = (dialog!!.findViewById<View>(R.id.nameView) as TextView).text.toString()
-        if (!TextUtils.isEmpty(obj) && iconView!!.drawable.also { drawable = it } != null) {
+        val views = binding
+        val obj = views?.nameView?.text?.toString().orEmpty()
+        var drawable: Drawable? = views?.iconView?.drawable
+        if (!TextUtils.isEmpty(obj) && drawable != null) {
             val intent = Intent()
             intent.setClassName(packageName, className)
             if (!custom && Build.VERSION.SDK_INT >= 26) {
@@ -150,51 +131,45 @@ class CustomLauncherIconMakerDialog(
     }
 
     private fun showShapeLayout() {
-        shapeView!!.visibility = View.GONE
+        val views = binding ?: return
+        views.shapeLayout.visibility = View.GONE
     }
 
     private fun showColorLayout() {
-        colorView!!.visibility = if (custom) View.GONE else View.VISIBLE
+        val views = binding ?: return
+        views.colorLayout.visibility = if (custom) View.GONE else View.VISIBLE
     }
 
     fun onCreateContentLayout() {
+        val views = binding ?: return
         background = ContextCompat.getDrawable(requireContext(), backgroundLogo)
         foreground = ContextCompat.getDrawable(requireContext(), foregroundLogo)
 
-        iconView = imageView
-        imageView!!.setOnClickListener {
-            if (photoSelectUtil == null) {
-                val customLauncherIconMakerDialog = this@CustomLauncherIconMakerDialog
-                customLauncherIconMakerDialog.photoSelectUtil = PhotoSelectUtil(activity)
-            }
-            photoSelectUtil!!.pickPhoto(this@CustomLauncherIconMakerDialog)
+        views.iconView.setOnClickListener {
+            val selectUtil = photoSelectUtil
+                ?: PhotoSelectUtil(activity).also { util -> photoSelectUtil = util }
+            selectUtil.pickPhoto(this@CustomLauncherIconMakerDialog)
         }
         showShapeLayout()
         showColorLayout()
-        roundMaskView = imageView2
-        imageView2!!.setOnClickListener {
+        views.roundMaskView.setOnClickListener {
             shape = 1
-            val unused = shape
             updateMaskShape()
         }
-        roundedSquareMaskView = imageView3
-        imageView3!!.setOnClickListener {
+        views.roundedSquareMaskView.setOnClickListener {
             shape = 2
-            val unused = shape
             updateMaskShape()
         }
-        SquareMaskView = imageView4
-        imageView4!!.setOnClickListener {
+        views.SquareMaskView.setOnClickListener {
             shape = 3
-            val unused = shape
             updateMaskShape()
         }
-        rSeekView!!.progress = r
-        gSeekView!!.progress = g
-        bSeekView!!.progress = b
-        rSeekView!!.setOnSeekBarChangeListener(this)
-        gSeekView!!.setOnSeekBarChangeListener(this)
-        bSeekView!!.setOnSeekBarChangeListener(this)
+        views.rSeekView.progress = r
+        views.gSeekView.progress = g
+        views.bSeekView.progress = b
+        views.rSeekView.setOnSeekBarChangeListener(this)
+        views.gSeekView.setOnSeekBarChangeListener(this)
+        views.bSeekView.setOnSeekBarChangeListener(this)
         maskColor()
         updateMaskShape()
     }
@@ -219,7 +194,7 @@ class CustomLauncherIconMakerDialog(
     }
 
     private fun maskColor() {
-        background!!.colorFilter = ColorMatrixColorFilter(
+        background?.colorFilter = ColorMatrixColorFilter(
             floatArrayOf(
                 0.0f,
                 0.0f,
@@ -247,37 +222,50 @@ class CustomLauncherIconMakerDialog(
 
     /* access modifiers changed from: private */
     fun updateMaskShape() {
-        roundMaskView!!.setColorFilter(resolveColor(requireContext(), android.R.attr.textColorSecondary))
-        roundedSquareMaskView!!.setColorFilter(
+        val views = binding ?: return
+        views.roundMaskView.setColorFilter(
+            resolveColor(requireContext(), android.R.attr.textColorSecondary)
+        )
+        views.roundedSquareMaskView.setColorFilter(
             resolveColor(
                 requireContext(),
                 android.R.attr.textColorSecondary
             )
         )
-        SquareMaskView!!.setColorFilter(resolveColor(requireContext(), android.R.attr.textColorSecondary))
+        views.SquareMaskView.setColorFilter(
+            resolveColor(requireContext(), android.R.attr.textColorSecondary)
+        )
         val i = shape
         if (i == 1) {
-            roundMaskView!!.setColorFilter(resolveColor(requireContext(), androidx.appcompat.R.attr.colorAccent))
+            views.roundMaskView.setColorFilter(
+                resolveColor(requireContext(), androidx.appcompat.R.attr.colorAccent)
+            )
             maskResId = R.drawable.mask_round
             maskShape()
         } else if (i == 2) {
-            roundedSquareMaskView!!.setColorFilter(resolveColor(requireContext(), androidx.appcompat.R.attr.colorAccent))
+            views.roundedSquareMaskView.setColorFilter(
+                resolveColor(requireContext(), androidx.appcompat.R.attr.colorAccent)
+            )
             maskResId = R.drawable.mask_rounded_square
             maskShape()
         } else if (i == 3) {
-            SquareMaskView!!.setColorFilter(resolveColor(requireContext(), androidx.appcompat.R.attr.colorAccent))
+            views.SquareMaskView.setColorFilter(
+                resolveColor(requireContext(), androidx.appcompat.R.attr.colorAccent)
+            )
             maskResId = R.drawable.mask_square
             maskShape()
         }
     }
 
     private fun maskShape() {
+        val views = binding ?: return
         val dip2px = dp2Px(requireContext(), ICON_SIZE.toFloat())
-        if (path != null) {
-            iconView!!.setImageBitmap(mask(requireContext(), path!!, maskResId, dip2px))
+        val selectedPath = path
+        if (selectedPath != null) {
+            views.iconView.setImageBitmap(mask(requireContext(), selectedPath, maskResId, dip2px))
             return
         }
-        iconView!!.setImageBitmap(
+        views.iconView.setImageBitmap(
             mask(
                 requireContext(),
                 LayerDrawable(arrayOf(background, foreground)),
@@ -294,7 +282,8 @@ class CustomLauncherIconMakerDialog(
     }
 
     fun handleActivityResult(i: Int, i2: Int, intent: Intent?) {
-        onSelected(photoSelectUtil!!.handleActivityResult(i, i2, intent))
+        val selectUtil = photoSelectUtil ?: return
+        onSelected(selectUtil.handleActivityResult(i, i2, intent))
     }
 
     companion object {

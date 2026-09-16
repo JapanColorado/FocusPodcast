@@ -17,7 +17,7 @@ import org.apache.commons.lang3.ArrayUtils
 import java.util.concurrent.TimeUnit
 
 class FeedRefreshPrefDialog(private val context: Context) {
-    private var viewBinding: FeedRefreshDialogBinding? = null
+    private lateinit var viewBinding: FeedRefreshDialogBinding
     fun show() {
         val builder: AlertDialog.Builder = AccentMaterialDialog(
             context,
@@ -29,63 +29,63 @@ class FeedRefreshPrefDialog(private val context: Context) {
                 context
             )
         )
-        builder.setView(viewBinding!!.root)
+        builder.setView(viewBinding.root)
         val spinnerArrayAdapter = ArrayAdapter(
             context,
             android.R.layout.simple_spinner_item, buildSpinnerEntries()
         )
         spinnerArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        viewBinding!!.spinner.adapter = spinnerArrayAdapter
-        viewBinding!!.timePicker.setIs24HourView(DateFormat.is24HourFormat(context))
-        viewBinding!!.spinner.setSelection(ArrayUtils.indexOf(INTERVAL_VALUES_HOURS, 24))
+        viewBinding.spinner.adapter = spinnerArrayAdapter
+        viewBinding.timePicker.setIs24HourView(DateFormat.is24HourFormat(context))
+        viewBinding.spinner.setSelection(ArrayUtils.indexOf(INTERVAL_VALUES_HOURS, 24))
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            viewBinding!!.timePicker.hour = 8
-            viewBinding!!.timePicker.minute = 0
+            viewBinding.timePicker.hour = 8
+            viewBinding.timePicker.minute = 0
         } else {
-            viewBinding!!.timePicker.currentHour = 8
-            viewBinding!!.timePicker.currentMinute = 0
+            viewBinding.timePicker.currentHour = 8
+            viewBinding.timePicker.currentMinute = 0
         }
         val currInterval = Prefs.updateInterval
         val updateTime = Prefs.updateTimeOfDay
         if (currInterval > 0) {
-            viewBinding!!.spinner.setSelection(
+            viewBinding.spinner.setSelection(
                 ArrayUtils.indexOf(
                     INTERVAL_VALUES_HOURS,
                     TimeUnit.MILLISECONDS.toHours(currInterval).toInt()
                 )
             )
-            viewBinding!!.intervalRadioButton.isChecked = true
+            viewBinding.intervalRadioButton.isChecked = true
         } else if (updateTime.size == 2 && updateTime[0] >= 0) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                viewBinding!!.timePicker.hour = updateTime[0]
-                viewBinding!!.timePicker.minute = updateTime[1]
+                viewBinding.timePicker.hour = updateTime[0]
+                viewBinding.timePicker.minute = updateTime[1]
             } else {
-                viewBinding!!.timePicker.currentHour = updateTime[0]
-                viewBinding!!.timePicker.currentMinute = updateTime[1]
+                viewBinding.timePicker.currentHour = updateTime[0]
+                viewBinding.timePicker.currentMinute = updateTime[1]
             }
-            viewBinding!!.timeRadioButton.isChecked = true
+            viewBinding.timeRadioButton.isChecked = true
         } else {
-            viewBinding!!.disableRadioButton.isChecked = true
+            viewBinding.disableRadioButton.isChecked = true
         }
         updateVisibility()
-        viewBinding!!.radioGroup.setOnCheckedChangeListener { radioGroup: RadioGroup?, i: Int -> updateVisibility() }
+        viewBinding.radioGroup.setOnCheckedChangeListener { radioGroup: RadioGroup?, i: Int -> updateVisibility() }
         builder.setPositiveButton(R.string.confirm_label) { dialog: DialogInterface?, which: Int ->
-            if (viewBinding!!.intervalRadioButton.isChecked) {
+            if (viewBinding.intervalRadioButton.isChecked) {
                 Prefs.updateInterval =
-                    INTERVAL_VALUES_HOURS[viewBinding!!.spinner.selectedItemPosition].toLong()
-            } else if (viewBinding!!.timeRadioButton.isChecked) {
+                    INTERVAL_VALUES_HOURS[viewBinding.spinner.selectedItemPosition].toLong()
+            } else if (viewBinding.timeRadioButton.isChecked) {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                     Prefs.setUpdateTimeOfDay(
-                        viewBinding!!.timePicker.hour,
-                        viewBinding!!.timePicker.minute
+                        viewBinding.timePicker.hour,
+                        viewBinding.timePicker.minute
                     )
                 } else {
                     Prefs.setUpdateTimeOfDay(
-                        viewBinding!!.timePicker.currentHour,
-                        viewBinding!!.timePicker.currentMinute
+                        viewBinding.timePicker.currentHour,
+                        viewBinding.timePicker.currentMinute
                     )
                 }
-            } else if (viewBinding!!.disableRadioButton.isChecked) {
+            } else if (viewBinding.disableRadioButton.isChecked) {
                 Prefs.disableAutoUpdate(context)
             } else {
                 throw IllegalStateException("Unexpected error.")
@@ -106,10 +106,10 @@ class FeedRefreshPrefDialog(private val context: Context) {
     }
 
     private fun updateVisibility() {
-        viewBinding!!.spinner.visibility =
-            if (viewBinding!!.intervalRadioButton.isChecked) View.VISIBLE else View.GONE
-        viewBinding!!.timePicker.visibility =
-            if (viewBinding!!.timeRadioButton.isChecked) View.VISIBLE else View.GONE
+        viewBinding.spinner.visibility =
+            if (viewBinding.intervalRadioButton.isChecked) View.VISIBLE else View.GONE
+        viewBinding.timePicker.visibility =
+            if (viewBinding.timeRadioButton.isChecked) View.VISIBLE else View.GONE
     }
 
     companion object {

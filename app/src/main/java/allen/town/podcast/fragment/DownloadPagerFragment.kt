@@ -39,7 +39,7 @@ class DownloadPagerFragment constructor() : PagedToolbarFragment() {
         if (savedInstanceState != null) {
             displayUpArrow = savedInstanceState.getBoolean(KEY_UP_ARROW)
         }
-        (getActivity() as MainActivity?)!!.setupToolbarToggle(toolbar, displayUpArrow)
+        (requireActivity() as MainActivity).setupToolbarToggle(toolbar, displayUpArrow)
         viewPager = root.findViewById(R.id.viewpager)
         viewPager.setAdapter(DownloadsPagerAdapter(this))
         viewPager.setOffscreenPageLimit(2)

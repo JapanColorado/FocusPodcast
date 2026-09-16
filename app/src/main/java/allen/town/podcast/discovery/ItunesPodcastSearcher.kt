@@ -17,6 +17,8 @@ import java.util.regex.Pattern
 
 open class ItunesPodcastSearcher : PodcastSearcher {
     fun searchByApiUrl(query: String?, url: String?): Single<List<PodcastSearchResult?>?> {
+        val apiUrl = url
+            ?: return Single.error(IllegalArgumentException("no search API url was given"))
         return Single.create(
             SingleOnSubscribe { subscriber: SingleEmitter<List<PodcastSearchResult?>?> ->
                 val encodedQuery: String?
@@ -26,7 +28,7 @@ open class ItunesPodcastSearcher : PodcastSearcher {
                     // this won't ever be thrown
                     query
                 }
-                val formattedUrl = String.format(url!!, encodedQuery)
+                val formattedUrl = String.format(apiUrl, encodedQuery)
                 val client = PodcastHttpClient.getHttpClient()
                 val httpReq = Request.Builder()
                     .url(formattedUrl)
@@ -34,7 +36,11 @@ open class ItunesPodcastSearcher : PodcastSearcher {
                 try {
                     val response = client.newCall(httpReq.build()).execute()
                     if (response.isSuccessful) {
-                        val resultString = response.body!!.string()
+                        val body = response.body ?: run {
+                            subscriber.onError(IOException("no response body for $formattedUrl"))
+                            return@SingleOnSubscribe
+                        }
+                        val resultString = body.string()
                         val result = JSONObject(resultString)
                         val j = result.getJSONArray("results")
                         var podcast: PodcastSearchResult
@@ -78,7 +84,11 @@ open class ItunesPodcastSearcher : PodcastSearcher {
             try {
                 val response = client.newCall(httpReq.build()).execute()
                 if (response.isSuccessful) {
-                    val resultString = response.body!!.string()
+                    val body = response.body ?: run {
+                        emitter.onError(IOException("no response body for $lookupUrl"))
+                        return@create
+                    }
+                    val resultString = body.string()
                     val result = JSONObject(resultString)
                     val results = result.getJSONArray("results").getJSONObject(0)
                     val feedUrlName = "feedUrl"

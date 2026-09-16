@@ -33,7 +33,7 @@ open class ToolbarBaseActivity : ATHToolbarActivity(),ClearAllActivityInterface 
 
     override fun onDestroy() {
         super.onDestroy()
-        val removed = activities.remove(this.hashCode())!!
+        activities.remove(this.hashCode())
     }
 
     override fun finish() {
@@ -71,7 +71,7 @@ open class ToolbarBaseActivity : ATHToolbarActivity(),ClearAllActivityInterface 
             }
         }
         if (DEBUG) {
-            Log.d(THIS_FILE, "clearAllBasicAppComapctActivites DONE!!!")
+            Log.d(THIS_FILE, "clearAllBasicAppComapctActivites done")
         }
     }
 

@@ -39,7 +39,10 @@ open class EpisodeItemListAdapter(mainActivity: MainActivity, @MenuRes menuResId
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): EpisodeItemViewHolder {
-        return EpisodeItemViewHolder(mainActivityRef.get()!!, parent)
+        val mainActivity = checkNotNull(mainActivityRef.get()) {
+            "the MainActivity is gone while its episode list is still creating rows"
+        }
+        return EpisodeItemViewHolder(mainActivity, parent)
     }
 
     override fun onBindViewHolder(holder: EpisodeItemViewHolder, pos: Int) {
@@ -148,17 +151,16 @@ open class EpisodeItemListAdapter(mainActivity: MainActivity, @MenuRes menuResId
     }
 
     override fun onCreateContextMenu(menu: ContextMenu, v: View, menuInfo: ContextMenuInfo?) {
-        val inflater = mainActivityRef.get()!!.menuInflater
+        val mainActivity = mainActivityRef.get() ?: return
+        val inflater = mainActivity.menuInflater
         if (inActionMode()) {
             inflater.inflate(R.menu.multi_select_context_popup, menu)
         } else {
-            if (longPressedItem == null) {
-                return
-            }
+            val pressed = longPressedItem ?: return
             inflater.inflate(R.menu.feeditemlist_context, menu)
             showContextMenuIcon(menu)
-            menu.setHeaderTitle(longPressedItem!!.title)
-            FeedItemMenuProcess.onPrepareMenu(menu, longPressedItem, R.id.skip_episode_item)
+            menu.setHeaderTitle(pressed.title)
+            FeedItemMenuProcess.onPrepareMenu(menu, pressed, R.id.skip_episode_item)
         }
     }
 

@@ -5,9 +5,9 @@ import allen.town.focus_common.views.ItemOffsetDecoration
 import allen.town.podcast.R
 import allen.town.podcast.core.pref.Prefs
 import allen.town.podcast.core.util.playback.PlaybackController
+import allen.town.podcast.databinding.SpeedSelectDialogBinding
 import allen.town.podcast.event.playback.SpeedChangedEvent
 import allen.town.podcast.model.playback.MediaType
-import allen.town.podcast.view.PlaybackSpeedSlider
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -28,27 +28,28 @@ import java.text.DecimalFormatSymbols
 import java.util.*
 
 class PlaySpeedDialog : BottomSheetDialogFragment() {
-    private var adapter: SpeedSelectionAdapter? = null
+    private lateinit var adapter: SpeedSelectionAdapter
     private val speedFormat: DecimalFormat
     private var controller: PlaybackController? = null
     private val selectedSpeeds: MutableList<Float>
-    private var speedSeekBar: PlaybackSpeedSlider? = null
-    private var addCurrentSpeedChip: Chip? = null
+    private var _binding: SpeedSelectDialogBinding? = null
+    private val binding get() = _binding ?: error("binding accessed outside of view lifecycle")
     private val uiHandler = Handler(Looper.getMainLooper())
     override fun onStart() {
         super.onStart()
-        controller = object : PlaybackController(requireActivity()) {
+        val playbackController = object : PlaybackController(requireActivity()) {
             override fun loadMediaInfo() {
-                updateSpeed(SpeedChangedEvent(controller!!.currentPlaybackSpeedMultiplier))
+                updateSpeed(SpeedChangedEvent(currentPlaybackSpeedMultiplier))
             }
         }
-        controller!!.init()
+        controller = playbackController
+        playbackController.init()
         EventBus.getDefault().register(this)
     }
 
     override fun onStop() {
         super.onStop()
-        controller!!.release()
+        controller?.release()
         controller = null
         EventBus.getDefault().unregister(this)
     }
@@ -56,43 +57,45 @@ class PlaySpeedDialog : BottomSheetDialogFragment() {
     override fun onDestroyView() {
         uiHandler.removeCallbacksAndMessages(null)
         super.onDestroyView()
+        _binding = null
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     fun updateSpeed(event: SpeedChangedEvent) {
-        speedSeekBar!!.updateSpeed(event.newSpeed)
-        addCurrentSpeedChip!!.text = speedFormat.format(event.newSpeed.toDouble())
+        _binding?.let {
+            it.speedSeekBar.updateSpeed(event.newSpeed)
+            it.addCurrentSpeedChip.text = speedFormat.format(event.newSpeed.toDouble())
+        }
     }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        val root = View.inflate(context, R.layout.speed_select_dialog, null)
-        speedSeekBar = root.findViewById(R.id.speed_seek_bar)
-        speedSeekBar!!.setProgressChangedListener(Consumer { multiplier: Float? ->
-            if (controller != null) {
-                controller!!.setPlaybackSpeed(multiplier!!)
+    ): View {
+        val binding = SpeedSelectDialogBinding.inflate(inflater)
+        _binding = binding
+        binding.speedSeekBar.setProgressChangedListener(Consumer { multiplier: Float? ->
+            val playbackController = controller
+            if (playbackController != null && multiplier != null) {
+                playbackController.setPlaybackSpeed(multiplier)
             }
         })
-        val selectedSpeedsGrid = root.findViewById<RecyclerView>(R.id.selected_speeds_grid)
-        selectedSpeedsGrid.layoutManager = GridLayoutManager(context, 4)
-        selectedSpeedsGrid.addItemDecoration(ItemOffsetDecoration(requireContext(), 4))
+        binding.selectedSpeedsGrid.layoutManager = GridLayoutManager(context, 4)
+        binding.selectedSpeedsGrid.addItemDecoration(ItemOffsetDecoration(requireContext(), 4))
         adapter = SpeedSelectionAdapter()
-        adapter!!.setHasStableIds(true)
-        selectedSpeedsGrid.adapter = adapter
-        addCurrentSpeedChip = root.findViewById(R.id.add_current_speed_chip)
-        addCurrentSpeedChip!!.setCloseIconVisible(true)
-        addCurrentSpeedChip!!.setCloseIconResource(R.drawable.ic_add)
-        addCurrentSpeedChip!!.setOnCloseIconClickListener(View.OnClickListener { v: View? -> addCurrentSpeed() })
-        addCurrentSpeedChip!!.setOnClickListener(View.OnClickListener { v: View? -> addCurrentSpeed() })
+        adapter.setHasStableIds(true)
+        binding.selectedSpeedsGrid.adapter = adapter
+        binding.addCurrentSpeedChip.isCloseIconVisible = true
+        binding.addCurrentSpeedChip.setCloseIconResource(R.drawable.ic_add)
+        binding.addCurrentSpeedChip.setOnCloseIconClickListener { addCurrentSpeed() }
+        binding.addCurrentSpeedChip.setOnClickListener { addCurrentSpeed() }
         val speed = Prefs.getPlaybackSpeed(MediaType.AUDIO)
         updateSpeed(SpeedChangedEvent(speed))
-        return root
+        return binding.root
     }
 
     private fun addCurrentSpeed() {
-        val newSpeed = controller!!.currentPlaybackSpeedMultiplier
+        val newSpeed = controller?.currentPlaybackSpeedMultiplier ?: return
         if (selectedSpeeds.contains(newSpeed)) {
             showSnack(
                 activity,
@@ -103,7 +106,7 @@ class PlaySpeedDialog : BottomSheetDialogFragment() {
             selectedSpeeds.add(newSpeed)
             Collections.sort(selectedSpeeds)
             Prefs.playbackSpeedArray = selectedSpeeds
-            adapter!!.notifyDataSetChanged()
+            adapter.notifyDataSetChanged()
         }
     }
 
@@ -119,18 +122,19 @@ class PlaySpeedDialog : BottomSheetDialogFragment() {
         override fun onBindViewHolder(holder: ViewHolder, position: Int) {
             val speed = selectedSpeeds[position]
             holder.chip.text = speedFormat.format(speed.toDouble())
-            holder.chip.setOnLongClickListener { v: View? ->
+            holder.chip.setOnLongClickListener {
                 selectedSpeeds.remove(speed)
                 Prefs.playbackSpeedArray = selectedSpeeds
                 notifyDataSetChanged()
                 true
             }
-            holder.chip.setOnClickListener { v: View? ->
+            holder.chip.setOnClickListener {
                 uiHandler.postDelayed(
                     {
-                        if (controller != null) {
+                        val playbackController = controller
+                        if (playbackController != null) {
                             dismiss()
-                            controller!!.setPlaybackSpeed(speed)
+                            playbackController.setPlaybackSpeed(speed)
                         }
                     }, 200
                 )

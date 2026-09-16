@@ -56,12 +56,7 @@ class AppWidgetBig : BaseAppWidget() {
 
         @JvmStatic
         val instance: AppWidgetBig
-            @Synchronized get() {
-                if (mInstance == null) {
-                    mInstance = AppWidgetBig()
-                }
-                return mInstance!!
-            }
+            @Synchronized get() = mInstance ?: AppWidgetBig().also { mInstance = it }
     }
 
     override fun getLayout(): Int {

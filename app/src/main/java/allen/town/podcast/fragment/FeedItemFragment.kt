@@ -25,7 +25,6 @@ import allen.town.podcast.event.UnreadItemsUpdateEvent
 import allen.town.podcast.event.playback.PlaybackPositionEvent
 import allen.town.podcast.model.feed.FeedItem
 import allen.town.podcast.model.feed.FeedMedia
-import allen.town.podcast.view.PodWebView
 import allen.town.podcast.viewholder.EpisodeItemViewHolder
 import android.os.Build
 import android.os.Bundle
@@ -38,9 +37,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.webkit.WebChromeClient
 import android.webkit.WebView
-import android.widget.ImageView
-import android.widget.ScrollView
-import android.widget.TextView
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.core.util.Consumer
@@ -49,10 +45,7 @@ import code.name.monkey.appthemehelper.util.VersionUtils.hasMarshmallow
 import code.name.monkey.appthemehelper.util.scroll.ThemedFastScroller
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
-import com.faltenreich.skeletonlayout.SkeletonLayout
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
-import com.google.android.material.progressindicator.CircularProgressIndicator
-import com.google.android.material.progressindicator.LinearProgressIndicator
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
@@ -72,27 +65,20 @@ class FeedItemFragment : Fragment() {
     private var item: FeedItem? = null
     private var webviewData: String? = null
     private var downloaderList: List<Downloader>? = null
-    private var root: ViewGroup? = null
-    private var webvDescription: PodWebView? = null
-    private var txtvPodcast: TextView? = null
-    private var txtvTitle: TextView? = null
-    private var tvSize: TextView? = null
-    private var txtvPublished: TextView? = null
-    private var imgvCover: ImageView? = null
-    private var progbarDownload: CircularProgressIndicator? = null
-    private var progbarPlayed: LinearProgressIndicator? = null
-    private var downloadIcon: ImageView? = null
     private var actionButton1: ItemActionButton? = null
     private var actionButton2: ItemActionButton? = null
     private var disposable: Disposable? = null
     private var sizeDisposable: Disposable? = null
     private var controller: PlaybackController? = null
-    private var floatingPlayActionButton: ExtendedFloatingActionButton? = null
-    private var skeletonLayout: SkeletonLayout? = null
+    private lateinit var floatingPlayActionButton: ExtendedFloatingActionButton
 
     /** Kept so the pending post can be cancelled when the view goes away. */
-    private val hideSkeleton = Runnable { skeletonLayout?.visibility = View.GONE }
-    private lateinit var feedItemListFragmentBinding: FeeditemFragmentBinding
+    private val hideSkeleton = Runnable {
+        _binding?.skeletonLayout?.visibility = View.GONE
+    }
+    private var _binding: FeeditemFragmentBinding? = null
+    private val feedItemListFragmentBinding: FeeditemFragmentBinding
+        get() = _binding ?: error("binding accessed outside of view lifecycle")
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -106,64 +92,58 @@ class FeedItemFragment : Fragment() {
     ): View? {
         super.onCreateView(inflater, container, savedInstanceState)
         val layout = inflater.inflate(R.layout.feeditem_fragment, container, false)
-        feedItemListFragmentBinding = FeeditemFragmentBinding.bind(layout)
-        root = layout.findViewById(R.id.content_root)
-        txtvPodcast = layout.findViewById(R.id.txtvPodcast)
-        layout.findViewById<View>(R.id.txtvPodcast_l)
-            .setOnClickListener { v: View? -> openPodcast() }
-        txtvTitle = layout.findViewById(R.id.txtvTitle)
+        val binding = FeeditemFragmentBinding.bind(layout)
+        _binding = binding
+        binding.txtvPodcastL.setOnClickListener { v: View? -> openPodcast() }
         if (Build.VERSION.SDK_INT >= 23) {
-            txtvTitle!!.setHyphenationFrequency(Layout.HYPHENATION_FREQUENCY_FULL)
+            binding.txtvTitle.setHyphenationFrequency(Layout.HYPHENATION_FREQUENCY_FULL)
         }
-        tvSize = layout.findViewById(R.id.tv_item_size)
-        txtvPublished = layout.findViewById(R.id.txtvPublished)
-        val scrollView = layout.findViewById<ScrollView>(R.id.scroll_view)
+        val scrollView = binding.scrollView
         ThemedFastScroller.create(scrollView)
-        floatingPlayActionButton =
-            (parentFragment as FeedItemsViewPagerFragment).extendedFloatingActionButton
+        val playButton = (requireParentFragment() as FeedItemsViewPagerFragment)
+            .extendedFloatingActionButton
+        floatingPlayActionButton = playButton
         if (hasMarshmallow()) {
             scrollView.setOnScrollChangeListener { v, scrollX, scrollY, oldScrollX, oldScrollY ->
                 if (scrollY > 0) {
-                    floatingPlayActionButton!!.shrink()
+                    playButton.shrink()
                 } else if (scrollY < 0) {
-                    floatingPlayActionButton!!.extend()
+                    playButton.extend()
                 }
             }
         }
-        txtvTitle!!.setEllipsize(TextUtils.TruncateAt.END)
-        webvDescription = layout.findViewById(R.id.webvDescription)
-        webvDescription!!.setTimecodeSelectedListener(Consumer { time: Int? ->
-            if (controller != null && item!!.media != null && controller!!.media != null && item!!.media!!.identifier == controller!!.media.identifier) {
-                controller!!.seekTo(time!!)
+        binding.txtvTitle.setEllipsize(TextUtils.TruncateAt.END)
+        binding.webvDescription.setTimecodeSelectedListener(Consumer { time: Int? ->
+            val playbackController = controller
+            val itemMedia = item?.media
+            val controllerMedia = playbackController?.media
+            if (time != null && itemMedia != null && controllerMedia != null
+                && itemMedia.identifier == controllerMedia.identifier
+            ) {
+                playbackController.seekTo(time)
             } else {
                 showSnack(activity, R.string.play_this_to_seek_position, Toast.LENGTH_LONG)
             }
         })
-        registerForContextMenu(webvDescription!!)
-        imgvCover = layout.findViewById(R.id.imgvCover)
-        imgvCover!!.setOnClickListener(View.OnClickListener { v: View? -> openPodcast() })
-        progbarDownload = layout.findViewById(R.id.progbarDownload)
-        progbarDownload!!.accentColor()
+        registerForContextMenu(binding.webvDescription)
+        binding.imgvCover.setOnClickListener(View.OnClickListener { v: View? -> openPodcast() })
+        binding.progbarDownload.accentColor()
 
-        progbarPlayed = layout.findViewById(R.id.progbarPlayed)
-        progbarPlayed!!.accentColor()
+        binding.progbarPlayed.accentColor()
 
-        downloadIcon = layout.findViewById(R.id.downloadIcon)
-
-        downloadIcon!!.setOnClickListener(View.OnClickListener { v: View? ->
+        binding.downloadIcon.setOnClickListener(View.OnClickListener { v: View? ->
             actionButton2?.onClick(
                 activity
             )
         })
-        skeletonLayout = layout.findViewById(R.id.skeletonLayout)
-        skeletonLayout!!.showSkeleton()
+        binding.skeletonLayout.showSkeleton()
 
-        webvDescription!!.webChromeClient = object : WebChromeClient() {
+        binding.webvDescription.webChromeClient = object : WebChromeClient() {
             override fun onProgressChanged(view: WebView?, newProgress: Int) {
                 super.onProgressChanged(view, newProgress)
                 if (newProgress == 100) {
                     //the ScrollView nests other layouts, so the WebView takes a while to actually appear
-                    skeletonLayout!!.postDelayed(hideSkeleton, 350)
+                    _binding?.skeletonLayout?.postDelayed(hideSkeleton, 350)
                 }
             }
         }
@@ -190,20 +170,20 @@ class FeedItemFragment : Fragment() {
     override fun onStart() {
         super.onStart()
         EventBus.getDefault().register(this)
-        controller = object : PlaybackController(requireActivity()) {
+        val playbackController = object : PlaybackController(requireActivity()) {
             override fun loadMediaInfo() {
                 // Do nothing
             }
         }
-        controller!!.init()
+        controller = playbackController
+        playbackController.init()
         load()
     }
 
     override fun onResume() {
         super.onResume()
         if (itemsLoaded) {
-//            progbarLoading!!.visibility = View.GONE
-            skeletonLayout!!.visibility = View.GONE
+            feedItemListFragmentBinding.skeletonLayout.visibility = View.GONE
             updateAppearance()
         }
     }
@@ -211,27 +191,28 @@ class FeedItemFragment : Fragment() {
     override fun onStop() {
         super.onStop()
         EventBus.getDefault().unregister(this)
-        controller!!.release()
+        controller?.release()
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
-        skeletonLayout?.removeCallbacks(hideSkeleton)
+        val binding = _binding
+        binding?.skeletonLayout?.removeCallbacks(hideSkeleton)
         sizeDisposable?.dispose()
-        if (disposable != null) {
-            disposable!!.dispose()
+        disposable?.dispose()
+        if (binding != null) {
+            binding.contentRoot.removeView(binding.webvDescription)
+            binding.webvDescription.destroy()
         }
-        if (webvDescription != null && root != null) {
-            root!!.removeView(webvDescription)
-            webvDescription!!.destroy()
-        }
+        _binding = null
     }
 
     private fun onFragmentLoaded() {
-        if (webviewData != null && !itemsLoaded) {
-            webvDescription!!.loadDataWithBaseURL(
+        val data = webviewData
+        if (data != null && !itemsLoaded) {
+            feedItemListFragmentBinding.webvDescription.loadDataWithBaseURL(
                 "https://127.0.0.1",
-                webviewData!!,
+                data,
                 "text/html",
                 "utf-8",
                 "about:blank"
@@ -241,17 +222,19 @@ class FeedItemFragment : Fragment() {
     }
 
     private fun updateAppearance() {
+        val item = this.item
         if (item == null) {
             Log.d(TAG, "update appearance item is null")
             return
         }
-        txtvPodcast!!.text = item!!.feed.title
-        txtvTitle!!.text = item!!.title
-        if (item!!.pubDate != null) {
-            val pubDateStr = DateFormatter.formatAbbrev(activity, item!!.pubDate)
-            txtvPublished!!.text = pubDateStr
-            txtvPublished!!.contentDescription = DateFormatter.formatForAccessibility(
-                item!!.pubDate
+        val binding = feedItemListFragmentBinding
+        binding.txtvPodcast.text = item.feed.title
+        binding.txtvTitle.text = item.title
+        if (item.pubDate != null) {
+            val pubDateStr = DateFormatter.formatAbbrev(activity, item.pubDate)
+            binding.txtvPublished.text = pubDateStr
+            binding.txtvPublished.contentDescription = DateFormatter.formatForAccessibility(
+                item.pubDate
             )
         }
         val options = RequestOptions()
@@ -259,48 +242,50 @@ class FeedItemFragment : Fragment() {
             .diskCacheStrategy(ApGlideSettings.AP_DISK_CACHE_STRATEGY)
             .dontAnimate()
         Glide.with(this)
-            .load(item!!.imageLocation)
+            .load(item.imageLocation)
             .error(
                 Glide.with(this)
-                    .load(ImageResourceUtils.getFallbackImageLocation(item!!))
+                    .load(ImageResourceUtils.getFallbackImageLocation(item))
                     .apply(options)
             )
             .apply(options)
             .centerCrop()
-            .into(imgvCover!!)
+            .into(binding.imgvCover)
         updateButtons()
     }
 
     private fun updatePlayButton() {
         //the float button is shared; ViewPager2 does not call onResume for off-screen pages, so use that to decide whether to update it
-        if (isResumed) {
-            val media = item!!.media
-            floatingPlayActionButton!!.icon =
-                ContextCompat.getDrawable(requireContext(), actionButton1!!.drawable)
-            floatingPlayActionButton!!.visibility = actionButton1!!.isVisibility
+        if (!isResumed) {
+            return
+        }
+        val playButton = actionButton1 ?: return
+        val media = item?.media
+        floatingPlayActionButton.icon =
+            ContextCompat.getDrawable(requireContext(), playButton.drawable)
+        floatingPlayActionButton.visibility = playButton.isVisibility
 
-            floatingPlayActionButton!!.setOnClickListener(View.OnClickListener { v: View? ->
-                actionButton1?.onClick(
-                    activity
-                )
-            })
-            if (media != null) {
-                if (media.duration > 0) {
-                    floatingPlayActionButton!!.text =
-                        Converter.getDurationStringLong(media.duration)
-                    floatingPlayActionButton!!.contentDescription =
-                        Converter.getDurationStringLocalized(
-                            context, media.duration.toLong()
-                        )
-                    floatingPlayActionButton!!.extend()
-                } else {
-                    floatingPlayActionButton!!.setText(actionButton1!!.label)
-                }
+        floatingPlayActionButton.setOnClickListener(View.OnClickListener { v: View? ->
+            actionButton1?.onClick(
+                activity
+            )
+        })
+        if (media != null) {
+            if (media.duration > 0) {
+                floatingPlayActionButton.text =
+                    Converter.getDurationStringLong(media.duration)
+                floatingPlayActionButton.contentDescription =
+                    Converter.getDurationStringLocalized(
+                        context, media.duration.toLong()
+                    )
+                floatingPlayActionButton.extend()
             } else {
-                //no media info, so no duration is shown; setting the text before shrinking has no effect
-                floatingPlayActionButton!!.shrink()
-                floatingPlayActionButton!!.text = ""
+                floatingPlayActionButton.setText(playButton.label)
             }
+        } else {
+            //no media info, so no duration is shown; setting the text before shrinking has no effect
+            floatingPlayActionButton.shrink()
+            floatingPlayActionButton.text = ""
         }
     }
 
@@ -308,95 +293,95 @@ class FeedItemFragment : Fragment() {
 
     private fun updateButtons() {
         val item = this.item ?: return // load() has not delivered yet
-        progbarDownload!!.visibility = View.INVISIBLE
-        if (item.hasMedia() && downloaderList != null) {
-            for (downloader in downloaderList!!) {
+        val binding = feedItemListFragmentBinding
+        val media = item.media
+        binding.progbarDownload.visibility = View.INVISIBLE
+        val downloaders = downloaderList
+        if (media != null && downloaders != null) {
+            for (downloader in downloaders) {
                 if (downloader.downloadRequest.feedfileType == FeedMedia.FEEDFILETYPE_FEEDMEDIA
-                    && downloader.downloadRequest.feedfileId == item!!.media!!.id
+                    && downloader.downloadRequest.feedfileId == media.id
                 ) {
-                    progbarDownload!!.visibility = View.VISIBLE
-                    progbarDownload!!.progress = downloader.downloadRequest.progressPercent
+                    binding.progbarDownload.visibility = View.VISIBLE
+                    binding.progbarDownload.progress = downloader.downloadRequest.progressPercent
                 }
             }
         }
 
-        val media = item!!.media
         if (media == null) {
-            actionButton1 = MarkAsPlayedActionButton(item!!)
-            actionButton2 = VisitWebsiteActionButton(item!!)
-            feedItemListFragmentBinding.downloadLayout.visibility = View.GONE
-            progbarPlayed!!.setVisibility(View.GONE)
+            actionButton1 = MarkAsPlayedActionButton(item)
+            actionButton2 = VisitWebsiteActionButton(item)
+            binding.downloadLayout.visibility = View.GONE
+            binding.progbarPlayed.setVisibility(View.GONE)
         } else {
             sizeDisposable?.dispose()
-            sizeDisposable = EpisodeItemViewHolder.setSizeTextView(media, context, tvSize!!, null)
+            sizeDisposable =
+                EpisodeItemViewHolder.setSizeTextView(media, context, binding.tvItemSize, null)
             actionButton1 = if (FeedItemUtil.isCurrentlyPlaying(media)) {
-                PauseActionButton(item!!)
-            } else if (item!!.feed.isLocalFeed) {
-                PlayLocalActionButton(item!!)
+                PauseActionButton(item)
+            } else if (item.feed.isLocalFeed) {
+                PlayLocalActionButton(item)
             } else if (media.isDownloaded) {
-                PlayActionButton(item!!)
+                PlayActionButton(item)
             } else {
-                StreamActionButton(item!!)
+                StreamActionButton(item)
             }
             actionButton2 = if (DownloadService.isDownloadingFile(media.download_url)) {
-                CancelDownloadActionButton(item!!)
+                CancelDownloadActionButton(item)
             } else if (!media.isDownloaded) {
-                DownloadActionButton(item!!)
+                DownloadActionButton(item)
             } else {
-                DeleteActionButton(item!!)
+                DeleteActionButton(item)
             }
 
-            if (FeedItemUtil.isPlaying(item!!.media) || item!!.isInProgress) {
+            if (FeedItemUtil.isPlaying(media) || item.isInProgress) {
                 if (lastPosition == 0) {
                     //use the most recent position; after a pause, re-reading it from the item gives a stale value
                     lastPosition = media.getPosition()
                 }
                 val progress: Int = (100.0 * lastPosition / media.getDuration()).toInt()
-                progbarPlayed!!.setProgress(progress)
-                progbarPlayed!!.setVisibility(View.VISIBLE)
+                binding.progbarPlayed.setProgress(progress)
+                binding.progbarPlayed.setVisibility(View.VISIBLE)
             } else {
-                progbarPlayed!!.setVisibility(View.GONE)
+                binding.progbarPlayed.setVisibility(View.GONE)
             }
         }
 
-        //an accent color was set
-        if (actionButton2!!.getDrawableTintColor(context) != -1) {
-            downloadIcon!!.setImageDrawable(
-                ContextCompat.getDrawable(
-                    requireContext(),
-                    actionButton2!!.drawable
-                )!!.tint(actionButton2!!.getDrawableTintColor(context))
-            )
-        } else {
-            downloadIcon!!.setImageResource(actionButton2!!.drawable)
+        val downloadButton = actionButton2
+        if (downloadButton != null) {
+            //an accent color was set
+            val tintColor = downloadButton.getDrawableTintColor(context)
+            val drawable = ContextCompat.getDrawable(requireContext(), downloadButton.drawable)
+            if (tintColor != -1 && drawable != null) {
+                binding.downloadIcon.setImageDrawable(drawable.tint(tintColor))
+            } else {
+                binding.downloadIcon.setImageResource(downloadButton.drawable)
+            }
+
+            binding.downloadLayout.visibility = downloadButton.isVisibility
         }
 
-        feedItemListFragmentBinding.downloadLayout.visibility = actionButton2!!.isVisibility
 
+        val isInQueue: Boolean = item.isTagged(FeedItem.TAG_QUEUE)
+        val isFavorite: Boolean = item.isTagged(FeedItem.TAG_FAVORITE)
 
-        val hasMedia = item!!.getMedia() != null
-        val isPlaying = hasMedia && FeedItemUtil.isPlaying(item!!.getMedia())
-        val isInQueue: Boolean = item!!.isTagged(FeedItem.TAG_QUEUE)
-        val fileDownloaded = hasMedia && item!!.getMedia()?.fileExists() ?: false
-        val isFavorite: Boolean = item!!.isTagged(FeedItem.TAG_FAVORITE)
-
-        feedItemListFragmentBinding.addToQueueItem.visibility =
-            if (!isInQueue && item!!.getMedia() != null)
+        binding.addToQueueItem.visibility =
+            if (!isInQueue && media != null)
                 View.VISIBLE
             else
                 View.GONE
 
-        feedItemListFragmentBinding.removeFromQueueItem.visibility =
+        binding.removeFromQueueItem.visibility =
             if (isInQueue)
                 View.VISIBLE
             else
                 View.GONE
-        feedItemListFragmentBinding.addToFavoritesItem.visibility =
+        binding.addToFavoritesItem.visibility =
             if (!isFavorite)
                 View.VISIBLE
             else
                 View.GONE
-        feedItemListFragmentBinding.removeFromFavoritesItem.visibility =
+        binding.removeFromFavoritesItem.visibility =
             if (isFavorite)
                 View.VISIBLE
             else
@@ -406,16 +391,15 @@ class FeedItemFragment : Fragment() {
     }
 
     override fun onContextItemSelected(item: MenuItem): Boolean {
-        return webvDescription!!.onContextItemSelected(item)
+        val binding = _binding ?: return false
+        return binding.webvDescription.onContextItemSelected(item)
     }
 
     private fun openPodcast() {
-        if (item == null) {
-            return
-        }
+        val item = this.item ?: return
 
-        val fragment: Fragment = FeedItemlistFragment.newInstance(item!!.feedId)
-        (activity as MainActivity?)!!.loadChildFragment(fragment)
+        val fragment: Fragment = FeedItemlistFragment.newInstance(item.feedId)
+        (requireActivity() as MainActivity).loadChildFragment(fragment)
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
@@ -430,10 +414,12 @@ class FeedItemFragment : Fragment() {
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
-    fun onEventMainThread(event: PlaybackPositionEvent?) {
+    fun onEventMainThread(event: PlaybackPositionEvent) {
         if (FeedItemUtil.isCurrentlyPlaying(item?.getMedia())) {
-            lastPosition = event!!.position
-            progbarPlayed!!.setProgress((100.0 * lastPosition / event.duration).toInt())
+            lastPosition = event.position
+            _binding?.progbarPlayed?.setProgress(
+                (100.0 * lastPosition / event.duration).toInt()
+            )
         }
     }
 
@@ -441,10 +427,7 @@ class FeedItemFragment : Fragment() {
     fun onEventMainThread(event: DownloadEvent) {
         val update = event.update
         downloaderList = update.downloaders
-        if (item == null || item!!.media == null) {
-            return
-        }
-        val mediaId = item!!.media!!.id
+        val mediaId = item?.media?.id ?: return
         if (ArrayUtils.contains(update.mediaIds, mediaId)) {
             if (itemsLoaded && activity != null) {
                 updateButtons()
@@ -463,19 +446,14 @@ class FeedItemFragment : Fragment() {
     }
 
     private fun load() {
-        if (disposable != null) {
-            disposable!!.dispose()
-        }
+        disposable?.dispose()
         if (!itemsLoaded) {
-//            progbarLoading!!.visibility = View.VISIBLE
-            skeletonLayout!!.showSkeleton()
+            _binding?.skeletonLayout?.showSkeleton()
         }
         disposable = Observable.fromCallable { loadInBackground() }
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe({ result: FeedItem? ->
-//                progbarLoading!!.visibility = View.GONE
-//                skeletonLayout!!.showOriginal()
                 item = result
                 onFragmentLoaded()
                 itemsLoaded = true
@@ -486,7 +464,7 @@ class FeedItemFragment : Fragment() {
         val feedItem = DBReader.getFeedItem(itemId)
         val context = context
         if (feedItem != null && context != null) {
-            val duration = if (feedItem.media != null) feedItem.media!!.duration else Int.MAX_VALUE
+            val duration = feedItem.media?.duration ?: Int.MAX_VALUE
             DBReader.loadDescriptionOfFeedItem(feedItem)
             val t = Timeline(context, feedItem.description, duration)
             webviewData = t.processShownotes()

@@ -24,18 +24,21 @@ class FeedAuthenticationActivity : DialogActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Validate.isTrue(intent.hasExtra(ARG_DOWNLOAD_REQUEST), "Download request missing")
-        val request = intent.getParcelableExtra<DownloadRequest>(ARG_DOWNLOAD_REQUEST)
+        val request = requireNotNull(
+            intent.getParcelableExtra<DownloadRequest>(ARG_DOWNLOAD_REQUEST)
+        ) { "missing extra $ARG_DOWNLOAD_REQUEST" }
         object : AuthenticationDialog(this, R.string.authentication_label, true, "", "") {
             @SuppressLint("CheckResult") // fire-and-forget: app-scoped DB work with its own onError; nothing to dispose
             override fun onConfirmed(username: String?, password: String?) {
                 Completable.fromAction {
-                    request!!.username = username
+                    request.username = username
                     request.password = password
                     if (request.feedfileType == FeedMedia.FEEDFILETYPE_FEEDMEDIA) {
                         val mediaId = request.feedfileId
                         val media = DBReader.getFeedMedia(mediaId)
-                        if (media != null) {
-                            val preferences = media.item!!.feed.preferences
+                        val item = media?.item
+                        if (item != null) {
+                            val preferences = item.feed.preferences
                             if (TextUtils.isEmpty(preferences.password)
                                 || TextUtils.isEmpty(preferences.username)
                             ) {

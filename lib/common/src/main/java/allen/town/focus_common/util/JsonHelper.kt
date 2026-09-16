@@ -58,8 +58,9 @@ object JsonHelper {
     @JvmStatic
     fun <T> parseObject(text: String?, clazz: Class<T>?): T? {
 
+        val type = clazz ?: return null
         try {
-            return gson.fromJson(text, clazz!!)
+            return gson.fromJson(text, type)
         } catch (e: Exception) {
             Timber.e(e, "parseObject failed cause")
             return null

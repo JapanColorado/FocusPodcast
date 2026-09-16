@@ -36,8 +36,8 @@ class MyApp : BaseApplication() {
         val uiThreadHandler = Handler(Looper.getMainLooper())
 
         @JvmStatic
-        fun runOnUiThread(runnable: Runnable?) {
-            uiThreadHandler.post(runnable!!)
+        fun runOnUiThread(runnable: Runnable) {
+            uiThreadHandler.post(runnable)
         }
 
 

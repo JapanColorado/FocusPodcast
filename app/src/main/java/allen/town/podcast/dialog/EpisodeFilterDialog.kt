@@ -18,7 +18,8 @@ import androidx.recyclerview.widget.GridLayoutManager
  */
 abstract class EpisodeFilterDialog(context: Context?, private val filter: FeedFilter) :
     AccentMaterialDialog(
-        context!!, R.style.MaterialAlertDialogTheme
+        requireNotNull(context) { "EpisodeFilterDialog needs a context" },
+        R.style.MaterialAlertDialogTheme
     ) {
     private lateinit var viewBinding: EpisodeFilterDialogBinding
     private lateinit var termList: MutableList<String>
@@ -109,9 +110,9 @@ abstract class EpisodeFilterDialog(context: Context?, private val filter: FeedFi
         onConfirmed(FeedFilter(includeFilter, excludeFilter, minimalDuration))
     }
 
-    open fun toFilterString(words: List<String?>?): String? {
+    open fun toFilterString(words: List<String?>): String {
         val result = StringBuilder()
-        for (word in words!!) {
+        for (word in words) {
             result.append("\"").append(word).append("\" ")
         }
         return result.toString()

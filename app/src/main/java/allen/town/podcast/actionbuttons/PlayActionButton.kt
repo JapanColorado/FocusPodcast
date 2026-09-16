@@ -25,24 +25,25 @@ class PlayActionButton(val item: FeedItem) : ItemActionButton {
         get() = R.drawable.ic_play_48dp
 
     override fun onClick(context: Activity?) {
+        val activity = context ?: return
         val media: FeedMedia = item.getMedia() ?: return
         // Only repair media that claims to be downloaded; local folder feeds use content://
         // URIs that cannot be checked here.
         val isLocalFeed = item.feed?.isLocalFeed == true
         if (media.isDownloaded && !isLocalFeed && !media.fileExists()) {
-            DBTasks.notifyMissingFeedMediaFile(context, media)
+            DBTasks.notifyMissingFeedMediaFile(activity, media)
             // fall through and stream instead, subject to the streaming preference
             UsageStatistics.logAction(UsageStatistics.ACTION_STREAM)
             if (!NetworkUtils.isStreamingAllowed()) {
-                UseStreamConfirmDialog(context!!, media).show()
+                UseStreamConfirmDialog(activity, media).show()
                 return
             }
         }
-        PlaybackServiceStarter(context, media)
+        PlaybackServiceStarter(activity, media)
             .callEvenIfRunning(true)
             .start()
         if (media.mediaType == MediaType.VIDEO) {
-            context!!.startActivity(PlaybackService.getPlayerActivityIntent(context, media))
+            activity.startActivity(PlaybackService.getPlayerActivityIntent(activity, media))
         }
     }
 }

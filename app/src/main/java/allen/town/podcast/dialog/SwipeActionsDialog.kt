@@ -22,9 +22,9 @@ import androidx.gridlayout.widget.GridLayout
 import com.annimon.stream.Stream
 
 class SwipeActionsDialog(private val context: Context, private val tag: String) {
-    private var rightAction: SwipeAction? = null
-    private var leftAction: SwipeAction? = null
-    private var keys: List<SwipeAction>? = null
+    private lateinit var rightAction: SwipeAction
+    private lateinit var leftAction: SwipeAction
+    private var keys: List<SwipeAction> = emptyList()
     fun show(prefsChanged: Callback) {
         val actions = SwipeActions.getPrefsWithDefaults(context, tag)
         leftAction = actions.left
@@ -40,14 +40,14 @@ class SwipeActionsDialog(private val context: Context, private val tag: String) 
             FeedItemlistFragment.TAG -> forFragment = context.getString(R.string.feeds_label)
             PlaylistFragment.TAG -> {
                 forFragment = context.getString(R.string.playlist_label)
-                keys = Stream.of<SwipeAction>(keys!!)
+                keys = Stream.of<SwipeAction>(keys)
                     .filter { a: SwipeAction -> a.id != SwipeAction.ADD_TO_QUEUE }
                     .toList()
             }
             else -> {}
         }
         if (tag != PlaylistFragment.TAG) {
-            keys = Stream.of<SwipeAction>(keys!!)
+            keys = Stream.of<SwipeAction>(keys)
                 .filter { a: SwipeAction -> a.id != SwipeAction.REMOVE_FROM_QUEUE }
                 .toList()
         }
@@ -66,7 +66,7 @@ class SwipeActionsDialog(private val context: Context, private val tag: String) 
         setupSwipeDirectionView(viewBinding.actionLeftContainer, LEFT)
         setupSwipeDirectionView(viewBinding.actionRightContainer, RIGHT)
         builder.setPositiveButton(R.string.confirm_label) { dialog: DialogInterface?, which: Int ->
-            savePrefs(tag, rightAction!!.getId(), leftAction!!.getId())
+            savePrefs(tag, rightAction.getId(), leftAction.getId())
             saveActionsEnabledPrefs(viewBinding.enableSwitch.isChecked)
             prefsChanged.onCall()
         }
@@ -77,7 +77,7 @@ class SwipeActionsDialog(private val context: Context, private val tag: String) 
     private fun setupSwipeDirectionView(view: SwipeactionsRowBinding, direction: Int) {
         val action = if (direction == LEFT) leftAction else rightAction
         view.swipeDirectionLabel.setText(if (direction == LEFT) R.string.swipe_left else R.string.swipe_right)
-        view.swipeActionLabel.text = action!!.getTitle(context)
+        view.swipeActionLabel.text = action.getTitle(context)
         view.changeButton.setOnClickListener { v: View? -> showPicker(view, direction) }
     }
 
@@ -95,8 +95,8 @@ class SwipeActionsDialog(private val context: Context, private val tag: String) 
         builder.setView(picker.root)
         builder.setNegativeButton(R.string.cancel_label, null)
         val dialog = builder.show()
-        for (i in keys!!.indices) {
-            val action = keys!![i]
+        for (i in keys.indices) {
+            val action = keys[i]
             val item = SwipeactionsPickerItemBinding.inflate(
                 LayoutInflater.from(
                     context
@@ -104,7 +104,11 @@ class SwipeActionsDialog(private val context: Context, private val tag: String) 
             )
             item.swipeActionLabel.text = action.getTitle(context)
             val icon =
-                DrawableCompat.wrap(AppCompatResources.getDrawable(context, action.actionIcon)!!)
+                DrawableCompat.wrap(
+                    checkNotNull(AppCompatResources.getDrawable(context, action.actionIcon)) {
+                        "no drawable for swipe action " + action.id
+                    }
+                )
             icon.mutate()
             DrawableCompat.setTintMode(icon, PorterDuff.Mode.SRC_ATOP)
             if (direction == LEFT && leftAction === action || direction == RIGHT && rightAction === action) {
@@ -128,9 +132,9 @@ class SwipeActionsDialog(private val context: Context, private val tag: String) 
             item.swipeIcon.setImageDrawable(icon)
             item.root.setOnClickListener { v: View? ->
                 if (direction == LEFT) {
-                    leftAction = keys!![i]
+                    leftAction = keys[i]
                 } else {
-                    rightAction = keys!![i]
+                    rightAction = keys[i]
                 }
                 setupSwipeDirectionView(view, direction)
                 dialog.dismiss()
@@ -143,7 +147,7 @@ class SwipeActionsDialog(private val context: Context, private val tag: String) 
             picker.pickerGridLayout.addView(item.root, param)
         }
         picker.pickerGridLayout.columnCount = 2
-        picker.pickerGridLayout.rowCount = (keys!!.size + 1) / 2
+        picker.pickerGridLayout.rowCount = (keys.size + 1) / 2
     }
 
     private fun populateMockEpisode(view: FeeditemlistItemBinding) {

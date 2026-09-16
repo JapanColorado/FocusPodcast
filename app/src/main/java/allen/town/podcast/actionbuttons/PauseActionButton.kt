@@ -21,9 +21,10 @@ class PauseActionButton(val item: FeedItem) : ItemActionButton {
         get() = R.drawable.ic_pause
 
     override fun onClick(context: Activity?) {
+        val activity = context ?: return
         val media: FeedMedia = item.getMedia() ?: return
         if (FeedItemUtil.isCurrentlyPlaying(media)) {
-            sendLocalBroadcast(context!!, PlaybackService.ACTION_PAUSE_PLAY_CURRENT_EPISODE)
+            sendLocalBroadcast(activity, PlaybackService.ACTION_PAUSE_PLAY_CURRENT_EPISODE)
         }
     }
 }
