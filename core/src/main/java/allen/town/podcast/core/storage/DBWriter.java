@@ -8,7 +8,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.NotificationManagerCompat;
 
-import com.wyjson.router.GoRouter;
 
 import org.greenrobot.eventbus.EventBus;
 
@@ -23,7 +22,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
-import allen.town.core.service.PayService;
 import allen.town.focus_common.util.Timber;
 import allen.town.podcast.core.R;
 import allen.town.podcast.core.event.DownloadLogEvent;
@@ -42,7 +40,6 @@ import allen.town.podcast.event.FavoritesEvent;
 import allen.town.podcast.event.FeedItemEvent;
 import allen.town.podcast.event.FeedListUpdateEvent;
 import allen.town.podcast.event.QueueEvent;
-import allen.town.podcast.event.SubscribedFeedLimitEvent;
 import allen.town.podcast.event.UnreadItemsUpdateEvent;
 import allen.town.podcast.event.playback.PlaybackHistoryEvent;
 import allen.town.podcast.model.download.DownloadStatus;
@@ -1022,17 +1019,7 @@ public class DBWriter {
         return dbExec.submit(() -> {
             Db adapter = Db.getInstance();
             adapter.open();
-            if (GoRouter.getInstance().getService(PayService.class).isPurchase(context, false)) {
-                adapter.subscribeFeed(feed.getId());
-            } else if (DBReader.getSubscribedFeedsCount() >= Feed.MAX_SUBSCRIBED_FEEDS_FOR_FREE) {
-                adapter.close();
-                EventBus.getDefault().post(new SubscribedFeedLimitEvent());
-                // still notify so an optimistic UI toggle is reverted
-                EventBus.getDefault().post(new FeedListUpdateEvent(feed));
-                return;
-            } else {
-                adapter.subscribeFeed(feed.getId());
-            }
+            adapter.subscribeFeed(feed.getId());
             adapter.close();
             EventBus.getDefault().post(new FeedListUpdateEvent(feed));
 

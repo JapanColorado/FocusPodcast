@@ -53,36 +53,6 @@
                 tools:background="@android:color/holo_green_light" />
         </LinearLayout>
 
-        <com.airbnb.lottie.LottieAnimationView
-            android:id="@+id/already_vip_lottie"
-            android:background="?selectableItemBackgroundBorderless"
-            android:layout_width="0dp"
-            android:layout_height="48dp"
-            android:layout_gravity="center_horizontal"
-            android:layout_weight="1"
-            app:lottie_autoPlay="true"
-            app:lottie_fileName="62984-diamond-blue.json"
-            app:lottie_loop="true" />
-        <com.airbnb.lottie.LottieAnimationView
-            android:id="@+id/view_ad_video_iv"
-            android:background="?selectableItemBackgroundBorderless"
-            android:layout_weight="1"
-            android:visibility="gone"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            app:lottie_autoPlay="true"
-            app:lottie_fileName="4039-rocking-gift.json"
-            app:lottie_loop="true" />
-        <com.airbnb.lottie.LottieAnimationView
-            android:id="@+id/remove_ad_iv"
-            android:background="?selectableItemBackgroundBorderless"
-            android:layout_weight="1"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:padding="6dp"
-            app:lottie_autoPlay="true"
-            app:lottie_fileName="109806-remove-ad-no-ads-block-ads.json"
-            app:lottie_loop="true" />
 
 
 

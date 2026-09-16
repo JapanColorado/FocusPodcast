@@ -19,7 +19,6 @@ import java.util.List;
 import allen.town.focus_common.util.Intents;
 import allen.town.focus_common.util.PackageUtils;
 import allen.town.focus_common.views.AccentMaterialDialog;
-import allen.town.podcast.MyApp;
 import butterknife.BindView;
 import butterknife.BindViews;
 import butterknife.ButterKnife;
@@ -49,7 +48,7 @@ public class AboutFragment extends AppCompatDialogFragment {
     @OnClick(R.id.share_app)
     public void shareMyApp() {
         Intents.shareText(getContext(), getString(R.string.share_to_friends_tip, PackageUtils.getAppName(getContext())) + " \n" +
-                        (MyApp.getInstance().isAlipay() ? "https://www.pgyer.com/focuspodcast" : "https://play.google.com/store/apps/details?id=allen.town.focus.podcast"),
+                        "https://play.google.com/store/apps/details?id=allen.town.focus.podcast",
                 "");
     }
 
@@ -109,12 +108,7 @@ public class AboutFragment extends AppCompatDialogFragment {
         View inflate = LayoutInflater.from(getActivity()).inflate(R.layout.fragment_about, (ViewGroup) null);
         ButterKnife.bind(this, inflate);
         this.version.setText(getString(R.string.version, BuildConfig.VERSION_NAME));
-        if(!MyApp.getInstance().isAlipay()){
-            checkUpradeView.setVisibility(View.GONE);
-        }
-        if(!MyApp.getInstance().isDroid()){
-            opensourceView.setVisibility(View.GONE);
-        }
+        checkUpradeView.setVisibility(View.GONE);
         butterknife.ViewCollections.run(this.styleButtons, (view, i) -> ((ImageView) view)
                 .setColorFilter(ThemeStore.accentColor(getContext()), PorterDuff.Mode.SRC_IN));
         return new AccentMaterialDialog(getContext(),R.style.MaterialAlertDialogTheme).setView(inflate).create();

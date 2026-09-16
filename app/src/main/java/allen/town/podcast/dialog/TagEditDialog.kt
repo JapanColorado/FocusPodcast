@@ -115,14 +115,12 @@ class TagEditDialog : DialogFragment() {
         feedPreferencesList: List<FeedPreferences>?,
         commonTags: Set<String>
     ) {
-        if (MyApp.instance.checkSupporter(requireContext())) {
-            //总是包含root tag
-            selectedTags.add(FeedPreferences.TAG_ROOT)
-            for (preferences in feedPreferencesList!!) {
-                preferences.tags.removeAll(commonTags)
-                preferences.tags.addAll(selectedTags)
-                DBWriter.setFeedPreferences(preferences)
-            }
+        //总是包含root tag
+        selectedTags.add(FeedPreferences.TAG_ROOT)
+        for (preferences in feedPreferencesList!!) {
+            preferences.tags.removeAll(commonTags)
+            preferences.tags.addAll(selectedTags)
+            DBWriter.setFeedPreferences(preferences)
         }
     }
 

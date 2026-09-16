@@ -14,7 +14,6 @@
 
 package allen.town.podcast.fragment.pref
 
-import allen.town.core.service.PayService
 import allen.town.focus_common.R
 import allen.town.focus_common.common.prefs.supportv7.ATEDialogPreference
 import allen.town.focus_common.databinding.PreferenceDialogLibraryCategoriesBinding
@@ -31,7 +30,6 @@ import androidx.fragment.app.DialogFragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import code.name.monkey.appthemehelper.ThemeStore
 import code.name.monkey.retromusic.extensions.materialDialog
-import com.wyjson.router.GoRouter
 
 
 class PodcastSearchEnginePreference @JvmOverloads constructor(
@@ -68,9 +66,6 @@ class PodcastSearchEnginePreferenceDialog : DialogFragment() {
     }
 
     private fun updateCategories(categories: List<CategoryInfo>) {
-        if(!GoRouter.getInstance().getService(PayService::class.java)!!.isPurchase(requireContext())){
-            return
-        }
         if (getSelected(categories) == 0) return
         Prefs.podcastSearchEngineList = categories
     }

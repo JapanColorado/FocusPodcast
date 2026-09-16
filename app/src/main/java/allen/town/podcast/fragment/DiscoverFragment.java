@@ -32,7 +32,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.faltenreich.skeletonlayout.Skeleton;
 import com.faltenreich.skeletonlayout.SkeletonLayoutUtils;
-import com.wyjson.router.GoRouter;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -47,7 +46,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 
-import allen.town.core.service.PayService;
 import allen.town.focus_common.util.DoubleClickBackToContentTopListener;
 import allen.town.focus_common.util.Timber;
 import allen.town.focus_common.util.TopSnackbarUtil;
@@ -203,9 +201,6 @@ public class DiscoverFragment extends Fragment implements Toolbar.OnMenuItemClic
     public boolean onMenuItemClick(MenuItem item) {
         final int itemId = item.getItemId();
         if (itemId == R.id.addLocalFolder) {
-            if (!MyApp.getInstance().checkSupporter(getContext(), true)) {
-                return false;
-            }
             try {
                 addLocalFolderLauncher.launch(null);
             } catch (ActivityNotFoundException e) {
@@ -364,11 +359,6 @@ public class DiscoverFragment extends Fragment implements Toolbar.OnMenuItemClic
         dirFeed.setItems(Collections.emptyList());
         dirFeed.setSortOrder(SortOrder.EPISODE_TITLE_A_Z);
         dirFeed.setSubscribed(true);
-
-        if (!GoRouter.getInstance().getService(PayService.class).isPurchase(getContext(), false) && DBReader.getSubscribedFeedsCount() >= Feed.MAX_SUBSCRIBED_FEEDS_FOR_FREE) {
-            Timber.w("The maximum number of subscriptions for the free version has been reached for local folder");
-            throw new IllegalArgumentException(getString(R.string.limit_subs_notify));
-        }
 
         Feed fromDatabase = DBTasks.updateFeed(getContext(), dirFeed, false);
         DBTasks.forceRefreshFeed(getContext(), fromDatabase, true);

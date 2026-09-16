@@ -1,6 +1,5 @@
 package allen.town.focus_common.theme
 
-import allen.town.core.service.PayService
 import allen.town.focus_common.R
 import allen.town.focus_common.util.ImageUtils.mask
 import allen.town.focus_common.util.PhotoSelectUtil
@@ -31,7 +30,6 @@ import androidx.appcompat.widget.AppCompatSeekBar
 import androidx.core.content.ContextCompat
 import code.name.monkey.appthemehelper.util.ATHUtil.resolveColor
 import allen.town.focus_common.extensions.addAccentColor
-import com.wyjson.router.GoRouter
 
 class CustomLauncherIconMakerDialog(
     private val custom_launcher_title: Int,
@@ -119,17 +117,15 @@ class CustomLauncherIconMakerDialog(
     }
 
     fun onConfirmDialog(dialogInterface: DialogInterface, i: Int) {
-        if(GoRouter.getInstance().getService(PayService::class.java)!!.isPurchase(requireContext())){
-            var drawable: Drawable? = null
-            val obj = (dialog!!.findViewById<View>(R.id.nameView) as TextView).text.toString()
-            if (!TextUtils.isEmpty(obj) && iconView!!.drawable.also { drawable = it } != null) {
-                val intent = Intent()
-                intent.setClassName(packageName, className)
-                if (!custom && Build.VERSION.SDK_INT >= 26) {
-                    drawable = AdaptiveIconDrawable(background, foreground)
-                }
-                ShortCutUtils.install(context, obj, drawable, intent, false)
+        var drawable: Drawable? = null
+        val obj = (dialog!!.findViewById<View>(R.id.nameView) as TextView).text.toString()
+        if (!TextUtils.isEmpty(obj) && iconView!!.drawable.also { drawable = it } != null) {
+            val intent = Intent()
+            intent.setClassName(packageName, className)
+            if (!custom && Build.VERSION.SDK_INT >= 26) {
+                drawable = AdaptiveIconDrawable(background, foreground)
             }
+            ShortCutUtils.install(context, obj, drawable, intent, false)
         }
 
         dialogInterface.dismiss()

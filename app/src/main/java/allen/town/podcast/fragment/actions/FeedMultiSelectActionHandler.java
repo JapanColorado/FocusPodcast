@@ -83,10 +83,6 @@ public class FeedMultiSelectActionHandler {
                 .setTitle(R.string.playback_speed)
                 .setView(viewBinding.getRoot())
                 .setPositiveButton(android.R.string.ok, (dialog, which) -> {
-                    if (!viewBinding.useGlobalCheckbox.isChecked() && !MyApp.getInstance().checkSupporter(activity, true)) {
-                        return;
-                    }
-
                     float newSpeed = viewBinding.useGlobalCheckbox.isChecked()
                             ? FeedPreferences.SPEED_USE_GLOBAL : viewBinding.seekBar.getCurrentSpeed();
                     saveFeedPreferences(feedPreferences -> feedPreferences.setFeedPlaybackSpeed(newSpeed));

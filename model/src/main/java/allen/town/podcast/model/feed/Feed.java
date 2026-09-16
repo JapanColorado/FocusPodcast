@@ -18,7 +18,6 @@ import java.util.List;
 public class Feed extends FeedFile implements Parcelable {
 
     public static final int FEEDFILETYPE_FEED = 0;
-    public static final int MAX_SUBSCRIBED_FEEDS_FOR_FREE = 100;
     public static final String TYPE_RSS2 = "rss";
     public static final String TYPE_ATOM1 = "atom";
     public static final String PREFIX_LOCAL_FOLDER = "FocusPodcastLocal:";

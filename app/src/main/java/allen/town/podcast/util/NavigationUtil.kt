@@ -14,11 +14,9 @@
 package allen.town.podcast.util
 
 import allen.town.focus_common.util.TopSnackbarUtil
-import allen.town.podcast.activity.PurchaseActivity
 import allen.town.podcast.core.R
 import android.app.Activity
 import android.content.ActivityNotFoundException
-import android.content.Context
 import android.content.Intent
 import android.media.audiofx.AudioEffect
 import android.widget.Toast
@@ -38,16 +36,5 @@ object NavigationUtil {
         } catch (notFound: ActivityNotFoundException) {
             TopSnackbarUtil.showSnack(activity, R.string.no_equalizer, Toast.LENGTH_LONG)
         }
-    }
-
-    @JvmStatic
-    fun goToProVersion(context: Context) {
-        context.startActivity(
-            Intent(context, PurchaseActivity::class.java)
-        )
-        (context as? Activity)?.overridePendingTransition(
-            R.anim.retro_fragment_open_enter,
-            R.anim.anim_activity_stay
-        )
     }
 }

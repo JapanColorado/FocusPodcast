@@ -84,9 +84,6 @@ class ThemeSettingsFragment : AbsSettingsFragment() {
                     colors = ACCENT_COLORS,
                     subColors = ACCENT_COLORS_SUB, allowCustomArgb = true
                 ) { _, color ->
-                    if(!MyApp.instance.checkSupporter(requireContext())){
-                        return@colorChooser
-                    }
                     ThemeStore.editTheme(requireContext()).accentColor(color).commit()
                     if (VersionUtils.hasNougatMR())
                         DynamicShortcutManager(

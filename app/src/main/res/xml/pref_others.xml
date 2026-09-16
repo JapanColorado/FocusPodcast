@@ -17,11 +17,4 @@
         android:layout="@layout/list_item_view_no_title"
         android:title="@string/change_log"
         app:icon="@drawable/ic_round_change_history_24" />
-
-    <allen.town.focus_common.common.prefs.supportv7.ATESwitchPreference
-        android:key="prefDisableFirebase"
-        android:layout="@layout/list_item_view_switch"
-        android:title="@string/disable_firebase_crashlytics_title"
-        android:summary="@string/disable_firebase_crashlytics_summary"
-        app:icon="@drawable/ic_round_privacy_tip_24" />
 </PreferenceScreen>

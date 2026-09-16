@@ -101,8 +101,6 @@
             </intent-filter>
 
         </activity>
-        <activity android:name="allen.town.podcast.activity.PurchaseActivity" />
-
         <activity
             android:name="allen.town.podcast.activity.MainActivity"
             android:exported="true"

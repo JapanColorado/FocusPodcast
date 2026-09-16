@@ -185,9 +185,6 @@ class FeedSettingsFragment : Fragment() {
                         feedPreferences!!.feedSkipEnding
                     ) {
                         override fun onConfirmed(skipIntro: Int, skipEnding: Int) {
-                            if (!instance.checkSupporter(context, true)) {
-                                return
-                            }
                             feedPreferences!!.feedSkipIntro = skipIntro
                             feedPreferences!!.feedSkipEnding = skipEnding
                             DBWriter.setFeedPreferences(feedPreferences)
@@ -232,12 +229,6 @@ class FeedSettingsFragment : Fragment() {
                         .setTitle(R.string.playback_speed)
                         .setView(viewBinding.root)
                         .setPositiveButton(android.R.string.ok) { dialog: DialogInterface?, which: Int ->
-                            if (!viewBinding.useGlobalCheckbox.isChecked && !instance.checkSupporter(
-                                    requireContext(), true
-                                )
-                            ) {
-                                return@setPositiveButton
-                            }
                             val newSpeed =
                                 if (viewBinding.useGlobalCheckbox.isChecked) FeedPreferences.SPEED_USE_GLOBAL else viewBinding.seekBar.currentSpeed
                             feedPreferences!!.feedPlaybackSpeed = newSpeed

@@ -62,9 +62,6 @@ class UserInterfacePrefFragment : AbsSettingsFragment() {
             }
         findPreference<Preference>(PREF_HOME_PAGE)!!.onPreferenceChangeListener =
             Preference.OnPreferenceChangeListener { preference, newValue ->
-                if (!instance.checkSupporter(context, true)) {
-                    return@OnPreferenceChangeListener false
-                }
                 restartActivity()
                 true
             }

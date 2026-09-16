@@ -55,7 +55,7 @@ open class SettingsActivity : SimpleToolbarActivity(), SearchPreferenceResultLis
             0,
             0,
             0,
-            if (!MyApp.instance.isAdBlockUser()) resources.getDimension(R.dimen.external_player_height).toInt() else 0
+            0
         )
         mainView.layoutParams = params
 

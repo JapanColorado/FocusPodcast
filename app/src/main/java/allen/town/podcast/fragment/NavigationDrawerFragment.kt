@@ -1,9 +1,6 @@
 package allen.town.podcast.fragment
 
-import allen.town.focus_common.ad.RewardedAdManager
-import allen.town.focus_common.ads.OnUserEarnedRewardListener
 import allen.town.focus_common.util.BasePreferenceUtil
-import allen.town.focus_common.util.EntityDateUtils
 import allen.town.focus_common.util.MenuIconUtil.showContextMenuIcon
 import allen.town.focus_common.util.Timber
 import allen.town.focus_common.util.TopSnackbarUtil
@@ -29,10 +26,8 @@ import allen.town.podcast.dialog.TagEditDialog
 import allen.town.podcast.dialog.TagEditDialog.Companion.newInstance
 import allen.town.podcast.event.FeedListUpdateEvent
 import allen.town.podcast.event.QueueEvent
-import allen.town.podcast.event.RemoveAdsPurchaseEvent
 import allen.town.podcast.event.UnreadItemsUpdateEvent
 import allen.town.podcast.model.feed.Feed
-import allen.town.podcast.util.NavigationUtil.goToProVersion
 import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
@@ -75,9 +70,6 @@ class NavigationDrawerFragment : Fragment(), OnSharedPreferenceChangeListener {
     private var progressBar: ProgressBar? = null
     private var openFolders: MutableSet<String> = HashSet()
     private var lottieAnimationView: LottieAnimationView? = null
-    private var lottieVip: LottieAnimationView? = null
-    private lateinit var removeAdIv: LottieAnimationView
-    private lateinit var viewVideoAdIv: LottieAnimationView
 
 
     override fun onCreateView(
@@ -91,14 +83,6 @@ class NavigationDrawerFragment : Fragment(), OnSharedPreferenceChangeListener {
         openFolders =
             HashSet(preferences.getStringSet(PREF_OPEN_FOLDERS, HashSet())) // Must not modify
         progressBar = root.findViewById(R.id.progressBar)
-        lottieVip = root.findViewById(R.id.already_vip_lottie)
-        removeAdIv = root.findViewById(R.id.remove_ad_iv)
-        viewVideoAdIv = root.findViewById(R.id.view_ad_video_iv)
-        lottieVip!!.setOnClickListener(View.OnClickListener {
-            (activity as MainActivity?)!!.closeDrawer {
-                goToProVersion(requireActivity())
-            }
-        })
         val navList = root.findViewById<RecyclerView>(R.id.nav_list)
         navAdapter = NavigationListAdapter(
             itemAccess,
@@ -118,18 +102,6 @@ class NavigationDrawerFragment : Fragment(), OnSharedPreferenceChangeListener {
         }
         lottieAnimationView = root.findViewById(R.id.lottie_play_item)
         lottieAnimationView!!.setAnimation(getRandomLottieFileName())
-        val lottieSettings = root.findViewById<LottieAnimationView>(R.id.lottie_settings)
-        lottieVip!!.addValueCallback(
-            KeyPath("**"),
-            LottieProperty.COLOR_FILTER,
-            SimpleLottieValueCallback {
-                PorterDuffColorFilter(
-                    accentColor(
-                        requireContext()
-                    ), PorterDuff.Mode.SRC_ATOP
-                )
-            }
-        )
         preferences.registerOnSharedPreferenceChangeListener(this)
         return root
     }
@@ -227,10 +199,6 @@ class NavigationDrawerFragment : Fragment(), OnSharedPreferenceChangeListener {
     override fun onResume() {
         super.onResume()
         loadData()
-        lottieVip!!.visibility =
-            if (instance.checkSupporter(requireContext(), false) && !MyApp.instance.isDroid) View.VISIBLE else View.GONE
-        setRemoveAdButton()
-        setViewVideoAdButton()
     }
 
     private val itemAccess: ItemAccess = object : ItemAccess {
@@ -393,76 +361,6 @@ class NavigationDrawerFragment : Fragment(), OnSharedPreferenceChangeListener {
         if (PREF_LAST_FRAGMENT_TAG == key) {
             navAdapter!!.notifyDataSetChanged() // Update selection
         }
-    }
-
-    /**
-     * 激励广告
-     */
-    private fun setViewVideoAdButton() {
-        if ((instance.checkSupporter(requireContext(), false)
-                    && !instance.temporarySupporter())
-            || !BasePreferenceUtil.isRewardCanShowToday() || instance.isDroid
-        ) {
-            viewVideoAdIv.visibility = View.GONE
-        } else {
-            viewVideoAdIv.visibility = View.VISIBLE
-            viewVideoAdIv.setOnClickListener {
-
-                if (BasePreferenceUtil.firstToViewVideoAd) {
-                    AccentMaterialDialog(
-                        requireContext(),
-                        R.style.MaterialAlertDialogTheme
-                    )
-                        .setTitle(R.string.rewarded_title)
-                        .setMessage(R.string.rewarded_ad_one_hour_tip)
-                        .setPositiveButton(android.R.string.cancel, null)
-                        .setNeutralButton(android.R.string.ok) { dialog: DialogInterface?, which: Int ->
-                            showRewardedAd()
-                        }
-                        .show()
-                    BasePreferenceUtil.firstToViewVideoAd = false
-                } else {
-                    showRewardedAd()
-                }
-
-
-            }
-        }
-    }
-
-    private fun showRewardedAd() {
-
-        RewardedAdManager.showRewardedVideo(requireActivity(), object : OnUserEarnedRewardListener {
-            override fun onUserEarnedReward() {
-                BasePreferenceUtil.rewardAdValidTime = System.currentTimeMillis()
-                setRemoveAdButton()
-                setViewVideoAdButton()
-                EventBus.getDefault().post(
-                    RemoveAdsPurchaseEvent()
-                )
-            }
-
-            override fun onClosed(isEarned: Boolean) {
-                if (isEarned) {
-                    TopSnackbarUtil.showSnack(
-                        activity,
-                        getString(
-                            R.string.rewarded_locked, EntityDateUtils.timeStamp2Date(
-                                BasePreferenceUtil
-                                    .rewardAdValidTime, "yyyy-MM-dd HH:mm"
-                            )
-                        ),
-                        Toast.LENGTH_LONG
-                    )
-                }
-            }
-
-        })
-
-    }
-
-    private fun setRemoveAdButton() {
-        removeAdIv.visibility = View.GONE
     }
 
     companion object {

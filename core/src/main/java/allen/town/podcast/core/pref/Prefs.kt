@@ -36,7 +36,6 @@ import code.name.monkey.retromusic.util.theme.ThemeMode
 import com.google.gson.Gson
 import com.google.gson.JsonSyntaxException
 import com.google.gson.reflect.TypeToken
-import com.wyjson.router.GoRouter
 import org.json.JSONArray
 import org.json.JSONException
 import java.io.File
@@ -59,7 +58,6 @@ object Prefs {
     // User Interface
     const val PREF_THEME = ThemeConstants.GENERAL_THEME //主题key
     const val PREF_DRAWER_FEED_ORDER_METHOD = "pref_feed_order_method"
-    const val PREF_DISABLE_FIREBASE = "prefDisableFirebase"
 
     //drive
     const val PREF_DROPBOX_REDENTIAL = "pref_dropbox_credential"
@@ -363,9 +361,6 @@ object Prefs {
         } else {
             NotificationCompat.PRIORITY_DEFAULT
         }
-    @JvmStatic
-    val isDisableFirebase: Boolean
-        get() = prefs!!.getBoolean(PREF_DISABLE_FIREBASE, false)
 
     /**
      * Returns true if notifications are persistent
@@ -797,12 +792,6 @@ object Prefs {
     val isAdapterColor: Boolean
         get() = prefs!!.getBoolean(PREF_ADAPTIVE_COLOR_APP, true)
 
-    /**
-     * 收费播放主题又不是付费用户
-     */
-    fun isNowPlayingThemesNotAvalibale(screen: NowPlayingScreen): Boolean {
-        return (screen.isCharge) && !GoRouter.getInstance().getService(PayService::class.java)!!.isPurchase(null,false)
-    }
     // Also set a cover theme for that now playing
     @JvmStatic
     var nowPlayingScreen: NowPlayingScreen
@@ -810,11 +799,7 @@ object Prefs {
             val id = prefs!!.getInt(NOW_PLAYING_SCREEN_ID, 0)
             for (nowPlayingScreen in NowPlayingScreen.values()) {
                 if (nowPlayingScreen.id == id) {
-                    if (isNowPlayingThemesNotAvalibale(nowPlayingScreen)) {
-                        Timber.i("is not pro use default playing theme")
-                    } else {
-                        return nowPlayingScreen
-                    }
+                    return nowPlayingScreen
                 }
             }
             return NowPlayingScreen.Normal
@@ -835,19 +820,7 @@ object Prefs {
             val id = prefs!!.getInt(ALBUM_COVER_STYLE, 0)
             for (albumCoverStyle in AlbumCoverStyle.values()) {
                 if (albumCoverStyle.id == id) {
-                    val screenId = prefs!!.getInt(NOW_PLAYING_SCREEN_ID, 0)
-                    var isNowPlayingThemesNotAvalibale = false
-                    for (nowPlayingScreen in NowPlayingScreen.values()) {
-                        if (nowPlayingScreen.id == screenId) {
-                            isNowPlayingThemesNotAvalibale = isNowPlayingThemesNotAvalibale(nowPlayingScreen)
-                        }
-                    }
-                    //coverStyle和playingScreen匹配，如果需要用默认的都使用默认
-                    if (isNowPlayingThemesNotAvalibale) {
-                        Timber.i("is not pro use default album cover")
-                    } else {
-                        return albumCoverStyle
-                    }
+                    return albumCoverStyle
                 }
             }
             return AlbumCoverStyle.Normal

@@ -2,25 +2,18 @@ package allen.town.podcast.fragment.pref;
 
 import android.os.Bundle;
 
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.preference.Preference;
 
 import com.bytehamster.lib.preferencesearch.SearchConfiguration;
 import com.bytehamster.lib.preferencesearch.SearchPreference;
 
-import org.greenrobot.eventbus.EventBus;
-import org.greenrobot.eventbus.Subscribe;
-import org.greenrobot.eventbus.ThreadMode;
-
 import allen.town.focus_common.util.Constants;
 import allen.town.focus_common.util.LogUtils;
 import allen.town.podcast.BuildConfig;
-import allen.town.podcast.MyApp;
 import allen.town.podcast.R;
 import allen.town.podcast.activity.SettingsActivity;
 import allen.town.podcast.core.util.IntentUtils;
-import allen.town.podcast.event.PurchaseEvent;
 
 /**
  * 一级设置界面
@@ -38,26 +31,8 @@ public class MainPrefFragment extends AbsSettingsFragment {
     private static final String PREF_ABOUT = "pref_about";
     private static final String PREF_NOTIFICATION = "notifications";
     private static final String PREF_OTHER = "others";
-    private static final String PREF_BUY = "buyPreference";
     private static final String PREF_GENERAL = "pref_general";
 
-
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        EventBus.getDefault().register(this);
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        EventBus.getDefault().unregister(this);
-    }
-
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onPurchaseChange(PurchaseEvent purchaseEvent){
-        findPreference(PREF_BUY).setVisible(false);
-    }
 
     @Override
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
@@ -73,8 +48,6 @@ public class MainPrefFragment extends AbsSettingsFragment {
     }
 
     private void setupMainScreen() {
-        findPreference(PREF_BUY).setVisible(!MyApp.getInstance().checkSupporter(null,false));
-
         findPreference(PREF_SCREEN_USER_INTERFACE).setOnPreferenceClickListener(preference -> {
             ((SettingsActivity) getActivity()).openScreen(R.xml.pref_user_interface);
             return true;
@@ -122,14 +95,12 @@ public class MainPrefFragment extends AbsSettingsFragment {
             return true;
         });
 
-        if(MyApp.getInstance().isDroid()){
-            Preference donatePref = findPreference(PREF_DONATE);
-            donatePref.setVisible(true);
-            donatePref.setOnPreferenceClickListener(preference -> {
-                IntentUtils.openInBrowser(getActivity(), "https://ko-fi.com/focusapps");
-                return true;
-            });
-        }
+        Preference donatePref = findPreference(PREF_DONATE);
+        donatePref.setVisible(true);
+        donatePref.setOnPreferenceClickListener(preference -> {
+            IntentUtils.openInBrowser(getActivity(), "https://ko-fi.com/focusapps");
+            return true;
+        });
 
     }
 

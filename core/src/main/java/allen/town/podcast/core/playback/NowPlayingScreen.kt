@@ -23,16 +23,15 @@ enum class NowPlayingScreen constructor(
     val titleRes: Int,
     @param:DrawableRes @field:DrawableRes val drawableResId: Int,
     val id: Int,
-    val defaultCoverTheme: AlbumCoverStyle?,
-    val isCharge: Boolean = true
+    val defaultCoverTheme: AlbumCoverStyle?
 ) {
     // Some Now playing themes look better with particular Album cover theme
     Full(R.string.full, R.drawable.np_full, 2, AlbumCoverStyle.Full),
     BlurCard(R.string.blur_card, R.drawable.np_blur_card, 9, AlbumCoverStyle.BlurCard),
-    Adaptive(R.string.adaptive, R.drawable.np_adaptive, 10, AlbumCoverStyle.FullCard, false),
+    Adaptive(R.string.adaptive, R.drawable.np_adaptive, 10, AlbumCoverStyle.FullCard),
     Vinyl(R.string.vinyl, R.drawable.np_vinyl, 16, AlbumCoverStyle.Vinyl),
-    Circle(R.string.circular, R.drawable.np_circle, 15, AlbumCoverStyle.Circle, false),
+    Circle(R.string.circular, R.drawable.np_circle, 15, AlbumCoverStyle.Circle),
     Color(R.string.color, R.drawable.np_color, 5, AlbumCoverStyle.Normal),
-    Blur(R.string.blur, R.drawable.np_blur, 4, AlbumCoverStyle.Normal, false),
-    Normal(R.string.normal, R.drawable.np_normal, 0, AlbumCoverStyle.Normal, false),
+    Blur(R.string.blur, R.drawable.np_blur, 4, AlbumCoverStyle.Normal),
+    Normal(R.string.normal, R.drawable.np_normal, 0, AlbumCoverStyle.Normal),
 }

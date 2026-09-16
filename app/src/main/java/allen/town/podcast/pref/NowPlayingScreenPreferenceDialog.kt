@@ -23,7 +23,6 @@ import allen.town.podcast.R
 import allen.town.podcast.core.playback.NowPlayingScreen
 import allen.town.podcast.core.pref.Prefs
 import allen.town.podcast.databinding.PreferenceNowPlayingScreenItemBinding
-import allen.town.podcast.util.NavigationUtil
 import android.app.Dialog
 import android.content.Context
 import android.os.Bundle
@@ -87,12 +86,7 @@ class NowPlayingScreenPreferenceDialog : DialogFragment(), ViewPager.OnPageChang
         return materialDialog(R.string.pref_title_now_playing_screen_appearance)
             .setCancelable(false)
             .setPositiveButton(R.string.settings_label) { _, _ ->
-                val nowPlayingScreen = NowPlayingScreen.values()[viewPagerPosition]
-                if (Prefs.isNowPlayingThemesNotAvalibale(nowPlayingScreen)) {
-                    NavigationUtil.goToProVersion(requireContext())
-                } else {
-                    Prefs.nowPlayingScreen = nowPlayingScreen
-                }
+                Prefs.nowPlayingScreen = NowPlayingScreen.values()[viewPagerPosition]
             }
             .setView(view)
             .create()
@@ -115,12 +109,7 @@ private class NowPlayingScreenAdapter(private val context: Context) : PagerAdapt
         val binding = PreferenceNowPlayingScreenItemBinding.inflate(inflater, collection, true)
         Glide.with(context).load(nowPlayingScreen.drawableResId).into(binding.image)
         binding.title.setText(nowPlayingScreen.titleRes)
-        if (Prefs.isNowPlayingThemesNotAvalibale(nowPlayingScreen)) {
-            binding.proText.show()
-            binding.proText.setText(R.string.app_pro)
-        } else {
-            binding.proText.hide()
-        }
+        binding.proText.hide()
         return binding.root
     }
 

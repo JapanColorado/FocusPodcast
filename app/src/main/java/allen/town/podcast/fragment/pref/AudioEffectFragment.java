@@ -89,9 +89,6 @@ public class AudioEffectFragment extends AbsSettingsFragment {
         audioEffectPreference.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
             @Override
             public boolean onPreferenceChange(@NonNull Preference preference, Object newValue) {
-                if((boolean) newValue && !MyApp.getInstance().checkSupporter(getContext(),true)){
-                    return false;
-                }
                 feedPreferences.setUseFeedEffect((Boolean) newValue);
                 DBWriter.setFeedPreferences(feedPreferences);
 

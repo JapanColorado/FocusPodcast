@@ -278,22 +278,7 @@ class ImportOPMLActivity : SimpleToolbarActivity() {
 
     fun updateSum() {
         viewBinding!!.opmlSumTv.visibility = View.VISIBLE
-        if (instance.checkSupporter(this, false)) {
-            viewBinding!!.opmlSumTv.setText(R.string.opml_sum_pro)
-        } else {
-            var checkedCount = 0
-            for (i in checked.indices) {
-                if (checked[i]!!) {
-                    checkedCount++
-                }
-            }
-            val left = Feed.MAX_SUBSCRIBED_FEEDS_FOR_FREE - checkedCount - subCount
-            viewBinding!!.opmlSumTv.text = getString(
-                R.string.opml_sum_free,
-                Feed.MAX_SUBSCRIBED_FEEDS_FOR_FREE,
-                left
-            )
-        }
+        viewBinding!!.opmlSumTv.setText(R.string.opml_sum_pro)
     }
 
     inner class FeedViewHolder(view: View) : BindableViewHolder<String?>(view) {

@@ -19,15 +19,12 @@ import androidx.core.app.ServiceCompat;
 
 import androidx.core.content.ContextCompat;
 
-import com.wyjson.router.GoRouter;
 
-import allen.town.core.service.PayService;
 import allen.town.focus_common.util.Timber;
 import allen.town.podcast.core.BuildConfig;
 import allen.town.podcast.core.R;
 import allen.town.podcast.core.feed.LocalFeedUpdater;
 import allen.town.podcast.core.storage.EpisodeCleanupAlgorithmFactory;
-import allen.town.podcast.event.SubscribedFeedLimitEvent;
 import allen.town.podcast.model.download.DownloadStatus;
 import org.apache.commons.io.FileUtils;
 import org.greenrobot.eventbus.EventBus;
@@ -159,15 +156,6 @@ public class DownloadService extends Service {
     }
 
     /**
-     * Returns true if the user has purchased the pro version, or if the purchase service is
-     * unavailable (in which case the free-tier limits are not enforced rather than crashing).
-     */
-    private static boolean isPurchased(@Nullable Context context) {
-        PayService payService = GoRouter.getInstance().getService(PayService.class);
-        return payService == null || payService.isPurchase(context, false);
-    }
-
-    /**
      * Starts the service in the foreground. On Android 12+ the system may refuse foreground
      * service starts from the background; in that case the request is logged and dropped
      * instead of crashing the caller (e.g. a WorkManager worker or a network callback).
@@ -185,28 +173,8 @@ public class DownloadService extends Service {
 
     public static void download(Context context, boolean cleanupMedia, DownloadRequest... requests) {
         ArrayList<DownloadRequest> requestsToSend = new ArrayList<>();
-        int count = 0;
-        boolean limitReached = false;
-        Boolean purchased = null;
         for (DownloadRequest request : requests) {
             if (!isDownloadingFile(request.getSource())) {
-                if (request.isNeedAutoSubscribe()) {
-                    //自动订阅需要判断由没有达到上限，如果是多个请求不能循环调用不然每次查询到订阅数都是没变化
-                    if (purchased == null) {
-                        purchased = isPurchased(context);
-                    }
-                    if (!purchased
-                            && (DBReader.getSubscribedFeedsCount() + count++) >= Feed.MAX_SUBSCRIBED_FEEDS_FOR_FREE) {
-                        if (!limitReached) {
-                            limitReached = true;
-                            EventBus.getDefault().post(new SubscribedFeedLimitEvent());
-                            Timber.w("The maximum number of subscriptions for the free version has been reached");
-                        }
-                        // skip this subscription but keep processing other requests in the batch
-                        continue;
-                    }
-
-                }
                 Timber.i("got request " + request.getTitle());
                 requestsToSend.add(request);
             }
@@ -736,21 +704,8 @@ public class DownloadService extends Service {
     private void enqueueAll(Intent intent) {
         boolean initiatedByUser = intent.getBooleanExtra(EXTRA_INITIATED_BY_USER, false);
         List<Feed> feeds = DBReader.getFeedList();
-        int count = 0;
-        Boolean purchased = null;
         for (Feed feed : feeds) {
             if (feed.getPreferences().getKeepUpdated()) {
-                if (++count > Feed.MAX_SUBSCRIBED_FEEDS_FOR_FREE) {
-                    if (purchased == null) {
-                        purchased = isPurchased(null);
-                    }
-                    if (!purchased) {
-                        EventBus.getDefault().post(new SubscribedFeedLimitEvent());
-                        Timber.i("reach feed limit , suspend refresh feeds (%d of %d skipped)",
-                                feeds.size() - count + 1, feeds.size());
-                        break;
-                    }
-                }
                 DownloadRequest.Builder builder = DownloadRequestCreator.create(feed);
                 builder.withInitiatedByUser(initiatedByUser);
                 if (feed.hasLastUpdateFailed()) {

@@ -1,6 +1,5 @@
 package code.name.monkey.appthemehelper
 
-import allen.town.core.service.PayService
 import android.content.Context
 import android.content.SharedPreferences
 import android.graphics.Color
@@ -14,7 +13,6 @@ import code.name.monkey.appthemehelper.util.ATHUtil.isWindowBackgroundDark
 import code.name.monkey.appthemehelper.util.ATHUtil.resolveColor
 import code.name.monkey.appthemehelper.util.ColorUtil
 import code.name.monkey.appthemehelper.util.VersionUtils
-import com.wyjson.router.GoRouter
 
 
 /**
@@ -255,9 +253,6 @@ private constructor(private val mContext: Context) : ThemeStorePrefKeys, ThemeSt
             val desaturatedColor = prefs(context).getBoolean(DESATURATED_COLOR, false)
             val color = if (isWallpaperAccentEnabled(context)) {
                 wallpaperColor(context, isWindowBackgroundDark(context))
-            } else if (!GoRouter.getInstance().getService(PayService::class.java)!!.isPurchase(null, false) && !GoRouter.getInstance().getService(PayService::class.java)!!.isThemeFree()) {
-                Log.i("","not pro so use default accent color")
-                ContextCompat.getColor(context, R.color.deault_accent_color)
             } else {
                 prefs(context).getInt(
                     ThemeStorePrefKeys.KEY_ACCENT_COLOR,

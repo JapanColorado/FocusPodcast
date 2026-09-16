@@ -72,7 +72,7 @@ class SyncPrefFragment : AbsSettingsFragment() {
 
     private fun setupScreen() {
         val activity: Activity? = activity
-        findPreference<Preference>(PREFERENCE_SYNC_ALL_DATA)!!.isVisible = !(MyApp.instance.isDroid || MyApp.instance.isAlipay)
+        findPreference<Preference>(PREFERENCE_SYNC_ALL_DATA)!!.isVisible = false
         findPreference<Preference>(PREFERENCE_SYNC_ALL_DATA)!!.onPreferenceClickListener =
             Preference.OnPreferenceClickListener { preference: Preference? ->
                 activity!!.startActivity(Intent(activity, DriveBackupActivity::class.java))

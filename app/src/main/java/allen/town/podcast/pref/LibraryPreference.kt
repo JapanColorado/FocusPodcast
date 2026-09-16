@@ -14,7 +14,6 @@
 
 package allen.town.podcast.pref
 
-import allen.town.core.service.PayService
 import allen.town.focus_common.R
 import allen.town.podcast.adapter.CategoryInfoAdapter
 import allen.town.focus_common.databinding.PreferenceDialogLibraryCategoriesBinding
@@ -31,7 +30,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import code.name.monkey.appthemehelper.ThemeStore
 import allen.town.focus_common.common.prefs.supportv7.ATEDialogPreference
 import code.name.monkey.retromusic.extensions.materialDialog
-import com.wyjson.router.GoRouter
 
 
 class LibraryPreference @JvmOverloads constructor(
@@ -73,9 +71,6 @@ class LibraryPreferenceDialog : DialogFragment() {
     }
 
     private fun updateCategories(categories: List<CategoryInfo>) {
-        if(!GoRouter.getInstance().getService(PayService::class.java)!!.isPurchase(requireContext())){
-            return
-        }
         if (getSelected(categories) == 0) return
         BasePreferenceUtil.libraryCategory = categories
     }

@@ -20,7 +20,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.VisibleForTesting;
 
-import com.wyjson.router.GoRouter;
 
 import org.apache.commons.io.FileUtils;
 
@@ -33,7 +32,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
-import allen.town.core.service.PayService;
 import allen.town.podcast.model.download.DownloadStatus;
 import allen.town.podcast.model.feed.Chapter;
 import allen.town.podcast.model.feed.Feed;
@@ -1547,7 +1545,6 @@ public class Db {
      */
     public Cursor searchItems(long feedID, String searchQuery) {
         String[] queryWords = prepareSearchQuery(searchQuery);
-        boolean isPro = GoRouter.getInstance().getService(PayService.class).isPurchase(context,false);
 
         String queryFeedId;
         if (feedID != 0) {
@@ -1564,11 +1561,9 @@ public class Db {
         StringBuilder sb = new StringBuilder(queryStart);
 
         for (int i = 0; i < queryWords.length; i++) {
-             if(isPro){
-                 descriptionStr = descriptionStr
-                         .append(KEY_DESCRIPTION + " LIKE '%").append(queryWords[i])
-                         .append("%' OR ");
-             }
+            descriptionStr = descriptionStr
+                    .append(KEY_DESCRIPTION + " LIKE '%").append(queryWords[i])
+                    .append("%' OR ");
             sb.append("(")
                     .append(descriptionStr)
                     .append(KEY_TITLE).append(" LIKE '%").append(queryWords[i])

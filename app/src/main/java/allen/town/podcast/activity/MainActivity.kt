@@ -1,6 +1,5 @@
 package allen.town.podcast.activity
 
-import allen.town.core.service.PayService
 import allen.town.focus_common.ad.BannerAdManager
 import allen.town.focus_common.ad.ConsentRequestManager
 import allen.town.focus_common.ad.InterstitialAdManager
@@ -12,9 +11,6 @@ import allen.town.focus_common.extensions.setLightNavigationBarAuto
 import allen.town.focus_common.extensions.setLightStatusBarAuto
 import allen.town.focus_common.extensions.setNavigationBarColor
 import allen.town.focus_common.extensions.surfaceColor
-import allen.town.focus_common.http.LeanHttpClient
-import allen.town.focus_common.http.LeanHttpClient.getUpgradeInfo
-import allen.town.focus_common.http.bean.LeanUpgradeBean
 import allen.town.focus_common.inappupdate.InAppPlayUpdateUtil.checkGooglePlayInAppUpdate
 import allen.town.focus_common.util.BasePreferenceUtil.libraryCategory
 import allen.town.focus_common.util.BasePreferenceUtil.materialYou
@@ -24,9 +20,7 @@ import allen.town.focus_common.util.TopSnackbarUtil.showSnack
 import allen.town.focus_common.views.AccentMaterialDialog
 import allen.town.podcast.BuildConfig
 import allen.town.podcast.MyApp.Companion.instance
-import allen.town.podcast.ProductWrap
 import allen.town.podcast.R
-import allen.town.podcast.core.dialog.MessageDialog
 import allen.town.podcast.core.pref.Prefs
 import allen.town.podcast.core.pref.Prefs.BackButtonBehavior
 import allen.town.podcast.core.receiver.MediaButtonReceiver
@@ -35,9 +29,6 @@ import allen.town.podcast.core.storage.DBTasks
 import allen.town.podcast.core.util.StorageUtils
 import allen.town.podcast.core.util.download.AutoUpdateManager
 import allen.town.podcast.event.MessageEvent
-import allen.town.podcast.event.PurchaseEvent
-import allen.town.podcast.event.RemoveAdsPurchaseEvent
-import allen.town.podcast.event.SubscribedFeedLimitEvent
 import allen.town.podcast.fragment.AudioPlayerFragment
 import allen.town.podcast.fragment.DiscoverFragment
 import allen.town.podcast.fragment.DownloadPagerFragment
@@ -97,18 +88,15 @@ import com.bumptech.glide.Glide
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetBehavior.BottomSheetCallback
 import com.google.android.material.snackbar.Snackbar
-import com.wyjson.router.GoRouter
 import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.functions.Consumer
 import io.reactivex.schedulers.Schedulers
 import org.apache.commons.lang3.ArrayUtils
 import org.apache.commons.lang3.Validate
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
-import java.util.Locale
 
 
 /**
@@ -155,8 +143,8 @@ class MainActivity : SimpleToolbarActivity(), OnSharedPreferenceChangeListener {
         navDrawer = findViewById(R.id.navDrawerFragment)
         bottomAdView = findViewById(R.id.bottom_adView)
         setNavDrawerSize()
-        checkUpgrade()
-        getNotifyFromServer()
+        Timber.d("app version %s , %s", BuildConfig.VERSION_NAME, BuildConfig.VERSION_CODE)
+        Timber.d("Android: " + Build.VERSION.RELEASE + " " + Build.MANUFACTURER + " " + Build.MODEL)
         val fm = supportFragmentManager
         if (fm.findFragmentByTag(MAIN_FRAGMENT_TAG) == null) {
             //先查询上次保存的tag
@@ -230,10 +218,6 @@ class MainActivity : SimpleToolbarActivity(), OnSharedPreferenceChangeListener {
         RewardedAdManager.loadRewardedAd(this)
         InterstitialAdManager.loadAd(this)
         requestNotificationPermission()
-        if (!instance.isDroid && instance.needOpenPurchaseWhenAppOpen) {
-            instance.checkSupporter(this, true)
-        }
-
     }
 
     override fun onRequestPermissionsResult(
@@ -255,21 +239,6 @@ class MainActivity : SimpleToolbarActivity(), OnSharedPreferenceChangeListener {
                 arrayOf(Manifest.permission.READ_PHONE_STATE),
                 PERMISSIONS_REQUEST_PHONE
             )
-        }
-    }
-
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    fun onPurchaseChange(purchaseEvent: PurchaseEvent?) {
-        if(!GoRouter.getInstance().getService(PayService::class.java)!!.isAliPay()){
-            BannerAdManager.showBannerAd(this,bottomAdView)
-        }
-
-    }
-
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    fun onRemoveAdsPurchaseChange(removeAdsPurchaseEvent: RemoveAdsPurchaseEvent?) {
-        if(!GoRouter.getInstance().getService(PayService::class.java)!!.isAliPay()){
-            BannerAdManager.showBannerAd(this,bottomAdView)
         }
     }
 
@@ -429,56 +398,6 @@ class MainActivity : SimpleToolbarActivity(), OnSharedPreferenceChangeListener {
             val edit = prefs.edit()
             edit.putBoolean(PREF_IS_FIRST_LAUNCH, false)
             edit.apply()
-        }
-    }
-
-    private fun checkUpgrade() {
-        Timber.d("app version %s , %s", BuildConfig.VERSION_NAME, BuildConfig.VERSION_CODE)
-        Timber.d("Android: " + Build.VERSION.RELEASE + " " + Build.MANUFACTURER + " " + Build.MODEL)
-        if(!instance.isDroid){
-            getUpgradeInfo(
-                "6275d0e6a3842e3a5c34c2f3",
-                "6275d143a3842e3a5c34c3e6",
-                instance.isAlipay
-            ).subscribeOn(
-                Schedulers.io()
-            ).observeOn(AndroidSchedulers.mainThread())
-                .subscribe(Consumer { leanUpgradeBean: LeanUpgradeBean? ->
-                    if (leanUpgradeBean != null
-                        && leanUpgradeBean.version_code > BuildConfig.VERSION_CODE
-                    ) {
-                        if (!Prefs.lastVersionChecked(leanUpgradeBean.version_code)) {
-                            ProductWrap.doCheck(this@MainActivity, leanUpgradeBean)
-                        }
-                    }
-                })
-        }
-
-    }
-
-    private fun getNotifyFromServer() {
-        if (instance.isAlipay) {
-            LeanHttpClient.getNewNotify("62c2ea3c1054e678a0575384").subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe { leanNotifyBean ->
-                    if (leanNotifyBean != null) {
-                        if (leanNotifyBean.enable && !Prefs.lastNotifyVersionChecked(
-                                leanNotifyBean.version
-                            )
-                        ) {
-                            Timber.i("get notify from server")
-                            if (!TextUtils.isEmpty(leanNotifyBean.content_cn)) {
-                                MessageDialog.show(
-                                    this@MainActivity,
-                                    if ("zh" == Locale.getDefault()
-                                            .language
-                                    ) leanNotifyBean.content_cn else leanNotifyBean.content_en
-                                )
-                                Prefs.notifyVersionCode = leanNotifyBean.version
-                            }
-                        }
-                    }
-                }
         }
     }
 
@@ -687,9 +606,7 @@ class MainActivity : SimpleToolbarActivity(), OnSharedPreferenceChangeListener {
         handleNavIntent()
         RatingDialog.check()
         ConsentRequestManager().showConsentForm(this)
-        if(!GoRouter.getInstance().getService(PayService::class.java)!!.isAliPay()){
-            BannerAdManager.showBannerAd(this,bottomAdView)
-        }
+        BannerAdManager.showBannerAd(this, bottomAdView)
     }
 
     override fun onStop() {
@@ -792,12 +709,6 @@ class MainActivity : SimpleToolbarActivity(), OnSharedPreferenceChangeListener {
         if (event.action != null) {
             snackbar.setAction(getString(R.string.undo)) { v: View? -> event.action!!.run() }
         }
-    }
-
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    fun subscribedFeedLimitChanged(event: SubscribedFeedLimitEvent?) {
-        Timber.i("subscribedFeedLimitChanged The maximum number of")
-        showSnack(this, R.string.limit_subs_notify, Toast.LENGTH_LONG)
     }
 
     private fun handleNavIntent() {

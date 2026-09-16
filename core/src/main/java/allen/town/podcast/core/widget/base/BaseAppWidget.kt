@@ -14,7 +14,6 @@
  */
 package allen.town.podcast.core.widget.base
 
-import allen.town.core.service.PayService
 import android.app.PendingIntent
 import android.appwidget.AppWidgetManager
 import android.appwidget.AppWidgetProvider
@@ -39,7 +38,6 @@ import allen.town.podcast.model.playback.MediaType
 import allen.town.podcast.playback.base.PlayerStatus
 import allen.town.podcast.ui.startintent.MainActivityStarter
 import allen.town.podcast.ui.startintent.VideoPlayerActivityStarter
-import com.wyjson.router.GoRouter
 import java.util.*
 
 abstract class BaseAppWidget : AppWidgetProvider() {
@@ -243,31 +241,6 @@ abstract class BaseAppWidget : AppWidgetProvider() {
 
         processRemoteViewIfNeeded(context, views, widgetState, appWidgetIds, true)
 
-        //gotoPro 需要是false，否则不会正常往下走，导致显示正常的widget了
-        if (this !is AppWidgetClassic && !GoRouter.getInstance().getService(PayService::class.java)?.isPurchase(context, false)!!) {
-            //除classic外其他都是付费的widget,可以显示出来，但是按钮不能点击，提示升级高级版
-            views.setViewVisibility(R.id.txtvTitle, View.VISIBLE)
-            views.setTextViewText(R.id.txtvTitle, context.getString(R.string.need_pro))
-
-//            views.setViewVisibility(R.id.imgvCover, View.GONE)
-//            views.setViewVisibility(R.id.butPlayExtended, View.GONE)
-//            views.setViewVisibility(R.id.butRew, View.GONE)
-//            views.setViewVisibility(R.id.butFastForward, View.GONE)
-//            views.setViewVisibility(R.id.butSkip, View.GONE)
-//            views.setViewVisibility(R.id.txtvProgress, View.GONE)
-
-            views.setOnClickPendingIntent(R.id.butPlayExtended, null)
-            views.setOnClickPendingIntent(R.id.butRew, null)
-            views.setOnClickPendingIntent(R.id.butFastForward, null)
-            views.setOnClickPendingIntent(R.id.butSkip, null)
-            views.setOnClickPendingIntent(R.id.txtvProgress, null)
-
-            //text widget外其他的是异步获取图片后才push，所以不加这行没问题，text 是同步push的，不加这行就不生效
-            if (this is AppWidgetText) {
-                pushUpdate(context, appWidgetIds, views)
-            }
-
-        }
 
 
     }

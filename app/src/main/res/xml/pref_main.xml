@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.preference.PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:search="http://schemas.android.com/apk/res-auto">
-    <allen.town.podcast.fragment.pref.BuyPreference android:key="buyPreference" />
-
 
     <!-- 2.0.0正常，2.1.0自定义字符串有问题，所以直接用相同的名字进行覆盖 -->
     <com.bytehamster.lib.preferencesearch.SearchPreference
