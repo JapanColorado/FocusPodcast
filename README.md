@@ -72,7 +72,7 @@ other
 
 
 ## Feedback
-Bug reports and feature requests can be submitted [here](https://github.com/allentown521/FocusPodcast/issues) (please read the [instructions](https://github.com/allentown521/FocusPodcast/blob/develop/CONTRIBUTING.md) on how to report a bug and how to submit a feature request first!).
+Bug reports and feature requests can be submitted [here](https://github.com/allentown521/FocusPodcast/issues) (please read the [instructions](https://github.com/allentown521/FocusPodcast/blob/main/CONTRIBUTING.md) on how to report a bug and how to submit a feature request first!).
 
 ## License
 
@@ -80,7 +80,18 @@ FocusPodcast is licensed under the GNU General Public License (GPL-3.0). You can
 
 ## Building FocusPodcast
 
-You can build FocusPodcast just like any other Android project. Refer to the [instructions](https://github.com/allentown521/FocusPodcast/blob/main/CONTRIBUTING.md) for more details.
+The build is driven by [pixi](https://pixi.sh), which provides JDK 17. You need an Android SDK with platform 35 and build-tools 34.0.0 (default location `~/Android/Sdk`, override with `ANDROID_HOME`).
+
+```bash
+git submodule update --init
+pixi install          # one-time: fetches the JDK
+pixi run build        # debug APK
+pixi run test         # JVM unit tests
+pixi run check        # build + test + lint
+pixi run install      # install on a connected device
+```
+
+Release builds additionally need a `secrets.properties` (copy `secrets.properties.sample`) with your signing keystore. See [CONTRIBUTING.md](CONTRIBUTING.md) for details.
 
 ## Donate
 If you like this app, please consider sponsoring me  

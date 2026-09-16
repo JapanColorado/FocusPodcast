@@ -31,28 +31,23 @@ Submit a pull request
 - Fork the repository
 - Create a new branch for your contribution
     - This makes opening possible additional pull requests easier.
-    - As a base, use the `develop` branch.
-        - Almost all changes of FocusPodcast are done on the `develop` branch. If a new version of FocusPodcast is released, the `develop` branch is merged into `master`. As a result, the `master` branch probably doesn't contain the latest changes when you are reading this. Otherwise, there might be a lot of merge-conflicts when merging your changes into `develop` and therefore it might take longer to review your pull-request.
+    - As a base, use the `main` branch.
 - Get coding :)
     - If possible, add unit tests for your pull request and make sure that they pass.
-    - Please do not upgrade dependencies or build tools unless you have a good reason for it. Doing so can easily introduce bugs that are hard to track down.
+    - Upgrade dependencies or build tools only with a concrete reason, in a separate commit, and note why in the commit message. Several pinned versions carry comments explaining why newer releases break.
 - Open the PR
     - Mention the corresponding issue in the pull request text, so that it can be closed once your pull request has been merged. If you use [special keywords](https://docs.github.com/en/issues/tracking-your-work-with-issues/linking-a-pull-request-to-an-issue), GitHub will close the issue(s) automatically.
 
 
 Building From Source
 --------------------------
-1. Fork this repository
-1. Download Latest version Android Studio
-1. Download FocusPodcast
-    1. Option A: Using the git command line (recommended)
-        1. Use `git clone <url>` with the remote url of your forked repo.
-           The FocusPodcast repo contains a large submodule with app store metadata like screenshots.
-           You **do not need that** for normal development.
-        1. In Android Studio: File » New » Project from existing sources
-    1. Option B: From Android Studio
-        1. File » New » Project from version control
-        1. Enter the remote url of the forked repo
-2. Use Java 17 in Android Studio Settings - Gradle
-1. Wait for a long time until all progress bars go away
-1. Press the Play button
+1. Clone the repository and initialise the submodules: `git submodule update --init`.
+1. Install [pixi](https://pixi.sh) and an Android SDK with platform 35 and build-tools 34.0.0
+   (default location `~/Android/Sdk`; set `ANDROID_HOME` to override).
+1. `pixi install` downloads JDK 17 into the project environment.
+1. `pixi run build` produces the debug APK; `pixi run test`, `pixi run lint` and `pixi run check`
+   run the verification tasks. `pixi task list` shows everything available.
+1. For release builds copy `secrets.properties.sample` to `secrets.properties` and fill in your
+   signing keystore.
+1. Android Studio works too: open the project, set Gradle JDK to 17, and use `pixi shell` for the
+   terminal so `JAVA_HOME` and `ANDROID_HOME` are set.

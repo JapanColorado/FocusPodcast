@@ -13,7 +13,7 @@ FocusPodcast is an Android podcast app (app id `allen.town.focus.podcast`, packa
    git submodule update --init
    ```
 2. **Create `secrets.properties`** at repo root from `secrets.properties.sample`. `app/build.gradle` reads it for `buildConfigField`s, manifest placeholders, and **both** `debug` and `release` signing configs, so a keystore path is needed even for debug builds. The `googleAdsKey`/`dropboxScheme` placeholders and `google-services.json` (gitignored, needed by the applied `com.google.gms.google-services` plugin) are also missing from a fresh clone.
-3. **JDK 17** (`compileSdk 35`, Gradle 8.7, AGP 8.4.1, Kotlin 1.9.23). The machine default is JDK 21, which breaks the build; prefix every Gradle call with `JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64`. Point `local.properties` (gitignored) at the SDK that has platform 35 and build-tools 34: `sdk.dir=/home/russell/Android/Sdk`. The Debian SDK at `/usr/lib/android-sdk` has no platforms and is unusable.
+3. **JDK 17** (`compileSdk 35`, Gradle 8.7, AGP 8.4.1, Kotlin 1.9.23). Use pixi: `pixi install` fetches JDK 17 from conda-forge and `scripts/env.sh` exports `JAVA_HOME`/`ANDROID_HOME` on activation, so run every Gradle command as `pixi run <task>` (or `pixi shell` then `./gradlew ...`). `scripts/check-env.sh` writes `local.properties` (gitignored) pointing at `$ANDROID_HOME` (default `~/Android/Sdk`, which must have platform 35 and build-tools 34.0.0). The Debian SDK at `/usr/lib/android-sdk` has no platforms and is unusable.
 4. Dependency resolution goes through ~13 Aliyun mirrors plus `jcenter()` in root `build.gradle`. Expect slow or flaky resolution outside China; do not "clean up" the mirror list without checking every old artifact still resolves.
 
 ## Commands
@@ -21,6 +21,16 @@ FocusPodcast is an Android podcast app (app id `allen.town.focus.podcast`, packa
 Flavor dimension `market` has three flavors: `fdroid`, `play`, `free`. Task names are `<flavor><BuildType>`, e.g. `assemblePlayDebug`.
 
 ```bash
+pixi run build      # assembleFdroidDebug
+pixi run test       # testFdroidDebugUnitTest
+pixi run lint       # ./gradlew lint
+pixi run nn         # !! ratchet (scripts/count-bangbang.sh)
+pixi run check      # build + test + lint + nn
+pixi run release    # assembleFdroidRelease (needs secrets.properties)
+pixi run install    # adb install the debug APK
+pixi run clean
+
+# Raw Gradle equivalents (inside `pixi shell`):
 ./gradlew assembleFdroidDebug            # most self-contained flavor (no Google/ads/purchase deps)
 ./gradlew assemblePlayDebug              # full Google build (Cast, Firebase, Play Billing, Drive/Dropbox backup)
 ./gradlew assembleFreeRelease            # Chinese-market build; targetSdk 33, Alipay, Baidu stats, self-hosted updater
