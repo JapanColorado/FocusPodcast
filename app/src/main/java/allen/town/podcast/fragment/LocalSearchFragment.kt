@@ -1,5 +1,6 @@
 package allen.town.podcast.fragment
 
+import allen.town.podcast.core.view.TopAppBarLayout
 import allen.town.podcast.R
 import allen.town.podcast.activity.MainActivity
 import allen.town.podcast.adapter.EpisodeItemListAdapter
@@ -83,7 +84,7 @@ class LocalSearchFragment constructor() : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         val layout: View = inflater.inflate(R.layout.search_fragment, container, false)
-        setupToolbar(layout.findViewById(R.id.toolbar))
+        setupToolbar(layout.findViewById<TopAppBarLayout>(R.id.appBarLayout).toolbar)
         prefs = requireActivity().getSharedPreferences(SubFeedsFragment.PREFS, Context.MODE_PRIVATE)
         recyclerView = layout.findViewById(R.id.recyclerView)
         recyclerView.setLayoutManager(LinearLayoutManager(getActivity()))
@@ -104,7 +105,6 @@ class LocalSearchFragment constructor() : Fragment() {
             }
         }
         recyclerView.setAdapter(adapter)
-        //        itemSkeleton = SkeletonLayoutUtils.applySkeleton(recyclerView, R.layout.item_small_recyclerview_skeleton, 15);
         val recyclerViewFeeds: RecyclerView = layout.findViewById(R.id.recyclerViewFeeds)
         val gridLayoutManager: GridLayoutManager = GridLayoutManager(
             getContext(),
@@ -117,11 +117,6 @@ class LocalSearchFragment constructor() : Fragment() {
         recyclerViewFeeds.setLayoutManager(gridLayoutManager)
         adapterFeeds = FeedSearchResultAdapter((getActivity() as MainActivity?)!!)
         recyclerViewFeeds.setAdapter(adapterFeeds)
-        //        recyclerViewFeeds.setNestedScrollingEnabled(false);
-//        feedSkeleton = SkeletonLayoutUtils.applySkeleton(recyclerViewFeeds, R.layout.item_grid_recyclerview_skeleton, 30);
-//        NestedScrollView nestedScrollView = layout.findViewById(R.id.nested_scroll);
-//        ScrollView nestedScrollView = layout.findViewById(R.id.nested_scroll);
-//        nestedScrollView.setNestedScrollingEnabled(true);
         create(recyclerView)
         create(recyclerViewFeeds)
         emptyViewHandler = EmptyViewHandler(getContext())
@@ -278,13 +273,11 @@ class LocalSearchFragment constructor() : Fragment() {
     }
 
     private fun searchWithProgressBar() {
-//        progressBar.setVisibility(View.VISIBLE);
         emptyViewHandler!!.hide()
         if (requireArguments().getLong(ARG_FEED, 0) == 0L) {
             //not shown when searching within a feed
 //            feedSkeleton.showSkeleton();
         }
-        //        itemSkeleton.showSkeleton();
         search()
     }
 
@@ -298,13 +291,6 @@ class LocalSearchFragment constructor() : Fragment() {
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe({ results: Pair<List<FeedItem>?, List<Feed>?> ->
-//                    progressBar.setVisibility(View.GONE);
-//                    if (feedSkeleton.isSkeleton()) {
-//                        feedSkeleton.showOriginal();
-//                    }
-//                    if (itemSkeleton.isSkeleton()) {
-//                        itemSkeleton.showOriginal();
-//                    }
                 this.results = results.first as MutableList<FeedItem>?
                 adapter!!.updateItems((results.first)!!)
                 if (requireArguments().getLong(ARG_FEED, 0) == 0L) {

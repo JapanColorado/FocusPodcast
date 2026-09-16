@@ -3,11 +3,6 @@ plugins {
 }
 apply from: "../../common.gradle"
 
-repositories {
-//    flatDir {
-//        dirs 'libs'
-//    }
-}
 android {
     defaultConfig {
         namespace "allen.town.focus_common"

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<lint>
+    <!--
+        ToolbarContentTintHelper tints the overflow menu and action-mode views by
+        reaching into androidx.appcompat internals (MenuBuilder, MenuPopupHelper,
+        ListMenuItemView, ActionMenuItemView, WindowDecorActionBar,
+        ToolbarWidgetWrapper). There is no public API that exposes those views, so
+        these hits are reported as warnings instead of errors.
+    -->
+    <issue id="RestrictedApi" severity="warning" />
+</lint>

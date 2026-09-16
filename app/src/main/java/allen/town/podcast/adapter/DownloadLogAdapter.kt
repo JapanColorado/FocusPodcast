@@ -81,13 +81,8 @@ class DownloadLogAdapter(private val context: Activity) :
             holder.secondaryActionButton.visibility = View.INVISIBLE
             holder.reason.visibility = View.GONE
         } else {
-//            if (status.getReason() == DownloadError.ERROR_PARSER_EXCEPTION_DUPLICATE) {
             holder.icon.setColorFilter(ContextCompat.getColor(context, R.color.download_failed_red))
             holder.icon.setImageResource(R.drawable.ic_round_error_outline_24)
-            //            } else {
-//                holder.icon.setTextColor(ContextCompat.getColor(context, R.color.download_failed_red));
-//                holder.icon.setText("{fa-times-circle}");
-//            }
             holder.icon.contentDescription = context.getString(R.string.error_label)
             holder.reason.setText(DownloadErrorLabel.from(status.reason))
             holder.reason.visibility = View.VISIBLE
@@ -210,7 +205,6 @@ class DownloadLogAdapter(private val context: Activity) :
         }
         if (!percentageWasSet) {
             holder.secondaryActionButton.progress = 0
-            //            holder.secondaryActionProgress.setPercentage(0, request);
         }
         holder.status.text = status
     }

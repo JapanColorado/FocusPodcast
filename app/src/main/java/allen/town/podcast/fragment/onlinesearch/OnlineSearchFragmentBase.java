@@ -157,16 +157,13 @@ public abstract class OnlineSearchFragmentBase extends Fragment {
         disposable = searchProvider.search(query).subscribe(result -> {
             searchResults = result;
             skeleton.showOriginal();
-//            progressBar.setVisibility(View.GONE);
             adapter.addAll(searchResults);
-//            gridView.setVisibility(!searchResults.isEmpty() ? View.VISIBLE : View.GONE);
             txtvEmpty.setVisibility(searchResults.isEmpty() ? View.VISIBLE : View.GONE);
             //using the fragment's context directly here crashes on the second search after the first one returns; the cause was not investigated
             txtvEmpty.setText(txtvEmpty.getContext().getString(R.string.no_results_for_query, query));
         }, error -> {
             Log.e(TAG, Log.getStackTraceString(error));
             skeleton.showOriginal();
-//            progressBar.setVisibility(View.GONE);
             txtvError.setText(error.toString());
             txtvError.setVisibility(View.VISIBLE);
             butRetry.setOnClickListener(v -> search(query));
@@ -177,11 +174,9 @@ public abstract class OnlineSearchFragmentBase extends Fragment {
     private Disposable getFeedsListDisposable;
 
     private void showOnlyProgressBar() {
-//        gridView.setVisibility(View.GONE);
         txtvError.setVisibility(View.GONE);
         butRetry.setVisibility(View.GONE);
         txtvEmpty.setVisibility(View.GONE);
-//        progressBar.setVisibility(View.VISIBLE);
         skeleton.showSkeleton();
     }
 

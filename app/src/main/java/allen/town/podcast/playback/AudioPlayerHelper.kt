@@ -42,7 +42,6 @@ fun AppCompatActivity.onPaletteColorChanged(paletteColor: Int) {
         || nowPlayingScreen === NowPlayingScreen.Full
     ) {
         setNavigationBarColor(paletteColor)
-        //                ActivityThemeExtensionsUtils.setLightNavigationBar(this,isColorLight);
         setLightStatusBar(isColorLight)
     }
 }

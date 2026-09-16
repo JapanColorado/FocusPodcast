@@ -816,7 +816,6 @@ public class LocalPSMP extends PlaybackServiceMediaPlayer {
                 mediaPlayer.setDisplay(null);
                 reinit();
             } else {
-//                Log.e(TAG, "Resetting video surface for media of Audio type");
             }
             playerLock.unlock();
         });

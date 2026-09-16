@@ -188,7 +188,6 @@ public final class DBTasks {
         media.setFile_url(null);
         DBWriter.setFeedMediaDownloadState(media);
         EventBus.getDefault().post(FeedItemEvent.updated(media.getItem()));
-//        EventBus.getDefault().post(new MessageEvent(context.getString(R.string.error_file_not_found)));
     }
 
     /**

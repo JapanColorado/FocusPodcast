@@ -54,15 +54,8 @@ open class SubFeedsAdapter(mainActivity: MainActivity) :
         if (viewType == COVER_WITH_TITLE) {
             topAndBottomItemId = 0
             belowItemId = R.id.imgvCover
-            //            feedTitle.setBackgroundColor(feedTitle.getContext().getResources().getColor(R.color.feed_text_bg));
-//            int padding = (int) convertDpToPixel(feedTitle.getContext(), 4);
-//            feedTitle.setPadding(padding, padding, padding, padding);
         }
-        //        params.addRule(RelativeLayout.BELOW, belowItemId);
-//        params.addRule(RelativeLayout.ALIGN_TOP, topAndBottomItemId);
-//        params.addRule(RelativeLayout.ALIGN_BOTTOM, topAndBottomItemId);
         feedTitle.layoutParams = params
-        //        feedTitle.setSingleLine(viewType == COVER_WITH_TITLE);
         return SubscriptionViewHolder(itemView)
     }
 

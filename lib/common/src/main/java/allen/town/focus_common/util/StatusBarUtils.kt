@@ -91,7 +91,6 @@ object StatusBarUtils {
                 Timber.i("statusBarHeight %s", statusBarHeight)
                 val toolParams = view.layoutParams
                 toolParams.height = statusBarHeight
-//                view.layoutParams = toolParams
             } else {
                 view.post {
                     // On a Pixel 5 with Android 12 the first approach returns a wrong height; this one works
@@ -102,7 +101,6 @@ object StatusBarUtils {
                     // Do not add getPaddingTop: on secondary screens it already equals the status bar height, reason unknown
                     val toolParams = view.layoutParams
                     toolParams.height = rectangle.top
-//                    view.layoutParams = toolParams
 
                 }
             }

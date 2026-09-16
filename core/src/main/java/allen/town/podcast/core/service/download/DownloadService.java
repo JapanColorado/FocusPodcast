@@ -1,5 +1,6 @@
 package allen.town.podcast.core.service.download;
 
+import android.annotation.SuppressLint;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.Service;
@@ -134,6 +135,10 @@ public class DownloadService extends Service {
     }
 
     @Override
+    // Lint's UnspecifiedRegisterReceiverFlag fires on the pre-Android-13 branch below,
+    // where the two-argument registerReceiver is the only overload that exists. The
+    // exported flags are passed on Android 13+, which is where they are enforced.
+    @SuppressLint("UnspecifiedRegisterReceiverFlag")
     public void onCreate() {
         Log.d(TAG, "onCreate");
         isRunning = true;

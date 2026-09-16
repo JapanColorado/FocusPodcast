@@ -111,10 +111,6 @@ class MainActivity : SimpleToolbarActivity(), OnSharedPreferenceChangeListener {
         }
         Timber.d("onCreate")
         super.onCreate(savedInstanceState)
-//        MediationTestSuite.launch(this)
-//        AppLovinSdk.getInstance(this).showMediationDebugger()
-//        AppLovinSdk.getInstance(this).settings.testDeviceAdvertisingIds = arrayListOf("a57a80a7-661e-4a27-bb05-7f774cd5308f")
-//        val a = AppLovinSdk.getInstance(this).settings.testDeviceAdvertisingIds
         addEntranceActivityName(this.javaClass.simpleName)
         StorageUtils.checkStorageAvailability(this)
         // Once per process: un-flag episodes whose downloaded file no longer exists
@@ -373,11 +369,6 @@ class MainActivity : SimpleToolbarActivity(), OnSharedPreferenceChangeListener {
         //on first launch, open the add-subscription drawer
         if (prefs.getBoolean(PREF_IS_FIRST_LAUNCH, true)) {
             loadFragment(DiscoverFragment.TAG, null)
-            //            new Handler(Looper.getMainLooper()).postDelayed(() -> {
-//                if (drawerLayout != null) { // Tablet layout does not have a drawer
-//                    drawerLayout.openDrawer(navDrawer);
-//                }
-//            }, 1500);
 
             // for backward compatibility, we only change defaults for fresh installs
             Prefs.updateInterval = 12
@@ -606,7 +597,6 @@ class MainActivity : SimpleToolbarActivity(), OnSharedPreferenceChangeListener {
             //this branch means the activity was destroyed by pressing back, not recreated like on a theme change; only do this in the former case
             Timber.i("isFinishing")
             Observable.fromCallable {
-//                DBWriter.clearUnuseAndNotSubedFeedItems(this)
             }
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())

@@ -18,7 +18,6 @@ import java.util.*
 abstract class SimpleToolbarActivity : ToolbarBaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         updateTheme()
-//        hideStatusBar(R.id.status_bar)
         super.onCreate(savedInstanceState)
         setEdgeToEdgeOrImmersive(R.id.status_bar,false)
         toggleScreenOn()

@@ -130,9 +130,6 @@ class CoverLoader(private val activity: MainActivity?) {
                         placeholder.visibility = View.VISIBLE
                         val bgColor = placeholder.context.resources.getColor(R.color.feed_text_bg)
                         if (palette == null || !showTitle) {
-//                        placeholder.setBackgroundColor(bgColor);
-//                        placeholder.setTextColor(ThemeUtils.getColorFromAttr(placeholder.getContext(),
-//                                android.R.attr.textColorPrimary));
                             return
                         }
                         val dominantColor = palette.getDominantColor(bgColor)
@@ -140,8 +137,6 @@ class CoverLoader(private val activity: MainActivity?) {
                         if (ColorUtils.calculateLuminance(dominantColor) > 0.5) {
                             textColor = placeholder.context.resources.getColor(R.color.black)
                         }
-                        //                    placeholder.setTextColor(textColor);
-//                    placeholder.setBackgroundColor(dominantColor);
                     } else {
                         placeholder.visibility = View.INVISIBLE
                     }

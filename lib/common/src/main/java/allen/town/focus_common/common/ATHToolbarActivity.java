@@ -26,13 +26,11 @@ public class ATHToolbarActivity extends ATHActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         Toolbar toolbar = getATHToolbar();
-//        ToolbarContentTintHelper.handleOnCreateOptionsMenu(this, toolbar, menu, getToolbarBackgroundColor(toolbar));
         return super.onCreateOptionsMenu(menu);
     }
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
-//        ToolbarContentTintHelper.handleOnPrepareOptionsMenu(this, getATHToolbar());
         return super.onPrepareOptionsMenu(menu);
     }
 

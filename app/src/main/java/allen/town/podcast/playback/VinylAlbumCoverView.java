@@ -31,7 +31,6 @@ public class VinylAlbumCoverView extends View implements ValueAnimator.AnimatorU
     private Bitmap mCoverBitmap;
     private Bitmap mNeedleBitmap;
     private Drawable mCoverBorder;
-    private int mTopLineHeight;
     private int mCoverBorderWidth;
     private Matrix mDiscMatrix = new Matrix();
     private Matrix mCoverMatrix = new Matrix();
@@ -79,7 +78,6 @@ public class VinylAlbumCoverView extends View implements ValueAnimator.AnimatorU
         mDiscBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.vinly_image);
         mCoverBitmap = ImageUtils.resizeImage(bitmap, roundLength, roundLength);
         mNeedleBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.needle_image);
-        mTopLineHeight = dp2px(1);
         mCoverBorderWidth = dp2px(1);
 
         mPlayAnimator = ValueAnimator.ofFloat(NEEDLE_ROTATION_PAUSE, NEEDLE_ROTATION_PLAY);
@@ -119,24 +117,21 @@ public class VinylAlbumCoverView extends View implements ValueAnimator.AnimatorU
 
     @Override
     protected void onDraw(Canvas canvas) {
-        // 1. draw the dashed line at the top
-//        mTopLine.setBounds(0, 0, getWidth(), mTopLineHeight);
-//        mTopLine.draw(canvas);
-        // 2. draw the translucent border around the vinyl record
+        // 1. draw the translucent border around the vinyl record
         mCoverBorder.setBounds(mDiscPoint.x - mCoverBorderWidth, mDiscPoint.y - mCoverBorderWidth,
                 mDiscPoint.x + mDiscBitmap.getWidth() + mCoverBorderWidth, mDiscPoint.y + mDiscBitmap.getHeight() + mCoverBorderWidth);
         mCoverBorder.draw(canvas);
-        // 3. draw the vinyl record
+        // 2. draw the vinyl record
         // set the rotation center and angle; the order of setRotate and preTranslate matters
         mDiscMatrix.setRotate(mDiscRotation, mDiscCenterPoint.x, mDiscCenterPoint.y);
         // set the image origin
         mDiscMatrix.preTranslate(mDiscPoint.x, mDiscPoint.y);
         canvas.drawBitmap(mDiscBitmap, mDiscMatrix, null);
-        // 4. draw the cover
+        // 3. draw the cover
         mCoverMatrix.setRotate(mDiscRotation, mCoverCenterPoint.x, mCoverCenterPoint.y);
         mCoverMatrix.preTranslate(mCoverPoint.x, mCoverPoint.y);
         canvas.drawBitmap(mCoverBitmap, mCoverMatrix, null);
-        // 5. draw the needle
+        // 4. draw the needle
         mNeedleMatrix.setRotate(mNeedleRotation, mNeedleCenterPoint.x, mNeedleCenterPoint.y);
         mNeedleMatrix.preTranslate(mNeedlePoint.x, mNeedlePoint.y);
         canvas.drawBitmap(mNeedleBitmap, mNeedleMatrix, null);

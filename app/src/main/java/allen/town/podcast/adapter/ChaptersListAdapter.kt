@@ -67,9 +67,6 @@ class ChaptersListAdapter(private val context: Context, private val callback: Ca
         if (TextUtils.isEmpty(sc.link)) {
             holder.link.visibility = View.GONE
         } else {
-//            holder.link.setVisibility(View.VISIBLE);
-//            holder.link.setText(sc.getLink());
-//            holder.link.setOnClickListener(v -> IntentUtils.openInBrowser(context, sc.getLink()));
         }
         holder.itemView.setOnClickListener { v: View? ->
             callback?.onPlayChapterButtonClicked(
@@ -84,25 +81,16 @@ class ChaptersListAdapter(private val context: Context, private val callback: Ca
             )
         )
         if (position == currentChapterIndex) {
-//            int playingBackGroundColor = ThemeUtils.getColorFromAttr(context, R.attr.currently_playing_background);
-//            holder.itemView.setBackgroundColor(playingBackGroundColor);
-//            ((MaterialCardView) holder.itemView).setCardBackgroundColor(ThemeUtils.getColorFromAttr(activity.get(), R.attr.colorSurface));
             (holder.itemView as MaterialCardView).isChecked = true
             var progress = (currentChapterPosition - sc.start).toFloat() / duration
             progress = Math.max(progress, CircularProgressBar.MINIMUM_PERCENTAGE)
             progress = Math.min(progress, CircularProgressBar.MAXIMUM_PERCENTAGE)
             holder.lottieAnimationView.visibility = View.VISIBLE
         } else {
-//            holder.itemView.setBackgroundColor(ContextCompat.getColor(context, android.R.color.transparent));
             (holder.itemView as MaterialCardView).isChecked = false
             holder.lottieAnimationView.visibility = View.GONE
         }
 
-//        if (hasImages) {
-//            holder.image.setVisibility(View.VISIBLE);
-//            if (TextUtils.isEmpty(sc.getImageUrl())) {
-//                Glide.with(context).clear(holder.image);
-//            } else {
         Glide.with(context)
             .load(EmbeddedChapterImage.getModelFor(media, position))
             .apply(
@@ -117,10 +105,6 @@ class ChaptersListAdapter(private val context: Context, private val callback: Ca
                     )
             )
             .into(holder.image)
-        //            }
-//        } else {
-//            holder.image.setVisibility(View.GONE);
-//        }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ChapterHolder {

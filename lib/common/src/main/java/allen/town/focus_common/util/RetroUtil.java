@@ -179,7 +179,7 @@ public class RetroUtil {
   public static void openUrl(@NonNull Activity context, @NonNull String str) {
     Intent intent = new Intent("android.intent.action.VIEW");
     intent.setData(Uri.parse(str));
-    intent.setFlags(268435456);
+    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
     context.startActivity(intent);
   }
 
@@ -215,7 +215,6 @@ public class RetroUtil {
         for (InetAddress addr : addrs) {
           if (!addr.isLoopbackAddress()) {
             String sAddr = addr.getHostAddress();
-            //boolean isIPv4 = InetAddressUtils.isIPv4Address(sAddr);
             boolean isIPv4 = sAddr.indexOf(':') < 0;
             if (useIPv4) {
               if (isIPv4) return sAddr;

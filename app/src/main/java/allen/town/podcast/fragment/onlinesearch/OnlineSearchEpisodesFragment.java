@@ -28,18 +28,6 @@ public class OnlineSearchEpisodesFragment extends OnlineSearchFragmentBase {
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onEventMainThread(FeedItemEvent event) {
-//        for (FeedItem item : event.items) {
-//            int pos = FeedItemUtil.indexOfItemWithId(episodes, item.getId());
-//            if (pos >= 0) {
-//                episodes.remove(pos);
-//                if (shouldUpdatedItemRemainInList(item)) {
-//                    episodes.add(pos, item);
-//                    adapter.notifyItemChangedCompat(pos);
-//                } else {
-//                    adapter.notifyItemRemoved(pos);
-//                }
-//            }
-//        }
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)

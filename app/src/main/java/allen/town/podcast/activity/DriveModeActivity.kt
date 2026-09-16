@@ -47,9 +47,6 @@ class DriveModeActivity : SimpleToolbarActivity() {
         binding = ActivityDriveModeBinding.inflate(layoutInflater)
         setContentView(binding.root)
         setEdgeToEdgeOrImmersive(R.id.status_bar, true)
-        //hide the status bar icons
-//        setStatusBarColor(Color.TRANSPARENT, R.id.status_bar)
-//        setLightStatusBar(false)
         lastPlaybackControlsColor = ThemeStore.accentColor(this)
 
         libraryViewModel = ViewModelProvider(this).get(

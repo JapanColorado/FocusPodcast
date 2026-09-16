@@ -2,7 +2,6 @@ package allen.town.focus_common.crash;
 
 import android.util.Log;
 
-import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Arrays;
@@ -24,23 +23,6 @@ public abstract class Reflection {
         }
 
         return null;
-    }
-
-    public static boolean setStaticFieldValue(final Class<?> klass, final String name, final Object value) {
-        if (null != klass && null != name) {
-            try {
-                final Field field = getField(klass, name);
-                if (null != field) {
-                    field.setAccessible(true);
-                    field.set(klass, value);
-                    return true;
-                }
-            } catch (final Throwable t) {
-                Log.w(THIS_FILE, "set field " + name + " of " + klass + " error", t);
-            }
-        }
-
-        return false;
     }
 
     @SuppressWarnings("unchecked")
@@ -92,64 +74,6 @@ public abstract class Reflection {
         }
 
         return false;
-    }
-
-    public static <T> T newInstance(final String className, final Object... args) {
-        try {
-            return newInstance(Class.forName(className), args);
-        } catch (final ClassNotFoundException e) {
-            Log.w(THIS_FILE, "new instance of error", e);
-            return null;
-        }
-    }
-
-    @SuppressWarnings("unchecked")
-    public static <T> T newInstance(final Class<?> clazz, Object... args) {
-        final Constructor<?>[] ctors = clazz.getDeclaredConstructors();
-
-        loop:
-        for (final Constructor<?> ctor : ctors) {
-            final Class<?>[] types = ctor.getParameterTypes();
-            if (types.length == args.length) {
-                for (int i = 0; i < types.length; i++) {
-                    if (null != args[i] && !types[i].isAssignableFrom(args[i].getClass())) {
-                        continue loop;
-                    }
-                }
-
-                try {
-                    ctor.setAccessible(true);
-                    return (T) ctor.newInstance(args);
-                } catch (final Throwable t) {
-                    Log.w(THIS_FILE, "Invoke constructor " + ctor + " error", t);
-                    return null;
-                }
-            }
-        }
-
-        return null;
-    }
-
-    @SuppressWarnings("unchecked")
-    public static <T> T invokeStaticMethod(final Class<?> klass, final String name) {
-        return invokeStaticMethod(klass, name, new Class[0], new Object[0]);
-    }
-
-    @SuppressWarnings("unchecked")
-    public static <T> T invokeStaticMethod(final Class<?> klass, final String name, final Class[] types, final Object[] args) {
-        if (null != klass && null != name && null != types && null != args && types.length == args.length) {
-            try {
-                final Method method = getMethod(klass, name, types);
-                if (null != method) {
-                    method.setAccessible(true);
-                    return (T) method.invoke(klass, args);
-                }
-            } catch (final Throwable e) {
-                Log.w(THIS_FILE, "Invoke " + name + "(" + Arrays.toString(types) + ") of " + klass + " error", e);
-            }
-        }
-
-        return null;
     }
 
 

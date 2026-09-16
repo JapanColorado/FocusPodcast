@@ -13,9 +13,6 @@
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
 
     <!-- target 33 -->
-<!--    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />-->
-<!--    <uses-permission android:name="android.permission.READ_MEDIA_AUDIO" />-->
-<!--    <uses-permission android:name="android.permission.READ_MEDIA_VIDEO" />-->
 
     <supports-screens
         android:anyDensity="true"
@@ -30,7 +27,6 @@
     <uses-feature
         android:name="android.hardware.touchscreen"
         android:required="false" />
-<!--    <uses-permission android:name="android.permission.READ_PHONE_STATE" />-->
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-sdk tools:overrideLibrary="com.paul623.wdsyncer"/>
@@ -259,7 +255,13 @@
                 <data android:pathPattern=".*.xml" />
                 <data android:pathPattern=".*.opml" />
             </intent-filter>
-            <intent-filter android:label="@string/opml_import_label">
+            <!--
+                This filter matches by MIME type only: it deliberately declares no
+                android:scheme, so the host/pathPattern entries never take part in URI
+                matching. Adding a scheme would widen what the app offers to open, so
+                the AppLinkUrlError this provokes is suppressed rather than "fixed".
+            -->
+            <intent-filter android:label="@string/opml_import_label" tools:ignore="AppLinkUrlError">
                 <action android:name="android.intent.action.VIEW" />
                 <action android:name="android.intent.action.EDIT" />
 

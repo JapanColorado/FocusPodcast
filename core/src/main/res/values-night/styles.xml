@@ -4,11 +4,4 @@
     <style name="Theme.FocusPodcast.MD3.Base.Black" parent="Theme.FocusPodcast.MD3.Base">
         <item name="colorSurface">@color/blackColorSurface</item>
     </style>
-
-<!--    <style name="CustomMediaRouterTheme" parent="Theme.MediaRouter">
-        <item name="mediaRouteButtonStyle">@style/CustomMediaRouteButtonStyle</item>
-    </style>
-    <style name="CustomMediaRouteButtonStyle" parent="Widget.MediaRouter.MediaRouteButton">
-        <item name="mediaRouteButtonTint">?colorControlNormal</item>
-    </style>-->
 </resources>

@@ -1,5 +1,6 @@
 package allen.town.podcast.fragment
 
+import allen.town.podcast.core.view.TopAppBarLayout
 import allen.town.podcast.R
 import allen.town.podcast.activity.MainActivity
 import allen.town.podcast.ui.common.PagedToolbarFragment
@@ -31,7 +32,7 @@ class DownloadPagerFragment constructor() : PagedToolbarFragment() {
     ): View {
         super.onCreateView(inflater, container, savedInstanceState)
         val root: View = inflater.inflate(R.layout.collapsing_pager_fragment, container, false)
-        val toolbar: Toolbar = root.findViewById(R.id.toolbar)
+        val toolbar: Toolbar = root.findViewById<TopAppBarLayout>(R.id.appBarLayout).toolbar
         toolbar.setTitle(R.string.downloads_label)
         toolbar.inflateMenu(R.menu.downloads)
         displayUpArrow = getParentFragmentManager().getBackStackEntryCount() != 0
@@ -47,7 +48,6 @@ class DownloadPagerFragment constructor() : PagedToolbarFragment() {
         // Give the TabLayout the ViewPager
         tabLayout = root.findViewById(R.id.sliding_tabs)
 
-//        tabLayout.setTabGravity(GRAVITY_CENTER);
         TabLayoutMediator(
             tabLayout,
             viewPager,

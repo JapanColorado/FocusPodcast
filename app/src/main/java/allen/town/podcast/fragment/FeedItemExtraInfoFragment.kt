@@ -40,12 +40,6 @@ class FeedItemExtraInfoFragment
         super.onStart()
         bottomSheet = dialog!!.findViewById(com.google.android.material.R.id.design_bottom_sheet) as ViewGroup
         bottomSheetBehavior = BottomSheetBehavior.from(bottomSheet)
-//        bottomSheetBehavior.skipCollapsed = true
-//        bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
-//        if (dialog != null) {
-//            val bottomSheet: View = dialog!!.findViewById(com.google.android.material.R.id.design_bottom_sheet)
-//            bottomSheet.layoutParams.height = ViewGroup.LayoutParams.MATCH_PARENT
-//        }
     }
 
 

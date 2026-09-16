@@ -520,7 +520,6 @@ class VideoPlayerActivity : ToolbarBaseActivity(), OnSeekBarChangeListener {
         super.onCreateOptionsMenu(menu)
         val inflater = menuInflater
         inflater.inflate(R.menu.mediaplayer, menu)
-        //        menu.findItem(R.id.audio_controls).setVisible(false);
         showMenuIcon(menu)
         return true
     }

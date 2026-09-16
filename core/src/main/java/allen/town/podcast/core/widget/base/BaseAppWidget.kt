@@ -47,14 +47,11 @@ abstract class BaseAppWidget : AppWidgetProvider() {
     override fun onReceive(context: Context?, intent: Intent?) {
         Log.d(TAG, "onReceive")
         super.onReceive(context, intent)
-//        WidgetUpdaterWorker.enqueueWork(context)
     }
 
     override fun onEnabled(context: Context) {
         super.onEnabled(context)
         Log.d(TAG, "Widget enabled")
-//        setEnabled(context, true)
-//        WidgetUpdaterWorker.enqueueWork(context)
     }
 
     override fun onUpdate(
@@ -72,7 +69,6 @@ abstract class BaseAppWidget : AppWidgetProvider() {
     override fun onDisabled(context: Context) {
         super.onDisabled(context)
         Log.d(TAG, "Widget disabled")
-//        setEnabled(context, false)
     }
 
     override fun onDeleted(context: Context?, appWidgetIds: IntArray?) {

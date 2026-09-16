@@ -38,9 +38,6 @@ open class ToolbarBaseActivity : ATHToolbarActivity(),ClearAllActivityInterface 
 
     override fun finish() {
         super.finish()
-//        if (entranceActivityNames.contains(javaClass.simpleName)) {
-//            clearAllAppcompactActivities(false)
-//        }
     }
 
     /**

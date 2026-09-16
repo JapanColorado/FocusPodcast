@@ -61,8 +61,6 @@ public class SingleListDialogFragmentCompat extends ATEPreferenceDialogFragment 
 
         builder.setSingleChoiceItems(mItems, mClickedDialogEntryIndex, (dialog, which) -> {
             mClickedDialogEntryIndex = which;
-//            dismiss();
-//            onClick(dialog, which);
         });
 
         /*

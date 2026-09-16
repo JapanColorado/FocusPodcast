@@ -1,8 +1,11 @@
 package code.name.monkey.appthemehelper.util;
 
+import android.annotation.SuppressLint;
 import android.content.res.ColorStateList;
 import android.graphics.PorterDuff;
+import android.graphics.PorterDuffColorFilter;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.util.Log;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -35,39 +38,42 @@ public class EditTextUtil {
             Log.w(TAG, "setCursorDrawable null");
             return;
         }
-        try {
-            Field declaredField = TextView.class.getDeclaredField("mCursorDrawableRes");
-            declaredField.setAccessible(true);
-            int i = declaredField.getInt(editText);
-            Field declaredField2 = TextView.class.getDeclaredField("mEditor");
-            declaredField2.setAccessible(true);
-            Object obj = declaredField2.get(editText);
-            Drawable drawable = ContextCompat.getDrawable(editText.getContext(), i);
-            drawable.setColorFilter(ThemeStore.accentColor(editText.getContext()), PorterDuff.Mode.SRC_IN);
-            Drawable[] drawableArr = {drawable, drawable};
-            Field declaredField3 = obj.getClass().getDeclaredField("mCursorDrawable");
-            declaredField3.setAccessible(true);
-            declaredField3.set(obj, drawableArr);
-        } catch (Exception unused) {
-            Log.w(TAG, unused);
-
-            try {
-                Field declaredField = TextView.class.getDeclaredField("mCursorDrawableRes");
-                declaredField.setAccessible(true);
-                int i = declaredField.getInt(editText);
-                Drawable drawable = ContextCompat.getDrawable(editText.getContext(), i);
-                drawable.setColorFilter(ThemeStore.accentColor(editText.getContext()), PorterDuff.Mode.SRC_IN);
-                Drawable[] drawableArr = {drawable, drawable};
-                Field declaredField3 = TextView.class.getDeclaredField("mCursorDrawable");
-                declaredField3.setAccessible(true);
-                declaredField3.set(editText, drawable);
-            } catch (Exception unused2) {
-                Log.w(TAG, unused2);
+        int accentColor = ThemeStore.accentColor(editText.getContext());
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            Drawable cursor = editText.getTextCursorDrawable();
+            if (cursor != null) {
+                cursor = cursor.mutate();
+                cursor.setColorFilter(new PorterDuffColorFilter(accentColor, PorterDuff.Mode.SRC_IN));
+                editText.setTextCursorDrawable(cursor);
             }
+        } else {
+            setCursorDrawableLegacy(editText, accentColor);
         }
 
-        ViewCompat.setBackgroundTintList(editText, new ColorStateList(new int[][]{new int[0]}, new int[]{ThemeStore.accentColor(editText.getContext())}));
+        ViewCompat.setBackgroundTintList(editText, new ColorStateList(new int[][]{new int[0]}, new int[]{accentColor}));
     }
 
-
+    /**
+     * Pre-API-29 there is no public API for the cursor drawable, so the private
+     * TextView/Editor fields are the only option. The reflective names are hidden
+     * (and blocked from API 29 on), hence the suppressions and the silent failure.
+     */
+    @SuppressLint({"SoonBlockedPrivateApi", "BlockedPrivateApi", "DiscouragedPrivateApi"})
+    private static void setCursorDrawableLegacy(EditText editText, int accentColor) {
+        try {
+            Field cursorDrawableRes = TextView.class.getDeclaredField("mCursorDrawableRes");
+            cursorDrawableRes.setAccessible(true);
+            int drawableRes = cursorDrawableRes.getInt(editText);
+            Field editorField = TextView.class.getDeclaredField("mEditor");
+            editorField.setAccessible(true);
+            Object editor = editorField.get(editText);
+            Drawable drawable = ContextCompat.getDrawable(editText.getContext(), drawableRes);
+            drawable.setColorFilter(new PorterDuffColorFilter(accentColor, PorterDuff.Mode.SRC_IN));
+            Field cursorDrawable = editor.getClass().getDeclaredField("mCursorDrawable");
+            cursorDrawable.setAccessible(true);
+            cursorDrawable.set(editor, new Drawable[]{drawable, drawable});
+        } catch (Exception e) {
+            Log.w(TAG, "could not tint the text cursor", e);
+        }
+    }
 }

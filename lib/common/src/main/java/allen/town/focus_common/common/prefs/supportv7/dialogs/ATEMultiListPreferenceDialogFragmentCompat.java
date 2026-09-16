@@ -73,8 +73,6 @@ public class ATEMultiListPreferenceDialogFragmentCompat extends ATEPreferenceDia
                 onDialogClosed(true);
             }
         });
-//        builder.setNegativeButton(null, null);
-//        builder.setNeutralButton(null, null);
     }
 
     @Override

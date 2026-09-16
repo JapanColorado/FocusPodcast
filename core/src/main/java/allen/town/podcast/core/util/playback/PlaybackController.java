@@ -1,7 +1,9 @@
 package allen.town.podcast.core.util.playback;
 
+
 import static android.content.Context.RECEIVER_EXPORTED;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
@@ -83,6 +85,10 @@ public abstract class PlaybackController {
         }
     }
 
+    // Lint's UnspecifiedRegisterReceiverFlag fires on the pre-Android-13 branch below,
+    // where the two-argument registerReceiver is the only overload that exists. The
+    // exported flags are passed on Android 13+, which is where they are enforced.
+    @SuppressLint("UnspecifiedRegisterReceiverFlag")
     private synchronized void initServiceRunning() {
         if (initialized) {
             return;
@@ -91,16 +97,12 @@ public abstract class PlaybackController {
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             activity.registerReceiver(statusUpdate, new IntentFilter(
-                PlaybackService.ACTION_PLAYER_STATUS_CHANGED),RECEIVER_EXPORTED);
+                PlaybackService.ACTION_PLAYER_STATUS_CHANGED), RECEIVER_EXPORTED);
+            activity.registerReceiver(notificationReceiver, new IntentFilter(
+                PlaybackService.ACTION_PLAYER_NOTIFICATION), RECEIVER_EXPORTED);
         } else {
             activity.registerReceiver(statusUpdate, new IntentFilter(
                 PlaybackService.ACTION_PLAYER_STATUS_CHANGED));
-        }
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            activity.registerReceiver(notificationReceiver, new IntentFilter(
-                PlaybackService.ACTION_PLAYER_NOTIFICATION),RECEIVER_EXPORTED);
-        } else {
             activity.registerReceiver(notificationReceiver, new IntentFilter(
                 PlaybackService.ACTION_PLAYER_NOTIFICATION));
         }
@@ -196,14 +198,12 @@ public abstract class PlaybackController {
     private final BroadcastReceiver statusUpdate = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-//            Log.d(TAG, "Received statusUpdate Intent.");
             if (playbackService != null) {
                 PlaybackServiceMediaPlayer.PSMPInfo info = playbackService.getPSMPInfo();
                 status = info.playerStatus;
                 media = info.playable;
                 handleStatus();
             } else {
-//                Log.w(TAG, "Couldn't receive status update: playbackService was null");
                 if (PlaybackService.isRunning) {
                     bindToService();
                 } else {
@@ -257,7 +257,6 @@ public abstract class PlaybackController {
      * should be used to update the GUI or start/cancel background threads.
      */
     private void handleStatus() {
-//        Log.d(TAG, "status: " + status.toString());
         checkMediaInfoLoaded();
         switch (status) {
             case PAUSED:
@@ -316,7 +315,6 @@ public abstract class PlaybackController {
      * information has to be refreshed
      */
     private void queryService() {
-//        Log.d(TAG, "Querying service info");
         if (playbackService != null) {
             PlaybackServiceMediaPlayer.PSMPInfo info = playbackService.getPSMPInfo();
             status = info.playerStatus;

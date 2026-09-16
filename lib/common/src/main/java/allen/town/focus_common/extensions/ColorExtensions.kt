@@ -161,7 +161,6 @@ fun Chip.accentBackgroundColor() {
 fun Chip.elevatedAccentColor() {
     if (materialYou) return
     val color = context.darkAccentColorVariant()
-//    rippleColor = ColorStateList.valueOf(color)
     setTextColor(MaterialValueHelper.getPrimaryTextColor(context, color.isColorLight))
 
     chipBackgroundColor = ColorStateList.valueOf(color)
@@ -192,9 +191,6 @@ fun MaterialButton.accentOutlineBackgroundColor() {
     if (materialYou) return
     val color = ThemeStore.accentColor(context)
     val colorStateList = ColorStateList.valueOf(color)
-//    iconTint = colorStateList
-//    strokeColor = colorStateList
-//    setTextColor(colorStateList)
     val sl = ColorStateList(
         arrayOf(
             intArrayOf(android.R.attr.state_enabled, -android.R.attr.state_checked),
@@ -206,20 +202,17 @@ fun MaterialButton.accentOutlineBackgroundColor() {
     )
 
     backgroundTintList = sl
-//    rippleColor = colorStateList
 }
 
 fun MaterialCardView.accentBackgroundColor() {
     if (materialYou) return
     val color = context.darkAccentColorVariant()
-//    rippleColor = ColorStateList.valueOf(color)
     setCardBackgroundColor(color)
 }
 
 fun MaterialButton.elevatedAccentColor() {
     if (materialYou) return
     val color = context.darkAccentColorVariant()
-//    rippleColor = ColorStateList.valueOf(color)
     setBackgroundColor(color)
     setTextColor(MaterialValueHelper.getPrimaryTextColor(context, color.isColorLight))
     iconTint = ColorStateList.valueOf(context.accentColor())

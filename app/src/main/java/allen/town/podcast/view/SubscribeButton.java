@@ -92,20 +92,20 @@ public class SubscribeButton extends View {
         int accentColor = ThemeStore.accentColor(getContext());
         int color2 = resources.getColor(R.color.primary_color_5);
         try {
-            this.mSubscribeDrawable = obtainStyledAttributes.getDrawable(18);
-            this.mSubscribedDrawable = obtainStyledAttributes.getDrawable(16);
-            this.mInnerSize = obtainStyledAttributes.getDimensionPixelSize(12, resources.getDimensionPixelOffset(R.dimen.episode_item_play_pause_inner_size));
-            this.mCircleRingWidth = obtainStyledAttributes.getDimensionPixelSize(4, 0);
-            int color3 = obtainStyledAttributes.getColor(1, color);
-            this.mShowCircleShadow = obtainStyledAttributes.getBoolean(23, false);
-            float f = obtainStyledAttributes.getFloat(6, 20.0f);
-            int integer = obtainStyledAttributes.getInteger(5, 180);
-            float dimensionPixelSize = obtainStyledAttributes.getDimensionPixelSize(7, 0);
-            this.mCircleRingColor = obtainStyledAttributes.getColor(3, this.mCircleRingColor);
-            obtainStyledAttributes.getColor(9, themedColor);
-            obtainStyledAttributes.getColor(27, themedColor2);
-            obtainStyledAttributes.getColor(21, accentColor);
-            obtainStyledAttributes.getColor(17, color2);
+            this.mSubscribeDrawable = obtainStyledAttributes.getDrawable(R.styleable.PlayPauseProgressButton_playIconSrc);
+            this.mSubscribedDrawable = obtainStyledAttributes.getDrawable(R.styleable.PlayPauseProgressButton_pauseIconSrc);
+            this.mInnerSize = obtainStyledAttributes.getDimensionPixelSize(R.styleable.PlayPauseProgressButton_innerSize, resources.getDimensionPixelOffset(R.dimen.episode_item_play_pause_inner_size));
+            this.mCircleRingWidth = obtainStyledAttributes.getDimensionPixelSize(R.styleable.PlayPauseProgressButton_circleRingWidth, 0);
+            int color3 = obtainStyledAttributes.getColor(R.styleable.PlayPauseProgressButton_circleFillColor, color);
+            this.mShowCircleShadow = obtainStyledAttributes.getBoolean(R.styleable.PlayPauseProgressButton_showCircleShadow, false);
+            float f = obtainStyledAttributes.getFloat(R.styleable.PlayPauseProgressButton_circleShadowRadius, 20.0f);
+            int integer = obtainStyledAttributes.getInteger(R.styleable.PlayPauseProgressButton_circleShadowAlpha, 180);
+            float dimensionPixelSize = obtainStyledAttributes.getDimensionPixelSize(R.styleable.PlayPauseProgressButton_circleShadowY, 0);
+            this.mCircleRingColor = obtainStyledAttributes.getColor(R.styleable.PlayPauseProgressButton_circleRingColor, this.mCircleRingColor);
+            obtainStyledAttributes.getColor(R.styleable.PlayPauseProgressButton_currentProgressColor, themedColor);
+            obtainStyledAttributes.getColor(R.styleable.PlayPauseProgressButton_throbColor, themedColor2);
+            obtainStyledAttributes.getColor(R.styleable.PlayPauseProgressButton_pulseRingColor, accentColor);
+            obtainStyledAttributes.getColor(R.styleable.PlayPauseProgressButton_pauseThrobColor, color2);
             obtainStyledAttributes.recycle();
             Drawable drawable = this.mSubscribeDrawable;
             if (drawable != null) {

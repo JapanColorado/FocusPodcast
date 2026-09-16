@@ -6,24 +6,12 @@
     <string name="done">Terminé</string>
     <string name="pref_language_name">Sélectionner la langue</string>
     <string name="add_action">Ajouter</string>
-    <string name="email_app_not_found">Impossible de lancer l\'application de messagerie</string>
     <string name="copied_to_clipboard">Copié dans le presse-papiers</string>
     <string name="share">Partager</string>
     <string name="send_file">Veuillez m\'envoyer un e-mail, et l\'adresse e-mail a été copiée</string>
     <string name="asc">Ascendant</string>
     <string name="desc">Descendant</string>
     <string name="title">Titre</string>
-    <string name="backup">Sauvegarde</string>
-    <string name="one_drive" translatable="false">Un seul disque</string>
-    <string name="connect">Se connecter à</string>
-    <string name="already_connect">connecté</string>
-    <string name="backup_failed">Échec de la sauvegarde</string>
-    <string name="already_backup_webdav">Sauvegardé sur WebDAV</string>
-    <string name="restore_success">La restauration a réussi, veuillez redémarrer l\'application</string>
-    <string name="restore_failed">La restauration a échoué</string>
-    <string name="already_backup_one_drive">Sauvegardé sur un lecteur</string>
-    <string name="backup_not_found">Aucun fichier de sauvegarde trouvé</string>
-    <string name="select">Sélectionner</string>
     <string name="made_by">Par ville allen</string>
     <string name="twitter_follow_me">Suivez-moi</string>
     <string name="others_app_of_us">Nos autres applications</string>
@@ -33,45 +21,16 @@
     <string name="communication">Communication</string>
     <string name="change_log">Journal des modifications</string>
     <string name="others">Autres</string>
-    <string name="restore">Restaurer</string>
-    <string name="purchase">Achat</string>
-    <string name="month">mois</string>
-    <string name="months">mois</string>
-    <string name="day_trial">Essai de %1$d jours</string>
-    <string name="premium">Premium</string>
-    <string name="annually">annuellement</string>
-    <string name="free">Gratuit</string>
     <string name="colors">Couleurs</string>
 
     <string name="today">Aujourd\'hui</string>
     <string name="not_today">Pas aujourd\'hui</string>
     <string name="yesterday">Hier</string>
 
-    <string name="cancel_any_time">%1$s, annulez à tout moment.</string>
-    <string name="premium_pro_tip">Votre pro premium est activé</string>
 
-    <string name="payment_iap_sucess">ACHETÉ</string>
-    <string name="payment_price_3month">%1$s / 3 mois</string>
-    <string name="payment_price_6month">%1$s / 6 mois</string>
-    <string name="payment_price_month">%1$s / mois</string>
-    <string name="payment_price_week">%1$s / semaine</string>
-    <string name="payment_price_year">%1$s / an</string>
-    <string name="then_price">puis %1$s</string>
-    <string name="then_price_year">puis %1$s / an</string>
-    <string name="try_it_free">Essayez-le gratuitement</string>
 
-    <string name="thanks_purchase">Abonnement réussi, merci pour votre achat</string>
-    <string name="restore_purchase">Restaurer l\'achat</string>
-    <string name="restore_tip">J\'ai déjà payé, cliquez pour restaurer l\'achat</string>
-    <string name="expired_time">Valable jusqu\'au: </string>
 
-    <string name="google_service_not_install">Le service Google n\'est peut-être pas installé, ne pourra pas payer</string>
 
-    <string name="subscribe_monthly">1 mois\n</string>
-    <string name="subscribe_weekly">1semaine\n</string>
-    <string name="subscribe_yearly">1 an\n</string>
-    <string name="subscribe_quaterly">3 mois\n</string>
-    <string name="recommend">Recommandé</string>
 
     <string name="search_history">Historique des recherches</string>
     <string name="expanded">Développé</string>
@@ -84,16 +43,7 @@
     <string name="share_to_friends">Partager avec des amis</string>
     <string name="share_to_friends_tip">Hé! Voici le lien pour télécharger l\'application %s. J\'aime beaucoup cette application et j\'espère que vous l\'aimerez aussi.</string>
 
-    <string name="rewarded_title">Annonce avec récompense</string>
-    <string name="rewarded_ad_not_ready">L\'annonce avec récompense n\'était pas encore prête, veuillez fermer l\'application et réessayer</string>
-    <string name="rewarded_ad_tip">Vous regarderez une annonce avec récompense pendant quelques secondes, et après chaque vue, vous serez récompensé:\n1. Il n\'y aura plus d\'annonces aujourd\'hui\n2. Vous débloquerez toutes les fonctionnalités de la version premium pendant une heure\n\n
-Vous pouvez regarder à plusieurs reprises pour obtenir cette récompense à plusieurs reprises</string>
-    <string name="rewarded_ad_one_hour_tip">Vous regarderez une annonce avec récompense pendant quelques secondes, et après chaque vue, vous
-         sera récompensé:\n1. Vous débloquerez les fonctionnalités Premium pendant 10 minutes\n\n
-Jusqu\'à 2 fois par jour, les récompenses seront cumulées après chaque visionnage</string>
 
-    <string name="rewarded_locked">Vous avez déverrouillé les fonctionnalités Premium jusqu\'au %s</string>
-    <string name="pref_title_tab_text_mode">Mode des titres d\'onglet</string>
     <string name="auto">Auto</string>
     <string name="labeled">Étiqueté</string>
     <string name="selected">Sélectionné</string>
@@ -108,33 +58,7 @@ Jusqu\'à 2 fois par jour, les récompenses seront cumulées après chaque visio
     <!-- À propos de l\'écran -->
     <string name="about_pref">À propos</string>
     <string name="privacy_policy">Politique de confidentialité</string>
-    <string name="buy_now">Afficher toutes les fonctionnalités avancées</string>
-    <string name="help_me_translate_tip">aidez-nous à traduire</string>
 
-    <string name="remove_ads_modest">Modestie</string>
-    <string name="remove_ads_suggested">Recommandations 🙏 </string>
-    <string name="remove_ads_generous">Générosité 👑</string>
-    <string name="remove_ads_tip">Supprimez les publicités en faisant le don suivant</string>
     <string name="pref_custom_launcher_title">Lanceur personnalisé</string>
     <string name="pref_custom_launcher_summary">Tous les téléphones portables ne prennent pas en charge cette fonctionnalité, veuillez tester par vous-même</string>
-    <string name="memory_manage">Gestion de la mémoire</string>
-    <string name="backup_category">Options de sauvegarde et de restauration</string>
-    <string name="clear_memory">Nettoyer la mémoire</string>
-    <string name="delete_cache">Supprimer le cache maintenant</string>
-    <string name="cache_dialog">Supprimer le Cache ?</string>
-    <string name="not_cache">Ceci ne s\'applique pas dans le cache de l\'application.</string>
-    <string name="current_cache_size">Taille actuelle du cache</string>
-    <string name="cache_dialog_summary">Cette action ne peut être annulée</string>
-    <string name="trimming">Réduction en cours...</string>
-    <string name="trim_success">Réduction réussie</string>
-    <string name="pro_tip_fonts">Plus d\'options de police</string>
-    <string name="pro_tip_custom_icon">Icône d\'application personnalisée</string>
-    <string name="pro_tip_lazy_mode">Mode paresseux, défilement automatique des articles, vous permettant de profiter d\'un contenu passionnant sans bouger votre pouce</string>
-    <string name="pro_tip_remove_ads">Supprimer les publicités</string>
-    <string name="pro_tip_switch_account">Passez rapidement d\'un compte à l\'autre lorsque vous faites des commentaires et des publications</string>
-    <string name="next">Suivant</string>
-    <string name="loading_instance">Récupération des informations serveur…</string>
-    <string name="not_a_mastodon_instance">%s ne semble pas être un serveur Mastodon.</string>
-    <string name="server_rules_disagree">Refuser</string>
-    <string name="i_agree">J’accepte</string>
 </resources>

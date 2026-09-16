@@ -2,6 +2,7 @@ package allen.town.podcast.core.service.playback;
 
 import static allen.town.podcast.model.feed.FeedPreferences.SPEED_USE_GLOBAL;
 
+import android.annotation.SuppressLint;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
@@ -251,6 +252,10 @@ public class PlaybackService extends MediaBrowserServiceCompat {
         }
     }
 
+    // Lint's UnspecifiedRegisterReceiverFlag fires on the pre-Android-13 branch below,
+    // where the two-argument registerReceiver is the only overload that exists. The
+    // exported flags are passed on Android 13+, which is where they are enforced.
+    @SuppressLint("UnspecifiedRegisterReceiverFlag")
     @Override
     public void onCreate() {
         super.onCreate();
@@ -271,6 +276,8 @@ public class PlaybackService extends MediaBrowserServiceCompat {
             registerReceiver(pausePlayCurrentEpisodeReceiver, new IntentFilter(ACTION_PAUSE_PLAY_CURRENT_EPISODE), RECEIVER_NOT_EXPORTED);
             registerReceiver(lockScreenReceiver, new IntentFilter(Intent.ACTION_SCREEN_OFF), RECEIVER_EXPORTED);
         } else {
+            // Pre-Android-13 registerReceiver takes no exported flag, which is what lint's
+            // UnspecifiedRegisterReceiverFlag asks for; the flags are passed in the branch above.
             registerReceiver(autoStateUpdated, new IntentFilter("com.google.android.gms.car.media.STATUS"));
             registerReceiver(headsetDisconnected, new IntentFilter(Intent.ACTION_HEADSET_PLUG));
             registerReceiver(shutdownReceiver, new IntentFilter(ACTION_SHUTDOWN_PLAYBACK_SERVICE));
@@ -547,10 +554,8 @@ public class PlaybackService extends MediaBrowserServiceCompat {
             if (keycode != -1) {
                 boolean notificationButton;
                 if (hardwareButton) {
-//                    Log.d(TAG, "Received hardware button event");
                     notificationButton = false;
                 } else {
-//                    Log.d(TAG, "Received media button event");
                     notificationButton = true;
                 }
                 boolean handled = handleKeycode(keycode, notificationButton);
@@ -860,8 +865,6 @@ public class PlaybackService extends MediaBrowserServiceCompat {
                     PlaybackPreferences.writePlayerStatus(mediaPlayer.getPlayerStatus());
                     break;
                 case STOPPED:
-                    //writePlaybackPreferencesNoMediaPlaying();
-                    //stopService();
                     break;
                 case PLAYING:
                     PlaybackPreferences.writePlayerStatus(mediaPlayer.getPlayerStatus());
@@ -1365,8 +1368,6 @@ public class PlaybackService extends MediaBrowserServiceCompat {
             playableIconLoaderThread.interrupt();
         }
         if (playable == null || mediaPlayer == null) {
-//            Log.d(TAG, "setupNotification: playable=" + playable);
-//            Log.d(TAG, "setupNotification: mediaPlayer=" + mediaPlayer);
             if (!stateManager.hasReceivedValidStartCommand()) {
                 stateManager.stopService();
             }
@@ -1414,7 +1415,6 @@ public class PlaybackService extends MediaBrowserServiceCompat {
             duration = playable.getDuration();
         }
         if (position != INVALID_TIME && duration != INVALID_TIME && playable != null) {
-//            Log.d(TAG, "Saving current position to " + position);
             PlayableUtils.saveCurrentPosition(playable, position, System.currentTimeMillis());
         }
     }
@@ -1452,9 +1452,7 @@ public class PlaybackService extends MediaBrowserServiceCompat {
         public void onReceive(Context context, Intent intent) {
             String status = intent.getStringExtra("media_connection_status");
             boolean isConnectedToCar = "media_connected".equals(status);
-//            Log.d(TAG, "Received Auto Connection update: " + status);
             if (!isConnectedToCar) {
-//                Log.d(TAG, "Car was unplugged during playback.");
             } else {
                 PlayerStatus playerStatus = mediaPlayer.getPlayerStatus();
                 if (playerStatus == PlayerStatus.PAUSED || playerStatus == PlayerStatus.PREPARED) {

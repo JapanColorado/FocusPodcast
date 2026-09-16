@@ -45,7 +45,7 @@ import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 
 public class ImportExportPreferencesFragment extends AbsSettingsFragment {
-    private static final String TAG = "ImportExportPreferencesFragment";
+    private static final String TAG = "ImportExportPrefs";
     private static final String PREF_OPML_EXPORT = "prefOpmlExport";
     private static final String PREF_OPML_IMPORT = "prefOpmlImport";
     private static final String PREF_DATABASE_IMPORT = "prefDatabaseImport";
@@ -189,7 +189,6 @@ public class ImportExportPreferencesFragment extends AbsSettingsFragment {
             );
         alert.setNeutralButton(android.R.string.ok, (dialog, which) -> dialog.dismiss());
         alert.setTitle(R.string.export_success_title);
-//        alert.setMessage(getContext().getString(R.string.export_success_sum, path));
         alert.setPositiveButton(R.string.share_label, (dialog, which) -> {
             new ShareCompat.IntentBuilder(getContext())
                     .setType(exportType.contentType)

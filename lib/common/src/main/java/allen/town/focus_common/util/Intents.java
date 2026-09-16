@@ -18,7 +18,7 @@ public class Intents {
         try {
             Intent intent = new Intent("android.intent.action.VIEW");
             intent.setData(Uri.parse(str));
-            intent.setFlags(268435456);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             return startActivity(context, intent);
         } catch (Exception exception) {
             Timber.e(exception, "launchUrl");
@@ -59,7 +59,7 @@ public class Intents {
 
     public static void startNewTask(Context context, Class cls) {
         Intent intent = new Intent(context, cls);
-        intent.setFlags(268468224);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         context.startActivity(intent);
     }
 

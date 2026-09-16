@@ -34,7 +34,6 @@ class StorePositionRecyclerView : RecyclerView {
         layoutManager!!.recycleChildrenOnDetach = true
         setLayoutManager(layoutManager)
         setHasFixedSize(true)
-        //        addItemDecoration(new DividerItemDecoration(getContext(), layoutManager.getOrientation()));
         clipToPadding = false
     }
 

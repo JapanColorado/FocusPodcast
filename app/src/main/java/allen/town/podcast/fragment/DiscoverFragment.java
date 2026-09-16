@@ -60,10 +60,8 @@ import allen.town.podcast.databinding.DiscoverLayoutBinding;
 import allen.town.podcast.discovery.CombinedSearcher;
 import allen.town.podcast.discovery.ItunesCategoryTopLoader;
 import allen.town.podcast.discovery.PodcastSearchResult;
-import allen.town.podcast.event.DiscoveryDefaultUpdateEvent;
 import allen.town.podcast.event.FeedListUpdateEvent;
 import allen.town.podcast.event.ItunesCategoryChangeEvent;
-import allen.town.podcast.event.ShowSwitchCountryEvent;
 import allen.town.focus_common.common.prefs.supportv7.dialogs.PreferenceListDialog;
 import allen.town.podcast.model.feed.Feed;
 import allen.town.podcast.model.feed.SortOrder;
@@ -215,7 +213,7 @@ public class DiscoverFragment extends Fragment implements Toolbar.OnMenuItemClic
             }
             return true;
         } else if (itemId == R.id.switch_country) {
-            EventBus.getDefault().post(new ShowSwitchCountryEvent());
+            showSwitchCountryDialog();
             return true;
         } else if (itemId == R.id.search) {
             performSearch();
@@ -338,7 +336,6 @@ public class DiscoverFragment extends Fragment implements Toolbar.OnMenuItemClic
                     .putString(ItunesCategoryTopLoader.PREF_KEY_COUNTRY_CODE, countryCode)
                     .apply();
 
-            EventBus.getDefault().post(new DiscoveryDefaultUpdateEvent());
             loadToplist(countryCode);
 
         });
@@ -395,11 +392,6 @@ public class DiscoverFragment extends Fragment implements Toolbar.OnMenuItemClic
         }
     }
 
-
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    public void showSwitchCountry(ShowSwitchCountryEvent event) {
-        showSwitchCountryDialog();
-    }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void changeItunesCategory(ItunesCategoryChangeEvent itunesCategoryChangeEvent) {

@@ -1,5 +1,6 @@
 package allen.town.podcast.fragment
 
+import allen.town.podcast.core.view.TopAppBarLayout
 import allen.town.focus_common.util.DoubleClickBackToContentTopListener
 import allen.town.focus_common.util.MenuIconUtil.showToolbarMenuIcon
 import allen.town.focus_common.util.TopSnackbarUtil.showSnack
@@ -181,7 +182,7 @@ abstract class EpisodesListFragment : Fragment(), OnSelectModeListener, DoubleCl
         super.onCreateView(inflater, container, savedInstanceState)
         val root = inflater.inflate(R.layout.all_episodes_fragment, container, false)
         txtvInformation = root.findViewById(R.id.txtvInformation)
-        toolbar = root.findViewById(R.id.toolbar)
+        toolbar = root.findViewById<TopAppBarLayout>(R.id.appBarLayout).toolbar
         toolbar.inflateMenu(R.menu.episodes)
         showToolbarMenuIcon(toolbar)
         toolbar.setOnMenuItemClickListener(Toolbar.OnMenuItemClickListener { item: MenuItem ->
@@ -214,7 +215,6 @@ abstract class EpisodesListFragment : Fragment(), OnSelectModeListener, DoubleCl
             )
         }
         progLoading = root.findViewById(R.id.progLoading)
-        //        progLoading.setVisibility(View.VISIBLE);
         loadingMoreView = root.findViewById(R.id.loadingMore)
         emptyView = EmptyViewHandler(context)
         emptyView.attachToRecyclerView(recyclerView)
@@ -271,7 +271,6 @@ abstract class EpisodesListFragment : Fragment(), OnSelectModeListener, DoubleCl
                 recyclerView.post {
                     isLoadingMore = false
                 } // Make sure to not always load 2 pages at once
-                //                        progLoading.setVisibility(View.GONE);
                 if (skeleton!!.isSkeleton()) {
                     skeletonRecyclerDelay.showOriginal()
                 }

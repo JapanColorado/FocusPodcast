@@ -103,7 +103,6 @@ public class PlaybackServiceTaskManager {
     public synchronized void cancelPositionSaver() {
         if (isPositionSaverActive()) {
             positionSaverFuture.cancel(false);
-//            Log.d(TAG, "Cancelled PositionSaver");
         }
     }
 
@@ -181,7 +180,6 @@ public class PlaybackServiceTaskManager {
      */
     public synchronized void restartSleepTimer() {
         if (isSleepTimerActive()) {
-//            Log.d(TAG, "Restarting sleep timer");
             sleepTimer.restart();
         }
     }
@@ -210,7 +208,6 @@ public class PlaybackServiceTaskManager {
     public synchronized void cancelWidgetUpdater() {
         if (isWidgetUpdaterActive()) {
             widgetUpdaterFuture.cancel(false);
-//            Log.d(TAG, "Cancelled WidgetUpdater");
         }
     }
 

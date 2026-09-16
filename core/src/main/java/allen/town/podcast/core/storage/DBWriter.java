@@ -209,15 +209,9 @@ public class DBWriter {
      * Deletes the entire playback history.
      */
     public static void clearUnuseAndNotSubedFeedItems(@NonNull Context context) {
-//            List<FeedItem> items = DBReader.getUnsubFeedItems();
-            // Deleting the items but keeping the feed would be odd
-//            if (items.size() > (BuildConfig.DEBUG ? 0 : 1000)) {
-//                Timber.i("found items not subed to delete " + items.size());
                 Db adapter = Db.getInstance();
                 try {
-//                    deleteFeedItemsSynchronous(context, items);
                     List<Long> notSubAndNotInPlaylistAndFavFeedList = DBReader.getNotSubAndNotInPlaylistAndFavFeedList(adapter);
-//                    adapter.getDb().beginTransactionNonExclusive();
                     if (notSubAndNotInPlaylistAndFavFeedList.size() > 0) {
                         Timber.i("found feeds not subed and no-fav and no-playlist to delete " + notSubAndNotInPlaylistAndFavFeedList.size());
                         for (Long feedId : notSubAndNotInPlaylistAndFavFeedList
@@ -227,7 +221,6 @@ public class DBWriter {
                         }
                     }
 
-//                    adapter.getDb().setTransactionSuccessful();
                 } catch (Exception e) {
                     Log.e(TAG, Log.getStackTraceString(e));
                 } finally {

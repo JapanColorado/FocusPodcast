@@ -93,13 +93,6 @@ class ItunesAdapter(
         val isSubscribedOut = RssSearchActivity.feedInFeedlist(subscribedFeedsList, feedOut)
         //subscribe button state
         viewHolder.subscribe_button.setAccentDefaultTheme()
-//        itemView.setBackgroundResource(ThemeUtils.getDrawableFromAttr(activity, R.attr.rectSelector));
-//        viewHolder.itemView.setBackgroundColor(
-//            getColorFromAttr(
-//                viewHolder.itemView.context,
-//                R.attr.colorSurface
-//            )
-//        )
         (viewHolder.itemView as MaterialCardView).isChecked = false
         viewHolder.playing_lottie.visibility = View.GONE
 
@@ -187,7 +180,6 @@ class ItunesAdapter(
                     Timber.v("we got FeedItem in db {${episodeSearchResult.title}}")
                     feedItems.add(it)
                     viewHolder.bindFeedItem(it)
-//                    notifyItemChanged(viewHolder.bindingAdapterPosition, "search_episodes")
                 }) {
                     Observable.fromCallable {
                         val feedFromDb = DBReader.getFeed(
@@ -205,7 +197,6 @@ class ItunesAdapter(
                             DBWriter.setFeedItemExcludeFeed(feedItemToInsert)
                             feedItems.add(feedItemToInsert)
                             viewHolder.bindFeedItem(feedItemToInsert)
-//                            notifyItemChanged(viewHolder.bindingAdapterPosition, "search_episodes")
                         }, {
 
                             val feedToInsert = Feed().also {
@@ -361,9 +352,6 @@ class ItunesAdapter(
                                 }
                             }
 
-//                                    feedToRemove.setSubscribed(true);
-//                                    subscribedFeedsList.add(feedToRemove);
-//                                    notifyDataSetChanged();
                         showSnack(
                             viewHolder.itemView.context,
                             R.string.subscribing_label,

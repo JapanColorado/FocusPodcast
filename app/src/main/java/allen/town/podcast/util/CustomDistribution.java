@@ -141,17 +141,6 @@ public final class CustomDistribution {
 
 
     /**
-     * The default wizard info for this distrib. If none no custom distribution
-     * wizard is shown
-     *
-     * @return the default wizard info
-    //     */
-//    public static WizardInfo getCustomDistributionWizard() {
-//        // modified by txp,2013-5-7 default wizard is nv
-//        return WizardUtils.getWizardClass(WizardUtils.NV_WIZARD_TAG);
-//    }
-
-    /**
      * Show or not the issue list in help
      *
      * @return whether link to issue list should be displayed

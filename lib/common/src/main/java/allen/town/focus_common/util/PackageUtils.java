@@ -26,40 +26,6 @@ public class PackageUtils {
         }
     }
 
-    private static String versionName;
-
-    public static String getVersionName(Context context) {
-        if (!TextUtils.isEmpty(versionName)) {
-            return versionName;
-        }
-        PackageInfo packageInfo = getPackageInfo(context);
-        if (packageInfo != null) {
-            return versionName = packageInfo.versionName;
-        } else {
-            return null;
-        }
-    }
-
-    /**
-     * Get the version code.
-     *
-     * @param context
-     * @return
-     */
-    private static int versionCode = -1;
-
-    public static int getAppVersion(Context context) {
-        if (versionCode != -1) {
-            return versionCode;
-        }
-        PackageInfo packageInfo = getPackageInfo(context);
-        if (packageInfo != null) {
-            return packageInfo.versionCode;
-        }
-        return 1;
-    }
-
-
     private static String packageName;
 
     public static String getPackageName(Context context) {
@@ -71,20 +37,6 @@ public class PackageUtils {
             return packageName = packageInfo.packageName;
         } else {
             return null;
-        }
-    }
-
-    private static int appIcon;
-
-    public static int getPackageIcon(Context context) {
-        if (appIcon > 0) {
-            return appIcon;
-        }
-        PackageInfo packageInfo = getPackageInfo(context);
-        if (packageInfo != null) {
-            return appIcon = packageInfo.applicationInfo.icon;
-        } else {
-            return 0;
         }
     }
 

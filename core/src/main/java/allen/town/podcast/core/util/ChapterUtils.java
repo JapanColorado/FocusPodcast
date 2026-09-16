@@ -163,7 +163,6 @@ public class ChapterUtils {
         Collections.sort(chapters, new ChapterStartTimeComparator());
         enumerateEmptyChapterTitles(chapters);
         if (!chaptersValid(chapters)) {
-//            Log.e(TAG, "Chapter data was invalid");
             return Collections.emptyList();
         }
         return chapters;

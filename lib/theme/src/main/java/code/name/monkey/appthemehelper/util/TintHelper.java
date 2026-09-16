@@ -7,6 +7,8 @@ import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.RippleDrawable;
+import android.os.Build;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -23,10 +25,10 @@ import androidx.annotation.ColorInt;
 import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.widget.AppCompatEditText;
 import androidx.appcompat.widget.SwitchCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.graphics.drawable.DrawableCompat;
+import androidx.core.view.ViewCompat;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.materialswitch.MaterialSwitch;
@@ -117,6 +119,23 @@ public final class TintHelper {
     }
 
     public static void setCursorTint(@NonNull EditText editText, @ColorInt int color) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            Drawable cursor = editText.getTextCursorDrawable();
+            if (cursor != null) {
+                editText.setTextCursorDrawable(createTintedDrawable(cursor, color));
+            }
+            return;
+        }
+        setCursorTintLegacy(editText, color);
+    }
+
+    /**
+     * Pre-API-29 there is no public API for the cursor drawable, so the private
+     * TextView/Editor fields are the only option. The reflective names are hidden
+     * (and blocked from API 29 on), hence the suppressions and the silent failure.
+     */
+    @SuppressLint({"SoonBlockedPrivateApi", "BlockedPrivateApi", "DiscouragedPrivateApi"})
+    private static void setCursorTintLegacy(@NonNull EditText editText, @ColorInt int color) {
         try {
             Field fCursorDrawableRes = TextView.class.getDeclaredField("mCursorDrawableRes");
             fCursorDrawableRes.setAccessible(true);
@@ -134,7 +153,7 @@ public final class TintHelper {
             drawables[1] = createTintedDrawable(drawables[1], color);
             fCursorDrawable.set(editor, drawables);
         } catch (Exception e) {
-            e.printStackTrace();
+            Log.w("TintHelper", "could not tint the text cursor", e);
         }
     }
 
@@ -186,11 +205,7 @@ public final class TintHelper {
                         useDarker ? R.color.ate_control_normal_dark : R.color.ate_control_normal_light),
                 color
         });
-        if (editText instanceof AppCompatEditText) {
-            ((AppCompatEditText) editText).setSupportBackgroundTintList(editTextColorStateList);
-        } else {
-            editText.setBackgroundTintList(editTextColorStateList);
-        }
+        ViewCompat.setBackgroundTintList(editText, editTextColorStateList);
         setCursorTint(editText, color);
     }
 

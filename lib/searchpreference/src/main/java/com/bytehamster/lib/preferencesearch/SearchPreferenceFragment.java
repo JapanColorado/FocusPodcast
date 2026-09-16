@@ -98,7 +98,6 @@ public class SearchPreferenceFragment extends Fragment implements SearchPreferen
         adapter.setOnItemClickListener(this);
         viewHolder.recyclerView.setAdapter(adapter);
         viewHolder.recyclerView.setVerticalScrollBarEnabled(false);
-//        ThemedFastScroller.create(viewHolder.recyclerView);
         viewHolder.recyclerView.setOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {

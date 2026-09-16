@@ -71,12 +71,10 @@ open class BlurCardAudioPlayerFragment : AudioPlayerFragment(false) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-//        ToolbarContentTintHelper.colorizeToolbar(toolbar, Color.WHITE, activity)
         initBlur()
     }
     private var lastRequest: GlideRequest<Drawable>? = null
     private fun initBlur() {
-//        GlideApp.with(this).load(ColorDrawable(Color.DKGRAY)).into(colorBackground)
 
     }
 

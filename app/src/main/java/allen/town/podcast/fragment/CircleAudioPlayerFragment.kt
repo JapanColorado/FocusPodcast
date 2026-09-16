@@ -16,16 +16,6 @@ import allen.town.podcast.event.CoverColorChangeEvent
 class CircleAudioPlayerFragment : AudioPlayerFragment(false) {
     override fun coverColorUpdate(event: CoverColorChangeEvent) {
         super.coverColorUpdate(event)
-//        colorGradientBackground.visibility = GONE
-//        _binding.colorBackground.visibility = VISIBLE
-//        _binding.colorBackground.setBackgroundColor(event.color.backgroundColor)
-//        ToolbarContentTintHelper.colorizeToolbar(_binding.toolbar, event.color.secondaryTextColor, activity)
-//        sbPosition.applyColor(accentColor(requireContext()))
-//        ViewUtil.setProgressDrawable(
-//            sbPosition,
-//            accentColor(requireContext()),
-//            false
-//        )
         var colorFinal: Int
         colorFinal = if (Prefs.isAdapterColor) {
             event.color.primaryTextColor
@@ -38,7 +28,6 @@ class CircleAudioPlayerFragment : AudioPlayerFragment(false) {
         TintHelper.setTintAuto(butPlay, event.color.backgroundColor, false)
         sbPosition.applyColor(colorFinal)
 
-//        lastPlaybackControlsColor = event.color.secondaryTextColor
 
         butFF.setColorFilter(colorFinal, PorterDuff.Mode.SRC_IN)
         butRev.setColorFilter(colorFinal, PorterDuff.Mode.SRC_IN)
@@ -51,7 +40,6 @@ class CircleAudioPlayerFragment : AudioPlayerFragment(false) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-//        ToolbarContentTintHelper.colorizeToolbar(_binding.toolbar, Color.WHITE, activity)
     }
 
 

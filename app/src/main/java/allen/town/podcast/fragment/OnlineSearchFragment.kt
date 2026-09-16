@@ -1,5 +1,6 @@
 package allen.town.podcast.fragment
 
+import allen.town.podcast.core.view.TopAppBarLayout
 import allen.town.focus_common.util.TopSnackbarUtil
 import allen.town.focus_common.views.ItemCategoryDecoration
 import allen.town.podcast.R
@@ -62,7 +63,7 @@ constructor() : Fragment() {
     ): View {
         // Inflate the layout for this fragment
         val root: View = inflater.inflate(R.layout.collapsing_pager_fragment, container, false)
-        setupToolbar(root.findViewById(R.id.toolbar))
+        setupToolbar(root.findViewById<TopAppBarLayout>(R.id.appBarLayout).toolbar)
         viewPager = root.findViewById(R.id.viewpager)
         viewPager.setOffscreenPageLimit(2)
         viewPager.setAdapter(PagerAdapter(this))

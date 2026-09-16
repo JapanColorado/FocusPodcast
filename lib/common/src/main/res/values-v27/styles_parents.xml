@@ -27,7 +27,6 @@
     </style>
 
     <style name="Theme.FocusPodcast.Base" parent="Theme.FocusPodcast.Base.Black">
-<!--        <item name="android:actionOverflowButtonStyle">@style/Widget.ActionButton.Overflow</item>-->
 
         <!--Manual setting colors-->
         <item name="colorSurface">@color/darkColorSurface</item>

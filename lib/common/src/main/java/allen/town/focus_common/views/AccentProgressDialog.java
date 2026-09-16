@@ -4,9 +4,10 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.PorterDuff;
+import android.graphics.PorterDuffColorFilter;
+import android.graphics.drawable.Drawable;
+import android.view.View;
 import android.widget.ProgressBar;
-
-import java.lang.reflect.Field;
 
 import allen.town.focus_common.util.Timber;
 import code.name.monkey.appthemehelper.ThemeStore;
@@ -73,9 +74,16 @@ public class AccentProgressDialog {
 
     private static void init(final ProgressDialog progressDialog) {
         try {
-            Field declaredField = ProgressDialog.class.getDeclaredField("mProgress");
-            declaredField.setAccessible(true);
-            ((ProgressBar) declaredField.get(progressDialog)).getIndeterminateDrawable().setColorFilter(ThemeStore.accentColor(progressDialog.getContext()), PorterDuff.Mode.SRC_ATOP);
+            // android.R.id.progress is the id ProgressDialog gives its ProgressBar in
+            // both its spinner and its horizontal layout, so no reflection is needed.
+            View progressView = progressDialog.findViewById(android.R.id.progress);
+            if (progressView instanceof ProgressBar) {
+                Drawable drawable = ((ProgressBar) progressView).getIndeterminateDrawable();
+                if (drawable != null) {
+                    drawable.setColorFilter(new PorterDuffColorFilter(
+                            ThemeStore.accentColor(progressDialog.getContext()), PorterDuff.Mode.SRC_ATOP));
+                }
+            }
         } catch (Exception unused) {
             Timber.e(unused, "refresh");
         }

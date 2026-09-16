@@ -1,5 +1,6 @@
 package allen.town.podcast.fragment
 
+import allen.town.podcast.core.view.TopAppBarLayout
 import allen.town.focus_common.util.DoubleClickBackToContentTopListener
 import allen.town.focus_common.util.MenuIconUtil.showToolbarMenuIcon
 import allen.town.focus_common.util.Timber
@@ -91,7 +92,7 @@ class SubFeedsFragment : Fragment(), Toolbar.OnMenuItemClickListener, OnSelectMo
     ): View? {
         Timber.v("subfeeds oncreate view")
         val root = inflater.inflate(R.layout.fragment_subscriptions, container, false)
-        toolbar = root.findViewById(R.id.toolbar)
+        toolbar = root.findViewById<TopAppBarLayout>(R.id.appBarLayout).toolbar
         toolbar.setOnMenuItemClickListener(this)
         displayUpArrow = parentFragmentManager.backStackEntryCount != 0
         if (savedInstanceState != null) {
@@ -210,7 +211,6 @@ class SubFeedsFragment : Fragment(), Toolbar.OnMenuItemClickListener, OnSelectMo
         val loadLayoutAnimation =
             AnimationUtils.loadLayoutAnimation(context, R.anim.grid_layout_animation_from_bottom)
         subscriptionRecycler.layoutAnimation = loadLayoutAnimation
-//        subscriptionRecycler.scheduleLayoutAnimation()
 
         subscriptionAdapter = object : SubFeedsAdapter((activity as MainActivity?)!!) {
             override fun onCreateContextMenu(
@@ -228,11 +228,6 @@ class SubFeedsFragment : Fragment(), Toolbar.OnMenuItemClickListener, OnSelectMo
         }
         subscriptionAdapter!!.setOnSelectModeListener(this)
         subscriptionRecycler.adapter = subscriptionAdapter
-//        subscriptionRecycler.adapter = ScaleInAnimationAdapter(subscriptionAdapter!!).apply {
-//            setFirstOnly(true)
-//            setDuration(1500)
-//            setInterpolator(OvershootInterpolator(.5f))
-//        }
 
         subscriptionAdapter!!.setOnMenuItemClickListener(object :
             MultiSelectAdapter.OnMenuItemClickListener {

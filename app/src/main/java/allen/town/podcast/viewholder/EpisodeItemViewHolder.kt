@@ -59,7 +59,6 @@ class EpisodeItemViewHolder(private val activity: MainActivity, parent: ViewGrou
     private val isVideo: ImageView
     val isFavorite: ImageView
 
-    //    private final CircularProgressBar secondaryActionProgress;
     private val separatorIcons: TextView
     val separatorSize: TextView
     private val leftPadding: View
@@ -110,9 +109,6 @@ class EpisodeItemViewHolder(private val activity: MainActivity, parent: ViewGrou
             )
         }
         sizeDisposable = setSizeTextView(item.media, activity, size, separatorSize)
-        //        itemView.setBackgroundResource(ThemeUtils.getDrawableFromAttr(activity, R.attr.rectSelector));
-//        itemView.setBackgroundColor(ThemeUtils.getColorFromAttr(activity, R.attr.colorSurface));
-//        itemView.setSelected(false);
         (itemView as MaterialCardView).isChecked = false
         playingLottieView.visibility = View.GONE
         if (item.media != null) {
@@ -139,7 +135,6 @@ class EpisodeItemViewHolder(private val activity: MainActivity, parent: ViewGrou
         duration.visibility = if (media.duration > 0) View.VISIBLE else View.GONE
         progressLayout.visibility = View.VISIBLE
         if (FeedItemUtil.isCurrentlyPlaying(media)) {
-//            itemView.setSelected(true);
             (itemView as MaterialCardView).isChecked = true
             playingLottieView.visibility = View.VISIBLE
         }
@@ -151,18 +146,15 @@ class EpisodeItemViewHolder(private val activity: MainActivity, parent: ViewGrou
             null
         }
         if (downloadRequest != null) {
-            //            secondaryActionProgress.setPercentage(Math.max(percent, 0.01f), item);
             cancelDownloadButtons.visibility = View.VISIBLE
             downloadedButton.visibility = View.GONE
             downloadProgress.progress = downloadRequest.progressPercent
         } else if (media.isDownloaded) {
             downloadedButton.visibility = View.VISIBLE
             cancelDownloadButtons.visibility = View.GONE
-            //            secondaryActionProgress.setPercentage(1, item); // Do not animate 100% -> 0%
         } else {
             downloadedButton.visibility = View.GONE
             cancelDownloadButtons.visibility = View.GONE
-            //            secondaryActionProgress.setPercentage(0, item); // Animate X% -> 0%
         }
         duration.text = Converter.getDurationStringLong(media.duration)
         duration.contentDescription = activity.getString(

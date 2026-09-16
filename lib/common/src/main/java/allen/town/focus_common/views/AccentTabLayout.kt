@@ -15,7 +15,6 @@ class AccentTabLayout @JvmOverloads constructor(
 ) : TabLayout(context, attrs) {
     init {
 
-//        tabLayout.setTabGravity(GRAVITY_CENTER);
         setTabIndicatorFullWidth(true)
         setSelectedTabIndicatorGravity(INDICATOR_GRAVITY_STRETCH)
         // Changing the tint color has no effect

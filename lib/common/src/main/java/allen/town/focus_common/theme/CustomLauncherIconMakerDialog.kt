@@ -150,11 +150,7 @@ class CustomLauncherIconMakerDialog(
     }
 
     private fun showShapeLayout() {
-//        if (this.custom || Build.VERSION.SDK_INT < 26) {
-//            shapeView.setVisibility(View.VISIBLE);
-//        } else {
         shapeView!!.visibility = View.GONE
-        //        }
     }
 
     private fun showColorLayout() {
@@ -162,17 +158,9 @@ class CustomLauncherIconMakerDialog(
     }
 
     fun onCreateContentLayout() {
-//        if (Build.VERSION.SDK_INT >= 26) {
         background = ContextCompat.getDrawable(requireContext(), backgroundLogo)
         foreground = ContextCompat.getDrawable(requireContext(), foregroundLogo)
 
-//        this.background = ContextCompat.getDrawable(getContext(), R.mipmap.ic_launcher_background);
-//        this.foreground = ContextCompat.getDrawable(getContext(), R.drawable.ic_launcher_foreground);
-//        }
-//        else {
-//            this.background = ContextCompat.getDrawable(getContext(), R.drawable.ic_launcher_background_legacy);
-//            this.foreground = ContextCompat.getDrawable(getContext(), R.drawable.ic_launcher_foreground_legacy);
-//        }
         iconView = imageView
         imageView!!.setOnClickListener {
             if (photoSelectUtil == null) {

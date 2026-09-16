@@ -4,7 +4,6 @@ import allen.town.podcast.R
 import allen.town.podcast.core.storage.DBReader
 import allen.town.podcast.core.storage.DBReader.StatisticsResult
 import allen.town.podcast.core.storage.StatisticsItem
-import allen.town.podcast.event.StatisticsEvent
 import allen.town.podcast.util.SkeletonRecyclerDelay
 import android.content.Context
 import android.os.Bundle
@@ -20,9 +19,6 @@ import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
-import org.greenrobot.eventbus.EventBus
-import org.greenrobot.eventbus.Subscribe
-import org.greenrobot.eventbus.ThreadMode
 import java.util.*
 
 /**
@@ -32,7 +28,6 @@ abstract class SubscriptionStatisticsBaseFragment : Fragment() {
     private var disposable: Disposable? = null
     private lateinit var feedStatisticsList: RecyclerView
 
-    //    private ProgressBar progressBar;
     private var listAdapter: PlaybackStatisticsListAdapter? = null
     private var statisticsResult: StatisticsResult? = null
     private lateinit var skeleton: Skeleton
@@ -48,7 +43,6 @@ abstract class SubscriptionStatisticsBaseFragment : Fragment() {
     ): View? {
         val root = inflater.inflate(R.layout.statistics_fragment, container, false)
         feedStatisticsList = root.findViewById(R.id.statistics_list)
-        //        progressBar = root.findViewById(R.id.progressBar);
         listAdapter = PlaybackStatisticsListAdapter(this)
         feedStatisticsList.setLayoutManager(LinearLayoutManager(context))
         feedStatisticsList.setAdapter(listAdapter)
@@ -56,7 +50,6 @@ abstract class SubscriptionStatisticsBaseFragment : Fragment() {
         skeleton = feedStatisticsList.applySkeleton(R.layout.list_item_recyclerview_skeleton, 15)
         skeletonRecyclerDelay = SkeletonRecyclerDelay(skeleton, feedStatisticsList)
         skeletonRecyclerDelay.showSkeleton()
-        EventBus.getDefault().register(this)
         return root
     }
 
@@ -67,15 +60,9 @@ abstract class SubscriptionStatisticsBaseFragment : Fragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
-        EventBus.getDefault().unregister(this)
         if (disposable != null) {
             disposable!!.dispose()
         }
-    }
-
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    fun statisticsEvent(event: StatisticsEvent?) {
-        refreshStatistics()
     }
 
     override fun onPrepareOptionsMenu(menu: Menu) {
@@ -87,8 +74,6 @@ abstract class SubscriptionStatisticsBaseFragment : Fragment() {
     }
 
     private fun refreshStatistics() {
-//        progressBar.setVisibility(View.VISIBLE);
-//        feedStatisticsList.setVisibility(View.GONE);
         loadStatistics()
     }
 
@@ -122,8 +107,6 @@ abstract class SubscriptionStatisticsBaseFragment : Fragment() {
                 // When "from" is "today", set it to today
                 listAdapter!!.setTimeFilter(headStrRes)
                 listAdapter!!.update(result.feedTime)
-                //                    progressBar.setVisibility(View.GONE);
-//                    feedStatisticsList.setVisibility(View.VISIBLE);
                 if (skeleton.isSkeleton()) {
                     skeletonRecyclerDelay.showOriginal()
                 }

@@ -115,73 +115,7 @@ public class NotificationColorUtil {
     return charSequence;
   }
 
-  //    /**
-  //     * Inverts all the grayscale colors set by {@link android.text.style.TextAppearanceSpan}s on
-  //     * the text.
-  //     *
-  //     * @param charSequence The text to process.
-  //     * @return The color inverted text.
-  //     */
-  //    public CharSequence invertCharSequenceColors(CharSequence charSequence) {
-  //        if (charSequence instanceof Spanned) {
-  //            Spanned ss = (Spanned) charSequence;
-  //            Object[] spans = ss.getSpans(0, ss.length(), Object.class);
-  //            SpannableStringBuilder builder = new SpannableStringBuilder(ss.toString());
-  //            for (Object span : spans) {
-  //                Object resultSpan = span;
-  //                if (resultSpan instanceof CharacterStyle) {
-  //                    resultSpan = ((CharacterStyle) span).getUnderlying();
-  //                }
-  //                if (resultSpan instanceof TextAppearanceSpan) {
-  //                    TextAppearanceSpan processedSpan = processTextAppearanceSpan(
-  //                            (TextAppearanceSpan) span);
-  //                    if (processedSpan != resultSpan) {
-  //                        resultSpan = processedSpan;
-  //                    } else {
-  //                        // we need to still take the orgininal for wrapped spans
-  //                        resultSpan = span;
-  //                    }
-  //                } else if (resultSpan instanceof ForegroundColorSpan) {
-  //                    ForegroundColorSpan originalSpan = (ForegroundColorSpan) resultSpan;
-  //                    int foregroundColor = originalSpan.getForegroundColor();
-  //                    resultSpan = new ForegroundColorSpan(processColor(foregroundColor));
-  //                } else {
-  //                    resultSpan = span;
-  //                }
-  //                builder.setSpan(resultSpan, ss.getSpanStart(span), ss.getSpanEnd(span),
-  //                        ss.getSpanFlags(span));
-  //            }
-  //            return builder;
-  //        }
-  //        return charSequence;
-  //    }
 
-  //    private TextAppearanceSpan processTextAppearanceSpan(TextAppearanceSpan span) {
-  //        ColorStateList colorStateList = span.getTextColor();
-  //        if (colorStateList != null) {
-  //            int[] colors = colorStateList.getColors();
-  //            boolean changed = false;
-  //            for (int i = 0; i < colors.length; i++) {
-  //                if (ImageUtils.isGrayscale(colors[i])) {
-  //
-  //                    // Allocate a new array so we don't change the colors in the old color state
-  //                    // list.
-  //                    if (!changed) {
-  //                        colors = Arrays.copyOf(colors, colors.length);
-  //                    }
-  //                    colors[i] = processColor(colors[i]);
-  //                    changed = true;
-  //                }
-  //            }
-  //            if (changed) {
-  //                return new TextAppearanceSpan(
-  //                        span.getFamily(), span.getTextStyle(), span.getTextSize(),
-  //                        new ColorStateList(colorStateList.getStates(), colors),
-  //                        span.getLinkTextColor());
-  //            }
-  //        }
-  //        return span;
-  //    }
 
   /**
    * Finds a suitable color such that there's enough contrast.
@@ -381,49 +315,7 @@ public class NotificationColorUtil {
     return color;
   }
 
-  //
-  //    public static int resolveContrastColor(Context context, int notificationColor,
-  //                                           int backgroundColor) {
-  //        return NotificationColorUtil.resolveContrastColor(context, notificationColor,
-  //                backgroundColor, false /* isDark */);
-  //    }
 
-  //    /**
-  //     * Resolves a Notification's color such that it has enough contrast to be used as the
-  //     * color for the Notification's action and header text.
-  //     *
-  //     * @param notificationColor the color of the notification or {@link
-  // Notification#COLOR_DEFAULT}
-  //     * @param backgroundColor the background color to ensure the contrast against.
-  //     * @param isDark whether or not the {@code notificationColor} will be placed on a background
-  //     *               that is darker than the color itself
-  //     * @return a color of the same hue with enough contrast against the backgrounds.
-  //     */
-  //    public static int resolveContrastColor(Context context, int notificationColor,
-  //                                           int backgroundColor, boolean isDark) {
-  //        final int resolvedColor = resolveColor(context, notificationColor);
-  //
-  //        final int actionBg = context.getColor(
-  //                com.android.internal.R.color.notification_action_list);
-  //
-  //        int color = resolvedColor;
-  //        color = NotificationColorUtil.ensureLargeTextContrast(color, actionBg, isDark);
-  //        color = NotificationColorUtil.ensureTextContrast(color, backgroundColor, isDark);
-  //
-  //        if (color != resolvedColor) {
-  //            if (DEBUG){
-  //                Log.w(TAG, String.format(
-  //                        "Enhanced contrast of notification for %s %s (over action)"
-  //                                + " and %s (over background) by changing #%s to %s",
-  //                        context.getPackageName(),
-  //                        NotificationColorUtil.contrastChange(resolvedColor, color, actionBg),
-  //                        NotificationColorUtil.contrastChange(resolvedColor, color,
-  // backgroundColor),
-  //                        Integer.toHexString(resolvedColor), Integer.toHexString(color)));
-  //            }
-  //        }
-  //        return color;
-  //    }
 
   /**
    * Get a color that stays in the same tint, but darkens or lightens it by a certain amount. This

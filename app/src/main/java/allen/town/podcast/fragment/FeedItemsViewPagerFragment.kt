@@ -1,5 +1,6 @@
 package allen.town.podcast.fragment
 
+import allen.town.podcast.core.view.TopAppBarLayout
 import allen.town.focus_common.util.MenuIconUtil.showToolbarMenuIcon
 import allen.town.podcast.fragment.FeedItemFragment.Companion.newInstance
 import allen.town.podcast.model.feed.FeedItem
@@ -42,7 +43,7 @@ class FeedItemsViewPagerFragment : Fragment(), Toolbar.OnMenuItemClickListener {
     ): View? {
         super.onCreateView(inflater, container, savedInstanceState)
         val layout = inflater.inflate(R.layout.feeditem_pager_fragment, container, false)
-        toolbar = layout.findViewById(R.id.toolbar)
+        toolbar = layout.findViewById<TopAppBarLayout>(R.id.appBarLayout).toolbar
         toolbar.setTitle("")
         toolbar.inflateMenu(R.menu.feeditem_options)
         toolbar.setNavigationOnClickListener(View.OnClickListener { v: View? -> parentFragmentManager.popBackStack() })

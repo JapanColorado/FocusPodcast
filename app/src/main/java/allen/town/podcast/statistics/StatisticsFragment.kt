@@ -1,5 +1,6 @@
 package allen.town.podcast.statistics
 
+import allen.town.podcast.core.view.TopAppBarLayout
 import allen.town.podcast.R
 import allen.town.podcast.ui.common.PagedToolbarFragment
 import android.os.Bundle
@@ -32,7 +33,7 @@ class StatisticsFragment : PagedToolbarFragment() {
         setHasOptionsMenu(true)
         val rootView = inflater.inflate(R.layout.collapsing_pager_fragment, container, false)
         viewPager = rootView.findViewById(R.id.viewpager)
-        toolbar = rootView.findViewById(R.id.toolbar)
+        toolbar = rootView.findViewById<TopAppBarLayout>(R.id.appBarLayout).toolbar
         toolbar.setTitle(getString(R.string.statistics_label))
         toolbar.setNavigationOnClickListener(View.OnClickListener { v: View? -> parentFragmentManager.popBackStack() })
         viewPager.setAdapter(StatisticsPagerAdapter(this))

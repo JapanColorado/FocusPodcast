@@ -94,7 +94,6 @@ class CoverFragment : Fragment {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-//        setRetainInstance(true);
         root = inflater.inflate(layoutWithPlayerTheme, container, false)
         txtvPodcastTitle = root!!.findViewById(R.id.txtvPodcastTitle)
         txtvEpisodeTitle = root!!.findViewById(R.id.txtvEpisodeTitle)
@@ -139,10 +138,7 @@ class CoverFragment : Fragment {
                 )
             )
             setupRotateAnimation()
-            //            ColorExtensionsUtils.accentColor(circularProgressIndicator);
 
-//            binding.volumeSeekBar.circleProgressColor = accentColor()
-//            binding.volumeSeekBar.circleColor = ColorUtil.withAlpha(accentColor(), 0.25f)
         }
     }
 

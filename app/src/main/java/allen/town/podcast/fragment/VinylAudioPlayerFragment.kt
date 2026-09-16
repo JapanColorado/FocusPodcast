@@ -14,7 +14,6 @@ class VinylAudioPlayerFragment : BlurAudioPlayerFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-//        ToolbarContentTintHelper.colorizeToolbar(_binding.toolbar, Color.WHITE, activity)
     }
 
 

@@ -6,29 +6,16 @@ import static allen.town.focus_common.crash.Reflection.getStaticFieldValue;
 import static allen.town.focus_common.crash.Reflection.invokeMethod;
 import static allen.town.focus_common.crash.Reflection.setFieldValue;
 
-import android.content.Context;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.os.Build;
 import android.os.DeadSystemException;
-import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.text.SimpleDateFormat;
 import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 import allen.town.focus_common.crash.compat.ActivityKillerV15_V20;
@@ -41,7 +28,6 @@ import allen.town.focus_common.util.Timber;
 
 
 public class CustomCrashHandler implements Thread.UncaughtExceptionHandler {
-    public static final String BUGLY_TAG = "BuglyCrashHandler";
     private static IActivityKiller sActivityKiller;
     private static final String[] CRASH_PACKAGE_PREFIXES = {
             "android.view.Choreographer",// An exception during view measure/layout/draw kills the Choreographer, so just kill the app
@@ -74,89 +60,11 @@ public class CustomCrashHandler implements Thread.UncaughtExceptionHandler {
      */
     @Override
     public void uncaughtException(Thread thread, Throwable ex) {
-//        saveInfoToSD(mContext, ex);
         // This should never be null, but dropping the check might break something, so keep it for now
         if (mDefaultHandler != null) {
-//            if (thread.getId() == mContext.getMainLooper().getThread().getId()) {
-////                // Exceptions on the main thread of the main process go to the system, i.e. the app crashes
-//                mDefaultHandler.uncaughtException(thread, ex);
-//            } else {
-            // Otherwise swallow the exception so the app does not crash
+            // Swallow the exception so the app does not crash
             reportToBugly(ex);
-//            }
         }
-    }
-
-    private void saveInfoToSD(Context context, Throwable ex) {
-        StringBuffer sb = obtainPhoneInfo(context);
-
-        sb.append(obtainExceptionInfo(ex));
-
-        if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
-            FileOutputStream fos = null;
-            try {
-                File outFile = context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS + "/log.txt");
-                fos = new FileOutputStream(outFile, true);
-                fos.write(sb.toString().getBytes("UTF-8"));
-                fos.flush();
-                fos.close();
-            } catch (Exception e) {
-                Timber.e(e, "");
-            } finally {
-                if (fos != null) {
-                    try {
-                        fos.close();
-                    } catch (IOException e1) {
-                        Timber.e(e1, "");
-                    }
-                }
-            }
-
-        }
-
-    }
-
-    public static StringBuffer obtainPhoneInfo(Context context) {
-
-        HashMap<String, String> map = new HashMap<String, String>();
-        PackageManager mPackageManager = context.getPackageManager();
-        try {
-            PackageInfo mPackageInfo = mPackageManager.getPackageInfo(context.getPackageName(),
-                    PackageManager.GET_ACTIVITIES);
-            map.put("versionName", mPackageInfo.versionName);
-            map.put("versionCode", "" + mPackageInfo.versionCode);
-        } catch (PackageManager.NameNotFoundException e) {
-            Timber.e(e, "");
-        }
-
-        map.put("time", new SimpleDateFormat("yyyy/MM/dd HH:mm").format(new Date(System
-                .currentTimeMillis())));
-        map.put("MODEL", "" + Build.MODEL);
-        map.put("SDK_INT", "" + Build.VERSION.SDK_INT);
-        map.put("PRODUCT", "" + Build.PRODUCT);
-        map.put("cpu_ABI", "" + Build.CPU_ABI);
-        map.put("cpu_ABI2", "" + Build.CPU_ABI2);
-
-
-        StringBuffer sb = new StringBuffer();
-
-        for (Map.Entry<String, String> entry : map.entrySet()) {
-            String key = entry.getKey();
-            String value = entry.getValue();
-            sb.append(key).append(" = ").append(value).append("\n");
-        }
-
-        return sb;
-    }
-
-    private String obtainExceptionInfo(Throwable throwable) {
-        StringWriter mStringWriter = new StringWriter();
-        PrintWriter mPrintWriter = new PrintWriter(mStringWriter);
-        throwable.printStackTrace(mPrintWriter);
-        mPrintWriter.close();
-
-        Timber.e(mStringWriter.toString());
-        return mStringWriter.toString();
     }
 
     private void reportToBugly(Throwable ex) {

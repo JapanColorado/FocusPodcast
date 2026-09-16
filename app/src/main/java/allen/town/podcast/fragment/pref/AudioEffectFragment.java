@@ -54,7 +54,6 @@ public class AudioEffectFragment extends AbsSettingsFragment {
         controller = new PlaybackController(getActivity()) {
             @Override
             public void loadMediaInfo() {
-//                setupAudioEffectPreference();
             }
         };
         controller.init();

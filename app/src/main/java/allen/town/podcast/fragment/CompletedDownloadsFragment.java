@@ -234,7 +234,6 @@ public class CompletedDownloadsFragment extends Fragment implements DoubleClickB
                     items = result;
                     adapter.updateItems(result);
                     ((PagedToolbarFragment) getParentFragment()).invalidateOptionsMenuIfActive(this);
-//                    progressBar.setVisibility(View.GONE);
                     if(skeleton.isSkeleton()) {
                         skeletonRecyclerDelay.showOriginal();
                     }

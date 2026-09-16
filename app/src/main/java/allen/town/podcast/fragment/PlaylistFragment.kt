@@ -359,7 +359,7 @@ class PlaylistFragment : Fragment(), Toolbar.OnMenuItemClickListener, OnSelectMo
     ): View? {
         super.onCreateView(inflater, container, savedInstanceState)
         val root = inflater.inflate(R.layout.queue_fragment, container, false)
-        toolbar = root.findViewById(R.id.toolbar)
+        toolbar = root.findViewById<TopAppBarLayout>(R.id.appBarLayout).toolbar
         toolbar.setOnMenuItemClickListener(this)
         displayUpArrow = parentFragmentManager.backStackEntryCount != 0
         if (savedInstanceState != null) {
@@ -395,8 +395,6 @@ class PlaylistFragment : Fragment(), Toolbar.OnMenuItemClickListener, OnSelectMo
         emptyView.setIcon(R.drawable.ic_playlist)
         emptyView.setTitle(R.string.no_items_header_label)
         progLoading = root.findViewById(R.id.progLoading)
-        //        progLoading.setVisibility(View.VISIBLE);
-//        topAppBarLayout = root.findViewById(R.id.appBarLayout);
         toolbar.setTitle(getString(R.string.playlist_label))
         skeleton = recyclerView.applySkeleton(R.layout.item_small_recyclerview_skeleton, 15)
         skeletonRecyclerDelay = SkeletonRecyclerDelay(skeleton,recyclerView)
@@ -499,13 +497,11 @@ class PlaylistFragment : Fragment(), Toolbar.OnMenuItemClickListener, OnSelectMo
         if (queue == null) {
             emptyView.hide()
             skeletonRecyclerDelay.showSkeleton()
-            //            progLoading.setVisibility(View.VISIBLE);
         }
         disposable = Observable.fromCallable { DBReader.getQueue() }
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe({ items: MutableList<FeedItem>? ->
-//                    progLoading.setVisibility(View.GONE);
                 queue = items
                 onFragmentLoaded(restoreScrollPosition)
                 if (skeleton.isSkeleton()) {

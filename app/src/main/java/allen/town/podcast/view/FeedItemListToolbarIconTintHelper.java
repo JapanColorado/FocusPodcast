@@ -52,7 +52,6 @@ public class FeedItemListToolbarIconTintHelper implements AppBarLayout.OnOffsetC
                     .setIcon(shareDrawable);
             ActivityThemeExtensionsUtils.setLightStatusBar((MainActivity)context,false);
         } else {
-//            doTint(context);
             safeSetColorFilter(toolbar.getNavigationIcon(), null);
             safeSetColorFilter(toolbar.getOverflowIcon(), null);
             safeSetColorFilter(toolbar.getCollapseIcon(), null);

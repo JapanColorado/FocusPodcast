@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<lint>
+    <!--
+        ATEPreferenceFragmentCompat has to call PreferenceFragmentCompat.getCallbackFragment()
+        to reproduce the dispatch order of the androidx implementation it replaces; androidx
+        exposes no public equivalent. Reported as a warning rather than an error.
+    -->
+    <issue id="RestrictedApi" severity="warning" />
+</lint>

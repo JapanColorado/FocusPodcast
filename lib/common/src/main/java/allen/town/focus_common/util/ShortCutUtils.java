@@ -13,17 +13,6 @@ import android.os.Build;
 import androidx.annotation.RequiresApi;
 
 public class ShortCutUtils {
-    public static void install(Context context, String str, int i, Intent intent, boolean z) {
-        Intent intent2 = new Intent("com.android.launcher.action.INSTALL_SHORTCUT");
-        intent2.putExtra("android.intent.extra.shortcut.NAME", str);
-        intent2.putExtra("duplicate", z);
-        intent2.putExtra("android.intent.extra.shortcut.ICON_RESOURCE", Intent.ShortcutIconResource.fromContext(context, i));
-        intent.setAction("android.intent.action.MAIN");
-        intent.addCategory("android.intent.category.LAUNCHER");
-        intent2.putExtra("android.intent.extra.shortcut.INTENT", intent);
-        context.sendBroadcast(intent2);
-    }
-
     /**
      * Create a launcher shortcut.
      * @param context
@@ -67,13 +56,5 @@ public class ShortCutUtils {
             intent.setAction("android.intent.action.VIEW");
             shortcutManager.requestPinShortcut(new ShortcutInfo.Builder(context, System.currentTimeMillis() + "").setIcon(Icon.createWithBitmap(bitmap)).setShortLabel(str).setIntent(intent).build(), null);
         }
-    }
-
-    public static void delete(Context context, String str, Intent intent, boolean z) {
-        Intent intent2 = new Intent("com.android.launcher.action.UNINSTALL_SHORTCUT");
-        intent2.putExtra("android.intent.extra.shortcut.NAME", str);
-        intent2.putExtra("duplicate", z);
-        intent2.putExtra("android.intent.extra.shortcut.INTENT", intent);
-        context.sendBroadcast(intent2);
     }
 }

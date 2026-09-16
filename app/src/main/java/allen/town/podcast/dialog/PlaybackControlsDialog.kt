@@ -39,12 +39,9 @@ class PlaybackControlsDialog : DialogFragment() {
         super.onStart()
         controller = object : PlaybackController(requireActivity()) {
             override fun loadMediaInfo() {
-//                setupUi()
-//                setupAudioTracks()
             }
         }
         controller!!.init()
-//        setupUi()
 
         Maybe.create { emitter: MaybeEmitter<Feed?> ->
             feed = DBReader.getFeed(feedId)

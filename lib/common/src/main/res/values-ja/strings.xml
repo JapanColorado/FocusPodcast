@@ -5,7 +5,6 @@
     <string name="reset_action">リセット</string>
     <string name="done">完了</string>
     <string name="add_action">追加</string>
-    <string name="email_app_not_found">メール アプリが見つかりません</string>
     <string name="copied_to_clipboard">コピーされました</string>
     <string name="share">共有</string>
     <string name="send_file">メールを送ってください。メール アドレスがコピーされました</string>
@@ -14,16 +13,6 @@
     <string name="desc">降順</string>
     <string name="title">タイトル</string>
     <string name="pref_language_name">言語を選択</string>
-    <string name="backup">バックアップ</string>
-    <string name="connect">接続</string>
-    <string name="already_connect">すでに接続されています</string>
-    <string name="backup_failed">バックアップに失敗しました</string>
-    <string name="already_backup_webdav">すでに WebDAV にバックアップされています</string>
-    <string name="restore_success">復元に成功しました</string>
-    <string name="restore_failed">復元に失敗しました</string>
-    <string name="already_backup_one_drive">すでに One Drive にバックアップされています</string>
-    <string name="backup_not_found">バックアップ ファイルが見つかりません</string>
-    <string name="select">選択</string>
     <string name="made_by">著者アレン・タウン</string>
     <string name="twitter_follow_me">フォローしてください</string>
     <string name="rate_me">評価</string>
@@ -32,46 +21,17 @@
     <string name="change_log">ログを更新</string>
     <string name="others_app_of_us">その他のアプリ</string>
     <string name="others">その他</string>
-    <string name="restore">復元</string>
-    <string name="purchase">購入</string>
 
-    <string name="month">月</string>
-    <string name="months">月</string>
-    <string name="day_trial">%1$d 日のトライアル</string>
-    <string name="premium">メンバー</string>
-    <string name="annually">年</string>
-    <string name="free">無料</string>
     <string name="colors">色</string>
 
     <string name="today">今日</string>
     <string name="not_today">今日ではありません</string>
     <string name="yesterday">昨日</string>
 
-    <string name="cancel_any_time">%1$s、いつでもキャンセルできます。 </string>
-    <string name="premium_pro_tip">プレミアム メンバーシップが有効になりました</string>
 
-    <string name="payment_iap_sucess">購入しました</string>
-    <string name="payment_price_3month">%1$s /3month</string>
-    <string name="payment_price_6month">%1$s /6month</string>
-    <string name="payment_price_month">%1$s/月</string>
-    <string name="payment_price_week">%1$s/週</string>
-    <string name="payment_price_year">%1$s /年</string>
 
-    <string name="then_price">その後 %1$s</string>
-    <string name="then_price_year">その後 %1$s /年</string>
-    <string name="try_it_free">無料トライアル</string>
-    <string name="thanks_purchase">定期購入が完了しました。ご購入いただきありがとうございます</string>
 
-    <string name="restore_tip">支払いました。クリックして購入を復元します</string>
-    <string name="restore_purchase">購入を復元</string>
-    <string name="expired_time">有効期限:</string>
-    <string name="google_service_not_install">Google サービスがインストールされず、支払いが完了しない可能性があります</string>
 
-    <string name="subscribe_yearly">1 年\n</string>
-    <string name="subscribe_quaterly">3 か月\n</string>
-    <string name="subscribe_monthly">1 か月\n</string>
-    <string name="subscribe_weekly">1 週間\n</string>
-    <string name="recommend">推奨</string>
     <string name="search_history">検索履歴</string>
 
     <string name="expanded">展開</string>
@@ -83,13 +43,6 @@
     <string name="pref_language_names_tradition_chinese">繁体字中国語</string>
     <string name="share_to_friends">友達に共有</string>
     <string name="share_to_friends_tip">こんにちは！ %s アプリをダウンロードするためのリンクは次のとおりです。私はこのアプリがとても気に入っていますので、あなたも気に入っていただければ幸いです。 </string>
-    <string name="rewarded_ad_not_ready">リワード広告の準備がまだ整っていません。アプリを閉じてもう一度お試しください。</string>
-    <string name="rewarded_title">リワード広告</string>
-    <string name="rewarded_ad_tip">リワード広告を数秒間視聴すると、視聴するたびに報酬を受け取ります:\n1. 今日はこれ以上広告は表示されません\n2. プレミアム バージョンのすべてを 1 時間ロック解除します。機能\n\n繰り返し視聴すると、この報酬を繰り返し獲得できます</string>
-    <string name="rewarded_ad_one_hour_tip">リワード広告を数秒間視聴すると、視聴するたびに報酬を受け取ります:\n1. 10 分間のプレミアム バージョンのすべての機能のロックを解除します。\n\n
- 1 日に 2 回まで視聴でき、視聴するたびに報酬が蓄積されます</string>
-    <string name="rewarded_locked">%s までプレミアム機能のロックを解除しました</string>
-    <string name="pref_title_tab_text_mode">タブ タイトル モード</string>
     <string name="auto">自動</string>
     <string name="labeled">ラベル付き</string>
     <string name="selected">選択されたもののみ</string>
@@ -102,34 +55,7 @@
     <!--画面について-->
     <string name="about_pref">概要</string>
     <string name="privacy_policy">プライバシー ポリシー</string>
-    <string name="buy_now">高度な機能をすべて表示</string>
-    <string name="help_me_translate_tip">翻訳にご協力ください</string>
 
-    <string name="remove_ads_modest">控えめ</string>
-    <string name="remove_ads_suggested">提案 🙏 </string>
-    <string name="remove_ads_generous">寛大です 👑</string>
-    <string name="remove_ads_tip">以下に寄付して広告を削除してください</string>
     <string name="pref_custom_launcher_title">カスタム ランチャー アイコン</string>
     <string name="pref_custom_launcher_summary">すべての携帯電話がこの機能をサポートしているわけではありません。ご自身でテストしてください。</string>
-    <string name="memory_manage">ストレージ管理</string>
-    <string name="backup_category">バックアップと復元</string>
-    <string name="clear_memory">ストレージをクリア</string>
-    <string name="pro_tip_remove_ads">広告を削除</string>
-    <string name="delete_cache">現在のキャッシュをクリアします</string>
-    <string name="cache_dialog">キャッシュをクリアしますか? </string>
-    <string name="not_cache">これはアプリケーション キャッシュには影響しません</string>
-    <string name="current_cache_size">現在のキャッシュ サイズ</string>
-    <string name="cache_dialog_summary">この操作は元に戻すことができません</string>
-    <string name="trimming">最適化中...</string>
-    <string name="trim_success">最適化が成功しました</string>
-    <string name="pro_tip_custom_icon">カスタム アプリ アイコン</string>
-    <string name="pro_tip_fonts">その他のフォントの選択肢</string>
-    <string name="pro_tip_lazy_mode">レイジー モードでは記事が自動的にスクロールされ、親指を動かさずにエキサイティングなコンテンツを楽しむことができます</string>
-    <string name="pro_tip_switch_account">コメントや投稿を行うときにアカウントをすばやく切り替える</string>
-    <string name="next">次へ</string>
-    <string name="loading_instance">サーバー情報を取得しています...</string>
-    <string name="not_a_mastodon_instance">%s は Mastodon インスタンスではないようです。 </string>
-    <string name="server_rules_disagree">同意しません</string>
-    <string name="i_agree">同意します</string>
-    <string name="error_empty">コンテンツを空にすることはできません</string>
 </resources>

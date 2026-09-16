@@ -487,7 +487,6 @@ public class AudioPlayerFragment extends Fragment implements
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-//        setRetainInstance(true);
     }
 
     @Override
@@ -538,7 +537,6 @@ public class AudioPlayerFragment extends Fragment implements
         int duration = converter.convert(event.getDuration());
         int remainingTime = converter.convert(Math.max(event.getDuration() - event.getPosition(), 0));
         currentChapterIndex = ChapterUtils.getCurrentChapterIndex(controller.getMedia(), currentPosition);
-//        Log.d(TAG, "current position  -> " + Converter.getDurationStringLong(currentPosition));
         if (currentPosition == PlaybackService.INVALID_TIME || duration == PlaybackService.INVALID_TIME) {
             Log.w(TAG, "failed to position observer update because of invalid time");
             return;
@@ -661,16 +659,6 @@ public class AudioPlayerFragment extends Fragment implements
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onEventMainThread(FeedItemEvent event) {
-//        if (controller != null) {
-//            Log.v(TAG, "FeedItemEvent() called with: " + "event = [" + event + "]");
-//            for (FeedItem item : event.items) {
-//                if (Objects.equals(this.controller.getMedia().getIdentifier(), item.getMedia().getIdentifier())) {
-//                    Log.d(TAG, "re - setupOptionsMenu");
-//                    setupOptionsMenu(this.controller.getMedia());
-//                    return;
-//                }
-//            }
-//        }
 
     }
 

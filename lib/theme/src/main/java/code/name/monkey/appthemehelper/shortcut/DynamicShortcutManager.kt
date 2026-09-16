@@ -29,9 +29,7 @@ class DynamicShortcutManager(private val context: Context,private val defaultSho
         this.context.getSystemService()
 
     fun initDynamicShortcuts() {
-        // if (shortcutManager.dynamicShortcuts.size == 0) {
         shortcutManager?.dynamicShortcuts = defaultShortcuts
-        // }
     }
 
     fun updateDynamicShortcuts() {
