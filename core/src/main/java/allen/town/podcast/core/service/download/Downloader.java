@@ -7,7 +7,6 @@ import androidx.annotation.NonNull;
 import java.util.Date;
 import java.util.concurrent.Callable;
 
-import allen.town.podcast.core.ClientConfig;
 import allen.town.podcast.core.R;
 import allen.town.podcast.model.download.DownloadStatus;
 
@@ -25,9 +24,13 @@ public abstract class Downloader implements Callable<Downloader> {
     final DownloadRequest request;
     @NonNull
     final DownloadStatus result;
+    /** Application context; downloads outlive the Service instance that enqueued them. */
+    @NonNull
+    final Context appContext;
 
-    Downloader(@NonNull DownloadRequest request) {
+    Downloader(@NonNull Context context, @NonNull DownloadRequest request) {
         super();
+        this.appContext = context.getApplicationContext();
         this.request = request;
         this.request.setStatusMsg(R.string.download_pending);
         this.cancelled = false;
@@ -38,8 +41,7 @@ public abstract class Downloader implements Callable<Downloader> {
     protected abstract void download();
 
     public final Downloader call() {
-        WifiManager wifiManager = (WifiManager)
-                ClientConfig.applicationCallbacks.getApplicationInstance().getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+        WifiManager wifiManager = (WifiManager) appContext.getSystemService(Context.WIFI_SERVICE);
         WifiManager.WifiLock wifiLock = null;
         if (wifiManager != null) {
             wifiLock = wifiManager.createWifiLock(TAG);

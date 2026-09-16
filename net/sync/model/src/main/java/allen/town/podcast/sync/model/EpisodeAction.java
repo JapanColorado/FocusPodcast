@@ -73,7 +73,8 @@ public class EpisodeAction {
                 parser.setTimeZone(TimeZone.getTimeZone("UTC"));
                 builder.timestamp(parser.parse(utcTimestamp));
             } catch (ParseException e) {
-                e.printStackTrace();
+                // The action is still usable without a timestamp, so keep the rest of the fields.
+                Log.e(TAG, "Failed to parse episode action timestamp: " + utcTimestamp, e);
             }
         }
         String guid = object.optString("guid", null);

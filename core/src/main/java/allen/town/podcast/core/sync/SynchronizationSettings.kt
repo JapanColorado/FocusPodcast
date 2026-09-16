@@ -3,7 +3,6 @@ package allen.town.podcast.core.sync
 import allen.town.podcast.core.sync.SynchronizationSettings
 import allen.town.podcast.core.sync.SynchronizationProviderViewData
 import android.content.SharedPreferences
-import allen.town.podcast.core.ClientConfig
 import android.content.Context
 
 object SynchronizationSettings {
@@ -78,7 +77,15 @@ object SynchronizationSettings {
             .putLong(LAST_EPISODE_ACTIONS_SYNC_TIMESTAMP, timestamp).apply()
     }
 
+    private var preferences: SharedPreferences? = null
+
+    /** Called once from [allen.town.podcast.core.ClientConfig.initialize]. */
+    @JvmStatic
+    fun init(context: Context) {
+        preferences = context.applicationContext.getSharedPreferences(NAME, Context.MODE_PRIVATE)
+    }
+
     private val sharedPreferences: SharedPreferences
-        private get() = ClientConfig.applicationCallbacks.applicationInstance
-            .getSharedPreferences(NAME, Context.MODE_PRIVATE)
+        get() = preferences
+            ?: throw IllegalStateException("SynchronizationSettings.init(context) must be called first")
 }

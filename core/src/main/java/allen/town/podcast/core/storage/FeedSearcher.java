@@ -1,5 +1,7 @@
 package allen.town.podcast.core.storage;
 
+import android.util.Log;
+
 import androidx.annotation.NonNull;
 import allen.town.podcast.model.feed.Feed;
 import allen.town.podcast.model.feed.FeedItem;
@@ -13,6 +15,8 @@ import java.util.concurrent.FutureTask;
  * Performs search on Feeds and FeedItems.
  */
 public class FeedSearcher {
+    private static final String TAG = "FeedSearcher";
+
     private FeedSearcher() {
 
     }
@@ -24,7 +28,11 @@ public class FeedSearcher {
             itemSearchTask.run();
             return itemSearchTask.get();
         } catch (ExecutionException | InterruptedException e) {
-            e.printStackTrace();
+            if (e instanceof InterruptedException) {
+                Thread.currentThread().interrupt();
+            }
+            // Documented behaviour of this @NonNull method: an empty result set on failure.
+            Log.e(TAG, "Feed item search failed for query: " + query, e);
             return Collections.emptyList();
         }
     }
@@ -36,7 +44,11 @@ public class FeedSearcher {
             feedSearchTask.run();
             return feedSearchTask.get();
         } catch (ExecutionException | InterruptedException e) {
-            e.printStackTrace();
+            if (e instanceof InterruptedException) {
+                Thread.currentThread().interrupt();
+            }
+            // Documented behaviour of this @NonNull method: an empty result set on failure.
+            Log.e(TAG, "Feed search failed for query: " + query, e);
             return Collections.emptyList();
         }
     }

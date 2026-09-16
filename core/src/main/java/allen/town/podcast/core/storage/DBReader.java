@@ -112,23 +112,6 @@ public final class DBReader {
      * @return
      */
     @NonNull
-    public static List<Long> getNotSubAndNotInPlaylistAndFavFeedList(Db adapter) {
-        try (Cursor cursor = adapter.getFeedsNotSubAndNotInPlaylistAndFavCursor()) {
-            List<Long> feeds = new ArrayList<>(cursor.getCount());
-            long feedId = 0;
-            int index = cursor.getColumnIndexOrThrow(Db.KEY_ID);
-            while (cursor.moveToNext()) {
-                feedId = cursor.getLong(index);
-                feeds.add(feedId);
-            }
-            cursor.close();
-            return feeds;
-        }
-    }
-
-
-
-
     /**
      * Returns a list with the download URLs of all feeds. Only actually subscribed feeds are
      * returned, because this is used for syncing to the cloud.
@@ -721,6 +704,9 @@ public final class DBReader {
                 }
                 return nextItem;
             } catch (Exception e) {
+                // Returns the documented null ("no next item"). A cursor failure here only means
+                // the queue lookup could not be answered; callers already handle a null result.
+                Log.e(TAG, "Could not read the item following " + item.getId() + " in the queue", e);
                 return null;
             }
         } finally {

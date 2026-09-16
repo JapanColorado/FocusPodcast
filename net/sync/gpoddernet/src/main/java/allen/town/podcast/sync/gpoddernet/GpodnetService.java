@@ -89,7 +89,7 @@ public class GpodnetService implements ISyncService {
             url = new URI(baseScheme, null, baseHost, basePort,
                     String.format(Locale.US, "/api/2/tags/%d.json", count), null, null).toURL();
         } catch (MalformedURLException | URISyntaxException e) {
-            e.printStackTrace();
+            Log.e(TAG, "Failed to build the top tags URL", e);
             throw new GpodnetServiceException(e);
         }
 
@@ -107,7 +107,7 @@ public class GpodnetService implements ISyncService {
             }
             return tagList;
         } catch (JSONException e) {
-            e.printStackTrace();
+            Log.e(TAG, "Failed to parse the top tags response", e);
             throw new GpodnetServiceException(e);
         }
     }
@@ -129,7 +129,7 @@ public class GpodnetService implements ISyncService {
             return readPodcastListFromJsonArray(jsonArray);
 
         } catch (JSONException | MalformedURLException | URISyntaxException e) {
-            e.printStackTrace();
+            Log.e(TAG, "Failed to load podcasts for tag " + tag.getTag(), e);
             throw new GpodnetServiceException(e);
         }
     }
@@ -156,7 +156,7 @@ public class GpodnetService implements ISyncService {
             return readPodcastListFromJsonArray(jsonArray);
 
         } catch (JSONException | MalformedURLException | URISyntaxException e) {
-            e.printStackTrace();
+            Log.e(TAG, "Failed to load the podcast toplist", e);
             throw new GpodnetServiceException(e);
         }
     }
@@ -183,10 +183,10 @@ public class GpodnetService implements ISyncService {
             return readPodcastListFromJsonArray(jsonArray);
 
         } catch (JSONException | MalformedURLException e) {
-            e.printStackTrace();
+            Log.e(TAG, "Failed to search podcasts for query: " + query, e);
             throw new GpodnetServiceException(e);
         } catch (URISyntaxException e) {
-            e.printStackTrace();
+            Log.e(TAG, "Failed to build the podcast search URL for query: " + query, e);
             throw new IllegalStateException(e);
         }
     }
@@ -208,7 +208,7 @@ public class GpodnetService implements ISyncService {
             JSONArray devicesArray = new JSONArray(response);
             return readDeviceListFromJsonArray(devicesArray);
         } catch (JSONException | MalformedURLException | URISyntaxException e) {
-            e.printStackTrace();
+            Log.e(TAG, "Failed to load the device list of user " + username, e);
             throw new GpodnetServiceException(e);
         }
     }
@@ -244,7 +244,7 @@ public class GpodnetService implements ISyncService {
             Request.Builder request = new Request.Builder().post(body).url(url);
             executeRequest(request);
         } catch (JSONException | MalformedURLException | URISyntaxException e) {
-            e.printStackTrace();
+            Log.e(TAG, "Failed to configure device " + deviceId, e);
             throw new GpodnetServiceException(e);
         }
     }
@@ -275,7 +275,7 @@ public class GpodnetService implements ISyncService {
             Request.Builder request = new Request.Builder().put(body).url(url);
             executeRequest(request);
         } catch (MalformedURLException | URISyntaxException e) {
-            e.printStackTrace();
+            Log.e(TAG, "Failed to build the subscription upload URL for device " + deviceId, e);
             throw new GpodnetServiceException(e);
         }
 
@@ -311,7 +311,7 @@ public class GpodnetService implements ISyncService {
             final String response = executeRequest(request);
             return GpodnetUploadChangesResponse.fromJSONObject(response);
         } catch (JSONException | MalformedURLException | URISyntaxException e) {
-            e.printStackTrace();
+            Log.e(TAG, "Failed to upload subscription changes for device " + deviceId, e);
             throw new GpodnetServiceException(e);
         }
 
@@ -339,10 +339,10 @@ public class GpodnetService implements ISyncService {
             JSONObject changes = new JSONObject(response);
             return ResponseMapper.readSubscriptionChangesFromJsonObject(changes);
         } catch (URISyntaxException e) {
-            e.printStackTrace();
+            Log.e(TAG, "Failed to build the subscription changes URL for device " + deviceId, e);
             throw new IllegalStateException(e);
         } catch (JSONException | MalformedURLException e) {
-            e.printStackTrace();
+            Log.e(TAG, "Failed to read subscription changes for device " + deviceId, e);
             throw new GpodnetServiceException(e);
         }
 
@@ -393,7 +393,7 @@ public class GpodnetService implements ISyncService {
             final String response = executeRequest(request);
             return GpodnetEpisodeActionPostResponse.fromJSONObject(response);
         } catch (JSONException | MalformedURLException | URISyntaxException e) {
-            e.printStackTrace();
+            Log.e(TAG, "Failed to upload episode actions " + from + " to " + to, e);
             throw new SyncServiceException(e);
         }
     }
@@ -420,10 +420,10 @@ public class GpodnetService implements ISyncService {
             JSONObject json = new JSONObject(response);
             return ResponseMapper.readEpisodeActionsFromJsonObject(json);
         } catch (URISyntaxException e) {
-            e.printStackTrace();
+            Log.e(TAG, "Failed to build the episode action changes URL for user " + username, e);
             throw new IllegalStateException(e);
         } catch (JSONException | MalformedURLException e) {
-            e.printStackTrace();
+            Log.e(TAG, "Failed to read episode action changes for user " + username, e);
             throw new SyncServiceException(e);
         }
 
@@ -442,7 +442,7 @@ public class GpodnetService implements ISyncService {
             url = new URI(baseScheme, null, baseHost, basePort,
                     String.format("/api/2/auth/%s/login.json", username), null, null).toURL();
         } catch (MalformedURLException | URISyntaxException e) {
-            e.printStackTrace();
+            Log.e(TAG, "Failed to build the login URL for user " + username, e);
             throw new GpodnetServiceException(e);
         }
         RequestBody requestBody = RequestBody.create(TEXT, "");
@@ -455,7 +455,7 @@ public class GpodnetService implements ISyncService {
             response.body().close();
             this.loggedIn = true;
         } catch (Exception e) {
-            e.printStackTrace();
+            Log.e(TAG, "Failed to log in to gpodder.net as user " + username, e);
             throw new GpodnetServiceException(e);
         }
     }
@@ -472,7 +472,7 @@ public class GpodnetService implements ISyncService {
             body = response.body();
             responseString = getStringFromResponseBody(body);
         } catch (IOException e) {
-            e.printStackTrace();
+            Log.e(TAG, "Request failed: " + request.url(), e);
             throw new GpodnetServiceException(e);
         } finally {
             if (body != null) {
@@ -499,7 +499,7 @@ public class GpodnetService implements ISyncService {
             }
             return outputStream.toString("UTF-8");
         } catch (IOException e) {
-            e.printStackTrace();
+            Log.e(TAG, "Failed to read the response body", e);
             throw new GpodnetServiceException(e);
         }
     }
@@ -514,7 +514,8 @@ public class GpodnetService implements ISyncService {
                     try {
                         Log.d(TAG, response.body().string());
                     } catch (IOException e) {
-                        e.printStackTrace();
+                        // Debug-only dump of the error body; the real failure is thrown just below.
+                        Log.e(TAG, "Failed to read the error response body for logging", e);
                     }
                 }
                 if (responseCode >= 500) {

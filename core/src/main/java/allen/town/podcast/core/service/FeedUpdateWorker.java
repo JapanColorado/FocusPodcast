@@ -28,7 +28,7 @@ public class FeedUpdateWorker extends Worker {
     public Result doWork() {
         final boolean isRunOnce = getInputData().getBoolean(PARAM_RUN_ONCE, false);
         Log.d(TAG, "syncing " + isRunOnce);
-        ClientConfig.initialize(getApplicationContext());
+        ClientConfig.ensureInitialized(getApplicationContext());
 
         boolean started = true;
         if (NetworkUtils.networkAvailable() && NetworkUtils.isFeedRefreshAllowed()) {

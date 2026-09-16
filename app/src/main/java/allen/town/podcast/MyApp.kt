@@ -6,6 +6,7 @@ import allen.town.focus_common.util.PodcastSearchPreferenceUtil
 import allen.town.podcast.activity.SplashActivity
 import allen.town.podcast.appshortcuts.ShortcutsDefaultList
 import allen.town.podcast.config.CategoriesDefaultList
+import allen.town.podcast.config.DownloadServiceCallbacksImpl
 import allen.town.podcast.config.PodcastSearchDefaultList
 import allen.town.podcast.core.ApCoreEventBusIndex
 import allen.town.podcast.core.ClientConfig
@@ -48,15 +49,6 @@ class MyApp : BaseApplication() {
             instance.startActivity(mainIntent)
             Runtime.getRuntime().exit(0)
         }
-
-        // make sure that ClientConfigurator executes its static code
-        init {
-            try {
-                Class.forName("allen.town.podcast.config.ClientConfigurator")
-            } catch (e: Exception) {
-                throw RuntimeException("ClientConfigurator not found", e)
-            }
-        }
     }
 
     override fun onCreate() {
@@ -84,7 +76,7 @@ class MyApp : BaseApplication() {
             StrictMode.setVmPolicy(builder.build())
         }
 
-        ClientConfig.initialize(this)
+        ClientConfig.initialize(this, DownloadServiceCallbacksImpl())
         Iconify.with(FontAwesomeModule())
         Iconify.with(MaterialModule())
         EventBus.builder()

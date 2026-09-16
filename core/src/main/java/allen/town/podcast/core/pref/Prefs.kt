@@ -19,6 +19,7 @@ import allen.town.podcast.model.feed.FeedCounter
 import allen.town.podcast.model.feed.SortOrder
 import allen.town.podcast.model.playback.MediaType
 import allen.town.focus_common.util.ThemeUtils.generalThemeValue
+import android.app.Application
 import android.content.Context
 import android.content.SharedPreferences
 import android.os.Build
@@ -166,7 +167,12 @@ object Prefs {
     const val FEED_ORDER_ALPHABETICAL = 1
     const val ORDER_ASC = "asc"
     const val ORDER_DESC = "desc"
-    private var context: Context? = null
+    /**
+     * Typed as [Application] rather than [Context] on purpose: this field lives for the whole
+     * process, so only the application instance may be stored here. Anything shorter-lived (an
+     * Activity, a Service) would be leaked.
+     */
+    private var context: Application? = null
     private var prefs: SharedPreferences? = null
     private var themePrefs: SharedPreferences? = null
 
@@ -178,7 +184,7 @@ object Prefs {
     @JvmStatic
     fun init(context: Context) {
         Log.d(TAG, "init")
-        Prefs.context = context.applicationContext
+        Prefs.context = context.applicationContext as Application
         prefs = PreferenceManager.getDefaultSharedPreferences(context)
         themePrefs = instance(context)
         createNoMediaFile()
@@ -929,8 +935,9 @@ object Prefs {
                 }
                 return selectedSpeeds
             } catch (e: JSONException) {
-                Log.e(TAG, "Got JSON error when trying to get speeds from JSONArray")
-                e.printStackTrace()
+                // Falls through to the default speed list below; a corrupt preference value
+                // should not stop the player from starting.
+                Log.e(TAG, "Could not read playback speeds from the stored JSON array", e)
             }
         }
         // If this preference hasn't been set yet, return the default options
@@ -1047,8 +1054,9 @@ object Prefs {
             try {
                 f.createNewFile()
             } catch (e: IOException) {
-                Log.e(TAG, "could not create .nomedia file")
-                e.printStackTrace()
+                // Safe to ignore: without .nomedia the media scanner may index downloaded
+                // episodes, which is cosmetic and not worth failing the data folder setup for.
+                Log.e(TAG, "Could not create .nomedia file in " + f.parent, e)
             }
             Log.d(TAG, ".nomedia file created")
         }

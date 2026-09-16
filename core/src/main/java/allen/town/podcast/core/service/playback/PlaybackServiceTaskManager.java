@@ -296,8 +296,10 @@ public class PlaybackServiceTaskManager {
                 try {
                     Thread.sleep(UPDATE_INTERVAL);
                 } catch (InterruptedException e) {
-                    Log.d(TAG, "thread interrupted while waiting");
-                    e.printStackTrace();
+                    // Expected: cancel() interrupts this thread to stop the sleep timer. Restore
+                    // the flag so anything further up the stack still sees the interruption.
+                    Log.d(TAG, "Sleep timer thread interrupted while waiting", e);
+                    Thread.currentThread().interrupt();
                     break;
                 }
 

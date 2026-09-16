@@ -1,5 +1,7 @@
 package allen.town.podcast.core.service.download;
 
+import android.content.Context;
+
 import androidx.annotation.NonNull;
 
 /**
@@ -7,8 +9,8 @@ import androidx.annotation.NonNull;
  */
 public class LocalFeedStubDownloader extends Downloader {
 
-    public LocalFeedStubDownloader(@NonNull DownloadRequest request) {
-        super(request);
+    public LocalFeedStubDownloader(@NonNull Context context, @NonNull DownloadRequest request) {
+        super(context, request);
     }
 
     @Override

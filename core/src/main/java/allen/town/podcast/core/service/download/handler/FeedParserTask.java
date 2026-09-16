@@ -67,11 +67,11 @@ public class FeedParserTask implements Callable<FeedHandlerResult> {
             }
         } catch (SAXException | IOException | ParserConfigurationException e) {
             successful = false;
-            e.printStackTrace();
+            Log.e(TAG, "Failed to parse feed " + request.getSource(), e);
             reason = DownloadError.ERROR_PARSER_EXCEPTION;
             reasonDetailed = e.getMessage();
         } catch (UnsupportedFeedtypeException e) {
-            e.printStackTrace();
+            Log.e(TAG, "Unsupported feed type for " + request.getSource(), e);
             successful = false;
             reason = DownloadError.ERROR_UNSUPPORTED_TYPE;
             if ("html".equalsIgnoreCase(e.getRootElement())) {
@@ -79,7 +79,7 @@ public class FeedParserTask implements Callable<FeedHandlerResult> {
             }
             reasonDetailed = e.getMessage();
         } catch (InvalidFeedException e) {
-            e.printStackTrace();
+            Log.e(TAG, "Invalid feed " + request.getSource(), e);
             successful = false;
             reason = DownloadError.ERROR_PARSER_EXCEPTION;
             reasonDetailed = e.getMessage();

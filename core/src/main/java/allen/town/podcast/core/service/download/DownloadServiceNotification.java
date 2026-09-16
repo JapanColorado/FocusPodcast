@@ -34,7 +34,7 @@ public class DownloadServiceNotification {
                 .setWhen(0)
                 .setOnlyAlertOnce(true)
                 .setShowWhen(false)
-                .setContentIntent(ClientConfig.downloadServiceCallbacks.getNotificationContentIntent(context))
+                .setContentIntent(ClientConfig.getDownloadServiceCallbacks().getNotificationContentIntent(context))
                 .setSmallIcon(R.drawable.ic_notification_sync);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             notificationCompatBuilder.setVisibility(NotificationCompat.VISIBILITY_PUBLIC);
@@ -186,14 +186,14 @@ public class DownloadServiceNotification {
                 channelId = NotificationUtils.CHANNEL_ID_AUTO_DOWNLOAD;
                 titleId = R.string.auto_download_report_title;
                 iconId = R.drawable.ic_notification_new;
-                intent = ClientConfig.downloadServiceCallbacks.getAutoDownloadReportNotificationContentIntent(context);
+                intent = ClientConfig.getDownloadServiceCallbacks().getAutoDownloadReportNotificationContentIntent(context);
                 id = R.id.notification_auto_download_report;
                 content = createAutoDownloadNotificationContent(reportQueue);
             } else {
                 channelId = NotificationUtils.CHANNEL_ID_DOWNLOAD_ERROR;
                 titleId = R.string.download_report_title;
                 iconId = R.drawable.ic_notification_sync_error;
-                intent = ClientConfig.downloadServiceCallbacks.getReportNotificationContentIntent(context);
+                intent = ClientConfig.getDownloadServiceCallbacks().getReportNotificationContentIntent(context);
                 id = R.id.notification_download_report;
                 content = createFailedDownloadNotificationContent(reportQueue);
             }
@@ -229,7 +229,7 @@ public class DownloadServiceNotification {
                         + ": " + resourceTitle))
                 .setSmallIcon(R.drawable.ic_notification_key)
                 .setAutoCancel(true)
-                .setContentIntent(ClientConfig.downloadServiceCallbacks.getAuthentificationNotificationContentIntent(context, downloadRequest));
+                .setContentIntent(ClientConfig.getDownloadServiceCallbacks().getAuthentificationNotificationContentIntent(context, downloadRequest));
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             builder.setVisibility(NotificationCompat.VISIBILITY_PUBLIC);
         }

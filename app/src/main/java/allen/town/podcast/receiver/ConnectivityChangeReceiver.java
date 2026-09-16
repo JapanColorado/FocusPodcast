@@ -18,7 +18,7 @@ public class ConnectivityChangeReceiver extends BroadcastReceiver {
         if (TextUtils.equals(intent.getAction(), ConnectivityManager.CONNECTIVITY_ACTION)) {
             Log.d(TAG, "onReceive");
 
-            ClientConfig.initialize(context);
+            ClientConfig.ensureInitialized(context);
             NetworkUtils.networkChangedDetected();
         }
     }

@@ -18,7 +18,7 @@ public class FeedsSyncReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         Log.d(TAG, "onReceive");
-        ClientConfig.initialize(context);
+        ClientConfig.ensureInitialized(context);
 
         AutoUpdateManager.runOnce(context);
     }

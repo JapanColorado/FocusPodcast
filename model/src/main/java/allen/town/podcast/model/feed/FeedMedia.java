@@ -6,6 +6,7 @@ import android.media.MediaMetadataRetriever;
 import android.net.Uri;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.util.Log;
 import androidx.annotation.Nullable;
 import android.support.v4.media.MediaBrowserCompat;
 import android.support.v4.media.MediaDescriptionCompat;
@@ -17,6 +18,7 @@ import java.util.Date;
 import java.util.List;
 
 public class FeedMedia extends FeedFile implements Playable {
+    private static final String TAG = "FeedMedia";
     public static final int FEEDFILETYPE_FEEDMEDIA = 2;
     public static final int PLAYABLE_TYPE_FEEDMEDIA = 1;
     public static final String FILENAME_PREFIX_EMBEDDED_COVER = "metadata-retriever:";
@@ -468,7 +470,7 @@ public class FeedMedia extends FeedFile implements Playable {
                 hasEmbeddedPicture = Boolean.FALSE;
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            Log.e(TAG, "Failed to read the embedded cover of " + getLocalMediaUrl(), e);
             hasEmbeddedPicture = Boolean.FALSE;
         }
     }

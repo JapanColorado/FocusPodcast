@@ -79,7 +79,8 @@ public abstract class VorbisCommentReader {
                 IOUtils.skipFully(input, vectorLength - key.length() - 1);
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            // A single unreadable comment is not fatal: the caller keeps reading the remaining comments.
+            Log.e(TAG, "Failed to read a Vorbis user comment", e);
         }
     }
 

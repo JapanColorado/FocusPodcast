@@ -10,7 +10,6 @@ import org.xmlpull.v1.XmlPullParserException;
 import org.xmlpull.v1.XmlPullParserFactory;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.Reader;
 
@@ -82,25 +81,30 @@ public class TypeGetter {
                     }
                 }
             } catch (XmlPullParserException e) {
-                e.printStackTrace();
+                Log.e(TAG, "Failed to parse feed as XML: " + feed.getFile_url(), e);
                 // XML document might actually be a HTML document -> try to parse as HTML
                 String rootElement = null;
                 try {
                     Jsoup.parse(new File(feed.getFile_url()));
                     rootElement = "html";
                 } catch (IOException e1) {
-                    e1.printStackTrace();
+                    // The HTML fallback is only used to name the root element in the exception below;
+                    // failing to read it just means we report an unknown root element.
+                    Log.e(TAG, "Failed to parse feed as HTML: " + feed.getFile_url(), e1);
                 }
                 throw new UnsupportedFeedtypeException(Type.INVALID, rootElement);
 
             } catch (IOException e) {
-                e.printStackTrace();
+                // The feed file could not be read at all, so fall through to the
+                // UnsupportedFeedtypeException(INVALID) thrown at the end of this method.
+                Log.e(TAG, "Failed to read feed file: " + feed.getFile_url(), e);
             } finally {
                 if (reader != null) {
                     try {
                         reader.close();
                     } catch (IOException e) {
-                        e.printStackTrace();
+                        // Closing a read-only reader can only fail after we already have our answer.
+                        Log.e(TAG, "Failed to close the feed file reader", e);
                     }
                 }
             }
@@ -109,17 +113,9 @@ public class TypeGetter {
         throw new UnsupportedFeedtypeException(Type.INVALID);
     }
 
-    private Reader createReader(Feed feed) {
-        Reader reader;
-        try {
-            reader = new XmlStreamReader(new File(feed.getFile_url()));
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-            return null;
-        } catch (IOException e) {
-            e.printStackTrace();
-            return null;
-        }
-        return reader;
+    private Reader createReader(Feed feed) throws IOException {
+        // Returning null here used to make the parser fail with a NullPointerException.
+        // Propagating instead lets getType() report the file as an invalid feed.
+        return new XmlStreamReader(new File(feed.getFile_url()));
     }
 }

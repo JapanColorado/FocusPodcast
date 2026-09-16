@@ -57,7 +57,9 @@ public class LocalFeedUpdater {
                 reportSuccess(feed);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            // Not fatal: the failure is recorded on the feed itself by reportError(), which is what
+            // the download report and the "last update failed" flag in the UI are built from.
+            Log.e(TAG, "Failed to update local feed " + feed.getDownload_url(), e);
             reportError(feed, e.getMessage());
         }
     }

@@ -33,9 +33,12 @@ import com.bumptech.glide.request.target.Target
 import com.bumptech.glide.request.transition.Transition
 import io.reactivex.Completable
 import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.Disposable
 
 class AppWidgetBig : BaseAppWidget() {
     private var target: Target<Bitmap>? = null // for cancellation
+    /** The pending artwork load; superseded by the next update, so it is disposed first. */
+    private var artworkUpdate: Disposable? = null
 
     private val TAG = "AppWidgetBig"
 
@@ -133,7 +136,8 @@ class AppWidgetBig : BaseAppWidget() {
             val appContext = context.applicationContext
 
 
-            Completable.fromAction {
+            artworkUpdate?.dispose()
+            artworkUpdate = Completable.fromAction {
             }
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
@@ -188,7 +192,7 @@ class AppWidgetBig : BaseAppWidget() {
                             }
                         })
                 }) { error: Throwable ->
-                    Log.e(TAG, error.stackTraceToString())
+                    Log.e(TAG, "Failed to load widget artwork", error)
                 }
         } else {
             pushUpdate(context, appWidgetIds, remoteViews)

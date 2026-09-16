@@ -89,7 +89,7 @@ public class ExoPlayerWrapper implements IPlayer {
                     if (bufferingUpdateListener != null) {
                         bufferingUpdateListener.onBufferingUpdate(null, exoPlayer.getBufferedPercentage());
                     }
-                });
+                }, error -> Log.e(TAG, "Buffering update timer failed", error));
     }
 
     private void createPlayer() {

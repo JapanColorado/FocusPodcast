@@ -150,7 +150,9 @@ public class ChapterUtils {
                 return PodcastIndexChapterParser.parse(response.body().string());
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            // Returns the documented null: chapters are optional metadata and the caller
+            // (PlaybackServiceTaskManager) simply keeps the media without them.
+            Log.e(TAG, "Failed to load chapters from " + url, e);
         }
         return null;
     }

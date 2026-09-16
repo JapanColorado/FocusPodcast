@@ -37,9 +37,12 @@ import allen.town.podcast.core.widget.base.BaseAppWidget
 import allen.town.podcast.playback.base.PlayerStatus
 import io.reactivex.Completable
 import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.Disposable
 
 open class AppWidgetMD : BaseAppWidget() {
     private var target: Target<BitmapPaletteWrapper>? = null // for cancellation
+    /** The pending artwork load; superseded by the next update, so it is disposed first. */
+    private var artworkUpdate: Disposable? = null
 
     private val TAG = "AppWidgetMD"
 
@@ -140,7 +143,8 @@ open class AppWidgetMD : BaseAppWidget() {
             // Load the album cover async and push the update on completion
             val appContext = context.applicationContext
 
-            Completable.fromAction {
+            artworkUpdate?.dispose()
+            artworkUpdate = Completable.fromAction {
             }
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
@@ -248,7 +252,7 @@ open class AppWidgetMD : BaseAppWidget() {
                             }
                         })
                 }) { error: Throwable ->
-                    Log.e(TAG, error.stackTraceToString())
+                    Log.e(TAG, "Failed to load widget artwork", error)
                 }
         } else {
             pushUpdate(context, appWidgetIds, remoteViews)

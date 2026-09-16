@@ -4,4 +4,8 @@
         <ignore path="res/drawable/ic_settings.xml" />
         <ignore path="res/drawable/ic_settings_white.xml" />
     </issue>
+
+    <!-- Hardening ratchet: static Context fields and undisposed Rx chains are errors here. -->
+    <issue id="StaticFieldLeak" severity="error" />
+    <issue id="CheckResult" severity="error" />
 </lint>

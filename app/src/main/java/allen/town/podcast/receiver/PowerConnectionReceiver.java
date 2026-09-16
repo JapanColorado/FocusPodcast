@@ -24,7 +24,7 @@ public class PowerConnectionReceiver extends BroadcastReceiver {
 
         Log.d(TAG, "onReceive " + action);
 
-        ClientConfig.initialize(context);
+        ClientConfig.ensureInitialized(context);
         if (Intent.ACTION_POWER_CONNECTED.equals(action)) {
             Log.d(TAG, "charging");
             // we're plugged in, this is a great time to auto-download if everything else is

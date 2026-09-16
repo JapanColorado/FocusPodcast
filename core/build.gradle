@@ -6,12 +6,13 @@ apply from: "../common.gradle"
 android {
     lintOptions {
         disable "InvalidPeriodicWorkRequestInterval", "ObsoleteLintCustomCheck", "DefaultLocale", "UnusedAttribute",
-                "ParcelClassLoader", "CheckResult", "TrustAllX509TrustManager",
-                "StaticFieldLeak", "IconDensities", "IconDuplicates"
+                "ParcelClassLoader", "TrustAllX509TrustManager",
+                "IconDensities", "IconDuplicates"
     }
 
     defaultConfig {
         namespace "allen.town.podcast.core"
+        buildConfigField "String", "VERSION_NAME", "\"${rootProject.ext.versionName}\""
         kapt {
             arguments {
                 arg('eventBusIndex', 'allen.town.podcast.core.ApCoreEventBusIndex')

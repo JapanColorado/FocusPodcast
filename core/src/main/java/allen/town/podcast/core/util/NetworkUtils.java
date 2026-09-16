@@ -1,5 +1,6 @@
 package allen.town.podcast.core.util;
 
+import android.app.Application;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.Network;
@@ -35,10 +36,15 @@ public class NetworkUtils {
 
     private static final String TAG = NetworkUtils.class.getSimpleName();
 
-    private static Context context;
+    /**
+     * Typed as {@link Application} rather than {@link Context} on purpose: this field lives for the
+     * whole process, so only the application instance may be stored here. Anything shorter-lived
+     * (an Activity, a Service) would be leaked.
+     */
+    private static Application context;
 
     public static void init(Context context) {
-        NetworkUtils.context = context;
+        NetworkUtils.context = (Application) context.getApplicationContext();
     }
 
     public static boolean isAutoDownloadAllowed() {

@@ -108,13 +108,15 @@ public class ResizingOkHttpStreamFetcher extends OkHttpStreamFetcher {
                     Log.d(TAG, "compress image from " + tempIn.length() / 1024
                             + " to " + tempOut.length() / 1024 + " kB ,final quality: " + quality + "%");
                 } catch (Throwable e) {
-                    e.printStackTrace();
+                    // Safe to ignore: resizing is an optimisation. If it fails (OOM, unsupported
+                    // image format, ...) we fall back to handing Glide the original bytes below.
+                    Log.e(TAG, "Failed to resize image, delivering the original", e);
 
                     try {
                         stream = new FileInputStream(tempIn);
                         callback.onDataReady(stream); // Just deliver the original, non-scaled image
                     } catch (FileNotFoundException fileNotFoundException) {
-                        e.printStackTrace();
+                        Log.e(TAG, "Original image is gone too, failing the load", fileNotFoundException);
                         callback.onLoadFailed(fileNotFoundException);
                     }
                 }

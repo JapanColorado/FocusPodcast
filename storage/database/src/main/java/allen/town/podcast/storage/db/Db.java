@@ -361,11 +361,18 @@ public class Db {
     private final DbHelper dbHelper;
 
     public static void init(Context context) {
+        if (context == null) {
+            throw new IllegalArgumentException("Db.init(context) must be called with a non-null context");
+        }
+        // Application context only: this field lives for the whole process.
         Db.context = context.getApplicationContext();
     }
 
     public static synchronized Db getInstance() {
         if (instance == null) {
+            if (context == null) {
+                throw new IllegalStateException("Db.init(context) must be called first");
+            }
             instance = new Db();
         }
         return instance;
@@ -386,7 +393,9 @@ public class Db {
             newDb = dbHelper.getWritableDatabase();
             newDb.disableWriteAheadLogging();
         } catch (SQLException ex) {
-            Log.e(TAG, Log.getStackTraceString(ex));
+            // Log and continue: a read-only handle still lets the app show existing content
+            // instead of crashing at startup; writes will fail loudly when they are attempted.
+            Log.e(TAG, "Could not open the database for writing, falling back to read-only", ex);
             newDb = dbHelper.getReadableDatabase();
         }
         return newDb;
@@ -603,7 +612,10 @@ public class Db {
             db.update(TABLE_NAME_FEED_MEDIA, values, null, new String[0]);
             db.setTransactionSuccessful();
         } catch (SQLException e) {
-            Log.e(TAG, Log.getStackTraceString(e));
+            // Log and continue: setTransactionSuccessful() was never reached, so the finally
+            // below rolls the whole statement back. The caller's in-memory model is unchanged
+            // and the next write of the same data retries it.
+            Log.e(TAG, "resetAllMediaPlayedDuration failed, transaction rolled back", e);
         } finally {
             db.endTransaction();
         }
@@ -633,7 +645,10 @@ public class Db {
             }
             db.setTransactionSuccessful();
         } catch (SQLException e) {
-            Log.e(TAG, Log.getStackTraceString(e));
+            // Log and continue: setTransactionSuccessful() was never reached, so the finally
+            // below rolls the whole statement back. The caller's in-memory model is unchanged
+            // and the next write of the same data retries it.
+            Log.e(TAG, "setCompleteFeed failed, transaction rolled back", e);
         } finally {
             db.endTransaction();
         }
@@ -656,7 +671,10 @@ public class Db {
             }
             db.setTransactionSuccessful();
         } catch (SQLException e) {
-            Log.e(TAG, Log.getStackTraceString(e));
+            // Log and continue: setTransactionSuccessful() was never reached, so the finally
+            // below rolls the whole statement back. The caller's in-memory model is unchanged
+            // and the next write of the same data retries it.
+            Log.e(TAG, "storeFeedItemlist failed, transaction rolled back", e);
         } finally {
             db.endTransaction();
         }
@@ -669,7 +687,10 @@ public class Db {
             result = updateOrInsertFeedItem(item, true);
             db.setTransactionSuccessful();
         } catch (SQLException e) {
-            Log.e(TAG, Log.getStackTraceString(e));
+            // Log and continue: setTransactionSuccessful() was never reached, so the finally
+            // below rolls the whole statement back. The caller's in-memory model is unchanged
+            // and the next write of the same data retries it.
+            Log.e(TAG, "setSingleFeedItem failed, transaction rolled back", e);
         } finally {
             db.endTransaction();
         }
@@ -688,7 +709,10 @@ public class Db {
             result = updateOrInsertFeedItem(item, false);
             db.setTransactionSuccessful();
         } catch (SQLException e) {
-            Log.e(TAG, Log.getStackTraceString(e));
+            // Log and continue: setTransactionSuccessful() was never reached, so the finally
+            // below rolls the whole statement back. The caller's in-memory model is unchanged
+            // and the next write of the same data retries it.
+            Log.e(TAG, "setSingleFeedItemExcludeFeed failed, transaction rolled back", e);
         } finally {
             db.endTransaction();
         }
@@ -799,7 +823,10 @@ public class Db {
 
             db.setTransactionSuccessful();
         } catch (SQLException e) {
-            Log.e(TAG, Log.getStackTraceString(e));
+            // Log and continue: setTransactionSuccessful() was never reached, so the finally
+            // below rolls the whole statement back. The caller's in-memory model is unchanged
+            // and the next write of the same data retries it.
+            Log.e(TAG, "setFeedItemRead failed, transaction rolled back", e);
         } finally {
             db.endTransaction();
         }
@@ -822,7 +849,10 @@ public class Db {
             }
             db.setTransactionSuccessful();
         } catch (SQLException e) {
-            Log.e(TAG, Log.getStackTraceString(e));
+            // Log and continue: setTransactionSuccessful() was never reached, so the finally
+            // below rolls the whole statement back. The caller's in-memory model is unchanged
+            // and the next write of the same data retries it.
+            Log.e(TAG, "setFeedItemRead failed, transaction rolled back", e);
         } finally {
             db.endTransaction();
         }
@@ -931,7 +961,10 @@ public class Db {
             }
             db.setTransactionSuccessful();
         } catch (SQLException e) {
-            Log.e(TAG, Log.getStackTraceString(e));
+            // Log and continue: setTransactionSuccessful() was never reached, so the finally
+            // below rolls the whole statement back. The caller's in-memory model is unchanged
+            // and the next write of the same data retries it.
+            Log.e(TAG, "setFavorites failed, transaction rolled back", e);
         } finally {
             db.endTransaction();
         }
@@ -983,7 +1016,10 @@ public class Db {
             }
             db.setTransactionSuccessful();
         } catch (SQLException e) {
-            Log.e(TAG, Log.getStackTraceString(e));
+            // Log and continue: setTransactionSuccessful() was never reached, so the finally
+            // below rolls the whole statement back. The caller's in-memory model is unchanged
+            // and the next write of the same data retries it.
+            Log.e(TAG, "setQueue failed, transaction rolled back", e);
         } finally {
             db.endTransaction();
         }
@@ -1021,7 +1057,10 @@ public class Db {
             db.delete(TABLE_NAME_FEED_ITEMS, KEY_ID + " IN (" + itemIds + ")", null);
             db.setTransactionSuccessful();
         } catch (SQLException e) {
-            Log.e(TAG, Log.getStackTraceString(e));
+            // Log and continue: setTransactionSuccessful() was never reached, so the finally
+            // below rolls the whole statement back. The caller's in-memory model is unchanged
+            // and the next write of the same data retries it.
+            Log.e(TAG, "removeFeedItems failed, transaction rolled back", e);
         } finally {
             db.endTransaction();
         }
@@ -1045,7 +1084,10 @@ public class Db {
                     new String[]{String.valueOf(feed.getId())});
             db.setTransactionSuccessful();
         } catch (SQLException e) {
-            Log.e(TAG, Log.getStackTraceString(e));
+            // Log and continue: setTransactionSuccessful() was never reached, so the finally
+            // below rolls the whole statement back. The caller's in-memory model is unchanged
+            // and the next write of the same data retries it.
+            Log.e(TAG, "removeFeed failed, transaction rolled back", e);
         } finally {
             db.endTransaction();
         }
@@ -1642,7 +1684,9 @@ public class Db {
                 FileUtils.copyFile(dbPath, backupFile);
                 Log.d(TAG, "dump database to " + backupFile.getPath());
             } catch (IOException e) {
-                Log.d(TAG, Log.getStackTraceString(e));
+                // Log and continue: the backup copy is a diagnostic nicety. The corrupted database
+                // must still be handed to DefaultDatabaseErrorHandler below so it gets recreated.
+                Log.e(TAG, "Could not back up the corrupted database before deleting it", e);
             }
 
             new DefaultDatabaseErrorHandler().onCorruption(db); // This deletes the database

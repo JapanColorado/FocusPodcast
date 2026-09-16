@@ -36,6 +36,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -83,11 +84,27 @@ public class DownloadService extends Service {
     public static final String EXTRA_INITIATED_BY_USER = "initiatedByUser";
     public static final String EXTRA_CLEANUP_MEDIA = "cleanupMedia";
 
-    public static boolean isRunning = false;
+    private static final AtomicBoolean RUNNING = new AtomicBoolean(false);
 
-    // Can be modified from another thread while iterating. Both possible race conditions are not critical:
-    // Remove while iterating: We think it is still downloading and don't start a new download with the same file.
-    // Add while iterating: We think it is not downloading and might start a second download with the same file.
+    /**
+     * The downloaders currently enqueued or running.
+     *
+     * <p>This list is static because the static query methods below ({@link #isDownloadingFile},
+     * {@link #isDownloadingFeeds}, {@link #findRequest}) are called from all over the app without a
+     * service binding. It is owned by the running service instance: entries are added in
+     * {@link #submitDownloader} and removed when a downloader finishes, is cancelled, or is rejected
+     * by the executor, and {@link #onDestroy} clears whatever is left after shutting the executors
+     * down. That clear is what keeps the list from carrying stale downloaders into the next service
+     * instance (which would make the new instance believe work is still pending and never stop).
+     * The entries are {@link Downloader} objects, not Contexts, so the static reference does not
+     * leak the Service. All reads are guarded by {@link #isRunning()} so that an empty list observed
+     * while no service is alive is reported as "not downloading" rather than as a stale answer.</p>
+     *
+     * <p>It can be modified from another thread while iterating. Both possible race conditions are
+     * not critical: remove while iterating means we think it is still downloading and don't start a
+     * new download with the same file; add while iterating means we think it is not downloading and
+     * might start a second download with the same file.</p>
+     */
     static final List<Downloader> downloads = new CopyOnWriteArrayList<>();
     private final ExecutorService downloadHandleExecutor;
     private final ExecutorService downloadEnqueueExecutor;
@@ -141,7 +158,7 @@ public class DownloadService extends Service {
     @SuppressLint("UnspecifiedRegisterReceiverFlag")
     public void onCreate() {
         Log.d(TAG, "onCreate");
-        isRunning = true;
+        RUNNING.set(true);
         notificationManager = new DownloadServiceNotification(this);
 
         IntentFilter cancelDownloadReceiverFilter = new IntentFilter();
@@ -212,7 +229,7 @@ public class DownloadService extends Service {
     }
 
     public static void cancel(Context context, String url) {
-        if (!isRunning) {
+        if (!isRunning()) {
             return;
         }
         Intent cancelIntent = new Intent(DownloadService.ACTION_CANCEL_DOWNLOAD);
@@ -222,7 +239,7 @@ public class DownloadService extends Service {
     }
 
     public static void cancelAll(Context context) {
-        if (!isRunning) {
+        if (!isRunning()) {
             return;
         }
         Intent cancelIntent = new Intent(DownloadService.ACTION_CANCEL_ALL_DOWNLOADS);
@@ -230,8 +247,13 @@ public class DownloadService extends Service {
         context.sendBroadcast(cancelIntent);
     }
 
+    /** @return true while a DownloadService instance is alive (between onCreate and onDestroy). */
+    public static boolean isRunning() {
+        return RUNNING.get();
+    }
+
     public static boolean isDownloadingFeeds() {
-        if (!isRunning) {
+        if (!isRunning()) {
             return false;
         }
         for (Downloader downloader : downloads) {
@@ -243,7 +265,7 @@ public class DownloadService extends Service {
     }
 
     public static boolean isDownloadingFile(String downloadUrl) {
-        if (!isRunning) {
+        if (!isRunning()) {
             return false;
         }
         for (Downloader downloader : downloads) {
@@ -261,7 +283,7 @@ public class DownloadService extends Service {
      */
     @Nullable
     public static DownloadRequest findRequest(String downloadUrl) {
-        if (!isRunning) {
+        if (!isRunning()) {
             return null;
         }
         for (Downloader downloader : downloads) {
@@ -315,7 +337,7 @@ public class DownloadService extends Service {
     @Override
     public void onDestroy() {
         Log.d(TAG, "onDestroy");
-        isRunning = false;
+        RUNNING.set(false);
         // Stop accepting work before clearing the list: a queued enqueue task or a retry could
         // otherwise re-add a downloader after the clear, and the static list would carry it
         // into the next service instance, which would then never stop.
@@ -420,7 +442,10 @@ public class DownloadService extends Service {
                 request.setProgressPercent((int) (100.0 * scanned / totalFiles));
             });
         } catch (Exception e) {
-            e.printStackTrace();
+            // Must not propagate: this runs on the shared download executor and an escaping
+            // exception would kill that worker (see the contract in the javadoc above). The feed's
+            // own failure state is recorded by LocalFeedUpdater.
+            Log.e(TAG, "Local feed refresh failed for " + request.getSource(), e);
         } finally {
             downloads.remove(downloader);
             postDownloaders();
@@ -601,7 +626,7 @@ public class DownloadService extends Service {
         @Override
         public void onReceive(Context context, Intent intent) {
             Log.d(TAG, "receiver cancel download intent " + intent.getAction());
-            if (!isRunning) {
+            if (!isRunning()) {
                 return;
             }
             if (TextUtils.equals(intent.getAction(), ACTION_CANCEL_DOWNLOAD)) {
@@ -690,7 +715,12 @@ public class DownloadService extends Service {
         try {
             actuallyEnqueued = DBTasks.enqueueFeedItemsToDownload(getApplicationContext(), feedItems);
         } catch (InterruptedException | ExecutionException e) {
-            e.printStackTrace();
+            if (e instanceof InterruptedException) {
+                Thread.currentThread().interrupt();
+            }
+            // Safe to continue: the downloads themselves still run. Only the "was enqueued by this
+            // download" bookkeeping is missing, so cancelling one of them will not undo the enqueue.
+            Log.e(TAG, "Failed to enqueue items for download", e);
         }
 
         for (DownloadRequest request : requests) {
@@ -734,11 +764,11 @@ public class DownloadService extends Service {
         }
         Log.d(TAG, "add new request -> " + request.getSource());
         if (request.getSource().startsWith(Feed.PREFIX_LOCAL_FOLDER)) {
-            Downloader downloader = new LocalFeedStubDownloader(request);
+            Downloader downloader = new LocalFeedStubDownloader(getApplicationContext(), request);
             submitDownloader(downloader, () -> performLocalFeedRefresh(downloader, request));
         } else {
             writeFileUrl(request);
-            Downloader downloader = downloaderFactory.create(request);
+            Downloader downloader = downloaderFactory.create(getApplicationContext(), request);
             if (downloader != null) {
                 submitDownloader(downloader, () -> performDownload(downloader));
             }
@@ -757,15 +787,12 @@ public class DownloadService extends Service {
         }
     }
 
+    /**
+     * Replaces the factory that turns a {@link DownloadRequest} into a {@link Downloader}.
+     * Tests only; production code always uses {@link DefaultDownloaderFactory}.
+     */
     @VisibleForTesting
-    public static DownloaderFactory getDownloaderFactory() {
-        return downloaderFactory;
-    }
-
-    // public scope rather than package private,
-    // because androidTest put classes in the non-standard de.test.FocusPodcast hierarchy
-    @VisibleForTesting
-    public static void setDownloaderFactory(DownloaderFactory downloaderFactory) {
+    public static void setDownloaderFactory(@NonNull DownloaderFactory downloaderFactory) {
         DownloadService.downloaderFactory = downloaderFactory;
     }
 

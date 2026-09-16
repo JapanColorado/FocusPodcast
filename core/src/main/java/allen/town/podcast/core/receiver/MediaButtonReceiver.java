@@ -27,7 +27,7 @@ public class MediaButtonReceiver extends BroadcastReceiver {
 		}
 		KeyEvent event = (KeyEvent) intent.getExtras().get(Intent.EXTRA_KEY_EVENT);
 		if (event != null && event.getAction() == KeyEvent.ACTION_DOWN && event.getRepeatCount()==0) {
-			ClientConfig.initialize(context);
+			ClientConfig.ensureInitialized(context);
 			Intent serviceIntent = new Intent(context, PlaybackService.class);
 			serviceIntent.putExtra(EXTRA_KEYCODE, event.getKeyCode());
 			serviceIntent.putExtra(EXTRA_SOURCE, event.getSource());

@@ -192,12 +192,15 @@ public class SyncService extends Worker {
     private void waitForDownloadServiceCompleted() {
         EventBus.getDefault().postSticky(new SyncServiceEvent(R.string.sync_status_wait_for_downloads));
         try {
-            while (DownloadService.isRunning) {
+            while (DownloadService.isRunning()) {
                 //noinspection BusyWait
                 Thread.sleep(1000);
             }
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            // Expected when WorkManager stops this worker. Restore the flag so the rest of the
+            // sync run sees the cancellation instead of continuing to wait.
+            Thread.currentThread().interrupt();
+            Log.e(TAG, "Interrupted while waiting for downloads to finish", e);
         }
     }
 

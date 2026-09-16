@@ -59,7 +59,12 @@ public class ExceptFavoriteCleanupAlgorithm extends EpisodeCleanupAlgorithm {
             try {
                 DBWriter.deleteFeedMediaOfItem(context, item.getMedia().getId()).get();
             } catch (InterruptedException | ExecutionException e) {
-                e.printStackTrace();
+                if (e instanceof InterruptedException) {
+                    Thread.currentThread().interrupt();
+                }
+                // Safe to continue with the next candidate: this is a best-effort cache cleanup and
+                // a file that could not be deleted now is simply offered again on the next run.
+                Log.e(TAG, "Failed to delete media of item " + item.getId(), e);
             }
         }
 

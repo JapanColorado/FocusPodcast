@@ -103,7 +103,12 @@ public final class DBTasks {
             try {
                 DBWriter.deleteFeed(context, feedID).get();
             } catch (InterruptedException | ExecutionException e) {
-                e.printStackTrace();
+                if (e instanceof InterruptedException) {
+                    Thread.currentThread().interrupt();
+                }
+                // Safe to continue: the feed is simply left in the database and the next refresh
+                // or manual removal can try again. There is no caller state to unwind here.
+                Log.e(TAG, "Failed to delete feed " + feedID, e);
             }
         } else {
             Log.w(TAG, "removeFeedWithDownloadUrl: Could not find feed with url: " + downloadUrl);
@@ -600,7 +605,12 @@ public final class DBTasks {
                 DBWriter.deleteFeedItems(context, unlistedItems).get();
             }
         } catch (InterruptedException | ExecutionException e) {
-            e.printStackTrace();
+            if (e instanceof InterruptedException) {
+                Thread.currentThread().interrupt();
+            }
+            // Safe to continue: the in-memory feed is still returned to the caller so that the
+            // refresh finishes; the database write is retried on the next refresh.
+            Log.e(TAG, "Failed to persist updated feed " + newFeed.getTitle(), e);
         }
 
         adapter.close();

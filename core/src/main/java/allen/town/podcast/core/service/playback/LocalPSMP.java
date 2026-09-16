@@ -220,7 +220,8 @@ public class LocalPSMP extends PlaybackServiceMediaPlayer {
             try {
                 playMediaObject(playable, false, stream, startWhenPrepared, prepareImmediately);
             } catch (RuntimeException e) {
-                e.printStackTrace();
+                // Rethrown: the caller's executor task must fail so the error is not silently lost.
+                Log.e(TAG, "Failed to start playing " + playable.getEpisodeTitle(), e);
                 throw e;
             } finally {
                 playerLock.unlock();
@@ -307,7 +308,8 @@ public class LocalPSMP extends PlaybackServiceMediaPlayer {
             }
 
         } catch (IOException | IllegalStateException e) {
-            e.printStackTrace();
+            // Reported to the UI through PlayerErrorEvent below; nothing else can be done here.
+            Log.e(TAG, "Failed to prepare media player", e);
             setPlayerStatus(PlayerStatus.ERROR, null);
             EventBus.getDefault().postSticky(new PlayerErrorEvent(e.getLocalizedMessage()));
         }
@@ -415,7 +417,8 @@ public class LocalPSMP extends PlaybackServiceMediaPlayer {
                     mediaPlayer.prepare();
                     onPrepared(startWhenPrepared.get());
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    // Reported to the UI through PlayerErrorEvent below.
+                    Log.e(TAG, "Failed to prepare media player", e);
                     setPlayerStatus(PlayerStatus.ERROR, null);
                     EventBus.getDefault().postSticky(new PlayerErrorEvent(e.getLocalizedMessage()));
                 }
@@ -513,7 +516,10 @@ public class LocalPSMP extends PlaybackServiceMediaPlayer {
                 try {
                     seekLatch.await(3, TimeUnit.SECONDS);
                 } catch (InterruptedException e) {
-                    Log.e(TAG, Log.getStackTraceString(e));
+                    // Safe to continue: the new seek below supersedes the one we were waiting for.
+                    // Restore the flag so the executor still sees that it was interrupted.
+                    Thread.currentThread().interrupt();
+                    Log.e(TAG, "Interrupted while waiting for the previous seek to finish", e);
                 }
             }
             seekLatch = new CountDownLatch(1);
@@ -526,7 +532,10 @@ public class LocalPSMP extends PlaybackServiceMediaPlayer {
             try {
                 seekLatch.await(3, TimeUnit.SECONDS);
             } catch (InterruptedException e) {
-                Log.e(TAG, Log.getStackTraceString(e));
+                // Safe to continue: the seek has already been handed to the player, we only stop
+                // waiting for its callback. Restore the flag for the executor.
+                Thread.currentThread().interrupt();
+                Log.e(TAG, "Interrupted while waiting for the seek to complete", e);
             }
         } else if (playerStatus == PlayerStatus.INITIALIZED) {
             media.setPosition(t);
@@ -600,6 +609,9 @@ public class LocalPSMP extends PlaybackServiceMediaPlayer {
                 return INVALID_TIME;
             }
         } catch (InterruptedException e) {
+            // Documented fallback of this method: INVALID_TIME when the position cannot be read
+            // right now. Restore the flag so the caller still sees the interruption.
+            Thread.currentThread().interrupt();
             return INVALID_TIME;
         }
 
@@ -784,7 +796,9 @@ public class LocalPSMP extends PlaybackServiceMediaPlayer {
                     mediaPlayer.stop();
                 }
             } catch (Exception e) {
-                e.printStackTrace();
+                // Best effort: the player is released right below either way, and an
+                // IllegalStateException here only means it was already in a dead state.
+                Log.e(TAG, "Error while stopping media player during shutdown", e);
             }
             mediaPlayer.release();
             mediaPlayer = null;
@@ -792,6 +806,9 @@ public class LocalPSMP extends PlaybackServiceMediaPlayer {
         }
         isShutDown = true;
         executor.shutdown();
+        // The delayed "still no audio focus" callback holds this player; drop it so it cannot
+        // fire (and call pause()) after the player has been torn down.
+        audioFocusCanceller.removeCallbacksAndMessages(null);
         abandonAudioFocus();
         releaseWifiLockIfNecessary();
     }

@@ -101,6 +101,7 @@ import io.reactivex.Completable;
 import io.reactivex.Observable;
 import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 
@@ -194,6 +195,11 @@ public class PlaybackService extends MediaBrowserServiceCompat {
     private PlaybackServiceTaskManager taskManager;
     private PlaybackServiceStateManager stateManager;
     private Disposable positionEventTimer;
+    /**
+     * Chains started by this service that must not outlive it. Cleared (not disposed) in
+     * {@link #onDestroy()} so the same instance can be reused if the service is recreated.
+     */
+    private final CompositeDisposable serviceDisposables = new CompositeDisposable();
     private PlaybackServiceNotificationBuilder notificationBuilder;
 
     private String autoSkippedFeedMediaId = null;
@@ -321,8 +327,7 @@ public class PlaybackService extends MediaBrowserServiceCompat {
             // even with correct use of the api.
             // See http://stackoverflow.com/questions/31556679/android-huawei-mediassessioncompat
             // and https://plus.google.com/+IanLake/posts/YgdTkKFxz7d
-            Log.e(TAG, "nullPointerException while setting up MediaSession");
-            npe.printStackTrace();
+            Log.e(TAG, "NullPointerException while setting up MediaSession", npe);
         }
 
         recreateMediaPlayer();
@@ -358,10 +363,13 @@ public class PlaybackService extends MediaBrowserServiceCompat {
         stateManager.stopForeground(!Prefs.isPersistNotify());
         isRunning = false;
         currentMediaType = MediaType.UNKNOWN;
-        if (playableIconLoaderThread != null) {
+        if (playableIconLoader != null) {
             // otherwise a Glide load still in flight re-posts the notification on a dead service
-            playableIconLoaderThread.interrupt();
+            playableIconLoader.dispose();
+            playableIconLoader = null;
         }
+        // Same reason: nothing started by this service may deliver a result after it is gone.
+        serviceDisposables.clear();
 
         cancelPositionObserver();
         PreferenceManager.getDefaultSharedPreferences(this).unregisterOnSharedPreferenceChangeListener(prefListener);
@@ -396,7 +404,7 @@ public class PlaybackService extends MediaBrowserServiceCompat {
     }
 
     private void loadQueueForMediaSession() {
-        Single.<List<MediaSessionCompat.QueueItem>>create(emitter -> {
+        serviceDisposables.add(Single.<List<MediaSessionCompat.QueueItem>>create(emitter -> {
             List<MediaSessionCompat.QueueItem> queueItems = new ArrayList<>();
             for (FeedItem feedItem : DBReader.getQueue()) {
                 if (feedItem.getMedia() != null) {
@@ -408,7 +416,8 @@ public class PlaybackService extends MediaBrowserServiceCompat {
         })
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(queueItems -> mediaSession.setQueue(queueItems), Throwable::printStackTrace);
+                .subscribe(queueItems -> mediaSession.setQueue(queueItems),
+                        error -> Log.e(TAG, "Failed to load the media session queue", error)));
     }
 
     private MediaBrowserCompat.MediaItem createBrowsableMediaItem(
@@ -452,7 +461,7 @@ public class PlaybackService extends MediaBrowserServiceCompat {
         Log.d(TAG, "OnLoadChildren parentMediaId " + parentId);
         result.detach();
 
-        Completable.create(emitter -> {
+        serviceDisposables.add(Completable.create(emitter -> {
             result.sendResult(loadChildrenSynchronous(parentId));
             emitter.onComplete();
         })
@@ -461,9 +470,9 @@ public class PlaybackService extends MediaBrowserServiceCompat {
                 .subscribe(
                     () -> {
                     }, e -> {
-                        e.printStackTrace();
+                        Log.e(TAG, "Failed to load media browser children", e);
                         result.sendResult(null);
-                    });
+                    }));
     }
 
     private List<MediaBrowserCompat.MediaItem> loadChildrenSynchronous(@NonNull String parentId)
@@ -571,7 +580,7 @@ public class PlaybackService extends MediaBrowserServiceCompat {
                 if (allowStreamAlways) {
                     Prefs.setAllowMobileStreaming(true);
                 }
-                Observable.fromCallable(
+                serviceDisposables.add(Observable.fromCallable(
                         () -> {
                             if (playable instanceof FeedMedia) {
                                 return DBReader.getFeedMedia(((FeedMedia) playable).getId());
@@ -584,10 +593,9 @@ public class PlaybackService extends MediaBrowserServiceCompat {
                         .subscribe(
                                 loadedPlayable -> startPlaying(loadedPlayable, allowStreamThisTime),
                                 error -> {
-                                    Log.d(TAG, "Playable was not found. Stopping service.");
-                                    error.printStackTrace();
+                                    Log.e(TAG, "Playable was not found. Stopping service.", error);
                                     stateManager.stopService();
-                                });
+                                }));
                 return Service.START_NOT_STICKY;
             }
         }
@@ -761,16 +769,16 @@ public class PlaybackService extends MediaBrowserServiceCompat {
     }
 
     private void startPlayingFromPreferences() {
-        Observable.fromCallable(() -> PlayableUtils.createInstanceFromPreferences(getApplicationContext()))
+        serviceDisposables.add(Observable.fromCallable(
+                () -> PlayableUtils.createInstanceFromPreferences(getApplicationContext()))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
                         playable -> startPlaying(playable, false),
                         error -> {
-                            Log.d(TAG, "Playable was not loaded from preferences. Stopping service.");
-                            error.printStackTrace();
+                            Log.e(TAG, "Playable was not loaded from preferences. Stopping service.", error);
                             stateManager.stopService();
-                        });
+                        }));
     }
 
     private void startPlaying(Playable playable, boolean allowStreamThisTime) {
@@ -1355,17 +1363,19 @@ public class PlaybackService extends MediaBrowserServiceCompat {
     }
 
     /**
-     * Used by setupNotification to load notification data in another thread.
+     * Used by setupNotification to load the notification icon off the main thread. Disposed when a
+     * newer icon load supersedes it and in {@link #onDestroy()}, so that a load still in flight
+     * cannot re-post the notification on a dead service.
      */
-    private Thread playableIconLoaderThread;
+    private Disposable playableIconLoader;
 
     /**
      * Prepares notification and starts the service in the foreground.
      */
     private synchronized void setupNotification(final Playable playable) {
         Log.d(TAG, "setupNotification");
-        if (playableIconLoaderThread != null) {
-            playableIconLoaderThread.interrupt();
+        if (playableIconLoader != null) {
+            playableIconLoader.dispose();
         }
         if (playable == null || mediaPlayer == null) {
             if (!stateManager.hasReceivedValidStartCommand()) {
@@ -1384,15 +1394,17 @@ public class PlaybackService extends MediaBrowserServiceCompat {
         notificationManager.notify(R.id.notification_playing, notificationBuilder.build());
 
         if (!notificationBuilder.isIconCached()) {
-            playableIconLoaderThread = new Thread(() -> {
-                Log.d(TAG, "Loading notification icon");
-                notificationBuilder.loadIcon();
-                if (!Thread.currentThread().isInterrupted()) {
-                    notificationManager.notify(R.id.notification_playing, notificationBuilder.build());
-                    updateMediaSessionMetadata(playable);
-                }
-            });
-            playableIconLoaderThread.start();
+            playableIconLoader = Single.fromCallable(() -> {
+                        Log.d(TAG, "Loading notification icon");
+                        notificationBuilder.loadIcon();
+                        return notificationBuilder.build();
+                    })
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(notification -> {
+                        notificationManager.notify(R.id.notification_playing, notification);
+                        updateMediaSessionMetadata(playable);
+                    }, error -> Log.e(TAG, "Failed to load notification icon", error));
         }
     }
 
@@ -1821,7 +1833,7 @@ public class PlaybackService extends MediaBrowserServiceCompat {
                         notificationManager.notify(R.id.notification_playing, notificationBuilder.build());
                     }
                     skipEndingIfNecessary();
-                });
+                }, error -> Log.e(TAG, "Position observer failed", error));
     }
 
     private void cancelPositionObserver() {

@@ -2,12 +2,15 @@ package allen.town.podcast.core.sync;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import allen.town.podcast.core.ClientConfig;
 import allen.town.podcast.core.pref.Prefs;
 import allen.town.podcast.core.sync.queue.SynchronizationQueueSink;
 
 /**
- * Manages preferences for accessing gpodder.net service and other sync providers
+ * Manages preferences for accessing gpodder.net service and other sync providers.
+ *
+ * <p>Holds the {@link SharedPreferences} handed to it by
+ * {@link allen.town.podcast.core.ClientConfig#initialize} rather than a {@code Context}, so that
+ * the (many) call sites can stay parameterless without core keeping a static Context around.</p>
  */
 public class SynchronizationCredentials {
 
@@ -20,9 +23,19 @@ public class SynchronizationCredentials {
     private static final String PREF_DEVICEID = "allen.town.podcast.preferences.gpoddernet.deviceID";
     private static final String PREF_HOSTNAME = "prefGpodnetHostname";
 
+    private static SharedPreferences preferences;
+
+    /** Called once from {@link allen.town.podcast.core.ClientConfig#initialize}. */
+    public static void init(Context context) {
+        preferences = context.getApplicationContext().getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
+    }
+
     private static SharedPreferences getPreferences() {
-        return ClientConfig.applicationCallbacks.getApplicationInstance()
-                .getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
+        SharedPreferences prefs = preferences;
+        if (prefs == null) {
+            throw new IllegalStateException("SynchronizationCredentials.init(context) must be called first");
+        }
+        return prefs;
     }
 
     public static String getUsername() {

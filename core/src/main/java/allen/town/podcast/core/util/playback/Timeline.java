@@ -61,7 +61,9 @@ public class Timeline {
             InputStream templateStream = context.getAssets().open("shownotesStyle.css");
             styleString = IOUtils.toString(templateStream, "UTF-8");
         } catch (IOException e) {
-            e.printStackTrace();
+            // Safe to ignore: styleString stays empty, so the shownotes are rendered unstyled
+            // rather than not at all.
+            Log.e(TAG, "Could not read shownotesStyle.css from assets", e);
         }
         webviewStyle = String.format(Locale.US, styleString, colorPrimary, colorAccent,colorAccent,
                 margin, margin, margin, margin);
@@ -137,7 +139,8 @@ public class Timeline {
                     return Integer.parseInt(m.group(1));
                 }
             } catch (NumberFormatException e) {
-                e.printStackTrace();
+                // Falls through to the documented -1 return value: not a valid timecode link.
+                Log.e(TAG, "Malformed timecode link: " + link, e);
             }
         }
         return -1;

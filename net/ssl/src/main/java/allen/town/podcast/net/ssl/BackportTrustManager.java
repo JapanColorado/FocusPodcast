@@ -33,7 +33,7 @@ public class BackportTrustManager {
                 }
             }
         } catch (NoSuchAlgorithmException | KeyStoreException e) {
-            e.printStackTrace();
+            Log.e(TAG, "Failed to load the system X509 trust manager", e);
         }
         throw new IllegalStateException("Unexpected default trust managers");
     }

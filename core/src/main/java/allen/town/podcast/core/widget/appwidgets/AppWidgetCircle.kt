@@ -37,9 +37,12 @@ import allen.town.podcast.core.widget.WidgetUpdater
 import allen.town.podcast.playback.base.PlayerStatus
 import io.reactivex.Completable
 import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.Disposable
 
 class AppWidgetCircle : AppWidgetMD() {
     private var target: Target<BitmapPaletteWrapper>? = null // for cancellation
+    /** The pending artwork load; superseded by the next update, so it is disposed first. */
+    private var artworkUpdate: Disposable? = null
 
     private val TAG = "AppWidgetCircle"
 
@@ -144,7 +147,8 @@ class AppWidgetCircle : AppWidgetMD() {
                 RoundedCorners(imageSize / 2)
             )
 
-            Completable.fromAction {
+            artworkUpdate?.dispose()
+            artworkUpdate = Completable.fromAction {
             }
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
@@ -216,7 +220,7 @@ class AppWidgetCircle : AppWidgetMD() {
                             }
                         })
                 }) { error: Throwable ->
-                    Log.e(TAG, error.stackTraceToString())
+                    Log.e(TAG, "Failed to load widget artwork", error)
                 }
         } else {
             pushUpdate(context, appWidgetIds, remoteViews)

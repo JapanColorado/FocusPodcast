@@ -1,5 +1,7 @@
 package allen.town.podcast.parser.feed;
 
+import android.util.Log;
+
 import allen.town.podcast.model.feed.Chapter;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -9,6 +11,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class PodcastIndexChapterParser {
+    private static final String TAG = "PodcastIndexChapters";
+
     public static List<Chapter> parse(String jsonStr) {
         try {
             List<Chapter> chapters = new ArrayList<>();
@@ -24,7 +28,7 @@ public class PodcastIndexChapterParser {
             }
             return chapters;
         } catch (JSONException e) {
-            e.printStackTrace();
+            Log.e(TAG, "Failed to parse Podcast Index chapters JSON", e);
         }
         return null;
     }

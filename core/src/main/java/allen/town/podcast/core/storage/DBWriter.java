@@ -84,7 +84,8 @@ public class DBWriter {
         try {
             dbExec.awaitTermination(1, TimeUnit.SECONDS);
         } catch (InterruptedException e) {
-            // ignore error
+            // Test-only helper: the wait is best effort, so an interruption just ends it early.
+            Thread.currentThread().interrupt();
         }
     }
 
@@ -203,30 +204,6 @@ public class DBWriter {
     @NonNull
     public static Future<?> deleteFeedItems(@NonNull Context context, @NonNull List<FeedItem> items) {
         return dbExec.submit(() -> deleteFeedItemsSynchronous(context, items));
-    }
-
-    /**
-     * Deletes the entire playback history.
-     */
-    public static void clearUnuseAndNotSubedFeedItems(@NonNull Context context) {
-                Db adapter = Db.getInstance();
-                try {
-                    List<Long> notSubAndNotInPlaylistAndFavFeedList = DBReader.getNotSubAndNotInPlaylistAndFavFeedList(adapter);
-                    if (notSubAndNotInPlaylistAndFavFeedList.size() > 0) {
-                        Timber.i("found feeds not subed and no-fav and no-playlist to delete " + notSubAndNotInPlaylistAndFavFeedList.size());
-                        for (Long feedId : notSubAndNotInPlaylistAndFavFeedList
-                        ) {
-                            // Wrapping this in a transaction seems to deadlock
-                            deleteFeed(context,feedId);
-                        }
-                    }
-
-                } catch (Exception e) {
-                    Log.e(TAG, Log.getStackTraceString(e));
-                } finally {
-                    adapter.getDb().endTransaction();
-                }
-
     }
 
     /**

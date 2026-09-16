@@ -1,5 +1,7 @@
 package allen.town.podcast.net.ssl;
 
+import android.util.Log;
+
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
@@ -15,6 +17,8 @@ import java.security.NoSuchAlgorithmException;
  * This fixes issues with old Android versions that abort if the server does not know TLS 1.0
  */
 public class NoV1SslSocketFactory extends SSLSocketFactory {
+    private static final String TAG = "NoV1SslSocketFactory";
+
     private SSLSocketFactory factory;
 
     public NoV1SslSocketFactory(TrustManager trustManager) {
@@ -23,7 +27,7 @@ public class NoV1SslSocketFactory extends SSLSocketFactory {
             try {
                 sslContext = SSLContext.getInstance("TLSv1.3");
             } catch (NoSuchAlgorithmException e) {
-                e.printStackTrace();
+                Log.e(TAG, "TLSv1.3 is unavailable on this device, falling back to TLSv1.2", e);
                 // The security provider can vary; some devices only support TLSv1.2.
                 sslContext = SSLContext.getInstance("TLSv1.2");
             }
@@ -31,7 +35,7 @@ public class NoV1SslSocketFactory extends SSLSocketFactory {
             sslContext.init(null, new TrustManager[] {trustManager}, null);
             factory = sslContext.getSocketFactory();
         } catch (GeneralSecurityException e) {
-            e.printStackTrace();
+            Log.e(TAG, "Failed to initialize the SSL context; this socket factory is unusable", e);
         }
     }
 
@@ -86,7 +90,7 @@ public class NoV1SslSocketFactory extends SSLSocketFactory {
         try {
             s.setEnabledProtocols(new String[]{"TLSv1.3", "TLSv1.2"});
         } catch (IllegalArgumentException e) {
-            e.printStackTrace();
+            Log.e(TAG, "Socket does not support TLSv1.3/TLSv1.2, falling back to older protocols", e);
             // Supported cipher suites may vary between devices.
             // Old protocols might be necessary to keep things working.
             s.setEnabledProtocols(new String[] { "TLSv1.2", "TLSv1.1", "TLSv1" });

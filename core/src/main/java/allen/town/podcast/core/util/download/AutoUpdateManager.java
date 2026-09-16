@@ -24,6 +24,9 @@ import allen.town.podcast.core.pref.Prefs;
 import allen.town.podcast.core.service.FeedUpdateWorker;
 import allen.town.podcast.core.storage.DBTasks;
 import allen.town.podcast.core.util.NetworkUtils;
+import io.reactivex.Completable;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.schedulers.Schedulers;
 
 public class AutoUpdateManager {
     private static final String WORK_ID_FEED_UPDATE = "allen.town.podcast.core.service.FeedUpdateWorker";
@@ -148,9 +151,22 @@ public class AutoUpdateManager {
         builder.show();
     }
 
-    private static void startRefreshAllFeeds(final Context context) {
-        new Thread(() -> DBTasks.refreshAllFeeds(
-                context.getApplicationContext(), true), "ManualRefreshAllFeeds").start();
+    /**
+     * The manual "refresh all feeds" run, kept so that a second tap while one is still running is
+     * ignored instead of starting a competing refresh.
+     */
+    private static Disposable manualRefresh;
+
+    private static synchronized void startRefreshAllFeeds(final Context context) {
+        if (manualRefresh != null && !manualRefresh.isDisposed()) {
+            Log.d(TAG, "A manual refresh of all feeds is already running.");
+            return;
+        }
+        final Context appContext = context.getApplicationContext();
+        manualRefresh = Completable.fromAction(() -> DBTasks.refreshAllFeeds(appContext, true))
+                .subscribeOn(Schedulers.io())
+                .subscribe(() -> { },
+                        error -> Log.e(TAG, "Manual refresh of all feeds failed", error));
     }
 
     public static void disableAutoUpdate(Context context) {

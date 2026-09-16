@@ -1,5 +1,7 @@
 package allen.town.podcast.core.service.download;
 
+import android.content.Context;
+
 import androidx.annotation.NonNull;
 import android.text.TextUtils;
 import android.util.Log;
@@ -39,8 +41,8 @@ public class HttpDownloader extends Downloader {
     private static final String TAG = "HttpDownloader";
     private static final int BUFFER_SIZE = 8 * 1024;
 
-    public HttpDownloader(@NonNull DownloadRequest request) {
-        super(request);
+    public HttpDownloader(@NonNull Context context, @NonNull DownloadRequest request) {
+        super(context, request);
     }
 
     @Override
@@ -191,16 +193,18 @@ public class HttpDownloader extends Downloader {
             }
 
         } catch (IllegalArgumentException e) {
-            e.printStackTrace();
+            // Every arm below reports the failure through onFail(), which is what puts the download
+            // in the download log and the failure notification; the exception itself is only logged.
+            Log.e(TAG, "Malformed download url " + request.getSource(), e);
             onFail(DownloadError.ERROR_MALFORMED_URL, e.getMessage());
         } catch (SocketTimeoutException e) {
-            e.printStackTrace();
+            Log.e(TAG, "Timed out downloading " + request.getSource(), e);
             onFail(DownloadError.ERROR_CONNECTION_ERROR, e.getMessage());
         } catch (UnknownHostException e) {
-            e.printStackTrace();
+            Log.e(TAG, "Unknown host downloading " + request.getSource(), e);
             onFail(DownloadError.ERROR_UNKNOWN_HOST, e.getMessage());
         } catch (IOException e) {
-            e.printStackTrace();
+            Log.e(TAG, "I/O error downloading " + request.getSource(), e);
             if (NetworkUtils.wasDownloadBlocked(e)) {
                 onFail(DownloadError.ERROR_IO_BLOCKED, e.getMessage());
                 return;
@@ -213,7 +217,7 @@ public class HttpDownloader extends Downloader {
             onFail(DownloadError.ERROR_IO_ERROR, e.getMessage());
         } catch (NullPointerException e) {
             // might be thrown by connection.getInputStream()
-            e.printStackTrace();
+            Log.e(TAG, "Connection error downloading " + request.getSource(), e);
             onFail(DownloadError.ERROR_CONNECTION_ERROR, request.getSource());
         } finally {
             IOUtils.closeQuietly(out);
@@ -246,7 +250,9 @@ public class HttpDownloader extends Downloader {
             try {
                 contentLength = Integer.parseInt(contentLen);
             } catch (NumberFormatException e) {
-                e.printStackTrace();
+                // Safe to ignore: a server sent a non-numeric Content-Length. contentLength stays
+                // -1, which makes this method treat the body as "small", the conservative answer.
+                Log.e(TAG, "Malformed Content-Length header: " + contentLen, e);
             }
         }
         String contentType = response.header("Content-Type");

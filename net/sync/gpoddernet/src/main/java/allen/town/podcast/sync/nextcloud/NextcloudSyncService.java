@@ -1,5 +1,7 @@
 package allen.town.podcast.sync.nextcloud;
 
+import android.util.Log;
+
 import allen.town.podcast.sync.HostnameParser;
 import allen.town.podcast.sync.gpoddernet.mapper.ResponseMapper;
 import allen.town.podcast.sync.gpoddernet.model.GpodnetUploadChangesResponse;
@@ -26,6 +28,7 @@ import java.util.HashMap;
 import java.util.List;
 
 public class NextcloudSyncService implements ISyncService {
+    private static final String TAG = "NextcloudSyncService";
     private static final int UPLOAD_BULK_SIZE = 30;
     private final OkHttpClient httpClient;
     private final HostnameParser hostname;
@@ -53,10 +56,10 @@ public class NextcloudSyncService implements ISyncService {
             JSONObject json = new JSONObject(responseString);
             return ResponseMapper.readSubscriptionChangesFromJsonObject(json);
         } catch (JSONException | MalformedURLException e) {
-            e.printStackTrace();
+            Log.e(TAG, "Failed to parse the Nextcloud subscription changes response", e);
             throw new SyncServiceException(e);
         } catch (Exception e) {
-            e.printStackTrace();
+            Log.e(TAG, "Failed to fetch subscription changes from Nextcloud", e);
             throw new SyncServiceException(e);
         }
     }
@@ -74,7 +77,7 @@ public class NextcloudSyncService implements ISyncService {
                     MediaType.get("application/json"), requestObject.toString());
             performRequest(url, "POST", requestBody);
         } catch (Exception e) {
-            e.printStackTrace();
+            Log.e(TAG, "Failed to upload subscription changes to Nextcloud", e);
             throw new NextcloudSynchronizationServiceException(e);
         }
 
@@ -90,10 +93,10 @@ public class NextcloudSyncService implements ISyncService {
             JSONObject json = new JSONObject(responseString);
             return ResponseMapper.readEpisodeActionsFromJsonObject(json);
         } catch (JSONException | MalformedURLException e) {
-            e.printStackTrace();
+            Log.e(TAG, "Failed to parse the Nextcloud episode action response", e);
             throw new SyncServiceException(e);
         } catch (Exception e) {
-            e.printStackTrace();
+            Log.e(TAG, "Failed to fetch episode action changes from Nextcloud", e);
             throw new SyncServiceException(e);
         }
     }
@@ -124,7 +127,7 @@ public class NextcloudSyncService implements ISyncService {
                     MediaType.get("application/json"), list.toString());
             performRequest(url, "POST", requestBody);
         } catch (Exception e) {
-            e.printStackTrace();
+            Log.e(TAG, "Failed to upload episode actions " + from + " to " + to + " to Nextcloud", e);
             throw new NextcloudSynchronizationServiceException(e);
         }
     }
