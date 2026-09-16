@@ -72,7 +72,7 @@
 
     <string name="restore_purchase">Restore Purchase</string>
     <string name="restore_tip">I already paid,click to restore purchase</string>
-    <string name="expired_time">Valid until：</string>
+    <string name="expired_time">Valid until: </string>
 
     <string name="google_service_not_install">Google service may not be installed , Will not be able to pay</string>
 

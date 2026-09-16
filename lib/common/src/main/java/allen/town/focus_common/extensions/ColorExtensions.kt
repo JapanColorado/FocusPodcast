@@ -175,7 +175,7 @@ fun Int.addAlpha(alpha: Float): Int {
     return ColorUtil.withAlpha(this, alpha)
 }
 
-//次级强调色，很多按钮直接用主题色不太合适
+// Secondary accent color; the theme color is a poor fit for many buttons
 const val accentAlpha = 0.12F
 
 fun MaterialButton.accentOutlineColor() {

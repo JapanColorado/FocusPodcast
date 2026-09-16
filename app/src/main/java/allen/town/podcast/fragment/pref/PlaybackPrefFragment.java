@@ -69,7 +69,7 @@ public class PlaybackPrefFragment extends AbsSettingsFragment implements SharedP
         });
 
 
-        //android 11以及以后不支持锁屏背景了
+        //lock screen backgrounds are not supported from Android 11 on
         findPreference(Prefs.PREF_LOCKSCREEN_BACKGROUND)
                 .setVisible(BuildConfig.DEBUG || !VersionUtils.hasR());
 

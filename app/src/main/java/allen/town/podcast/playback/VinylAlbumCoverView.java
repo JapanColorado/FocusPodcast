@@ -18,7 +18,7 @@ import allen.town.podcast.R;
 
 
 /**
- * 专辑封面
+ * Album cover
  * Created by wcy on 2015/11/30.
  */
 public class VinylAlbumCoverView extends View implements ValueAnimator.AnimatorUpdateListener {
@@ -42,11 +42,11 @@ public class VinylAlbumCoverView extends View implements ValueAnimator.AnimatorU
     private float mNeedleRotation = NEEDLE_ROTATION_PAUSE;
     private boolean isPlaying = false;
 
-    // 图片起始坐标
+    // image origin coordinates
     private Point mDiscPoint = new Point();
     private Point mCoverPoint = new Point();
     private Point mNeedlePoint = new Point();
-    // 旋转中心坐标
+    // rotation center coordinates
     private Point mDiscCenterPoint = new Point();
     private Point mCoverCenterPoint = new Point();
     private Point mNeedleCenterPoint = new Point();
@@ -119,24 +119,24 @@ public class VinylAlbumCoverView extends View implements ValueAnimator.AnimatorU
 
     @Override
     protected void onDraw(Canvas canvas) {
-        // 1.绘制顶部虚线
+        // 1. draw the dashed line at the top
 //        mTopLine.setBounds(0, 0, getWidth(), mTopLineHeight);
 //        mTopLine.draw(canvas);
-        // 2.绘制黑胶唱片外侧半透明边框
+        // 2. draw the translucent border around the vinyl record
         mCoverBorder.setBounds(mDiscPoint.x - mCoverBorderWidth, mDiscPoint.y - mCoverBorderWidth,
                 mDiscPoint.x + mDiscBitmap.getWidth() + mCoverBorderWidth, mDiscPoint.y + mDiscBitmap.getHeight() + mCoverBorderWidth);
         mCoverBorder.draw(canvas);
-        // 3.绘制黑胶
-        // 设置旋转中心和旋转角度，setRotate和preTranslate顺序很重要
+        // 3. draw the vinyl record
+        // set the rotation center and angle; the order of setRotate and preTranslate matters
         mDiscMatrix.setRotate(mDiscRotation, mDiscCenterPoint.x, mDiscCenterPoint.y);
-        // 设置图片起始坐标
+        // set the image origin
         mDiscMatrix.preTranslate(mDiscPoint.x, mDiscPoint.y);
         canvas.drawBitmap(mDiscBitmap, mDiscMatrix, null);
-        // 4.绘制封面
+        // 4. draw the cover
         mCoverMatrix.setRotate(mDiscRotation, mCoverCenterPoint.x, mCoverCenterPoint.y);
         mCoverMatrix.preTranslate(mCoverPoint.x, mCoverPoint.y);
         canvas.drawBitmap(mCoverBitmap, mCoverMatrix, null);
-        // 5.绘制指针
+        // 5. draw the needle
         mNeedleMatrix.setRotate(mNeedleRotation, mNeedleCenterPoint.x, mNeedleCenterPoint.y);
         mNeedleMatrix.preTranslate(mNeedlePoint.x, mNeedlePoint.y);
         canvas.drawBitmap(mNeedleBitmap, mNeedleMatrix, null);

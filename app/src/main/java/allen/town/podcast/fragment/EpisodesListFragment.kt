@@ -295,7 +295,7 @@ abstract class EpisodesListFragment : Fragment(), OnSelectModeListener, DoubleCl
     }
 
     /**
-     * 如果希望有不同的多选菜单覆盖它
+     * Override to provide a different multi-select menu.
      */
     open fun getMultiMenu():Int{
         return R.menu.episodes_multi_menu

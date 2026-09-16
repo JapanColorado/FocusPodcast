@@ -10,7 +10,7 @@ import allen.town.focus_common.views.AccentMaterialDialog;
 import allen.town.podcast.core.R;
 
 /**
- * 确认dialog
+ * Confirmation dialog
  */
 public abstract class ConfirmationDialog {
 

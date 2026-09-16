@@ -111,7 +111,7 @@ public class Feed extends FeedFile implements Parcelable {
     }
 
     /**
-     * 从itunes 的top api 去查找会有这个值
+     * Only set when the feed was found through the iTunes top list API.
      */
     @Nullable
     private String itunesId;
@@ -572,7 +572,7 @@ public class Feed extends FeedFile implements Parcelable {
         this.needAutoSubscribe = needAutoSubscribe;
     }
 
-    //是否同步的同时数据库不存在也自动订阅
+    // Whether to subscribe automatically during a sync even if the feed is not in the database yet
     private boolean needAutoSubscribe;
 
     @Override

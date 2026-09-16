@@ -41,11 +41,9 @@ public class DateFormatter {
         }
 
         if (DateUtils.isToday(time)) {
-            //今天
             return context.getString(R.string.today);
 
         } else if (EntityDateUtils.isYesterday(time)) {
-            //昨天
             return context.getString(R.string.yesterday);
         }
 

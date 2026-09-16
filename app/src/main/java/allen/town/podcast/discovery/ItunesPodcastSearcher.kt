@@ -109,7 +109,7 @@ open class ItunesPodcastSearcher : PodcastSearcher {
         get() = "Apple"
 
     companion object {
-        //搜播客
+        //search podcasts
         private const val ITUNES_API_URL = "https://itunes.apple.com/search?media=podcast&term=%s"
         private const val PATTERN_BY_ID = ".*/podcasts\\.apple\\.com/.*/podcast/.*/id(\\d+).*"
         const val SEARCH_ENGINE_TAG = "itunes_podcast_search"

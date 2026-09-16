@@ -134,7 +134,7 @@ public final class ToolbarContentTintHelper {
                     if (outViews.isEmpty()) {
                         return;
                     }
-                    final AppCompatImageView overflow = (AppCompatImageView) outViews.get(0); //有异常反馈不是AppCompatImageView，问题未知，暂时未调用此函数
+                    final AppCompatImageView overflow = (AppCompatImageView) outViews.get(0); // Crash reports show this is not always an AppCompatImageView; cause unknown, so this method is currently unused
                     overflow.setImageDrawable(TintHelper.createTintedDrawable(overflow.getDrawable(), color));
                     ViewUtil.INSTANCE.removeOnGlobalLayoutListener(decorView, this);
                 }

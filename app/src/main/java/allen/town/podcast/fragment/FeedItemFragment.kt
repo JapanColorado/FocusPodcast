@@ -159,7 +159,7 @@ class FeedItemFragment : Fragment() {
             override fun onProgressChanged(view: WebView?, newProgress: Int) {
                 super.onProgressChanged(view, newProgress)
                 if (newProgress == 100) {
-                    //ScrollView嵌套了其他布局导致 webview 实际展现到页面的时候比较慢
+                    //the ScrollView nests other layouts, so the WebView takes a while to actually appear
                     skeletonLayout!!.postDelayed({skeletonLayout!!.visibility = View.GONE},350)
                 }
             }
@@ -268,7 +268,7 @@ class FeedItemFragment : Fragment() {
     }
 
     private fun updatePlayButton() {
-        //floatbutton 是公用的，viewpager2默认屏幕外的不会走onResume方法，所以可以根据这个来控制是否更新 floatbutton
+        //the float button is shared; ViewPager2 does not call onResume for off-screen pages, so use that to decide whether to update it
         if (isResumed) {
             val media = item!!.media
             floatingPlayActionButton!!.icon =
@@ -293,7 +293,7 @@ class FeedItemFragment : Fragment() {
                     floatingPlayActionButton!!.setText(actionButton1!!.label)
                 }
             } else {
-                //没有媒体信息不显示时长,text赋值在前，shrink在后没有效果
+                //no media info, so no duration is shown; setting the text before shrinking has no effect
                 floatingPlayActionButton!!.shrink()
                 floatingPlayActionButton!!.text = ""
             }
@@ -344,7 +344,7 @@ class FeedItemFragment : Fragment() {
 
             if (FeedItemUtil.isPlaying(item!!.media) || item!!.isInProgress) {
                 if (lastPosition == 0) {
-                    //使用最近的position，否则暂停后重新从item获取的是旧的position
+                    //use the most recent position; after a pause, re-reading it from the item gives a stale value
                     lastPosition = media.getPosition()
                 }
                 val progress: Int = (100.0 * lastPosition / media.getDuration()).toInt()
@@ -355,7 +355,7 @@ class FeedItemFragment : Fragment() {
             }
         }
 
-        //设置了强调色
+        //an accent color was set
         if (actionButton2!!.getDrawableTintColor(context) != -1) {
             downloadIcon!!.setImageDrawable(
                 ContextCompat.getDrawable(

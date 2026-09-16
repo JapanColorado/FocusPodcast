@@ -47,7 +47,7 @@ class DriveModeActivity : SimpleToolbarActivity() {
         binding = ActivityDriveModeBinding.inflate(layoutInflater)
         setContentView(binding.root)
         setEdgeToEdgeOrImmersive(R.id.status_bar, true)
-        //不让看到状态栏的图标
+        //hide the status bar icons
 //        setStatusBarColor(Color.TRANSPARENT, R.id.status_bar)
 //        setLightStatusBar(false)
         lastPlaybackControlsColor = ThemeStore.accentColor(this)

@@ -32,7 +32,7 @@ public final class URLChecker {
     private static final String AP_SUBSCRIBE_DEEPLINK = "focuspodcast.com/deeplink/subscribe";
 
     /**
-     * 检查URL是否有效，如有必要则进行修改。
+     * Checks whether the URL is valid and modifies it if necessary.
      *
      * @param url The url which is going to be prepared
      * @return The prepared url

@@ -76,7 +76,7 @@ public class BalancedUIHelper {
     }
 
     /**
-     * 固定
+     * Fixed distribution
      *
      * @param arrayList
      * @param row
@@ -87,7 +87,7 @@ public class BalancedUIHelper {
         for (int i3 = 0; i3 < row; i3++) {
             arrayList2.add(new ArrayList<>());
         }
-        //每行的个数
+        //number of entries per row
         int columnRow = arrayList.size() / row;
         int count = 0;
         for (int j = 0; j < arrayList2.size(); j++) {
@@ -104,7 +104,7 @@ public class BalancedUIHelper {
     }
 
     /**
-     * 随机
+     * Random distribution
      *
      * @param arrayList
      * @param i

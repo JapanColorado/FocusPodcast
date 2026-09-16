@@ -80,14 +80,14 @@ class PlaybackControlsDialog : DialogFragment() {
             requireContext(),
             R.style.MaterialAlertDialogTheme
         )
-            .setTitle( /*R.string.audio_controls*/R.string.audio_effects) //奇怪的问题，如果这里直接写R.layout.audio_controls switch关闭状态显示颜色不对
+            .setTitle( /*R.string.audio_controls*/R.string.audio_effects) //odd issue: writing R.layout.audio_controls directly here gives the switch the wrong color in its off state
             .setView(content)
             .setPositiveButton(R.string.close_label, null).create()
         return dialog!!
     }
 
     /**
-     * 保证查询到数据库中feed是否使用了订阅源设置后再调用，否则状态不对导致onCheckedChanged执行后混乱了
+     * Only call once the database has been queried for whether the feed uses per-feed settings; otherwise the state is wrong and onCheckedChanged leaves things inconsistent.
      */
     private fun setupUi() {
 
@@ -113,7 +113,7 @@ class PlaybackControlsDialog : DialogFragment() {
             }
         }
 
-        //跳过静音
+        //skip silence
         val skipSilence = dialog!!.findViewById<SwitchCompat>(R.id.skipSilence)
         skipSilence!!.isChecked =
             if (useFeedEffect) feedPreferences!!.isSkipSilence else Prefs.isSkipSilence
@@ -130,7 +130,7 @@ class PlaybackControlsDialog : DialogFragment() {
             }
         }
 
-        //单声道
+        //mono
         val stereoToMono = dialog!!.findViewById<SwitchCompat>(R.id.stereo_to_mono)
         stereoToMono!!.isChecked =
             if (useFeedEffect) feedPreferences!!.isMono else Prefs.stereoToMono()
@@ -147,7 +147,7 @@ class PlaybackControlsDialog : DialogFragment() {
             }
         }
 
-        //人声增强
+        //vocal enhancement
         val vocal_enhancement = dialog!!.findViewById<SwitchCompat>(R.id.vocal_enhancement)
         vocal_enhancement!!.isChecked =
             if (useFeedEffect) feedPreferences!!.isLoudness else Prefs.audioLoudness()
@@ -169,7 +169,7 @@ class PlaybackControlsDialog : DialogFragment() {
 
 
     private fun setupAudioTracks() {
-        //这里不知道有啥作用，一直没有进入这个分支
+        //unclear what this is for; this branch is never reached
         val audioTracks = controller!!.audioTracks
         val selectedAudioTrack = controller!!.selectedAudioTrack
         val butAudioTracks = dialog!!.findViewById<Button>(R.id.audio_tracks)

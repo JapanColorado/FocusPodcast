@@ -179,7 +179,7 @@ constructor() : Fragment() {
         val intent: Intent = Intent(getActivity(), RssSearchActivity::class.java)
         intent.putExtra(RssSearchActivity.ARG_FEEDURL, url)
         startActivity(intent)
-        //添加完关闭此fragment
+        //close this fragment once it has been added
         parentFragmentManager.popBackStack()
     }
 
@@ -192,9 +192,9 @@ constructor() : Fragment() {
     }
 
     private fun search(query: String) {
-        //"https://feed.nashownotes.com/rss.xml "，从微信复制的带空格的用trim不够
+        //e.g. "https://feed.nashownotes.com/rss.xml " - urls copied from WeChat contain whitespace (including non-breaking spaces), and trim() alone is not enough
         val finalQuery: String = query.trim({ it <= ' ' }).replace("\\s*".toRegex(), "")
-        //如果是http开头的url那么打开解析订阅源界面
+        //if it is an http url, open the feed parsing screen
         if (finalQuery.matches(Regex("http[s]?://.*"))) {
             addUrl(finalQuery)
             return

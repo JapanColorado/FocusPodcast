@@ -2,7 +2,7 @@
 <androidx.preference.PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:search="http://schemas.android.com/apk/res-auto">
 
-    <!-- 2.0.0正常，2.1.0自定义字符串有问题，所以直接用相同的名字进行覆盖 -->
+    <!-- 2.0.0 worked; 2.1.0 has a bug with custom strings, so override them by declaring resources with the same names -->
     <com.bytehamster.lib.preferencesearch.SearchPreference
         android:key="searchPreference"
         search:textClearHistory="@string/searchpreference_clear_history"

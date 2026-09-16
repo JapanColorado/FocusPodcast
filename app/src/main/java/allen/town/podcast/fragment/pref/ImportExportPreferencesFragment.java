@@ -51,7 +51,7 @@ public class ImportExportPreferencesFragment extends AbsSettingsFragment {
     private static final String PREF_DATABASE_IMPORT = "prefDatabaseImport";
     private static final String PREF_DATABASE_EXPORT = "prefDatabaseExport";
     private static final String DEFAULT_OPML_OUTPUT_NAME = "focusPodcast_feeds_%s.opml";
-    //格式太严格有些app无法导入
+    //a stricter type prevents some apps from importing
     private static final String CONTENT_TYPE_OPML = "text/*";
     private static final String DEFAULT_HTML_OUTPUT_NAME = "focusPodcast_feeds_%s.html";
     private static final String CONTENT_TYPE_HTML = "text/html";

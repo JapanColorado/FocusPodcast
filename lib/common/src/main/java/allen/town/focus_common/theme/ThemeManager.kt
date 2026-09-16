@@ -7,7 +7,7 @@ import code.name.monkey.retromusic.util.theme.ThemeMode.*
 
 object ThemeManager {
 
-    //重要，这里必须要用application的context!!! 否则使用md3主题无法跟随系统自动切换主题
+    // Important: this must use the application context, otherwise the MD3 theme cannot follow the system theme automatically
     fun getNightMode(context: Context): Int = when (context.generalThemeValue) {
         LIGHT -> AppCompatDelegate.MODE_NIGHT_NO
         DARK -> AppCompatDelegate.MODE_NIGHT_YES

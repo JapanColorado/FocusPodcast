@@ -133,7 +133,7 @@ class FeedItemlistFragment() : Fragment(), OnItemClickListener, Toolbar.OnMenuIt
     public lateinit var filterImage:ImageView
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        //保留这行当前界面切换暗黑模式item不显示
+        //keep this line: otherwise items disappear when switching to dark mode on this screen
 //        setRetainInstance(true);
         val args = arguments
         Validate.notNull(args)
@@ -199,7 +199,7 @@ class FeedItemlistFragment() : Fragment(), OnItemClickListener, Toolbar.OnMenuIt
             }
         })
 
-        //需要设置paddingtop
+        //top padding is required
         setPaddingStatusBarTop((activity)!!, toolbar)
         setPaddingStatusBarTop((activity)!!, header)
         iconTintManager = FeedItemListToolbarIconTintHelper(context, toolbar, collapsingToolbar)
@@ -251,7 +251,7 @@ class FeedItemlistFragment() : Fragment(), OnItemClickListener, Toolbar.OnMenuIt
     }
 
     override fun onHiddenChanged(hidden: Boolean) {
-        //新的fragment add 才会isHidden=false
+        //isHidden is only false once the new fragment is added
         Log.d(
             TAG,
             "==>onHiddenChanged,isHidden=" + hidden + ",getUserVisibleHint=" + userVisibleHint
@@ -260,13 +260,13 @@ class FeedItemlistFragment() : Fragment(), OnItemClickListener, Toolbar.OnMenuIt
 //            if (isPageResume && getUserVisibleHint()) {
 //                onPagePause();
 //            }
-            //离开界面statusbar颜色就要还原
+            //restore the status bar color when leaving the screen
             onPanelCollapsed((activity as AppCompatActivity?)!!)
         } else {
 //            if (!isPageResume && getUserVisibleHint()) {
 //                onPageResume();
 //            }
-            //进入界面statusbar颜色就要重置
+            //reset the status bar color when entering the screen
             if (iconTintManager != null) {
                 iconTintManager!!.updateTint()
             }
@@ -276,7 +276,7 @@ class FeedItemlistFragment() : Fragment(), OnItemClickListener, Toolbar.OnMenuIt
 
     override fun onDestroyView() {
         super.onDestroyView()
-        //界面退出还原
+        //restore when the screen is closed
         onPanelCollapsed((activity as AppCompatActivity?)!!)
         EventBus.getDefault().unregister(this)
         if (disposable != null) {
@@ -438,10 +438,10 @@ class FeedItemlistFragment() : Fragment(), OnItemClickListener, Toolbar.OnMenuIt
                     { feeds: List<Feed>? ->
                         this@FeedItemlistFragment.feeds = feeds
                         if (feedInFeedlist(feeds, feed)) {
-                            //下载完成了，数据库中已有该feed了
+                            //download finished, the feed is now in the database
                             isDownloadingFeed = false
                             Log.i(TAG, "set isDownloadingFeed = false ")
-                            //从数据库中查找feedId(通过下载url)
+                            //look up the feedId in the database (by download url)
                             feedID = getFeedId(feeds, feed)
                             updateUi()
                         }
@@ -519,7 +519,7 @@ class FeedItemlistFragment() : Fragment(), OnItemClickListener, Toolbar.OnMenuIt
     }
 
     /**
-     * 展示列表
+     * Display the list
      */
     private fun displayList() {
         if (view == null) {
@@ -564,7 +564,7 @@ class FeedItemlistFragment() : Fragment(), OnItemClickListener, Toolbar.OnMenuIt
     }
 
     /**
-     * 刷新header feed标题图片等
+     * Refresh the header: feed title, image, etc.
      */
     private fun refreshHeaderView() {
         setupHeaderView()
@@ -636,7 +636,7 @@ class FeedItemlistFragment() : Fragment(), OnItemClickListener, Toolbar.OnMenuIt
     }
 
     /**
-     * 加载items
+     * Load the items
      */
     private fun loadItems() {
         if (disposable != null) {
@@ -649,7 +649,7 @@ class FeedItemlistFragment() : Fragment(), OnItemClickListener, Toolbar.OnMenuIt
                 { result: Feed? ->
                     refreshHeaderView()
                     if (!isDownloadingFeed) {
-                        //如果正在下载不需要处理这些界面逻辑
+                        //while a download is in progress this UI logic is not needed
                         displayList()
                         detailInfoView.setEpisodesLoaded(true)
                         if (feed != null && feed!!.getId() > 0) {
@@ -667,11 +667,11 @@ class FeedItemlistFragment() : Fragment(), OnItemClickListener, Toolbar.OnMenuIt
     private fun initDetailView() {
         runOnUiThread({
             if (getContext() == null) {
-                //从桌面快捷方式进入，因为会加载两个该item（一个最近，一个当前的）导致这里为空，而且后续rxjava两个分支都不走，原因未知
+                //entered from a home screen shortcut: the item gets loaded twice (one recent, one current), which leaves this null and makes neither RxJava branch run afterwards (reason unknown)
                 Timber.e(" loadItems break getContext() == null")
                 return@runOnUiThread
             }
-            //要放在主线程中执行哦，后面如果本地数据库不存在需要从网络获取，就放在下载之前调用
+            //must run on the main thread; called before downloading, since the feed may have to be fetched from the network if it is not in the local database
             if (!feed!!.isLocalFeed()) {
                 mInfoViewToggleButton!!.setVisibility(View.VISIBLE)
                 mInfoViewToggleButton!!.setOnClickListener(View.OnClickListener { v: View? -> openAbout() })
@@ -691,7 +691,7 @@ class FeedItemlistFragment() : Fragment(), OnItemClickListener, Toolbar.OnMenuIt
                 detailInfoView!!.setVisibility(View.GONE)
             }
 
-            //订阅按钮状态
+            //subscribe button state
             subscribe_button!!.setCircleRingColor(
                 resolveColor(
                     (getContext())!!,
@@ -712,7 +712,7 @@ class FeedItemlistFragment() : Fragment(), OnItemClickListener, Toolbar.OnMenuIt
     private var finalGetFeedUrl = false
     private fun loadData(): Feed? {
         if (feedID > 0) {
-            //有feedid说明在数据库中是存在的
+            //a feedId means the feed exists in the database
             feed = DBReader.getFeed(feedID, true)
         }
         if (feed == null) {
@@ -722,14 +722,14 @@ class FeedItemlistFragment() : Fragment(), OnItemClickListener, Toolbar.OnMenuIt
             if (feed!!.id == 0L) {
                 var feedFromDb: Feed? = null
                 if (!TextUtils.isEmpty(feed!!.itunesId)) {
-                    //来自itunes
+                    //comes from iTunes
                     Timber.i("feedUrl from itunes ")
                     feedFromDb = DBReader.getFeedByItunesFeedId(feed!!.itunesId, true)
                 } else {
                     feedFromDb = DBReader.getFeed(feed!!.download_url, true)
                 }
                 if (feedFromDb == null) {
-                    //id为0，并且通过feedUrl也查询不到才进入，否则会有多条记录
+                    //only reached when the id is 0 and the feedUrl lookup also fails; otherwise duplicate rows would be created
                     PodcastSearcherRegistry.lookupUrl(feed!!.download_url)
                         .subscribeOn(Schedulers.trampoline())
                         .observeOn(Schedulers.trampoline())
@@ -749,7 +749,7 @@ class FeedItemlistFragment() : Fragment(), OnItemClickListener, Toolbar.OnMenuIt
                                 } else {
                                     feed!!.setLastUpdateFailed(true)
                                     runOnUiThread {
-                                        //放在主线程中执行
+                                        //run on the main thread
                                         txtvFailure.setText(R.string.null_value_podcast_error)
                                     }
                                     Log.e(TAG, Log.getStackTraceString(error))
@@ -763,7 +763,7 @@ class FeedItemlistFragment() : Fragment(), OnItemClickListener, Toolbar.OnMenuIt
                             )
                             isDownloadingFeed = true
                         } else {
-                            //下载失败后同样会重新loadData，这时我们不能再重新下载了(也有可能其他Event会进入这个分支，检查下是否确实没有在下载了)否则进入了死循环，但是也确实下载完成了
+                            //loadData also runs again after a failed download, and we must not start another download then (other events can reach this branch too, so verify nothing is actually downloading) or we end up in an infinite loop
                             if (!DownloadService.isDownloadingFile(
                                     feed!!.download_url
                                 )
@@ -776,7 +776,7 @@ class FeedItemlistFragment() : Fragment(), OnItemClickListener, Toolbar.OnMenuIt
                     }
                     return feed
                 } else {
-                    //从数据库中查到feed了所以用db的值
+                    //the feed was found in the database, so use the stored values
                     feed = feedFromDb
                     feedID = feedFromDb.id
                 }

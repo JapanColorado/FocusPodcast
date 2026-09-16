@@ -16,7 +16,7 @@ import allen.town.podcast.activity.SettingsActivity;
 import allen.town.podcast.core.util.IntentUtils;
 
 /**
- * 一级设置界面
+ * Top-level settings screen
  */
 public class MainPrefFragment extends AbsSettingsFragment {
 

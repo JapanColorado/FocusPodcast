@@ -98,7 +98,7 @@ public class Timeline {
     public String processShownotes() {
         String shownotes = rawShownotes;
 
-        //加br是因为在pixel 4l Tiramisu上面显示不全
+        // The <br/> is needed because the text is cut off on a Pixel 4 XL running Tiramisu
         if (TextUtils.isEmpty(shownotes)) {
             Log.d(TAG, "no shownotes");
             shownotes = "<html><head></head><body><p id='apNoShownotes'>" + noShownotesLabel + "</p><br/></body></html>";

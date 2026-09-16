@@ -20,7 +20,7 @@ import androidx.appcompat.widget.AppCompatTextView
 import code.name.monkey.appthemehelper.ThemeStore
 
 /**
- * 和 AccentTextView 不太一样
+ * Not quite the same as AccentTextView.
  */
 class ATEAccentTextView @JvmOverloads constructor(
     context: Context,

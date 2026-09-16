@@ -138,10 +138,10 @@ class MainActivity : SimpleToolbarActivity(), OnSharedPreferenceChangeListener {
         Timber.d("Android: " + Build.VERSION.RELEASE + " " + Build.MANUFACTURER + " " + Build.MODEL)
         val fm = supportFragmentManager
         if (fm.findFragmentByTag(MAIN_FRAGMENT_TAG) == null) {
-            //先查询上次保存的tag
+            //first look up the tag saved last time
             var lastFragment = getLastNavFragment(this)
             if (!Prefs.shouldShowLastPageOfHome()) {
-                //如果选择了打开第一个item，那么遍历去查找
+                //if configured to open the first item, iterate to find it
                 val categoryInfoList = libraryCategory
                 for ((tag, visible) in categoryInfoList) {
                     if (visible) {
@@ -166,7 +166,7 @@ class MainActivity : SimpleToolbarActivity(), OnSharedPreferenceChangeListener {
             }
         }
 
-        //延时加载这个横竖屏切换播放界面有问题，会显示minifragment，debug版订阅源grid动画冷启动不显示，release版正常
+        //loading this lazily breaks the player on orientation change (the mini fragment shows instead); in debug builds the subscription grid animation is missing on cold start, release builds are fine
         val transaction = fm.beginTransaction()
         transaction.replace(
             R.id.audioplayerFragment,
@@ -177,7 +177,7 @@ class MainActivity : SimpleToolbarActivity(), OnSharedPreferenceChangeListener {
 
 
         navDrawer.postDelayed({
-            //延时加载这个fragment，让界面先显示出来，延时太短，订阅界面的动画没有执行或者卡顿
+            //load this fragment with a delay so the UI shows first; too short a delay makes the subscription screen animation skip or stutter
             Timber.v("post nav inti on ui thread")
             fm.beginTransaction().replace(
                 R.id.navDrawerFragment,
@@ -214,7 +214,7 @@ class MainActivity : SimpleToolbarActivity(), OnSharedPreferenceChangeListener {
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if(requestCode == notificationRequestCode()){
-            //为啥这样写，因为两个权限放一起申请，第一次只会申请通知的，下次打开app才会申请电话的，原因未知
+            //written this way because requesting both permissions together only asks for the notification one the first time; the phone one is not asked until the app is opened again (reason unknown)
 //            requestPhonePermission()
         }
     }
@@ -249,7 +249,7 @@ class MainActivity : SimpleToolbarActivity(), OnSharedPreferenceChangeListener {
     private var libraryViewModel: LibraryViewModel? = null
 
     /**
-     * 专辑封面颜色变化
+     * Album cover color changed
      */
     private fun onPaletteColorChanged() {
         if (bottomSheet!!.state == BottomSheetBehavior.STATE_EXPANDED) {
@@ -267,7 +267,7 @@ class MainActivity : SimpleToolbarActivity(), OnSharedPreferenceChangeListener {
 
     private val bottomSheetCallback: BottomSheetCallback = object : BottomSheetCallback() {
         /**
-         * 状态改变时调用
+         * Called when the state changes
          * @param view
          * @param state
          */
@@ -282,7 +282,7 @@ class MainActivity : SimpleToolbarActivity(), OnSharedPreferenceChangeListener {
         }
 
         /**
-         * 滑动时调用
+         * Called while sliding
          * @param view
          * @param slideOffset
          */
@@ -300,7 +300,7 @@ class MainActivity : SimpleToolbarActivity(), OnSharedPreferenceChangeListener {
     }
 
     /**
-     * 每个fragment都有自己的toolbar，这里封装了实现
+     * Every fragment has its own toolbar; this wraps the setup
      * @param toolbar
      * @param displayUpArrow
      */
@@ -315,7 +315,7 @@ class MainActivity : SimpleToolbarActivity(), OnSharedPreferenceChangeListener {
             )
             drawerLayout!!.addDrawerListener(drawerToggle!!)
             drawerToggle!!.syncState()
-            //原有的逻辑true代表menu事件系统处理
+            //in the original logic, true meant the system handled the menu event
 //            drawerToggle!!.isDrawerIndicatorEnabled = !displayUpArrow
             drawerToggle!!.isDrawerIndicatorEnabled = false
             toolbar.setNavigationIcon(if (displayUpArrow) R.drawable.ic_keyboard_backspace_black else R.drawable.ic_homepage)
@@ -370,7 +370,7 @@ class MainActivity : SimpleToolbarActivity(), OnSharedPreferenceChangeListener {
 
     private fun checkFirstLaunch() {
         val prefs = getSharedPreferences(PREF_NAME, MODE_PRIVATE)
-        //第一次启动打开添加订阅源 drawer
+        //on first launch, open the add-subscription drawer
         if (prefs.getBoolean(PREF_IS_FIRST_LAUNCH, true)) {
             loadFragment(DiscoverFragment.TAG, null)
             //            new Handler(Looper.getMainLooper()).postDelayed(() -> {
@@ -396,7 +396,7 @@ class MainActivity : SimpleToolbarActivity(), OnSharedPreferenceChangeListener {
 
     fun setPlayerVisible(visible: Boolean) {
         if (visible) {
-            //第一个参数实际没有用，但是不能为空所以随便传的
+            //the first argument is unused but must not be null, so anything is passed
             bottomSheetCallback.onStateChanged(navDrawer, bottomSheet!!.state) // Update toolbar visibility
         } else {
             bottomSheet!!.setState(BottomSheetBehavior.STATE_COLLAPSED)
@@ -416,7 +416,7 @@ class MainActivity : SimpleToolbarActivity(), OnSharedPreferenceChangeListener {
     }
 
     /**
-     * 通过tag加载fragment，这种方式是replace，保证当前栈只有一个fragment
+     * Load a fragment by tag. This replaces, so the stack only ever holds one fragment.
      * @param tag
      * @param args
      */
@@ -449,7 +449,7 @@ class MainActivity : SimpleToolbarActivity(), OnSharedPreferenceChangeListener {
     }
 
     /**
-     * 通过feedId加载订阅item fragment，这种方式是replace，保证当前栈只有一个fragment
+     * Load a subscription item fragment by feedId. This replaces, so the stack only ever holds one fragment.
      * @param feedId
      * @param args
      */
@@ -479,7 +479,7 @@ class MainActivity : SimpleToolbarActivity(), OnSharedPreferenceChangeListener {
             fragmentManager.popBackStack()
         }
         val t = fragmentManager.beginTransaction()
-        //不加这个动画点击feed有闪烁现象
+        //without this animation, tapping a feed flickers
         t.setCustomAnimations(
             R.anim.retro_fragment_open_enter,
             R.anim.retro_fragment_open_exit,
@@ -498,7 +498,7 @@ class MainActivity : SimpleToolbarActivity(), OnSharedPreferenceChangeListener {
     }
 
     /**
-     * 目前发现的区别好像只有加入了栈，可以回退
+     * The only difference found so far is that this adds to the back stack, so it can be popped.
      * @param fragment
      * @param transition
      */
@@ -558,7 +558,7 @@ class MainActivity : SimpleToolbarActivity(), OnSharedPreferenceChangeListener {
     }
 
     /**
-     * 设置drawer的宽度
+     * Set the drawer width
      */
     private fun setNavDrawerSize() {
         val screenPercent = resources.getInteger(R.integer.nav_drawer_screen_size_percent) * 0.01f
@@ -577,7 +577,7 @@ class MainActivity : SimpleToolbarActivity(), OnSharedPreferenceChangeListener {
     override fun onRestoreInstanceState(savedInstanceState: Bundle) {
         super.onRestoreInstanceState(savedInstanceState)
         if (bottomSheet!!.state == BottomSheetBehavior.STATE_EXPANDED) {
-            //重新打开
+            //re-open
             bottomSheetCallback.onSlide(navDrawer, 1.0f)
         }
     }
@@ -603,7 +603,7 @@ class MainActivity : SimpleToolbarActivity(), OnSharedPreferenceChangeListener {
         PreferenceManager.getDefaultSharedPreferences(this)
             .unregisterOnSharedPreferenceChangeListener(this)
         if (isFinishing) {
-            //这个分支是按返回键退出销毁了activity，而不是像主题切换recreate，我们仅在前者做此事
+            //this branch means the activity was destroyed by pressing back, not recreated like on a theme change; only do this in the former case
             Timber.i("isFinishing")
             Observable.fromCallable {
 //                DBWriter.clearUnuseAndNotSubedFeedItems(this)
@@ -730,7 +730,7 @@ class MainActivity : SimpleToolbarActivity(), OnSharedPreferenceChangeListener {
     }
 
     /**
-     * player上面显示snackbar
+     * Show a snackbar above the player
      * @param text
      * @param duration
      * @return
@@ -796,7 +796,7 @@ class MainActivity : SimpleToolbarActivity(), OnSharedPreferenceChangeListener {
     }
 
     /**
-     * Hardware keyboard support，自定义的按键事件丢给了PlaybackService
+     * Hardware keyboard support: custom key events are forwarded to PlaybackService
      */
     override fun onKeyUp(keyCode: Int, event: KeyEvent): Boolean {
         val currentFocus = currentFocus
@@ -865,7 +865,7 @@ class MainActivity : SimpleToolbarActivity(), OnSharedPreferenceChangeListener {
         const val EXTRA_FEED = "fragment_feed"
         const val PERMISSIONS_REQUEST_PHONE = 1005
 
-        //这个为true，作为childfragment打开可以返回
+        //when true, it is opened as a child fragment so back navigation works
         const val EXTRA_STARTED_FROM_SEARCH = "started_from_search"
         const val KEY_GENERATED_VIEW_ID = "generated_view_id"
 

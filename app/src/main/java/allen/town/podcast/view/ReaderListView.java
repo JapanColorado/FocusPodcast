@@ -16,10 +16,10 @@ public class ReaderListView extends ListView {
     }
     @Override
     /**
-     * 重写该方法，达到使ListView适应ScrollView的效果
+     * Overridden so the ListView sizes itself to fit inside a ScrollView.
      */
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        //测量的大小由一个32位的数字表示，前两位表示测量模式，后30位表示大小，这里需要右移两位才能拿到测量的大小
+        //the measure spec is a 32-bit value: the top 2 bits are the mode and the low 30 bits the size, so shift right by 2 to get the size
         int expandSpec = MeasureSpec.makeMeasureSpec(Integer.MAX_VALUE >> 2, MeasureSpec.AT_MOST);
         super.onMeasure(widthMeasureSpec, expandSpec);
     }

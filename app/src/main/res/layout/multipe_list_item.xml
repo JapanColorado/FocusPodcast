@@ -15,7 +15,7 @@
         android:layout_alignParentLeft="true"
         android:layout_toLeftOf="@id/cb"
         android:textSize="16sp"
-        tools:text="文件夹打发士大夫吉林省地方就是来得及发了多方力量的收费路段收费了上的飞机" />
+        tools:text="Folder name that is long enough to be truncated" />
 
     <allen.town.focus_common.common.views.AccentCheckbox
         android:focusable="false"

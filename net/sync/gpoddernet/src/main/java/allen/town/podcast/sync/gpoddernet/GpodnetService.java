@@ -146,7 +146,7 @@ public class GpodnetService implements ISyncService {
         }
 
         try {
-            //TODO 这里也要可以选择语言
+            //TODO it should be possible to choose a language here as well
             URL url = new URI(baseScheme, null, baseHost, basePort,
                     String.format(Locale.US, "/toplist/%d.json", count), null, null).toURL();
             Request.Builder request = new Request.Builder().url(url);

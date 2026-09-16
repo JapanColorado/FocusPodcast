@@ -66,7 +66,7 @@ abstract class AbsSettingsFragment : ATEPreferenceFragmentCompat() {
             listView.overScrollMode = View.OVER_SCROLL_NEVER
         }
 
-        //https://github.com/zhanghai/AndroidFastScroll/issues/new,目前会同时出现暂时隐藏
+        //https://github.com/zhanghai/AndroidFastScroll/issues/new - two scrollbars currently show at once, so hide it for now
 //        ThemedFastScroller.create(listView)
         listView.isVerticalScrollBarEnabled = false
         listView.applyInsetter {
@@ -98,7 +98,7 @@ abstract class AbsSettingsFragment : ATEPreferenceFragmentCompat() {
 
     fun restartActivity() {
         (activity as ToolbarBaseActivity).clearAllAppcompactActivities(true)
-        //11以下会有黑屏，此方法可以避免
+        //below Android 11 this causes a black screen; this approach avoids it
 /*        private fun restart() {
             val savedInstanceState = Bundle().apply {
                 onSaveInstanceState(this)

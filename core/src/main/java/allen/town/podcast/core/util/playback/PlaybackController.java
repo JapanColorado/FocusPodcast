@@ -39,7 +39,7 @@ import allen.town.podcast.playback.base.PlaybackServiceMediaPlayer;
 import allen.town.podcast.playback.base.PlayerStatus;
 
 /**
- * 界面使用它来控制 PlaybackService
+ * Used by the UI to control the PlaybackService.
  */
 public abstract class PlaybackController {
 
@@ -400,7 +400,7 @@ public abstract class PlaybackController {
     }
 
     /**
-     * 强制从数据库中获取最新的
+     * Forces reloading the most recent media from the database.
      * @param forceReloadMedia
      * @return
      */
@@ -487,7 +487,7 @@ public abstract class PlaybackController {
     }
 
     /**
-     * 获取当前正在播放的音频的播放速度
+     * Returns the playback speed of the audio that is currently playing.
      * @return
      */
     public float getCurrentPlaybackSpeedMultiplier() {

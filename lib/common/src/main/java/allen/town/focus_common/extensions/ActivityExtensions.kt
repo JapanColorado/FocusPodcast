@@ -37,7 +37,7 @@ fun AppCompatActivity.applyToolbar(toolbar: MaterialToolbar?) {
 }
 
 /**
- * android 13需要动态获取通知权限
+ * Android 13 requires requesting the notification permission at runtime.
  */
 fun AppCompatActivity.requestNotificationPermission() {
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU && !NotificationManagerCompat.from(this)

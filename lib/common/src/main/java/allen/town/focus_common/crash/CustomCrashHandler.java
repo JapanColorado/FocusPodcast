@@ -44,19 +44,19 @@ public class CustomCrashHandler implements Thread.UncaughtExceptionHandler {
     public static final String BUGLY_TAG = "BuglyCrashHandler";
     private static IActivityKiller sActivityKiller;
     private static final String[] CRASH_PACKAGE_PREFIXES = {
-            "android.view.Choreographer",//view measure layout draw时抛出异常会导致Choreographer挂掉建议直接杀死app
+            "android.view.Choreographer",// An exception during view measure/layout/draw kills the Choreographer, so just kill the app
     };
 
     private static final String LOADED_APK_GET_ASSETS = "android.app.LoadedApk.getAssets";
 
     private static final String ASSET_MANAGER_GET_RESOURCE_VALUE = "android.content.res.AssetManager.getResourceValue";
 
-    // 系统默认的UncaughtException处理类
+    // The system's default UncaughtException handler
     private Thread.UncaughtExceptionHandler mDefaultHandler;
     private static CustomCrashHandler mInstance = new CustomCrashHandler();
 
     private CustomCrashHandler() {
-        // 获取系统默认的UncaughtException处理器
+        // Grab the system's default UncaughtException handler
         mDefaultHandler = Thread.getDefaultUncaughtExceptionHandler();
         initActivityKiller();
         safeMode();
@@ -67,7 +67,7 @@ public class CustomCrashHandler implements Thread.UncaughtExceptionHandler {
     }
 
     /**
-     * 主线程的异常不会过来,see {@link #safeMode()}
+     * Main thread exceptions never reach this, see {@link #safeMode()}
      *
      * @param thread
      * @param ex
@@ -75,13 +75,13 @@ public class CustomCrashHandler implements Thread.UncaughtExceptionHandler {
     @Override
     public void uncaughtException(Thread thread, Throwable ex) {
 //        saveInfoToSD(mContext, ex);
-        //这里应该是空，但是不知道去掉是否会影响使用，暂时判空
+        // This should never be null, but dropping the check might break something, so keep it for now
         if (mDefaultHandler != null) {
 //            if (thread.getId() == mContext.getMainLooper().getThread().getId()) {
-////                //主进程且主线程的异常进行捕获，传给系统处理,实际就是闪退了
+////                // Exceptions on the main thread of the main process go to the system, i.e. the app crashes
 //                mDefaultHandler.uncaughtException(thread, ex);
 //            } else {
-            //其他情况捕获异常不会闪退
+            // Otherwise swallow the exception so the app does not crash
             reportToBugly(ex);
 //            }
         }
@@ -164,7 +164,7 @@ public class CustomCrashHandler implements Thread.UncaughtExceptionHandler {
     }
 
     /**
-     * 主线程有一些异常捕获了界面或者核心功能也会无法使用,这类的还是需要crash
+     * Some main thread exceptions leave the UI or core features unusable even when swallowed, so those still have to crash.
      *
      * @param t
      * @return
@@ -190,19 +190,19 @@ public class CustomCrashHandler implements Thread.UncaughtExceptionHandler {
         new Handler(Looper.getMainLooper()).post(new Runnable() {
             @Override
             public void run() {
-                //主线程异常拦截
+                // Intercept main thread exceptions
                 while (true) {
                     try {
-                        Looper.loop();//主线程的异常会从这里抛出
+                        Looper.loop();// main thread exceptions are thrown from here
                     } catch (final Error ex) {
-                        //error一般都是严重错误还是不要捕获
+                        // Errors are usually fatal, so do not swallow them
                         mDefaultHandler.uncaughtException(Looper.getMainLooper().getThread(), ex);
                     } catch (Throwable ex) {
                         if (needCrash(ex)) {
                             mDefaultHandler.uncaughtException(Looper.getMainLooper().getThread(), ex);
                         } else {
-                            //下面这些代码来源于https://github.com/didi/booster/blob/master/booster-android-instrument-activity-thread/src/main/java/com/didiglobal/booster/instrument/ActivityThreadCallback.java
-                            //作用未知
+                            // The code below comes from https://github.com/didi/booster/blob/master/booster-android-instrument-activity-thread/src/main/java/com/didiglobal/booster/instrument/ActivityThreadCallback.java
+                            // Purpose unknown
                             if (ex instanceof NullPointerException) {
                                 if (hasStackTraceElement(ex, ASSET_MANAGER_GET_RESOURCE_VALUE, LOADED_APK_GET_ASSETS)) {
                                     mDefaultHandler.uncaughtException(Looper.getMainLooper().getThread(), ex);
@@ -265,11 +265,11 @@ public class CustomCrashHandler implements Thread.UncaughtExceptionHandler {
     }
 
     /**
-     * 直接忽略生命周期的异常的话会导致黑屏，目前
-     * 会调用ActivityManager的finishActivity结束掉生命周期抛出异常的Activity
+     * Simply ignoring a lifecycle exception leaves a black screen, so instead call
+     * ActivityManager.finishActivity to finish the Activity whose lifecycle threw.
      */
     private void initActivityKiller() {
-        //各版本android的ActivityManager获取方式，finishActivity的参数，token(binder对象)的获取不一样
+        // How to obtain the ActivityManager, the finishActivity arguments and the token (a binder) all differ per Android version
         if (Build.VERSION.SDK_INT >= 28) {
             sActivityKiller = new ActivityKillerV28();
         } else if (Build.VERSION.SDK_INT >= 26) {
@@ -363,7 +363,7 @@ public class CustomCrashHandler implements Thread.UncaughtExceptionHandler {
 
         @Override
         public boolean handleMessage(Message msg) {
-            if (Build.VERSION.SDK_INT >= 28) {//android P 生命周期全部走这
+            if (Build.VERSION.SDK_INT >= 28) {// on Android P every lifecycle callback goes through here
                 final int EXECUTE_TRANSACTION = 159;
                 if (msg.what == EXECUTE_TRANSACTION) {
                     try {
@@ -385,7 +385,7 @@ public class CustomCrashHandler implements Thread.UncaughtExceptionHandler {
                         sActivityKiller.finishLaunchActivity(msg);
                     }
                     return true;
-                case RESUME_ACTIVITY://回到activity onRestart onStart onResume
+                case RESUME_ACTIVITY:// returning to an activity: onRestart onStart onResume
                     try {
                         mhHandler.handleMessage(msg);
                     } catch (Throwable throwable) {
@@ -393,8 +393,8 @@ public class CustomCrashHandler implements Thread.UncaughtExceptionHandler {
                         sActivityKiller.finishResumeActivity(msg);
                     }
                     return true;
-                case PAUSE_ACTIVITY_FINISHING://按返回键 onPause
-                case PAUSE_ACTIVITY://开启新页面时，旧页面执行 activity.onPause
+                case PAUSE_ACTIVITY_FINISHING:// back pressed: onPause
+                case PAUSE_ACTIVITY:// opening a new screen: the old one runs activity.onPause
                     try {
                         mhHandler.handleMessage(msg);
                     } catch (Throwable throwable) {
@@ -402,7 +402,7 @@ public class CustomCrashHandler implements Thread.UncaughtExceptionHandler {
                         sActivityKiller.finishPauseActivity(msg);
                     }
                     return true;
-                case STOP_ACTIVITY_HIDE://开启新页面时，旧页面执行 activity.onStop
+                case STOP_ACTIVITY_HIDE:// opening a new screen: the old one runs activity.onStop
                     try {
                         mhHandler.handleMessage(msg);
                     } catch (Throwable throwable) {
@@ -410,7 +410,7 @@ public class CustomCrashHandler implements Thread.UncaughtExceptionHandler {
                         sActivityKiller.finishStopActivity(msg);
                     }
                     return true;
-                case DESTROY_ACTIVITY:// 关闭activity onStop  onDestroy
+                case DESTROY_ACTIVITY:// closing an activity: onStop onDestroy
                     try {
                         mhHandler.handleMessage(msg);
                     } catch (Throwable throwable) {

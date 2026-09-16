@@ -59,7 +59,7 @@ public final class DBReader {
 
 
     /**
-     * 查询数据库中所有的feed，包括未订阅的
+     * Returns all feeds in the database, including the ones that are not subscribed.
      * @return
      */
     @NonNull
@@ -77,7 +77,7 @@ public final class DBReader {
     }
 
     /**
-     * Returns a list of Feeds（已订阅的）, sorted alphabetically by their title.
+     * Returns a list of subscribed Feeds, sorted alphabetically by their title.
      *
      * @return A list of Feeds, sorted alphabetically by their title. A Feed-object
      * of the returned list does NOT have its list of FeedItems yet. The FeedItem-list
@@ -107,7 +107,7 @@ public final class DBReader {
     }
 
     /**
-     * 查询没有在收藏和播放列表中的未订阅的feed
+     * Returns the unsubscribed feeds that are neither in the favorites nor in the playlist.
      * @param adapter
      * @return
      */
@@ -130,7 +130,8 @@ public final class DBReader {
 
 
     /**
-     * Returns a list with the download URLs of all feeds.（返回真正订阅的，这里是为了同步到云端使用的）
+     * Returns a list with the download URLs of all feeds. Only actually subscribed feeds are
+     * returned, because this is used for syncing to the cloud.
      *
      * @return A list of Strings with the download URLs of all feeds.
      */
@@ -183,7 +184,8 @@ public final class DBReader {
      * @param items The FeedItems whose Feed-objects should be loaded.
      */
     private static void loadFeedDataOfFeedItemList(List<FeedItem> items) {
-        List<Feed> feeds = getAllFeedList();//这里查询所有的订阅源而不是已订阅的，因为只是查询信息而已
+        // Query all feeds instead of only the subscribed ones, because this only reads information
+        List<Feed> feeds = getAllFeedList();
 
         Map<Long, Feed> feedIndex = new ArrayMap<>(feeds.size());
         for (Feed feed : feeds) {
@@ -444,7 +446,7 @@ public final class DBReader {
     }
 
     /**
-     * 获取已订阅的feed数量
+     * Returns the number of subscribed feeds.
      * @return
      */
     public static int getSubscribedFeedsCount() {
@@ -500,7 +502,7 @@ public final class DBReader {
     }
 
     /**
-     * 返回没有订阅的同时不在播放列表和收藏中的items
+     * Returns the items of unsubscribed feeds that are neither in the playlist nor in the favorites.
      * @return
      */
     public static List<FeedItem> getUnsubFeedItems() {
@@ -641,7 +643,7 @@ public final class DBReader {
     @Nullable
     public static Feed getFeedByItunesFeedId(final String itunesFeedId, boolean filtered) {
         if(TextUtils.isEmpty(itunesFeedId)){
-            //如果itunesFeedId为空，那么肯定是没有匹配的feed的，只有不为空的时候才去查询
+            // An empty itunesFeedId can never match a feed, so only query when it is not empty
             return null;
         }
         Db adapter = Db.getInstance();
@@ -934,7 +936,7 @@ public final class DBReader {
     }
 
     /**
-     * Searches the DB for statistics（统计所有订阅源）.
+     * Searches the DB for statistics over all subscribed feeds.
      *
      * @return The list of statistics objects
      */
@@ -988,7 +990,7 @@ public final class DBReader {
                 episodes++;
             }
             if(feedPlayedTime > 0){
-                //只统计播放过的feed
+                // Only count feeds that have actually been played
                 result.feedTime.add(new StatisticsItem(feed, feedTotalTime, feedPlayedTime, episodes,
                         episodesStarted, totalDownloadSize, episodesDownloadCount));
             }
@@ -1004,7 +1006,7 @@ public final class DBReader {
      * the list of subscriptions, the number of items in the queue and the number of unread
      * items.
      *
-     * @param includeNoTags true返回所有订阅源列表 false仅返回有tag的
+     * @param includeNoTags true returns all feeds, false returns only the ones that have a tag
      */
     @NonNull
     public static NavDrawerData getNavDrawerData(boolean includeNoTags) {
@@ -1019,7 +1021,7 @@ public final class DBReader {
         int feedOrder = Prefs.getFeedOrder();
         String orderMethod = Prefs.getFeedOrderMethod();
         if (feedOrder == Prefs.FEED_ORDER_COUNTER) {
-            //数量
+            // by count
             comparator = (lhs, rhs) -> {
                 long counterLhs = feedCounters.get(lhs.getId());
                 long counterRhs = feedCounters.get(rhs.getId());
@@ -1045,7 +1047,7 @@ public final class DBReader {
 
             };
         } else if (feedOrder == Prefs.FEED_ORDER_ALPHABETICAL) {
-            //名称
+            // by title
             comparator = (lhs, rhs) -> {
                 String t1 = lhs.getTitle();
                 String t2 = rhs.getTitle();
@@ -1063,7 +1065,7 @@ public final class DBReader {
                 }
             };
         } else {
-            //发布时间
+            // by publication date
             final Map<Long, Long> recentPubDates = adapter.getMostRecentItemDates();
             comparator = (lhs, rhs) -> {
                 long dateLhs = recentPubDates.containsKey(lhs.getId()) ? recentPubDates.get(lhs.getId()) : 0;
@@ -1089,7 +1091,7 @@ public final class DBReader {
                 NavDrawerData.FeedDrawerItem drawerItem = new NavDrawerData.FeedDrawerItem(feed, feed.getId(),
                         feedCounters.get(feed.getId()));
                 if (FeedPreferences.TAG_ROOT.equals(tag)) {
-                    if (feed.getPreferences().getTags().size() == 1 /*没有自定义tag才显示*/ || includeNoTags) {
+                    if (feed.getPreferences().getTags().size() == 1 /* only shown when there is no custom tag */ || includeNoTags) {
                         items.add(drawerItem);
                     }
                     continue;
@@ -1116,7 +1118,7 @@ public final class DBReader {
     }
 
     /**
-     * 通过下载的id查询feed id
+     * Looks up the feed id for a download id.
      * @param downloadId
      * @return
      */

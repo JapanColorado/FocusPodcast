@@ -42,7 +42,7 @@ public class FeedParserTask implements Callable<FeedHandlerResult> {
     public FeedHandlerResult call() {
         Feed feed = new Feed(request.getSource(), request.getLastModified());
         if(request.isNeedAutoSubscribe()){
-            //自动订阅需要把feed设置为已订阅
+            // Auto-subscribing requires marking the feed as subscribed
             Timber.i("set feed subscribed auto");
             feed.setSubscribed(true);
         }

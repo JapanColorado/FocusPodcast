@@ -19,7 +19,7 @@ public class EditTextUtil {
     public static final String TAG = "EditTextUtil";
 
     /**
-     * 设置光标为主题色
+     * Tint the cursor with the theme color.
      * @param searchView
      */
     public static void setCursorDrawableForSearchView(SearchView searchView) {
@@ -27,7 +27,7 @@ public class EditTextUtil {
     }
 
     /**
-     * 设置光标为主题色
+     * Tint the cursor with the theme color.
      * @param editText
      */
     public static void setCursorDrawable(EditText editText) {

@@ -43,7 +43,7 @@ android {
         disable "GradleDependency"
         checkDependencies false
         warningsAsErrors false
-        // true--只报告error
+        // true -- only report errors
         ignoreWarnings true
         abortOnError true
         checkGeneratedSources = false

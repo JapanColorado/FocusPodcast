@@ -38,7 +38,7 @@ object PodcastSearcherRegistry {
         }
         private set
 
-    //把搜索和查询url的分开，因为itunes始终需要查询url而其他的不需要
+    //search and url lookup are kept separate because iTunes always needs a url lookup while the others do not
     @get:Synchronized
     var  lookUpUrlProviders: MutableList<SearcherInfo>? = null
         get() {
@@ -53,7 +53,7 @@ object PodcastSearcherRegistry {
         }
         private set
     /**
-     * 目前看只有itunes需要，寻找到真实的feed rss url
+     * Resolves the real feed RSS url. Currently only iTunes needs this.
      * @param url
      * @return
      */

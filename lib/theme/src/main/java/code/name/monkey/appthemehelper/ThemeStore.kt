@@ -239,10 +239,10 @@ private constructor(private val mContext: Context) : ThemeStorePrefKeys, ThemeSt
             // Set MD3 accent if MD3 is enabled or in-app accent otherwise
             if (isMD3Enabled(context)) {
                 return if (VersionUtils.hasS()) {
-                    //从android12开始有莫奈色彩
+                    // Monet dynamic colors exist from Android 12 on
                     ContextCompat.getColor(context, R.color.m3_accent_color)
                 } else {
-                    //md3主题中colorAccent是黑色的，所以用colorPrimary
+                    // colorAccent is black in the MD3 theme, so use colorPrimary
                     resolveColor(
                         context,
                         androidx.appcompat.R.attr.colorPrimary,

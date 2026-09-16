@@ -40,7 +40,7 @@ public class PlayButton extends AppCompatImageButton {
             if (isVideoScreen) {
                 setImageResource(showPlay ? R.drawable.ic_play_video_white : R.drawable.ic_pause_video_white);
             }else if (/*!isShown()*/!getGlobalVisibleRect(new Rect()) || context instanceof LockScreenActivity) {
-                //ishown 对于在屏幕外的没有用，着色图标会导致动画执行完后显示异常（切换adapter app color必现），同时锁屏界面无法规避，确实是可见的时候执行了
+                //isShown() is useless for off-screen views, and tinting the icon makes it render wrong once the animation finishes (reproducible when switching the adapter app color); the lock screen cannot avoid this either, since it really is visible when this runs
                 Timber.v("showPlay" + showPlay);
                 setImageResource(showPlay ? R.drawable.ic_play_48dp : R.drawable.ic_pause);
             } else if (showPlay) {

@@ -460,7 +460,7 @@ public class AudioPlayerFragment extends Fragment implements
             colorFinal = ThemeStore.accentColor(requireContext());
         }
         colorFinal = ColorExtensionsUtils.ripAlpha(colorFinal);
-        //加了这行有个问题必现，播放过程中去设置“自定义颜色”然后回来，播放按钮动画没有完全完成
+        //with this line there is a reproducible issue: setting a "custom color" during playback and coming back leaves the play button animation unfinished
         TintHelper.setTintAuto(
                 butPlay,
                 MaterialValueHelper.getPrimaryTextColor(
@@ -559,7 +559,7 @@ public class AudioPlayerFragment extends Fragment implements
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void favoritesChanged(FavoritesEvent event) {
-        //收藏状态变化了需要从数据库查询最新的（当前界面操作正常是因为DBWriter直接修改了传过去的item，但是其他界面的修改不行）
+        //the favorite state changed, so re-read the latest value from the database (this screen works because DBWriter mutates the item it was handed, but changes made on other screens do not propagate)
         AudioPlayerFragment.this.loadMediaInfo(false,true);
     }
 
@@ -790,7 +790,7 @@ public class AudioPlayerFragment extends Fragment implements
         this.isDriveMode = isDriveMode;
     }
 
-    //必须要有，别问为什么
+    //required no-arg constructor, do not remove
     public AudioPlayerFragment(){
     }
 

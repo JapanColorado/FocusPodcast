@@ -19,7 +19,7 @@ open class ToolbarBaseActivity : ATHToolbarActivity(),ClearAllActivityInterface 
 
 
     /**
-     * 设置主activity，退出时将关闭所有activity
+     * Mark this as the main activity; leaving it closes every activity.
      *
      * @param entranceActivityName
      */

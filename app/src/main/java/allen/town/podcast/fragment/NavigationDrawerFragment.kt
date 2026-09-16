@@ -385,7 +385,7 @@ class NavigationDrawerFragment : Fragment(), OnSharedPreferenceChangeListener {
         )
 
         /**
-         * 保存最近一次打开的fragment
+         * Saves the most recently opened fragment
          *
          * @param context
          * @param tag

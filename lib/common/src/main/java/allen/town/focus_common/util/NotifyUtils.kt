@@ -13,7 +13,7 @@ import org.json.JSONObject
 import java.util.Scanner
 
 /**
- * 检查重要通知
+ * Checks for important notifications.
  */
 object NotifyUtils {
     @JvmStatic

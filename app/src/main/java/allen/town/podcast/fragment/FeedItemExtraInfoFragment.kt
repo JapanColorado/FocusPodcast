@@ -61,7 +61,7 @@ class FeedItemExtraInfoFragment
         viewPager.setOffscreenPageLimit(2)
         viewPager.setAdapter(PagerAdapter(this))
 
-        //加了这行默认只有第一个item滑动正常,除非每个item的可滑动项的isNestedScrollingEnabled全部设置为false才行
+        //without this only the first item scrolls correctly, unless every scrollable child of every item has isNestedScrollingEnabled set to false
         viewPager.children.find { it is RecyclerView }?.let {
             (it as RecyclerView).isNestedScrollingEnabled = false
         }

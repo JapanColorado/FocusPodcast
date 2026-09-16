@@ -12,7 +12,7 @@ import java.lang.Exception
 object ATHUtil {
 
     /**
-     * app背景色是否是暗色
+     * Whether the app background color is dark.
      */
     @JvmStatic
     fun isWindowBackgroundDark(context: Context): Boolean {

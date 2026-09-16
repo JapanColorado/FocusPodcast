@@ -195,7 +195,7 @@ public class SeriesDetailInfoView extends FrameLayout {
                 ArrayList<FeedFunding> fundingList = feed.getPaymentLinks();
                 StringBuilder str = new StringBuilder();
                 HashSet<String> seen = new HashSet<String>();
-                //When multiple funding tags reference the same URL, display the one with longer title，antennapod有此修改我没改感觉没啥必要
+                //When multiple funding tags reference the same URL, display the one with longer title. AntennaPod made this change; not adopted here as it seems unnecessary.
                 for (FeedFunding funding : fundingList) {
                     if (seen.contains(funding.url)) {
                         continue;

@@ -150,7 +150,7 @@ class AppWidgetBig : BaseAppWidget() {
                         return@subscribe
                     }
 
-                    //这里结合centerCrop就没有blur效果了
+                    // Combined with centerCrop, there is no blur effect here
                     target = Glide.with(appContext).asBitmap()
                         .apply(RequestOptions.centerCropTransform())
                         .load(

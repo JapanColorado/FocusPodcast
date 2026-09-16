@@ -483,7 +483,7 @@ class PlaylistFragment : Fragment(), Toolbar.OnMenuItemClickListener, OnSelectMo
             info += ")"
             toolbar!!.subtitle = info
         } else {
-            //播放列表是空不显示子标题
+            //no subtitle when the playlist is empty
             toolbar!!.subtitle = ""
         }
         toolbar!!.setSubtitleTextAppearance(
@@ -614,14 +614,14 @@ class PlaylistFragment : Fragment(), Toolbar.OnMenuItemClickListener, OnSelectMo
             layout.findViewById<View>(R.id.keep_sort_l).visibility = View.VISIBLE
             keepSortS = layout.findViewById(R.id.keep_sort_s)
             lockS = layout.findViewById(R.id.lock_s)
-            //保持排序
+            //keep sorted
             keepSortS.setChecked(lastIsQueueKeepSorted)
             keepSortS.setOnCheckedChangeListener(CompoundButton.OnCheckedChangeListener { buttonView, isChecked ->
                 lockS.setEnabled(!isChecked)
                 adapter!!.notifyDataSetChanged()
             })
 
-            //锁定
+            //lock
             lockS.setChecked(lastIsLocked)
             lockS.setEnabled(!keepSortS.isChecked())
             lockS.setOnCheckedChangeListener(CompoundButton.OnCheckedChangeListener { buttonView, isChecked -> })
@@ -658,7 +658,7 @@ class PlaylistFragment : Fragment(), Toolbar.OnMenuItemClickListener, OnSelectMo
 
         private fun updateKeepSort() {
             if (lastIsQueueKeepSorted == keepSortS!!.isChecked) {
-                //如果和上一次保存的结果相同那么不需要做处理
+                //nothing to do if it matches the last saved value
                 return
             }
             val keepSortedNew = keepSortS!!.isChecked
@@ -674,7 +674,7 @@ class PlaylistFragment : Fragment(), Toolbar.OnMenuItemClickListener, OnSelectMo
 
         private fun toggleQueueLock() {
             if (lastIsLocked == lockS!!.isChecked) {
-                //如果和上一次保存的结果相同那么不需要做处理
+                //nothing to do if it matches the last saved value
                 return
             }
             if (!lockS!!.isChecked) {
@@ -707,7 +707,7 @@ class PlaylistFragment : Fragment(), Toolbar.OnMenuItemClickListener, OnSelectMo
         }
 
         /**
-         * 当前选中的是否是随机，如果是随机那么隐藏排序分组
+         * Whether the current selection is random; if so, the sort group is hidden.
          *
          * @return
          */

@@ -8,7 +8,7 @@ class ItunesEpisodesSearcher : ItunesPodcastSearcher() {
     }
 
     companion object {
-        //搜单集
+        //search single episodes
         private const val ITUNES_EPISODS_API_URL =
             "https://itunes.apple.com/search?entity=podcastEpisode&media=podcast&limit=100&term=%s"
     }

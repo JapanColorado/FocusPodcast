@@ -172,7 +172,7 @@ class NavigationListAdapter(private val itemAccess: ItemAccess, context: Activit
         if (viewType != VIEW_TYPE_SECTION_DIVIDER) {
             val typedValue = TypedValue()
             activity.get()!!.theme.resolveAttribute(R.attr.colorSurface, typedValue, true)
-            //只有这样才能实现想要的效果，我也不知道为啥，其他界面好像又不需要
+            //only this produces the desired result; reason unknown, and other screens seem not to need it
             holder.itemView.setBackgroundResource(typedValue.resourceId)
             //            ((MaterialCardView) holder.itemView).setCardBackgroundColor(ThemeUtils.getColorFromAttr(activity.get(), R.attr.colorSurface));
             (holder.itemView as MaterialCardView).isChecked = itemAccess.isSelected(position)
@@ -208,7 +208,7 @@ class NavigationListAdapter(private val itemAccess: ItemAccess, context: Activit
                 holder.count.visibility = View.VISIBLE
             }
         } else if (tag == EpisodesFragment.TAG) {
-            //new items 但是我去掉了
+            //new items, but removed
 //            int unreadItems = itemAccess.getNumberOfNewItems();
             val sum = itemAccess.feedCounterSum
             if (sum > 0) {
@@ -268,7 +268,7 @@ class NavigationListAdapter(private val itemAccess: ItemAccess, context: Activit
             holder.feedsFilteredIv.visibility = View.VISIBLE
             holder.feedsFilteredMsg.visibility = View.VISIBLE
         } else {
-            //把根布局隐藏没用？我都没搞明白
+            //hiding the root layout apparently does nothing; not understood
             holder.itemView.isEnabled = false
             holder.feedsFilteredIv.visibility = View.GONE
             holder.feedsFilteredMsg.visibility = View.GONE

@@ -18,7 +18,7 @@ class AccentTabLayout @JvmOverloads constructor(
 //        tabLayout.setTabGravity(GRAVITY_CENTER);
         setTabIndicatorFullWidth(true)
         setSelectedTabIndicatorGravity(INDICATOR_GRAVITY_STRETCH)
-        //修改tint颜色没用
+        // Changing the tint color has no effect
         val selectedDrawable: Drawable? = context.getDrawable(R.drawable.cat_tabs_pill_indicator)
         if (!BasePreferenceUtil.materialYou) {
             setTabTextColors(

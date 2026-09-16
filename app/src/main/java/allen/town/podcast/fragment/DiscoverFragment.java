@@ -168,7 +168,7 @@ public class DiscoverFragment extends Fragment implements Toolbar.OnMenuItemClic
 
 //        NestedScrollView nestedScrollView = root.findViewById(R.id.nested_scroll);
         ThemedFastScroller.create(gridView);
-        //这里设置false，滑动有问题
+        //setting this to false breaks scrolling
 //        nestedScrollView.setNestedScrollingEnabled(false);
 
         getSubedFeedsList();
@@ -186,7 +186,7 @@ public class DiscoverFragment extends Fragment implements Toolbar.OnMenuItemClic
                 .subscribe(
                         feeds -> {
                             adapter.setSubscribedFeeds(feeds);
-                            //下载完成了，数据库中已有该feed了
+                            //download finished, the feed is now in the database
                         }, error -> Log.e(TAG, Log.getStackTraceString(error))
                 );
     }
@@ -234,7 +234,7 @@ public class DiscoverFragment extends Fragment implements Toolbar.OnMenuItemClic
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //如果保留这个，那么切换暗黑模式后从opml添加文件失败，但是注释掉不知道是否有其他问题，看git更新记录提及较少
+        //keeping this makes adding files from OPML fail after switching to dark mode; unclear whether commenting it out causes other problems, the git history says little about it
 //        setRetainInstance(true);
         prefs = getActivity().getSharedPreferences(ItunesCategoryTopLoader.PREFS, MODE_PRIVATE);
         countryCode = prefs.getString(ItunesCategoryTopLoader.PREF_KEY_COUNTRY_CODE, Locale.getDefault().getCountry());
@@ -273,7 +273,7 @@ public class DiscoverFragment extends Fragment implements Toolbar.OnMenuItemClic
         }
 
         skeleton.showSkeleton();
-        //先设置为可见，这时候只能看到skeleton，不会看到真实内容
+        //make it visible first: at this point only the skeleton is shown, not the real content
         gridView.setVisibility(View.VISIBLE);
         txtvError.setVisibility(View.GONE);
         butRetry.setVisibility(View.GONE);
@@ -410,7 +410,7 @@ public class DiscoverFragment extends Fragment implements Toolbar.OnMenuItemClic
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onFeedListChanged(FeedListUpdateEvent event) {
-        //订阅状态发生改变
+        //subscription state changed
         getSubedFeedsList();
     }
 

@@ -6,7 +6,7 @@ interface PodcastSearcher {
     fun search(query: String?): Single<List<PodcastSearchResult?>?>?
 
     /**
-     * 查找真实的feed url
+     * Look up the real feed url
      * @param resultUrl
      *
      * @return

@@ -91,7 +91,7 @@ class ItunesAdapter(
         viewHolder.sumView.visibility =
             if (!TextUtils.isEmpty(podcast.description)) View.VISIBLE else View.GONE
         val isSubscribedOut = RssSearchActivity.feedInFeedlist(subscribedFeedsList, feedOut)
-        //订阅按钮状态
+        //subscribe button state
         viewHolder.subscribe_button.setAccentDefaultTheme()
 //        itemView.setBackgroundResource(ThemeUtils.getDrawableFromAttr(activity, R.attr.rectSelector));
 //        viewHolder.itemView.setBackgroundColor(
@@ -173,7 +173,7 @@ class ItunesAdapter(
             Timber.v("we found FeedItem in cache {${episodeSearchResult.title}}")
             viewHolder.bindFeedItem(item)
         } else {
-            //从数据库中查找，查找完以后缓存起来
+            //look it up in the database and cache the result
             Observable.fromCallable {
                 val feedItemFromDb = DBReader.getFeedItemByGuidOrEpisodeUrl(
                     episodeSearchResult.episodeUuid,
@@ -199,7 +199,7 @@ class ItunesAdapter(
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe({ feed ->
-                            //有feed没有该曲目，插入一条曲目
+                            //the feed exists but not this episode, so insert the episode
                             Timber.v("we got Feed in db , but not found episode {${episodeSearchResult.title}}")
                             val feedItemToInsert = getFeedItemToInsert(episodeSearchResult, feed!!)
                             DBWriter.setFeedItemExcludeFeed(feedItemToInsert)
@@ -226,7 +226,7 @@ class ItunesAdapter(
                             viewHolder.bindFeedItem(itemToInsert)
 
                             Timber.v("we found nothing in db , insert feed and item !! {${episodeSearchResult.title}}")
-                            //数据库没有该item关联的feed那么构建一个
+                            //no feed in the database for this item, so build one
 //                            notifyItemChanged(viewHolder.bindingAdapterPosition, "search_episodes")
                         })
                 }
@@ -277,7 +277,7 @@ class ItunesAdapter(
         } else {
             viewHolder.subscribe_button.setPlayingAndPlayed(false, false, false)
             if (!podcast.itunesFeedId.isNullOrEmpty() && !podcast.feedUrl.isNullOrEmpty()) {
-                //如果是itunes的feed，先查询真实的url，然后再去数据库查询是否有订阅，如果订阅了修改itunesid然后刷新该item
+                //for an iTunes feed, resolve the real url first, then check the database for a subscription; if subscribed, update the iTunes id and refresh this item
 
                 PodcastSearcherRegistry.lookupUrl(podcast.feedUrl)
                     .subscribeOn(Schedulers.io())

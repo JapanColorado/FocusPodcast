@@ -49,7 +49,7 @@
     <color name="swipe_gray">@color/md_grey_800</color>
     <color name="swipe_red">@color/md_red_A400</color>
 
-    <!-- 重写了skeleton的颜色，主要是暗色模式 -->
+    <!-- Overrides the skeleton colors, mainly for dark mode -->
     <color name="skeleton_mask">#E0E0E0</color>
     <color name="skeleton_shimmer">#d5d5d5</color>
 

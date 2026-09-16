@@ -375,7 +375,7 @@ class CoverFragment : Fragment {
     private fun displayCoverImage() {
         val options: RequestOptions
         if (layoutWithPlayerTheme == R.layout.full_cover_fragment) {
-            //不需要rect round
+            //no rounded rect needed
             options = RequestOptions()
                 .diskCacheStrategy(ApGlideSettings.AP_DISK_CACHE_STRATEGY)
                 .centerCrop()
@@ -409,7 +409,7 @@ class CoverFragment : Fragment {
                     colors: MediaNotificationProcessor,
                     bitmap: Bitmap?
                 ) {
-                    //drive mode不需要针对cover ui的颜色做调整，否则其他界面监听到event会改变cover的颜色
+                    //drive mode does not adjust the cover UI colors; otherwise other screens listening for the event would recolor the cover
                     EventBus.getDefault().post(
                         CoverColorChangeEvent(
                             colors,
@@ -501,7 +501,7 @@ class CoverFragment : Fragment {
         this.isDriveMode = isDriveMode
     }
 
-    //必须要有，别问为什么
+    //required no-arg constructor, do not remove
     constructor() {}
 
     class CoverViewHolder constructor() {

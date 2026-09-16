@@ -147,7 +147,7 @@ object ImageUtils {
     }
 
     /**
-     * 将图片放大或缩小到指定尺寸
+     * Scale the bitmap up or down to the given size.
      */
     @JvmStatic
     fun resizeImage(source: Bitmap?, dstWidth: Int, dstHeight: Int): Bitmap? {
@@ -160,7 +160,7 @@ object ImageUtils {
     }
 
     /**
-     * 将图片剪裁为圆形
+     * Crop the bitmap to a circle.
      */
     @JvmStatic
     fun createCircleImage(source: Bitmap?): Bitmap? {

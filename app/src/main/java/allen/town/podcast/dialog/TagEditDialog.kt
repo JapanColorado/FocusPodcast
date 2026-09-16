@@ -27,10 +27,10 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 
 class TagEditDialog : DialogFragment() {
-    //选中的
+    //selected tags
     protected var selectedTags: ArrayList<String> = ArrayList()
 
-    //所有的tag
+    //all tags
     private var allTags: ArrayList<String> = ArrayList()
     private var viewBinding: EditTagsDialogLayoutBinding? = null
     private var adapter: TagSelectionAdapter? = null
@@ -115,7 +115,7 @@ class TagEditDialog : DialogFragment() {
         feedPreferencesList: List<FeedPreferences>?,
         commonTags: Set<String>
     ) {
-        //总是包含root tag
+        //always include the root tag
         selectedTags.add(FeedPreferences.TAG_ROOT)
         for (preferences in feedPreferencesList!!) {
             preferences.tags.removeAll(commonTags)

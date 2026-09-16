@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- main.xml中去掉fitsSystemWindows就没有底部的空白，但是去掉statusbar颜色又不能适配非md3主题 -->
+<!-- Removing fitsSystemWindows in main.xml gets rid of the blank space at the bottom, but without it the status bar color no longer works on non-MD3 themes -->
 <com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"

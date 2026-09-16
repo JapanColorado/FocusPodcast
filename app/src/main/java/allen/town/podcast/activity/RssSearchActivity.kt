@@ -105,7 +105,7 @@ class RssSearchActivity : DialogActivity() {
     }
 
     /**
-     * 播客未找到弹窗
+     * Dialog shown when the podcast was not found
      */
     fun showNoPodcastFoundError() {
         runOnUiThread {
@@ -183,7 +183,7 @@ class RssSearchActivity : DialogActivity() {
     }
 
     /**
-     * 通过feed url去解析items
+     * Parse items from a feed url
      *
      * @param url
      */
@@ -210,7 +210,7 @@ class RssSearchActivity : DialogActivity() {
     }
 
     /**
-     * 根据feed rss url下载文件到本地
+     * Download the feed RSS file from its url to local storage
      *
      * @param url
      */

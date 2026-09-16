@@ -44,7 +44,7 @@ object EntityDateUtils {
     }
 
     /**
-     * 日期字符串转换Date实体
+     * Parse a date string into a Date.
      */
     @JvmStatic
     fun parseServerTime(serverTime: String?, format: String?): Date? {
@@ -64,7 +64,7 @@ object EntityDateUtils {
     }
 
     /**
-     * 获取前后几个月的日期
+     * Get the date a number of months before or after the given one.
      * @param beginDate
      * @param distanceMonth
      * @param format
@@ -89,11 +89,11 @@ object EntityDateUtils {
     }
 
     /**
-     * 获取某个日期前后N天的日期
+     * Get the date N days before or after the given one.
      *
      * @param beginDate
-     * @param distanceDay 前后几天 如获取前7天日期则传-7即可；如果后7天则传7
-     * @param format      日期格式，默认"yyyy-MM-dd"
+     * @param distanceDay days offset, e.g. -7 for seven days earlier, 7 for seven days later
+     * @param format      date format, defaults to "yyyy-MM-dd"
      * @return
      */
     fun getOldDateByDay(beginDate: Date?, distanceDay: Int, format: String?): String? {
@@ -115,7 +115,7 @@ object EntityDateUtils {
     }
 
     /**
-     * Date对象获取时间字符串
+     * Convert a date string into a unix timestamp string.
      */
     @JvmStatic
     fun date2TimeStamp(date: String?, format: String?): String? {
@@ -129,7 +129,7 @@ object EntityDateUtils {
     }
 
     /**
-     * 时间戳转换日期格式字符串
+     * Format a timestamp as a date string.
      */
     @JvmStatic
     fun timeStamp2Date(time: Long, format: String? = "yyyy-MM-dd"): String? {
@@ -138,7 +138,7 @@ object EntityDateUtils {
     }
 
     /**
-     * 在from的基础上加上days
+     * Add days to from.
      */
     @JvmStatic
     fun addDays(from: String?, days: Int): String? {
@@ -153,8 +153,8 @@ object EntityDateUtils {
     }
 
     /**
-     * 在from的基础上加上days
-     * 这里有个坑如果不声明为Long,计算默认当做int类型处理的
+     * Add days to from.
+     * Careful: days must be a Long, otherwise the arithmetic is done in int and overflows.
      */
     @JvmStatic
     fun addDays(date: Date?, days: Long): Long {
@@ -195,7 +195,7 @@ object EntityDateUtils {
     }
 
     /**
-     * 是否为昨天
+     * Whether the timestamp falls on yesterday.
      */
     @JvmStatic
     fun isYesterday(timeStamp: Long?): Boolean {
@@ -214,16 +214,16 @@ object EntityDateUtils {
         val calendar = Calendar.getInstance()
         calendar.time = Date(System.currentTimeMillis())
         var dateInstance: DateFormat
-        //不是同一年显示包含年份完整的日期
+        // Different year: show the full date including the year
         if (!isCurrentYear(date)) {
             dateInstance = SimpleDateFormat.getDateInstance(2)
             return dateInstance.format(date)
         } else if (DateUtils.isToday(date.time)) {
-            //今天
+            // Today
             return context.getString(R.string.today)
 
         } else if (isYesterday(date.time)) {
-            //昨天
+            // Yesterday
             return context.getString(R.string.yesterday)
         } else {
             val df = SimpleDateFormat("MMM dd")
@@ -247,8 +247,8 @@ object EntityDateUtils {
     }
 
     /**
-     * 获取今天开始时间
-     * 不以当天0点开始计算而是从现在往前24小时
+     * Get the start of "today".
+     * Counts back 24 hours from now rather than starting at midnight.
      */
     @JvmStatic
     fun getStartTime(): String? {

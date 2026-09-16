@@ -88,7 +88,7 @@ public class TagsSectionView extends LinearLayout {
 
             if(selectedIndex == index){
 //                mTagsContainer.post(chip::performClick);
-                //不这样写当前界面切换主题chip没有显示选中，原因未知
+                //without this, the chip does not appear selected after a theme switch on this screen (reason unknown)
                 mTagsContainer.post(() -> {
                     chip.setChecked(true);
                     chip.setCheckedIconVisible(true);

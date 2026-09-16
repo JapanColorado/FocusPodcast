@@ -117,7 +117,7 @@ public class PlaybackPreferences implements SharedPreferences.OnSharedPreference
     }
 
     /**
-     * 获取单集临时播放速度
+     * Returns the temporary playback speed of the current episode.
      * @return
      */
     public static float getCurrentlyPlayingTemporaryPlaybackSpeed() {
@@ -164,7 +164,7 @@ public class PlaybackPreferences implements SharedPreferences.OnSharedPreference
     }
 
     /**
-     * 设置单曲临时使用的播放速度
+     * Sets the temporary playback speed used for the current episode.
      * @param speed
      */
     public static void setCurrentlyPlayingTemporaryPlaybackSpeed(float speed) {

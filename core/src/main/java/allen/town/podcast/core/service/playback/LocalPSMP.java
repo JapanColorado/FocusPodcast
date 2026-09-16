@@ -656,7 +656,7 @@ public class LocalPSMP extends PlaybackServiceMediaPlayer {
 
 
     /**
-     * 从配置文件中读取是否开启mono
+     * Reads from the preferences whether mono downmix is enabled.
      * @return
      */
     protected boolean downmix() {
@@ -664,7 +664,7 @@ public class LocalPSMP extends PlaybackServiceMediaPlayer {
     }
 
     /**
-     * 从配置文件中读取是否开启音量增强
+     * Reads from the preferences whether loudness enhancement is enabled.
      * @return
      */
     protected boolean loudness() {

@@ -55,25 +55,25 @@ object Prefs {
     private const val TAG = "Prefs"
 
     // User Interface
-    const val PREF_THEME = ThemeConstants.GENERAL_THEME //主题key
+    const val PREF_THEME = ThemeConstants.GENERAL_THEME //theme key
     const val PREF_DRAWER_FEED_ORDER_METHOD = "pref_feed_order_method"
 
     //drive
     const val PREF_QUEUE_KEEP_SORTED = "pref_queue_keep_sorted"
     
-    //app启动首页
+    //app start page
     const val PREF_HOME_PAGE = "pref_homepage"
     const val PREF_DRAWER_FEED_ORDER = "pref_feed_order"
     const val PREF_EXPANDED_NOTIFICATION = "pref_expand_notification"
     private const val PREF_PERSISTENT_NOTIFICATION = "pref_persist_notification"
-    const val PREF_SHOW_TIME_LEFT = "pref_show_left_time" //显示剩余时间
+    const val PREF_SHOW_TIME_LEFT = "pref_show_left_time" //show remaining time
     const val PREF_COMPACT_NOTIFICATION_BUTTONS = "pref_compact_noti_buttons"
     const val PREF_LOCKSCREEN_BACKGROUND = "pref_lock_screen_backgound"
     private const val PREF_DRAWER_FEED_COUNTER = "pref_feed_counts"
     private const val PREF_SHOW_DOWNLOAD_REPORT = "pref_show_download_sync_failed"
     const val PREF_COLUMN_IN_LANDSCAPE = "prefColumnDisplayInLandscape"
     const val PREF_BACK_BUTTON_BEHAVIOR = "pref_backbutton_behavior"
-    const val PREF_USE_EPISODE_COVER = "pref_use_episode_cover" //使用单集封面
+    const val PREF_USE_EPISODE_COVER = "pref_use_episode_cover" //use episode cover
     const val PREF_SHOW_EPISODE_COVER_IN_FEED = "pref_show_episode_cover_in_feed"
     const val PREF_FILTER_FEED = "prefSubscriptionsFilter"
     const val PREF_SUBSCRIPTION_TITLE = "pref_show_sub_title"
@@ -81,7 +81,7 @@ object Prefs {
     private const val PREF_SHOW_AUTO_DOWNLOAD_REPORT = "pref_show_auto_downlod_result"
 
 
-    //播放列表排序
+    //playlist sort order
     const val PREF_QUEUE_KEEP_SORTED_ORDER = "pref_playlist_keep_order"
 
 
@@ -135,7 +135,7 @@ object Prefs {
     public const val PREF_GPODNET_NOTIFICATIONS = "pref_show_gpod_notifications"
 
 
-    //音量增强
+    //loudness enhancement
     private const val PREF_AUDIO_LOUDNESS = "pref_audio_loudness"
     const val EPISODE_CLEANUP_QUEUE = -1
     const val EPISODE_CLEANUP_NULL = -2
@@ -143,14 +143,14 @@ object Prefs {
     const val EPISODE_CLEANUP_DEFAULT = 0
     
 
-    //全局的音频播放速度
+    //global audio playback speed
     private const val PREF_PLAYBACK_SPEED = "pref_globa_playback_speed"
     private const val PREF_VIDEO_PLAYBACK_SPEED = "pref_global_video_playback_speed"
     const val PREF_PLAYBACK_SKIP_SILENCE = "pref_global_skip_silence"
     private const val PREF_FAST_FORWARD_SECS = "pref_global_fast_forward_secs"
     private const val PREF_REWIND_SECS = "pref_global_rewind_secs"
 
-    //锁定播放列表
+    //lock the playlist
     private const val PREF_QUEUE_LOCKED = "pref_queue_Locked"
 
     // Experimental
@@ -185,7 +185,7 @@ object Prefs {
     }
 
     /**
-     * 获取当前主题
+     * Returns the current theme.
      *
      * @return R.style.Theme_FocusPodcast_Light or R.style.Theme_FocusPodcast_Dark
      */
@@ -308,7 +308,7 @@ object Prefs {
     }
 
     /**
-     * 是否显示最近打开的界面，1是第一个item，0是最近
+     * Whether to show the most recently opened page: "1" is the first item, "0" is the most recent one.
      * @return
      */
     @JvmStatic
@@ -510,7 +510,7 @@ object Prefs {
         }
 
     /**
-     * 获取全局的音频播放速度
+     * Returns the global audio playback speed.
      * @return
      */
     @JvmStatic
@@ -524,7 +524,7 @@ object Prefs {
         }
 
     /**
-     * 获取全局的视频播放速度
+     * Returns the global video playback speed.
      * @return
      */
     @JvmStatic
@@ -813,7 +813,7 @@ object Prefs {
         get() = prefs!!.getInt(NEW_BLUR_AMOUNT, 12)
 
     /**
-     * 播放列表是否锁定了
+     * Whether the playlist is locked.
      * @return
      */
     @JvmStatic
@@ -850,7 +850,7 @@ object Prefs {
         }
 
     /**
-     * 检查该版本是否被用户取消过更新
+     * Checks whether the user has already dismissed the update for this version.
      *
      * @param newVersion
      * @return
@@ -994,10 +994,10 @@ object Prefs {
         }
 
     /**
-     * 返回应用程序存储其所有数据的文件夹。这个方法将
-     * 返回标准数据文件夹，如果用户没有设置的话。
-     * @param type 数据文件夹内的文件夹的名称。当访问数据文件夹的根时为空
-     * @return 被请求的数据文件夹，如果文件夹不能被创建，则为空。
+     * Returns the folder where the app stores all of its data. This method returns the standard
+     * data folder if the user has not set one.
+     * @param type The name of the folder inside the data folder. May be null when accessing the root of the data folder.
+     * @return The requested data folder, or null if the folder could not be created.
      */
     @JvmStatic
     fun getDataFolder(type: String?): File? {
@@ -1179,7 +1179,7 @@ object Prefs {
         }
 
     /**
-     * 是否横屏时分两栏显示
+     * Whether to show two columns in landscape orientation.
      * @return
      */
     fun shouldShowColumnInLandscape(): Boolean {

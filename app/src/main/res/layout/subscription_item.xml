@@ -29,7 +29,7 @@
         android:paddingTop="48dp"
         android:singleLine="true"
         android:textColor="@color/light_gray"
-        tools:text="It is a 测试 , i will see how many words should display there,haha,go to moon" />
+        tools:text="Podcast title that is long enough to see how many words fit here" />
 
     <jp.shts.android.library.TriangleLabelView
         android:id="@+id/triangleCountView"

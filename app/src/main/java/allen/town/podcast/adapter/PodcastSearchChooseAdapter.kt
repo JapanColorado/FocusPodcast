@@ -87,7 +87,7 @@ class PodcastSearchChooseAdapter : RecyclerView.Adapter<PodcastSearchChooseAdapt
             }
             false
         }
-        //隐藏拖动图标
+        //hide the drag handle
         holder.binding.dragView.visibility = View.GONE
     }
 
@@ -104,7 +104,7 @@ class PodcastSearchChooseAdapter : RecyclerView.Adapter<PodcastSearchChooseAdapt
     }
 
     override fun onViewMoved(oldPosition: Int, newPosition: Int) {
-        //如果目标是最后一行并且最后一行不能拖拽，那么最后一行不能排序
+        //if the target is the last row and the last row is not draggable, it cannot be reordered
         if (newPosition == itemCount - 1 && !categoryInfos[newPosition].dragAble) {
             return
         }

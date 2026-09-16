@@ -1522,7 +1522,8 @@ public class PlaybackService extends MediaBrowserServiceCompat {
 
         @Override
         public void onReceive(Context context, Intent intent) {
-            // sound is about to change, eg. bluetooth -> speaker，测试发现会收到两次广播，所以不在这个分支赋值false
+            // Sound is about to change, eg. bluetooth -> speaker. Testing showed this broadcast is
+            // received twice, so nothing is set to false in this branch.
             Log.d(TAG, "pause playback because bluetooth -> speaker");
             pauseIfPauseOnDisconnect();
         }

@@ -127,7 +127,7 @@ public class DBWriter {
         } else if (media.getFile_url() != null) {
             File mediaFile = new File(media.getFile_url());
             if (mediaFile.exists() && !mediaFile.delete()) {
-                //本来就是默默删除，删除失败提示也没用
+                // This is a silent delete anyway, so reporting the failure to the user is pointless
 //                MessageEvent evt = new MessageEvent(context.getString(R.string.delete_failed));
 //                EventBus.getDefault().post(evt);
                 Log.e(TAG, "delete feed media file failed: " + media.getFile_url());
@@ -210,7 +210,7 @@ public class DBWriter {
      */
     public static void clearUnuseAndNotSubedFeedItems(@NonNull Context context) {
 //            List<FeedItem> items = DBReader.getUnsubFeedItems();
-            //item删除了，feed不删除也很奇怪
+            // Deleting the items but keeping the feed would be odd
 //            if (items.size() > (BuildConfig.DEBUG ? 0 : 1000)) {
 //                Timber.i("found items not subed to delete " + items.size());
                 Db adapter = Db.getInstance();
@@ -222,7 +222,7 @@ public class DBWriter {
                         Timber.i("found feeds not subed and no-fav and no-playlist to delete " + notSubAndNotInPlaylistAndFavFeedList.size());
                         for (Long feedId : notSubAndNotInPlaylistAndFavFeedList
                         ) {
-                            //加了失误好像死锁了
+                            // Wrapping this in a transaction seems to deadlock
                             deleteFeed(context,feedId);
                         }
                     }
@@ -1011,7 +1011,7 @@ public class DBWriter {
 
 
     /**
-     * 订阅某个feed
+     * Subscribes to a feed.
      * @param feed
      * @return
      */
@@ -1092,7 +1092,7 @@ public class DBWriter {
     }
 
     /**
-     * 重置数据库中的播客播放时长
+     * Resets the podcast playback durations stored in the database.
      */
     @NonNull
     public static Future<?> resetStatistics() {

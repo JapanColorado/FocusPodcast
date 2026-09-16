@@ -22,7 +22,7 @@ object JsonHelper {
     @JvmStatic
     fun toJSONString(`object`: Any?): String {
         if (`object` == null) {
-            //不然null会返回“null”
+            // Otherwise null is serialized as the string "null"
             return ""
         }
         try {
@@ -40,7 +40,7 @@ object JsonHelper {
     @JvmStatic
     fun toJSONString(`object`: Any?, typeOfT: Type): String {
         if (`object` == null) {
-            //不然null会返回“null”
+            // Otherwise null is serialized as the string "null"
             return ""
         }
         try {

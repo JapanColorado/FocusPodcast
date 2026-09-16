@@ -21,7 +21,7 @@ public enum SortOrder {
     FEED_TITLE_Z_A(101, INTER_FEED,101,3),
     FEED_TITLE_A_Z(102, INTER_FEED,101,3),
     RANDOM(103, INTER_FEED,0,4),
-    //这个是假的，不然算法有问题，random也保持2个
+    // This one is a dummy: without it the algorithm misbehaves, random has to keep 2 entries as well
     RANDOM_FAKE(104, INTER_FEED,0,4),
     SMART_SHUFFLE_NEW_OLD(105, INTER_FEED,105,5),
     SMART_SHUFFLE_OLD_NEW(106, INTER_FEED,105,5);

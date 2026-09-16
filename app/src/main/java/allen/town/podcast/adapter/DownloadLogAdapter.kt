@@ -99,7 +99,7 @@ class DownloadLogAdapter(private val context: Activity) :
                     status.feedfileType, status.feedfileId
                 ) || status.feedfileId.toInt() == 0
             ) {
-                //feedId=0 说明当时没有订阅，刷新是没用的，虽然插入数据库那里做了限制，但是可能出现正常的feed某次刷新失败，但是feed没有订阅被自动清理掉了
+                //feedId=0 means it was not subscribed at the time, so refreshing is pointless. The database insert guards against this, but a normal feed can still fail one refresh and then be auto-cleaned because it was never subscribed.
                 holder.secondaryActionButton.visibility = View.INVISIBLE
                 holder.secondaryActionButton.setOnClickListener(null)
                 holder.secondaryActionButton.tag = null

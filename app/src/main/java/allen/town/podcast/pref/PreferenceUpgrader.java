@@ -9,7 +9,7 @@ import allen.town.podcast.BuildConfig;
 import allen.town.podcast.core.util.download.AutoUpdateManager;
 
 /**
- * 检查更新
+ * Checks for updates
  */
 public class PreferenceUpgrader {
     private static final String PREF_CONFIGURED_VERSION = "version_code";
@@ -32,7 +32,7 @@ public class PreferenceUpgrader {
     }
 
     /**
-     * 对旧版做一些升级配置项处理
+     * Migrates preferences from older versions
      * @param oldVersion
      * @param context
      */

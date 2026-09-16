@@ -30,12 +30,12 @@ object StatusBarUtils {
             } else {
                 view.post {
 
-                    //pixel5 12第一种方式返回的高度好像不对，只能说这种方式可行
+                    // On a Pixel 5 with Android 12 the first approach returns a wrong height; this one works
                     val rectangle = Rect()
                     val window: Window = activity.window
                     window.decorView.getWindowVisibleDisplayFrame(rectangle)
                     Timber.i("statusBarHeight2 %s", rectangle.top)
-                    //如果计算getPaddingTop，二级页面已经是状态栏高度了，原因未知
+                    // Do not add getPaddingTop: on secondary screens it already equals the status bar height, reason unknown
                     view.setPadding(
                         view.paddingLeft, rectangle.top,
                         view.paddingRight,
@@ -58,12 +58,12 @@ object StatusBarUtils {
                 view.layoutParams = toolParams
             } else {
                 view.post {
-                    //pixel5 12第一种方式返回的高度好像不对，只能说这种方式可行
+                    // On a Pixel 5 with Android 12 the first approach returns a wrong height; this one works
                     val rectangle = Rect()
                     val window: Window = activity.window
                     window.decorView.getWindowVisibleDisplayFrame(rectangle)
                     Timber.i("statusBarHeight2 %s", rectangle.top)
-                    //如果计算getPaddingTop，二级页面已经是状态栏高度了，原因未知
+                    // Do not add getPaddingTop: on secondary screens it already equals the status bar height, reason unknown
                     val toolParams = view.layoutParams as MarginLayoutParams
                     toolParams.topMargin = rectangle.top
                     view.layoutParams = toolParams
@@ -94,12 +94,12 @@ object StatusBarUtils {
 //                view.layoutParams = toolParams
             } else {
                 view.post {
-                    //pixel5 12第一种方式返回的高度好像不对，只能说这种方式可行
+                    // On a Pixel 5 with Android 12 the first approach returns a wrong height; this one works
                     val rectangle = Rect()
                     val window: Window = activity.window
                     window.decorView.getWindowVisibleDisplayFrame(rectangle)
                     Timber.i("statusBarHeight2 %s", rectangle.top)
-                    //如果计算getPaddingTop，二级页面已经是状态栏高度了，原因未知
+                    // Do not add getPaddingTop: on secondary screens it already equals the status bar height, reason unknown
                     val toolParams = view.layoutParams
                     toolParams.height = rectangle.top
 //                    view.layoutParams = toolParams

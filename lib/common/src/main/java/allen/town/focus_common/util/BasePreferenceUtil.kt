@@ -165,7 +165,7 @@ object BasePreferenceUtil {
     @JvmStatic
     var interstitialAdTimeValid: Boolean = false
         get() {
-            //超过20分钟有效，即插屏广告20分钟内只会显示1次
+            // Valid once more than 20 minutes have passed, i.e. the interstitial shows at most once per 20 minutes
             return System.currentTimeMillis() - sharedPreferences!!.getLong(
                 INTERSTITIAL_AD_TIME,
                 0

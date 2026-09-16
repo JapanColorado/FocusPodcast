@@ -70,7 +70,7 @@ class CoverLoader(private val activity: MainActivity?) {
             return
         }
         val options = RequestOptions()
-            .diskCacheStrategy(ApGlideSettings.AP_DISK_CACHE_STRATEGY) //这里修改为centCrop那么底部标题的背景就固定是灰色的了，原因未知
+            .diskCacheStrategy(ApGlideSettings.AP_DISK_CACHE_STRATEGY) //switching this to centerCrop makes the background of the bottom title permanently gray (reason unknown)
             .fitCenter()
             .dontAnimate()
         var builder = Glide.with(imgvCover!!)

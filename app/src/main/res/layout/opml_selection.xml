@@ -54,7 +54,7 @@
                             style="@android:style/TextAppearance.Material.Headline"
                             android:text="@string/opml_title"
                             android:gravity="center"
-                            tools:text="了是第几个六十多个了是大功率是第几个了扫到两个老是打嗝了多少个"
+                            tools:text="OPML title"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content" />
 
@@ -64,7 +64,7 @@
                             android:visibility="gone"
                             android:gravity="center"
                             tools:visibility="visible"
-                            tools:text="零售价格老是打嗝了是第几个"
+                            tools:text="OPML summary"
                             android:text="@string/opml_sum_free"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content" />

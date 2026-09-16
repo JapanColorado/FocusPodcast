@@ -46,7 +46,7 @@ abstract class StatisticsListAdapter protected constructor(protected val context
             val pair = headerValue
             holder.totalTime1.text = pair.first
             holder.totalTime2.text = pair.second
-            //随机播放一个动画
+            //play a random animation
             holder.lottieAnimationView.setAnimation(getRandomLottieFileName())
         } else {
             val holder = h as StatisticsHolder

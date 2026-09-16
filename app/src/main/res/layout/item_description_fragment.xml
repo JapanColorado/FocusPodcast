@@ -4,7 +4,7 @@
     android:layout_height="match_parent"
     android:background="?colorSurface"
     xmlns:app="http://schemas.android.com/apk/res-auto">
-    <!-- 如果不加这个，那么viewpager的第二个item不显示骨架原因未知 -->
+    <!-- Without this, the second ViewPager item does not show its skeleton placeholder (reason unknown) -->
     <com.faltenreich.skeletonlayout.SkeletonLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/skeletonLayout"

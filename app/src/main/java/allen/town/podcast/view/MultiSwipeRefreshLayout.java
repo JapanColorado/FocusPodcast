@@ -21,7 +21,7 @@ public class MultiSwipeRefreshLayout extends SwipeRefreshLayout {
 
     public MultiSwipeRefreshLayout(Context context, AttributeSet attributeSet) {
         super(context, attributeSet);
-        //设置为强调色
+        //use the accent color
         setColorSchemeColors(ThemeStore.accentColor(context));
     }
 

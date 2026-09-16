@@ -57,8 +57,8 @@ open class PodcastSearchResult(
                 instance,
                 Date(ItunesEpisodesDateUtils.getTime(json.optString("releaseDate", null)))
             )
-            //releaseDate 格式一样
-            //没有uuid和description
+            //releaseDate has the same format
+            //no uuid or description available
             return PodcastSearchResult(title, imageUrl, feedUrl, author, "", "", publicationDate, 0)
         }
 
@@ -67,10 +67,10 @@ open class PodcastSearchResult(
             val episodeTitle = json.optString("trackName", "")
             val imageUrl = json.optString("artworkUrl160", "")
             val feedUrl = json.optString("feedUrl", "")
-            val author = json.optString("artistName", "") //实际并没有
+            val author = json.optString("artistName", "") //not actually present
             val uuid = json.optString("episodeGuid", "")
             val dateStr = json.optString("releaseDate", null)
-            //计算出来没有年付，6月10日这样
+            //the computed value has no year, e.g. "Jun 10"
             val publicationDate =
                 DateFormatter.formatAbbrev(instance, Date(ItunesEpisodesDateUtils.getTime(dateStr)))
             var description = json.optString("description")
@@ -78,9 +78,9 @@ open class PodcastSearchResult(
                 description = json.optString("shortDescription")
             }
             val itunesId = json.optString("collectionId", "")
-            //size 没有
+            //no size available
             var duration: Long = 0
-            //存数据库就可以了，会当做audio处理
+            //just store it in the database; it will be treated as audio
             val mimeType = json.optString("episodeContentType")
             val episodeUrl = json.optString("episodeUrl")
             try {
@@ -92,8 +92,8 @@ open class PodcastSearchResult(
                     duration = -1
                 }
             }
-            //contentAdvisoryRating（内容咨询评级） 为Explicit 代表是露骨内容，默认是Clean
-/* 小写
+            //contentAdvisoryRating of "Explicit" means explicit content; the default is "Clean"
+/* lowercase
  public enum PodcastTypeEnum {
             UNINITIALIZED,
             NONE,
@@ -122,7 +122,7 @@ open class PodcastSearchResult(
         @Throws(JSONException::class)
         @JvmStatic
         fun fromItunesToplist(json: JSONObject): PodcastSearchResult {
-            val title = json.getJSONObject("im:name").getString("label") //title 下的label太长了
+            val title = json.getJSONObject("im:name").getString("label") //the label under "title" is too long
             var summary: String? = null
             try {
                 summary = json.getJSONObject("summary").getString("label")
@@ -182,7 +182,7 @@ open class PodcastSearchResult(
         }
 
         /**
-         * 接口返回空，似乎没有用了？
+         * The endpoint returns empty; it seems to be unused now?
          *
          * @param searchHit
          * @return

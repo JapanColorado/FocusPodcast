@@ -77,7 +77,7 @@ class ChaptersListAdapter(private val context: Context, private val callback: Ca
             )
         }
 
-        //只有这样才能实现想要的效果，我也不知道为啥
+        //only this produces the desired result; reason unknown
         holder.itemView.setBackgroundColor(
             getColorFromAttr(
                 context, R.attr.colorSurface

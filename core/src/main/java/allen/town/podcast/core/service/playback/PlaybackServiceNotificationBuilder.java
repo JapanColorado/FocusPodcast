@@ -177,7 +177,8 @@ public class PlaybackServiceNotificationBuilder {
     private void addActions(NotificationCompat.Builder notification, MediaSessionCompat.Token mediaSessionToken,
                             PlayerStatus playerStatus) {
         ArrayList<Integer> compactActionList = new ArrayList<>();
-        //TODO:android13 好像忽略了自定义通知，使用的是控制媒体时的图标（快进和快退没用）和actions，但是addict也有自定义图标
+        //TODO: Android 13 seems to ignore the custom notification and uses its own media control
+        // icons (where fast forward and rewind do nothing) and actions, yet Addict manages to show custom icons
 
         int numActions = 0; // we start and 0 and then increment by 1 for each call to addAction
         // always let them rewind

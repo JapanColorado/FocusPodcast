@@ -109,30 +109,24 @@ public final class Converter {
      */
     public static Pair<String, String> shortLocalizedDuration(Context context, long time) {
         float hours = (float) time / 3600f;
-        //小于1个小时
         if (hours < 1) {
             if (time < 60) {
-                //显示秒
                 return new Pair(String.format(Locale.getDefault(), "%d ", time) + context.getString(R.string.time_seconds), "");
             } else {
-                //显示分钟
                 return new Pair(String.format(Locale.getDefault(), "%d ", time / 60) + context.getString(R.string.time_minutes), "");
             }
         } else {
             if (hours < 24) {
-                //显示小时和分
                 int hour = (int) (time / 3600);
                 String hourStr = String.format(Locale.getDefault(), "%d ", hour) + context.getString(R.string.time_hours);
                 String minStr = String.format(Locale.getDefault(), "%d ", (time - hour * 3600L) / 60) + context.getString(R.string.time_minutes);
                 return new Pair(hourStr, minStr);
             } else if (hours < 24 * 365) {
-                //显示天和小时
                 int days = (int) (time / (3600 * 24));
                 String dayStr = String.format(Locale.getDefault(), "%d ", days) + context.getString(R.string.time_days);
                 String hourStr = String.format(Locale.getDefault(), "%d ", (time - days * 24 * 3600L) / 3600) + context.getString(R.string.time_hours);
                 return new Pair(dayStr, hourStr);
             } else {
-                //显示年和天
                 int years = (int) (time / (3600 * 24 * 365));
                 String yearStr = String.format(Locale.getDefault(), "%d ", years) + context.getString(R.string.time_year);
                 String dayStr = String.format(Locale.getDefault(), "%d ", (time - years * 24 * 365 * 3600L) / (3600 * 24)) + context.getString(R.string.time_days);

@@ -7,8 +7,8 @@ object RetrieveFeedUtil {
     const val TAG = "RetrieveFeedUtil"
 
     /**
-     * feed url解析找不到，降级通过trackname去查找
-     * http返回是200，但是没有feed item，并不是404
+     * The feed url could not be resolved, so fall back to looking it up by track name.
+     * HTTP returns 200 with no feed items rather than a 404.
      *
      * @param error
      */

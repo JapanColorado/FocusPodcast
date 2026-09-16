@@ -34,7 +34,7 @@ public class OthersFragment extends AbsSettingsFragment {
         final String finalDocumentUrl = documentUrlBase;
         findPreference(PREF_DOCUMENTATION).setOnPreferenceClickListener(preference -> {
             BrowserLauncher.openUrl(getContext(), finalDocumentUrl);
-            //https://portals.docsie.io/allentown/focuspodcast-doc-help/focuspodcast-doc-help-docs/deployment_gJNsFb3AxfYNQuSF7/?doc=/getting-started/;这个可以直接翻译，缺点是只能有一个
+            //https://portals.docsie.io/allentown/focuspodcast-doc-help/focuspodcast-doc-help-docs/deployment_gJNsFb3AxfYNQuSF7/?doc=/getting-started/ - this one can be translated directly, but only one such deployment is possible
             return true;
         });
         findPreference(PREF_VIEW_FORUM).setOnPreferenceClickListener(preference -> {

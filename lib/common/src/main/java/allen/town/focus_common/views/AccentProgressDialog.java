@@ -38,7 +38,7 @@ public class AccentProgressDialog {
         progressDialog.setCancelable(z2);
         progressDialog.setOnCancelListener(onCancelListener);
         progressDialog.show();
-        //init放在show之后才有效果
+        // init() only has an effect after show()
         init(progressDialog);
         return progressDialog;
     }

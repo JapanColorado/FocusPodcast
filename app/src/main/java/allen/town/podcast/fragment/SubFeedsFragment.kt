@@ -206,7 +206,7 @@ class SubFeedsFragment : Fragment(), Toolbar.OnMenuItemClickListener, OnSelectMo
     override fun onViewCreated(v: View, savedInstanceState: Bundle?) {
         super.onViewCreated(v, savedInstanceState)
 
-        //gird 如何加载动画 https://proandroiddev.com/enter-animation-using-recyclerview-and-layoutanimation-part-2-grids-688829b1d29b
+        //how to animate a grid: https://proandroiddev.com/enter-animation-using-recyclerview-and-layoutanimation-part-2-grids-688829b1d29b
         val loadLayoutAnimation =
             AnimationUtils.loadLayoutAnimation(context, R.anim.grid_layout_animation_from_bottom)
         subscriptionRecycler.layoutAnimation = loadLayoutAnimation

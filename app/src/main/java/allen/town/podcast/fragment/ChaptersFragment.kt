@@ -60,7 +60,7 @@ class ChaptersFragment constructor() : Fragment() {
 
         })
         recyclerView.adapter = adapter
-        //这里换成 item_small_recyclerview_skeleton 只显示3条，原因未知
+        //switching to item_small_recyclerview_skeleton here only shows 3 rows (reason unknown)
         skeleton = recyclerView.applySkeleton(R.layout.simplechapter_item, 15)
         skeleton!!.showSkeleton()
 

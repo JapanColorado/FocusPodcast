@@ -61,7 +61,7 @@ public class SubscriptionActivityStarter {
     }
 
     /**
-     * 主动在app中创建快捷方式，区别于直接在launcher创建
+     * Creates a shortcut from inside the app, as opposed to creating one directly in the launcher.
      *
      * @param context
      * @param feed

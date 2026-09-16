@@ -78,7 +78,7 @@
 
     <string name="restore_purchase">Kauf wiederherstellen</string>
     <string name="restore_tip">Ich habe bereits bezahlt, klicken Sie hier, um den Kauf wiederherzustellen</string>
-    <string name="expired_time">Gültig bis：</string>
+    <string name="expired_time">Gültig bis: </string>
 
     <string name="google_service_not_install">Der Google-Dienst ist möglicherweise nicht installiert, kann nicht bezahlen</string>
 

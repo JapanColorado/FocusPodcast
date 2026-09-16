@@ -76,7 +76,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textColor="?third_text_color"
-                    tools:text="2022年6月21日" />
+                    tools:text="Jun 21, 2022" />
 
                 <com.google.android.material.textview.MaterialTextView
                     android:id="@+id/separatorIcons"
@@ -165,6 +165,6 @@
         android:paddingTop="4dp"
         android:textColor="?android:attr/textColorPrimary"
         android:textSize="14sp"
-        tools:text="三等奖傅雷家书两个胜利大街个价格sdfg;sdkg; ds;lgk s;dlkg 胜利大街个老师的价格两个落地生根是劳动工具类似的感觉收到了开关键胜利大街个了几个螺丝刀开关收到了根据十多个零售价大概" />
+        tools:text="Podcast description that runs long enough to wrap across several lines so the ellipsized layout can be previewed here in the editor" />
 </RelativeLayout>
 </com.google.android.material.card.MaterialCardView>

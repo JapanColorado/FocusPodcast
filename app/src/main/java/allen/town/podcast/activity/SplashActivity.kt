@@ -49,7 +49,7 @@ class SplashActivity : AppCompatActivity() {
     }
 
     /**
-     * 开屏页一定要禁止用户对返回按钮的控制，否则将可能导致用户手动退出了App而广告无法正常曝光和计费
+     * The splash screen must block the back button, otherwise the user can quit the app before the ad is shown and billed.
      */
     override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
         return if (keyCode == KeyEvent.KEYCODE_BACK || keyCode == KeyEvent.KEYCODE_HOME) {

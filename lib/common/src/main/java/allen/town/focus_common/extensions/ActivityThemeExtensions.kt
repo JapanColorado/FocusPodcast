@@ -78,8 +78,9 @@ private fun AppCompatActivity.hideStatusBar(fullscreen: Boolean, statusBarId: In
 }
 
 /**
- * 本意是适配导航栏透明，但是成本太高了，EdgeToEdgeUtils.applyEdgeToEdge，material库有
- * 现成的方法，这里还是用传统的，只是把导航栏颜色修改为surfaceColor
+ * This was meant to support a transparent navigation bar, but that turned out too costly. The material
+ * library already ships EdgeToEdgeUtils.applyEdgeToEdge; this keeps the traditional approach and only
+ * changes the navigation bar color to surfaceColor.
  */
 fun AppCompatActivity.setDrawBehindSystemBars(statusBarId: Int, behind: Boolean) {
     if (VersionUtils.hasOreo()) {

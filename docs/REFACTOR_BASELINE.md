@@ -11,7 +11,7 @@ because it is deleted outright.
 | First-party source lines (java + kt) | 71,121 | 66,282 |
 | Kotlin `!!` assertions (app, core, lib) | 1,865 | 1,694 |
 | `printStackTrace()` calls | 135 | 129 |
-| Chinese (CJK) lines outside translation resources | 626 | 471 |
+| Chinese (CJK) lines outside translation resources | 626 | 0 |
 | Rx `subscribe(` with no error handler | ~11 | ~11 |
 | Build flavors | 3 | 1 |
 | Git submodules | 4 | 0 |

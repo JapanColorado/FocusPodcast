@@ -249,7 +249,7 @@ class ImportOPMLActivity : SimpleToolbarActivity() {
                     viewBinding!!.feedlist.layoutManager =
                         LinearLayoutManager(this@ImportOPMLActivity)
                     viewBinding!!.feedlist.adapter = listAdapter
-                    //默认全部选中
+                    //select all by default
                     selectAllItems(true)
                 }) { e: Throwable ->
                 viewBinding!!.progressBar.visibility = View.GONE

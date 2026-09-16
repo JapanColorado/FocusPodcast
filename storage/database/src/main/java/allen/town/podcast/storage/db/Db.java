@@ -593,7 +593,7 @@ public class Db {
     }
 
     /**
-     * 将所有播客播放时长置为0
+     * Resets the playback duration of all podcasts to 0.
      */
     public void resetAllMediaPlayedDuration() {
         try {
@@ -677,7 +677,7 @@ public class Db {
     }
 
     /**
-     * 区别于 setSingleFeedItem(FeedItem item) 不更新feed
+     * Unlike setSingleFeedItem(FeedItem item), this does not update the feed.
      * @param item
      * @return
      */
@@ -880,12 +880,12 @@ public class Db {
      */
     public long setDownloadStatus(DownloadStatus status) {
         if(status.getFeedfileId() == 0){
-//            feedId=0 说明当时没有订阅,此时记录同步状态不是用户希望的
+//            feedId=0 means the feed was not subscribed at the time, recording the sync state is not what the user wants
             Log.d(TAG,"ignore feed id =0 download status " + status.getTitle());
             return 0;
         }
         if(status.isSuccessful()){
-            //如果成功了删除记录，用户只想知道下载完成的记录，关心的是下载中和失败的
+            // On success, drop the record: the user only cares about downloads that are running or failed
             db.delete(TABLE_NAME_DOWNLOAD_LOG, KEY_ID + "=?",
                     new String[]{String.valueOf(status.getId())});
             return status.getId();
@@ -1028,7 +1028,8 @@ public class Db {
     }
 
     /**
-     * Remove a feed with all its FeedItems and Media entries.(最好不要直接使用，因为可能feed下面的item都没有查询出来)
+     * Remove a feed with all its FeedItems and Media entries. Better not to call this directly,
+     * because the items of the feed may not have been queried at all.
      */
     public void removeFeed(Feed feed) {
         try {
@@ -1057,7 +1058,8 @@ public class Db {
     }
 
     /**
-     * 删除没有订阅的，同时没有items在播放列表和收藏中的feeds，不使用这种方式，用封装好的removeFeed更合适
+     * Deletes feeds that are not subscribed and have no items in the playlist or the favorites.
+     * Do not use this, the wrapped removeFeed is more appropriate.
      * @return
      */
     public void removeFeedsNotSubAndNotInPlaylistAndFav() {
@@ -1070,7 +1072,8 @@ public class Db {
     }
 
     /**
-     * 删除没有订阅的，同时没有items在播放列表和收藏和播放历史中的feeds
+     * Returns the feeds that are not subscribed and have no items in the playlist, the favorites
+     * or the playback history.
      * @return
      */
     public Cursor getFeedsNotSubAndNotInPlaylistAndFavCursor() {
@@ -1090,7 +1093,7 @@ public class Db {
     }
 
     /**
-     * Get all Feeds(已订阅的) from the Feed Table.
+     * Get all subscribed Feeds from the Feed Table.
      *
      * @return The cursor of the query
      */
@@ -1114,7 +1117,7 @@ public class Db {
     }
 
     /**
-     * 返回已订阅的feed list的下载地址
+     * Returns the download URLs of the subscribed feeds.
      * @return
      */
     public final Cursor getSubFeedCursorDownloadUrls() {
@@ -1245,7 +1248,7 @@ public class Db {
     }
 
     public final Cursor getRecentlyPublishedItemsCursor(int offset, int limit, FeedItemFilter filter) {
-        //把没有真正订阅的feed的单曲过滤掉
+        // Filter out the episodes of feeds that are not actually subscribed
         String filterQuery = FeedItemFilterQuery.generateFrom(filter);
         String whereClause = "".equals(filterQuery) ? " WHERE " + TABLE_NAME_FEEDS + "." + KEY_IS_SUBSCRIBED + "=1"
                 : " WHERE " + filterQuery +" AND " + TABLE_NAME_FEEDS + "." + KEY_IS_SUBSCRIBED + "=1";
@@ -1322,7 +1325,7 @@ public class Db {
     }
 
     /**
-     * 获取所有未订阅的feed items
+     * Returns all feed items of unsubscribed feeds.
      * @return
      */
     public final Cursor getUnsubFeedItemsCursor() {

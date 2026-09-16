@@ -34,10 +34,10 @@ object LogUtils {
             fileWriter.write(sb.toString())
             fileWriter.close()
             if (Build.VERSION.SDK_INT <= 22) {
-//                6.0及以下
+//                6.0 and below
                 Uri.fromFile(file)
             } else {
-                //7.0及以上
+                // 7.0 and above
                 FileProvider.getUriForFile(
                     context,
                     providerAuth,

@@ -23,7 +23,7 @@ import allen.town.podcast.glide.BlurTransformation
 import allen.town.podcast.glide.crossfadeListener
 
 /**
- * 有个bug，如果有章节，点击了菜单的更多，然后切换颜色不会变化，再点击更多恢复正常
+ * Known bug: when chapters are present, tapping the overflow menu and then switching the color has no effect; tapping overflow again fixes it.
  */
 open class BlurCardAudioPlayerFragment : AudioPlayerFragment(false) {
     override fun coverColorUpdate(event: CoverColorChangeEvent) {
@@ -56,7 +56,7 @@ open class BlurCardAudioPlayerFragment : AudioPlayerFragment(false) {
             TintHelper.setTintAuto(this, Color.WHITE, true)
         }
 
-        //加了这行有个问题必现，播放过程中去设置“自定义颜色”然后回来，播放按钮动画没有完全完成
+        //with this line there is a reproducible issue: setting a "custom color" during playback and coming back leaves the play button animation unfinished
         TintHelper.setTintAuto(
             butPlay,
             Color.BLACK,

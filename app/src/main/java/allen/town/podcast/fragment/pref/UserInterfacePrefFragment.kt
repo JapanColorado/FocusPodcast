@@ -29,7 +29,7 @@ class UserInterfacePrefFragment : AbsSettingsFragment() {
 
     private fun setupInterfaceScreen() {
 
-        //播放界面显示剩余时间还是时长
+        //show remaining time or total duration on the player screen
         findPreference<Preference>(Prefs.PREF_SHOW_TIME_LEFT)?.onPreferenceChangeListener =
             Preference.OnPreferenceChangeListener { preference: Preference?, newValue: Any? ->
                 setShowRemainTimeSetting(newValue as Boolean?)

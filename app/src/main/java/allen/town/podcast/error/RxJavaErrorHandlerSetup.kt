@@ -15,7 +15,7 @@ object RxJavaErrorHandlerSetup {
                 return@setErrorHandler
             }
             if (exception is OnErrorNotImplementedException) {
-                // 两个版本的此异常打印即可
+                // both variants of this exception only need to be logged
                 Log.w(TAG, "ignored exception: OnErrorNotImplementedException")
                 return@setErrorHandler
             }
@@ -25,7 +25,7 @@ object RxJavaErrorHandlerSetup {
             // threads might throw NPEs after disposing because we set controllers to null.
             // Just swallow all exceptions here.
 
-            //统一交给全局的异常处理
+            //hand off to the global exception handler
 //            if (BuildConfig.DEBUG) {
             Thread.currentThread().uncaughtExceptionHandler
                 .uncaughtException(Thread.currentThread(), exception)

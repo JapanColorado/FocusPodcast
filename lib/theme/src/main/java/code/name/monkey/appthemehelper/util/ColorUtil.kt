@@ -24,7 +24,7 @@ object ColorUtil {
     }
 
     /**
-     * 修改一个颜色的透明度
+     * Change a color's alpha.
      */
     private fun getColorWithAlpha(color: Int, opacity: Int): Int {
         return Math.round(0xFF * (0.01 * opacity)).toInt() * 0x1000000 + color
@@ -100,7 +100,7 @@ object ColorUtil {
     }
 
     /**
-     * 这里原来是0.4，我觉得0.2更合适
+     * This was originally 0.4; 0.2 looks better.
      */
     @JvmStatic
     fun isColorLight(@ColorInt color: Int): Boolean {

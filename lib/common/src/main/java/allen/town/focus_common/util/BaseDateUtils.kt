@@ -15,7 +15,7 @@ object BaseDateUtils {
 
 
     /**
-     * 获取前后几个月的日期
+     * Get the date a number of months before or after the given one.
      * @param beginDate
      * @param distanceMonth
      * @param format
@@ -47,11 +47,11 @@ object BaseDateUtils {
     }
 
     /**
-     * 获取某个日期前后N天的日期
+     * Get the date N days before or after the given one.
      *
      * @param beginDate
-     * @param distanceDay 前后几天 如获取前7天日期则传-7即可；如果后7天则传7
-     * @param format      日期格式，默认"yyyy-MM-dd"
+     * @param distanceDay days offset, e.g. -7 for seven days earlier, 7 for seven days later
+     * @param format      date format, defaults to "yyyy-MM-dd"
      * @return
      */
     fun getOldDateByDay(beginDate: Date?, distanceDay: Int, format: String?): String? {
@@ -73,7 +73,7 @@ object BaseDateUtils {
     }
 
     /**
-     * Date对象获取时间字符串
+     * Convert a date string into a unix timestamp string.
      */
     @JvmStatic
     fun date2TimeStamp(date: String?, format: String?): String? {
@@ -87,7 +87,7 @@ object BaseDateUtils {
     }
 
     /**
-     * 时间戳转换日期格式字符串
+     * Format a timestamp as a date string.
      */
     @JvmStatic
     fun timeStamp2Date(time: Long, format: String? = "yyyy-MM-dd"): String? {
@@ -118,7 +118,7 @@ object BaseDateUtils {
     }
 
     /**
-     * 是否为昨天
+     * Whether the timestamp falls on yesterday.
      */
     @JvmStatic
     fun isYesterday(timeStamp: Long?): Boolean {
@@ -142,7 +142,7 @@ object BaseDateUtils {
     }
 
     /**
-     * 获取今天零点的时间
+     * Get today's midnight in millis.
      * @return
      */
     @JvmStatic

@@ -151,7 +151,7 @@ public class SyncService extends Worker {
             }
             if (!URLChecker.containsUrl(localSubscriptions, downloadUrl) && !queuedRemovedFeeds.contains(downloadUrl)) {
                 Feed feed = new Feed(downloadUrl, null);
-                //需要自动订阅
+                // needs to be subscribed automatically
                 feed.setNeedAutoSubscribe(true);
                 DownloadRequest.Builder builder = DownloadRequestCreator.create(feed);
                 DownloadService.download(getApplicationContext(), false, builder.build());

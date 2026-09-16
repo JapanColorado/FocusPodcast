@@ -63,7 +63,7 @@
     <string name="thanks_purchase">Abonnement réussi, merci pour votre achat</string>
     <string name="restore_purchase">Restaurer l\'achat</string>
     <string name="restore_tip">J\'ai déjà payé, cliquez pour restaurer l\'achat</string>
-    <string name="expired_time">Valable jusqu\'au：</string>
+    <string name="expired_time">Valable jusqu\'au: </string>
 
     <string name="google_service_not_install">Le service Google n\'est peut-être pas installé, ne pourra pas payer</string>
 

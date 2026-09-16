@@ -112,7 +112,7 @@ public abstract class OnlineSearchFragmentBase extends Fragment {
                 .subscribe(
                         feeds -> {
                             adapter.setSubscribedFeeds(feeds);
-                            //下载完成了，数据库中已有该feed了
+                            //download finished, the feed is now in the database
                         }, error -> Log.e(TAG, Log.getStackTraceString(error))
                 );
     }
@@ -144,7 +144,7 @@ public abstract class OnlineSearchFragmentBase extends Fragment {
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onFeedListChanged(FeedListUpdateEvent event) {
-        //订阅状态发生改变
+        //subscription state changed
         getSubedFeedsList();
     }
 
@@ -161,7 +161,7 @@ public abstract class OnlineSearchFragmentBase extends Fragment {
             adapter.addAll(searchResults);
 //            gridView.setVisibility(!searchResults.isEmpty() ? View.VISIBLE : View.GONE);
             txtvEmpty.setVisibility(searchResults.isEmpty() ? View.VISIBLE : View.GONE);
-            //这里直接用fragment的context，第一次搜索正常返回再搜索就闪退了，懒得找原因了
+            //using the fragment's context directly here crashes on the second search after the first one returns; the cause was not investigated
             txtvEmpty.setText(txtvEmpty.getContext().getString(R.string.no_results_for_query, query));
         }, error -> {
             Log.e(TAG, Log.getStackTraceString(error));

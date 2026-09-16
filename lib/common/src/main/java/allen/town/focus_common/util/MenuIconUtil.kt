@@ -12,7 +12,7 @@ import kotlin.Exception
 
 object MenuIconUtil {
     /**
-     * 显示toolbar方式的option menu图标，即使是never
+     * Show the toolbar option menu icons, even for items with showAsAction="never".
      * @param toolbar
      */
     @SuppressLint("RestrictedApi")
@@ -27,7 +27,7 @@ object MenuIconUtil {
     }
 
     /**
-     * 显示传统方式 menu图标，即使是never
+     * Show the classic menu icons, even for items with showAsAction="never".
      * @param toolbar
      */
     @SuppressLint("RestrictedApi")
@@ -42,17 +42,17 @@ object MenuIconUtil {
     }
 
     /**
-     * 上下文菜单
+     * Context menu.
      */
     @JvmStatic
     fun showContextMenuIcon(menu: Menu) {
         if (menu.javaClass.simpleName == "ContextMenuBuilder") {
             try {
-                //这是ContextMenu加载菜单的Builder，com.android.internal.view.menu.MenuBuilder
+                // The builder a ContextMenu inflates into: com.android.internal.view.menu.MenuBuilder
                 val clazz = Class.forName("com.android.internal.view.menu.MenuBuilder")
                 val m = clazz.getDeclaredMethod("setOptionalIconsVisible", Boolean.TYPE)
                 m.isAccessible = true
-                //MenuBuilder实现Menu接口，创建菜单时，传进来的menu其实就是MenuBuilder对象(java的多态特征)
+                // MenuBuilder implements Menu, so the menu handed to us on creation really is a MenuBuilder
                 m.invoke(menu, true)
             } catch (ignored: Exception) {
             }
@@ -60,7 +60,7 @@ object MenuIconUtil {
     }
 
     /**
-     * 使用startActionMode
+     * For menus created through startActionMode.
      */
     @JvmStatic
     fun showMenuWrapICSIcon(menu: Menu) {
@@ -69,11 +69,11 @@ object MenuIconUtil {
                 val declaredField1: Field = menu.javaClass.getDeclaredField("mWrappedObject")
                 declaredField1.isAccessible = true
                 val objMenuBuilder: Any = declaredField1.get(menu)
-                //这是ContextMenu加载菜单的Builder，com.android.internal.view.menu.MenuBuilder
+                // The builder a ContextMenu inflates into: com.android.internal.view.menu.MenuBuilder
                 val clazz = Class.forName("androidx.appcompat.view.menu.MenuBuilder")
                 val m = clazz.getDeclaredMethod("setOptionalIconsVisible", Boolean.TYPE)
                 m.isAccessible = true
-                //MenuBuilder实现Menu接口，创建菜单时，传进来的menu其实就是MenuBuilder对象(java的多态特征)
+                // MenuBuilder implements Menu, so the menu handed to us on creation really is a MenuBuilder
                 m.invoke(objMenuBuilder, true)
             } catch (ignored: Exception) {
                 Log.e("",ignored.toString())

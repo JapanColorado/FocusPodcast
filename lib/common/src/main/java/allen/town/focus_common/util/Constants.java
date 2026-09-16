@@ -4,7 +4,7 @@ import java.util.Random;
 import java.util.UUID;
 
 /**
- * desc: 常量类
+ * desc: constants
  * author: Administrator .
  * date: 2018/4/12 17:41 .
  */
@@ -17,21 +17,21 @@ public class Constants {
     public static final String PRODUCT_EMAIL = "products.focus@gmail.com";
 
     /**
-     * 通话结束广播，开在可注册该广播接收相关通话信息
+     * Call-ended broadcast; register for it to receive call information.
      */
     public static final String CALL_END_INFO_RECEIVER = "com.mye.yuntongxun.sdk.imsdk.callend";
     /**
-     * 通话结束广播对应budle
+     * Bundle key of the call-ended broadcast.
      */
     public static final String BUNDLE_CALL_END = "bundle_call_end";
     /**
-     * 勿扰模式全局设置拼接符
+     * Prefix for the global do-not-disturb setting key.
      */
     public static final String APP_SILENT_MODE = "app_silent_mode_";
     public static final String LOGIN_FAIL_MESSAGE = "login_fail_message";
 
     public static final String KEY_SDK_INIT_RESULT = "key_sdk_init_result";
-    //分享相关功能发送时间
+    // Send time for sharing features
     public static final String KEY_CIRCLE_PUBLISH_PROCESSTIME = "key_circle_publish_processtime";
     public static final String KEY_CIRCLE_PUBLISH_COUNT = "key_circle_publish_count";
     public static final String KEY_CIRCLE_OLD_ID = "key_circle_old_id";
@@ -58,37 +58,37 @@ public class Constants {
 
     public static final String KEY_MESSAGE_PAGE_INDEX = "message_page_index";
     public static final String KEY_MESSAGE_PAGE_INNER_INDEX = "message_page_inner_index";
-    //选择联系人
+    // Selected contacts
     public static final String KEY_SELECTED_CONTACTS = "selected_contacts";
 
 
     /**
-     * 发审批、任务、日志时，给审批人发消息的内容的最大长度
+     * Maximum length of the message sent to the approver when filing an approval, task or log.
      */
     public static final int MAX_MSG_CONTENT_LENGHT = 50;
 
     /**
-     * startActivityForResult 常量
+     * startActivityForResult request codes.
      */
     public static final int REQUEST_CODE_SHARE_TO = 1001;
     /**
-     * 发工作或者发分享最大图片数
+     * Maximum number of images in a work post or a share.
      */
     public static final int MAX_IMAGES_COUNT = 9;
     /**
-     * 记录当前账号是否已经将旧版本的静音和置顶数据同步到服务端
+     * Whether this account has already uploaded its legacy mute and pin data to the server.
      */
     public static final String KEY_SESSION_ATTRIBUTE_UPLOAD = "key_session_attribute_upload";
     /**
-     * 记录当前账号是否已经成功获取过静音列表和置顶列表
+     * Whether this account has already fetched the mute list and the pin list.
      */
     public static final String KEY_SESSION_ATTRIBUTE = "key_session_attribute";
     /**
-     * @所有人时的用户名
+     * Username used for "@ everyone".
      */
     public static final String AT_ALL_USERNAME = "@all";
     /**
-     * 清除通知栏指定用户通知
+     * Clear the notifications of a given user from the status bar.
      */
     public static final String KEY_CANCEL_USERNAME = "key_cancel_username";
 

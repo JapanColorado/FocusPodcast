@@ -1141,8 +1141,8 @@ class PlayPauseProgressButton : View, ItemActionButton {
                 sendLocalBroadcast(context!!, PlaybackService.ACTION_PAUSE_PLAY_CURRENT_EPISODE)
             }
         } else {
-            //需要这行，考虑这种情况app备份数据（item文件已下载），恢复后数据库显示已下载但是文件实际不存在
-            //这种情况太少见了，所以稳定起见，只是继续往下执行
+            //this is needed for the case where the app backs up its data (with the item already downloaded) and, after restoring, the database says downloaded while the file is actually gone
+            //that case is rare enough that, for stability, we just carry on
             // Only repair media that claims to be downloaded. Local folder feeds use content://
             // URIs that cannot be checked here, and never-downloaded items have nothing to fix.
             val isLocalFeed = feedItem?.feed?.isLocalFeed == true
@@ -1150,7 +1150,7 @@ class PlayPauseProgressButton : View, ItemActionButton {
                 DBTasks.notifyMissingFeedMediaFile(context, media)
             }
             if (!media.fileExists()) {
-                //使用流式播放弹窗提醒
+                //prompt before falling back to streaming
                 UsageStatistics.logAction(UsageStatistics.ACTION_STREAM)
                 if (!NetworkUtils.isStreamingAllowed()) {
                     UseStreamConfirmDialog(context!!, media).show()

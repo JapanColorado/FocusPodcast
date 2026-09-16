@@ -15,7 +15,7 @@ public class AccentSwipeRefreshLayout extends SwipeRefreshLayout {
 
     public AccentSwipeRefreshLayout(Context context, AttributeSet attributeSet) {
         super(context, attributeSet);
-        //设置为强调色
+        // Use the accent color
         setColorSchemeColors(ThemeStore.accentColor(context));
     }
 

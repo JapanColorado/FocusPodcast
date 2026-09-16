@@ -16,7 +16,7 @@ open class BaseApplication: MultiDexApplication() {
     private fun setLog() {
         Timber.plant(object : Timber.DebugTree() {
             override fun log(priority: Int, tag: String?, message: String?, t: Throwable?) {
-                //release版本输出d以及以上的日志
+                // Release builds log debug level and above
                 if (BuildConfig.DEBUG || priority >= 3) {
                     super.log(priority, tag, message, t)
                 }
@@ -32,7 +32,7 @@ open class BaseApplication: MultiDexApplication() {
     var activityCounter = 0
     var onFront = false
 
-    //判断App是否在后台运行
+    // Whether the app is running in the background
     fun isAppRunningBackground(): Boolean {
         var flag = false
         if (activityCounter == 0) {
@@ -42,7 +42,7 @@ open class BaseApplication: MultiDexApplication() {
     }
 
     /**
-     * 判断App是否是从后台到前台
+     * Whether the app just came from the background to the foreground.
      */
     fun isAppOnFront(): Boolean {
         return onFront
@@ -50,8 +50,8 @@ open class BaseApplication: MultiDexApplication() {
 
     /**
      *
-     * 判断某activity是否处于栈顶
-     * @return true在栈顶 false不在栈顶
+     * Whether the given activity is on top of the stack.
+     * @return true if it is on top, false otherwise
      */
     private fun isActivityTop(cls: Class<*>, context: Context): Boolean {
         val manager: ActivityManager =
@@ -66,7 +66,7 @@ open class BaseApplication: MultiDexApplication() {
 
         override fun onActivityStarted(activity: Activity) {
             activityCounter++
-            //数值从0 变到 1 说明是从后台切到前台
+            // Going from 0 to 1 means we came from the background to the foreground
             onFront = activityCounter == 1
         }
 
@@ -96,7 +96,7 @@ open class BaseApplication: MultiDexApplication() {
         setLog()
         RxJavaErrorHandlerSetup.setupRxJavaErrorHandler()
         if(needInitDefaultWallpaperAccent()){
-            //系统壁纸监听只会执行一次，可能交给实现类去注册回调
+            // The system wallpaper listener is registered only once; subclasses may register the callback themselves
             wallpaperAccentManager.init()
         }
 

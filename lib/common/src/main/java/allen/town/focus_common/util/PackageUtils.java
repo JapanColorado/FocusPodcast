@@ -41,7 +41,7 @@ public class PackageUtils {
     }
 
     /**
-     * 获取版本号
+     * Get the version code.
      *
      * @param context
      * @return
@@ -89,7 +89,7 @@ public class PackageUtils {
     }
 
     /**
-     * 获取应用程序名称
+     * Get the application name.
      */
     private static String appName;
 

@@ -25,7 +25,7 @@ import okhttp3.Request;
 import okhttp3.Response;
 
 /**
- * 获取itunes top
+ * Fetches the iTunes top list
  */
 public class ItunesCategoryTopLoader {
     private static final String TAG = "ITunesTopListLoader";
@@ -75,7 +75,7 @@ public class ItunesCategoryTopLoader {
      * @throws IOException
      */
     private String getTopListFeed(OkHttpClient client, String country, int limit, int categoryCode) throws IOException {
-        /*https://itunes.apple.com/CN/rss/toppodcasts/genre=1306/limit=12/json，这个参数内容不一样，genre与流派有关，是可选的。我猜想，这默认为 "所有流派 "是不存在的。
+        /*https://itunes.apple.com/CN/rss/toppodcasts/genre=1306/limit=12/json - the contents differ per parameter. "genre" selects the genre and is optional; presumably it defaults to "all genres", which does not exist as its own id.
 
         1301 Arts
         1302 Society & Culture
@@ -88,18 +88,18 @@ public class ItunesCategoryTopLoader {
         1310 Music
         1311 News & Politics
         1314 Religion & Spirituality
-        1315 Science & Medicine 好像不是
-        1316 Sports & Recreation 好像不是
+        1315 Science & Medicine (apparently wrong)
+        1316 Sports & Recreation (apparently wrong)
         1318 Technology
-        1320 旅游
+        1320 Travel
         1321 Business
-        1323 Games & Hobbies 好像不是
+        1323 Games & Hobbies (apparently wrong)
         1324 Society & Culture
-        1325 Government 好像不是
-        新的api接口在这里 https://affiliate.itunes.apple.com/resources/documentation/itunes-store-web-service-search-api/
-        好像是404了
+        1325 Government (apparently wrong)
+        The new API is documented at https://affiliate.itunes.apple.com/resources/documentation/itunes-store-web-service-search-api/
+        (that link appears to 404 now)
         https://developer.apple.com/library/archive/documentation/AudioVideo/Conceptual/iTuneSearchAPI/Searching.html#//apple_ref/doc/uid/TP40017632-CH5-SW1
-        通过https://itunes.apple.com/WebObjects/MZStoreServices.woa/ws/genres?id=26先获取分类列表
+        Fetch the category list first via https://itunes.apple.com/WebObjects/MZStoreServices.woa/ws/genres?id=26
 
          */
         String url = "https://itunes.apple.com/%s/rss/toppodcasts" + (categoryCode > 0 ? "/genre=" + categoryCode : "") + "/limit=" + limit + "/explicit=true/json";

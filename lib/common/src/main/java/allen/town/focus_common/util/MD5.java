@@ -149,21 +149,21 @@ public class MD5 {
     private static final String MD5 = "MD5";
 
     /**
-     * 对输入字符串进行md5散列.
+     * MD5-hash the input string.
      */
     private static byte[] md5(byte[] input) {
         return digest(input, MD5, null, 1);
     }
 
     /**
-     * 对文件进行md5散列.
+     * MD5-hash the file.
      */
     private static byte[] md5(InputStream input) throws IOException {
         return digest(input, MD5);
     }
 
     /**
-     * 对字符串进行散列, 支持md5与sha1算法.
+     * Hash a string; md5 and sha1 are supported.
      */
     private static byte[] digest(byte[] input, String algorithm, byte[] salt, int iterations) {
         try {

@@ -19,7 +19,6 @@ object LottieHelper {
 
     @JvmStatic
     fun getRandomLottieFileName():String{
-        //随机播放一个动画
         val size: Int = lottieAmiList.size
         return lottieAmiList[Random().nextInt(size)]
     }

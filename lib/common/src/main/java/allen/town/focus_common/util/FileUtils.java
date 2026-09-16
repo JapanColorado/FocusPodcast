@@ -84,7 +84,7 @@ public class FileUtils {
 
 
     /**
-     * 获取手机的总内存
+     * Get the device's total memory.
      *
      * @param context
      * @return
@@ -93,7 +93,7 @@ public class FileUtils {
 
     /**
      * rename file or move file to another place
-     * 从data目录拷贝到sd上不能使用该方法，应使用copyfile
+     * Cannot be used to copy from the data directory to the SD card; use copyFile for that.
      *
      * @param originalPath
      * @param targetPath
@@ -149,11 +149,11 @@ public class FileUtils {
     }
 
     /**
-     * 删除单个文件
-     * 视频和图片的缩率图不删除
+     * Delete a single file.
+     * Video and image thumbnails are kept.
      *
-     * @param fileName 被删除文件的文件名
-     * @return 单个文件删除成功返回true, 否则返回false
+     * @param fileName name of the file to delete
+     * @return true if the file was deleted, false otherwise
      */
     private static boolean deleteFile(String fileName) {
         if (fileName == null) {
@@ -168,46 +168,46 @@ public class FileUtils {
     }
 
     /**
-     * 删除目录（文件夹）以及目录下的文件
+     * Delete a directory and everything inside it.
      *
-     * @param dir 被删除目录的文件路径
-     * @return 目录删除成功返回true, 否则返回false
+     * @param dir path of the directory to delete
+     * @return true if the directory was deleted, false otherwise
      */
     public static boolean deleteDirectory(String dir) {
         if (dir == null) {
             return false;
         }
-        // 如果dir不以文件分隔符结尾，自动添加文件分隔符
+        // Append a file separator if dir does not end with one
         if (!dir.endsWith(File.separator)) {
             dir = dir + File.separator;
         }
         File dirFile = new File(dir);
-        // 如果dir对应的文件不存在，或者不是一个目录，则退出
+        // Bail out if dir does not exist or is not a directory
         if (!dirFile.exists() || !dirFile.isDirectory()) {
             return false;
         }
-        // 删除文件夹下的所有文件(包括子目录)
+        // Delete everything under the directory (subdirectories included)
         File[] files = dirFile.listFiles();
         if (files != null) {
             for (int i = 0; i < files.length; i++) {
-                // 删除子文件
+                // Delete the child file
                 if (files[i].isFile()) {
                     deleteFile(files[i].getAbsolutePath());
                 }
-                // 删除子目录
+                // Delete the child directory
                 else {
                     deleteDirectory(files[i].getAbsolutePath());
                 }
             }
         }
 
-        // 删除当前目录
+        // Delete the directory itself
         return dirFile.delete();
 
     }
 
     /**
-     * 从data目录拷贝到sd上不能使用该方法，应使用copyfile
+     * Cannot be used to copy from the data directory to the SD card; use copyFile for that.
      *
      * @param originalPath
      * @param targetFolder
@@ -257,25 +257,25 @@ public class FileUtils {
             }
         }
         try {
-            // 新建文件输入流并对它进行缓冲
+            // Buffered file input stream
             inBuff = new BufferedInputStream(inputStream);
 
-            // 新建文件输出流并对它进行缓冲
+            // Buffered file output stream
             outBuff = new BufferedOutputStream(new FileOutputStream(targetPath));
 
-            // 缓冲数组
+            // Transfer buffer
             byte[] b = new byte[1024 * 5];
             int len;
             while ((len = inBuff.read(b)) != -1) {
                 outBuff.write(b, 0, len);
             }
-            // 刷新此缓冲的输出流
+            // Flush the buffered output stream
             outBuff.flush();
         } catch (Exception e) {
             Timber.e("copyFile failed cause " + e.toString());
             isCopySuccess = false;
         } finally {
-            // 关闭流
+            // Close the streams
             try {
                 if (inBuff != null)
                     inBuff.close();
@@ -289,7 +289,7 @@ public class FileUtils {
     }
 
     public static boolean copyFile(String originalPath, String targetPath) {
-        Timber.d("copyFile，originalPath：" + originalPath
+        Timber.d("copyFile, originalPath: " + originalPath
                 + ",targetPath:" + targetPath);
         BufferedInputStream inBuff = null;
         BufferedOutputStream outBuff = null;
@@ -303,25 +303,25 @@ public class FileUtils {
             }
         }
         try {
-            // 新建文件输入流并对它进行缓冲
+            // Buffered file input stream
             inBuff = new BufferedInputStream(new FileInputStream(originalPath));
 
-            // 新建文件输出流并对它进行缓冲
+            // Buffered file output stream
             outBuff = new BufferedOutputStream(new FileOutputStream(targetPath));
 
-            // 缓冲数组
+            // Transfer buffer
             byte[] b = new byte[1024 * 5];
             int len;
             while ((len = inBuff.read(b)) != -1) {
                 outBuff.write(b, 0, len);
             }
-            // 刷新此缓冲的输出流
+            // Flush the buffered output stream
             outBuff.flush();
         } catch (Exception e) {
             Timber.e("copyFile failed cause " + e.toString());
             isCopySuccess = false;
         } finally {
-            // 关闭流
+            // Close the streams
             try {
                 if (inBuff != null)
                     inBuff.close();
@@ -354,7 +354,7 @@ public class FileUtils {
 
         StringBuffer sb = new StringBuffer();
         try {
-            fis = new FileInputStream(file);//通过字节流获取
+            fis = new FileInputStream(file);// read through a byte stream
             isr = new InputStreamReader(fis);
             br = new BufferedReader(isr);
 
@@ -391,7 +391,7 @@ public class FileUtils {
     }
 
     /**
-     * 获取文件大小，不是文件夹
+     * Get the size of a file (not a directory).
      *
      * @param f
      * @return
@@ -535,8 +535,8 @@ public class FileUtils {
     public static String queryImagePath(final Context context, final Uri uri) {
         String path = null;
         if (uri != null) {
-            //这里可能大部分场景都没有用了，Permission Denial: opening provider android.support.v4.content.FileProvider from ProcessRecord
-            //8.0以后都是通过FileProvider提供的该Uri，但是提供该Uri的app如果没有给我们的app授权我们是无法访问此Uri的
+            // Probably dead code in most cases now: Permission Denial: opening provider android.support.v4.content.FileProvider from ProcessRecord
+            // Since 8.0 this Uri comes from a FileProvider, and we cannot read it unless the app that handed it over granted us permission
             Cursor cursor = context.getContentResolver().query(uri, new String[]{MediaStore.Images.Media.DATA}, null, null, null);
             if (cursor != null) {
                 int index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
@@ -615,7 +615,7 @@ public class FileUtils {
     }
 
     /**
-     * 获取文件夹或者文件大小，都可以
+     * Get the size of a file or of a directory.
      *
      * @param file
      * @return
@@ -625,7 +625,7 @@ public class FileUtils {
     }
 
     /**
-     * 获取文件夹或者文件大小，都可以
+     * Get the size of a file or of a directory.
      *
      * @param filePath
      * @return
@@ -641,14 +641,14 @@ public class FileUtils {
             }
         } catch (Exception e) {
             Timber.e(e, "");
-            Timber.e("获取文件大小", "获取失败!");
+            Timber.e("get file size", "failed!");
         }
         return blockSize;
     }
 
 
     /**
-     * 获取指定文件夹
+     * Get the total size of the given directory.
      *
      * @param f
      * @return
@@ -670,7 +670,7 @@ public class FileUtils {
     }
 
     /**
-     * 判断视频是否小于100M，大于100M不能上传
+     * Whether the video is at most 100 MB; anything larger cannot be uploaded.
      *
      * @param size
      * @return
@@ -680,7 +680,7 @@ public class FileUtils {
     }
 
     /**
-     * 视频需要需要压缩uploadFileToShare
+     * Whether the video has to be compressed for uploadFileToShare.
      *
      * @return
      */
@@ -693,7 +693,7 @@ public class FileUtils {
     }
 
     /**
-     * 转换文件大小
+     * Format a file size for display.
      *
      * @param fileS
      * @return
@@ -880,11 +880,11 @@ public class FileUtils {
     private static int BUFFER_SIZE = 8 * 1024;
 
     /**
-     * 文件留拷贝
+     * Copy a stream.
      *
      * @param is
      * @param os
-     * @return 拷贝的文件大小
+     * @return number of bytes copied
      * @throws IOException
      */
     public static long copy(InputStream is, OutputStream os) throws IOException {
@@ -947,7 +947,7 @@ public class FileUtils {
                         long fileSize = cursor.getLong(sizeIndex);
                         path = context.getExternalCacheDir() + File.separator + MD5.MD5Hash(uri.toString()) + File.separator + fileName;
                         File file = new File(path);
-                        //文件存在，直接返回
+                        // File already there, return it as is
                         if (file.exists()) {
                             if (fileSize == file.length()) {
                                 return path;

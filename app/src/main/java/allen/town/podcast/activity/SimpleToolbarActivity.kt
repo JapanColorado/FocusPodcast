@@ -39,7 +39,7 @@ abstract class SimpleToolbarActivity : ToolbarBaseActivity() {
         AppCompatDelegate.setDefaultNightMode(ThemeManager.getNightMode(application))
 
         if (BasePreferenceUtil.circlePlayButton) {
-            //开启后上下文菜单背景和图标显示异常所以关闭
+            //enabling this breaks the context menu background and icons, so it stays off
             setTheme(R.style.CircleFABOverlay)
         }
     }
@@ -53,6 +53,6 @@ abstract class SimpleToolbarActivity : ToolbarBaseActivity() {
             Locale.forLanguageTag(code)
         }
         super.attachBaseContext(LanguageContextWrapper.wrap(newBase, locale))
-        //和Android APP Bundle有关，加载资源用的，对apk方式有没有影响
+        //related to Android App Bundles; used for loading resources. Unclear whether it affects plain APK builds.
     }
 }

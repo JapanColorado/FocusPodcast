@@ -20,7 +20,7 @@ public class LockableBottomSheetBehavior<V extends View> extends ViewPagerBottom
     }
 
     /**
-     * 禁止滑动
+     * Disable dragging
      * @param locked
      */
     public void setLocked(boolean locked) {

@@ -281,7 +281,7 @@ class LocalSearchFragment constructor() : Fragment() {
 //        progressBar.setVisibility(View.VISIBLE);
         emptyViewHandler!!.hide()
         if (requireArguments().getLong(ARG_FEED, 0) == 0L) {
-            //订阅源下面搜索不显示
+            //not shown when searching within a feed
 //            feedSkeleton.showSkeleton();
         }
         //        itemSkeleton.showSkeleton();

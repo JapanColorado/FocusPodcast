@@ -25,7 +25,7 @@ public class ShortCutUtils {
     }
 
     /**
-     * 创建shortcut快捷方式
+     * Create a launcher shortcut.
      * @param context
      * @param str
      * @param bitmap
@@ -48,7 +48,7 @@ public class ShortCutUtils {
     }
 
     /**
-     * 创建shortcut快捷方式
+     * Create a launcher shortcut.
      * @param context
      * @param str
      * @param drawable

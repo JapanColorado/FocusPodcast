@@ -17,7 +17,7 @@ import allen.town.podcast.model.feed.FeedItem;
 import allen.town.podcast.model.feed.SortOrder;
 
 /**
- * 通过规则排序 {@link FeedItem} .
+ * Sorts {@link FeedItem} lists according to a rule.
  */
 public class FeedItemPermutors {
 

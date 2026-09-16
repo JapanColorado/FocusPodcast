@@ -8,7 +8,7 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
-        <!-- colorSurface可能被重写了，加上这个背景反而不对 -->
+        <!-- colorSurface may be overridden, so adding this background actually looks wrong -->
         <allen.town.focus_common.views.AccentTabLayout
             android:id="@+id/sliding_tabs"
             android:layout_width="match_parent"

@@ -40,8 +40,8 @@ public class BrowserLauncher {
             customTabsIntent.launchUrl(context, uri);
         } catch (Exception e) {
             //https://blog.csdn.net/baodinglaolang/article/details/52192414
-            //发现这个问题android.os.FileUriExposedException: file://player.bilibili.com/player.html?aid=245158683&bvid=BV1Uv41167HC&cid=254301627&page=1 exposed beyond app through Intent.getData()
-            //导致打开网页白屏并且打开其他的文章也是白屏加载进度总是10%所以捕获异常
+            // Seen in the wild: android.os.FileUriExposedException: file://player.bilibili.com/player.html?aid=245158683&bvid=BV1Uv41167HC&cid=254301627&page=1 exposed beyond app through Intent.getData()
+            // which leaves the page blank and makes every other article load blank stuck at 10%, so catch it
             Timber.e(e, "openCustomTab");
             return false;
         }

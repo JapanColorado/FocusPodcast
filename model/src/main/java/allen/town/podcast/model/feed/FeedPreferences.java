@@ -179,7 +179,7 @@ public class FeedPreferences implements Serializable {
     }
 
     /**
-     * 音量下降
+     * Volume reduction setting.
      * @return
      */
     public VolumeAdaptionSetting getVolumeAdaptionSetting() {

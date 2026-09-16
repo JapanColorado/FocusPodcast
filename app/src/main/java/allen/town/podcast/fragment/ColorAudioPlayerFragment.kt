@@ -11,7 +11,7 @@ import allen.town.focus_common.extensions.applyColor
 import allen.town.podcast.event.CoverColorChangeEvent
 
 /**
- * 有个bug，如果有章节，点击了菜单的更多，然后切换颜色不会变化，再点击更多恢复正常
+ * Known bug: when chapters are present, tapping the overflow menu and then switching the color has no effect; tapping overflow again fixes it.
  */
 class ColorAudioPlayerFragment : AudioPlayerFragment(false) {
     override fun coverColorUpdate(event: CoverColorChangeEvent) {

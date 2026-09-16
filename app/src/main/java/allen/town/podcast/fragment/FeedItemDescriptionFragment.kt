@@ -27,7 +27,7 @@ import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 
 /**
- * 显示曲目 shownote
+ * Displays the episode show notes
  */
 class FeedItemDescriptionFragment : Fragment() {
     private lateinit var webvDescription: PodWebView
@@ -54,7 +54,7 @@ class FeedItemDescriptionFragment : Fragment() {
         webvDescription.setWebChromeClient(object : WebChromeClient() {
             override fun onProgressChanged(view: WebView, newProgress: Int) {
                 super.onProgressChanged(view, newProgress)
-                //根据过往经验，这个回调是一定会执行的
+                //past experience shows this callback always fires
                 if (newProgress == 100) {
                     skeletonLayout.setVisibility(View.GONE)
                 }

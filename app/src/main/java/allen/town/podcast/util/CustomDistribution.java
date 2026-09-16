@@ -52,7 +52,7 @@ public final class CustomDistribution {
     public static final String MIGRATE_JSON = "migrate.json";
 
 
-    //begin:xlog 放在data目录是防止用户清理了日志
+    //begin:xlog - kept in the data directory so the user cannot wipe the logs
     final static String XLOG_CACHE_FOLDER = PRIVATE_FILE_PATH + File.separator + "xlogCache";
     public final static String XLOG_FOLDER = PRIVATE_FILE_PATH
             + File.separator + "xlogs";
@@ -65,12 +65,12 @@ public final class CustomDistribution {
     public final static String LOGS_FOLDER = SDCARD_ROOT
             + File.separator + LOGS;
 
-    //增加一个新的文件夹的话在{@link FOLDER_LIST}中声明，程序自动创建
+    //to add a new folder, declare it in {@link FOLDER_LIST} and it is created automatically
     public final static String VIDEO_FOLDER = SDCARD_ROOT
             + File.separator + "videos";
     public final static String RECORD_FOLDER = SDCARD_ROOT
             + File.separator + RECORDER;
-    //这里改成data目录后7.0版本以下无法拍照,不能随意修改,此外从sdcard只能拷贝到data,rename会失败
+    //moving this to the data directory breaks taking photos below Android 7.0, so do not change it lightly; also, sdcard content can only be copied to data, rename fails
     public final static String IMAGE = "Image";
     public final static String IMAGE_FOLDER = SDCARD_ROOT + File.separator + IMAGE;
     private final static String ROTATE_IMAGE_FOLDER = SDCARD_ROOT + File.separator + "rotateImage";
@@ -85,7 +85,7 @@ public final class CustomDistribution {
             + File.separator + "sysApps";
     public final static String CIRCLE_FOLDER = SDCARD_ROOT
             + File.separator + "Circle";
-    //这里必须保存到sdcard中
+    //this must be stored on the sdcard
     public final static String PICTURE_FOLDER = SDCARD_ROOT
             + File.separator + "picture";
     public final static String AD_FOLDER = SDCARD_ROOT
@@ -147,7 +147,7 @@ public final class CustomDistribution {
      * @return the default wizard info
     //     */
 //    public static WizardInfo getCustomDistributionWizard() {
-//        // modified by txp,2013-5-7 默认向导为nv
+//        // modified by txp,2013-5-7 default wizard is nv
 //        return WizardUtils.getWizardClass(WizardUtils.NV_WIZARD_TAG);
 //    }
 

@@ -11,10 +11,10 @@ import androidx.recyclerview.widget.RecyclerView
 
 /**
  * Used by Recyclerviews that need to provide ability to select items.
- * 只有使用了系统默认actionbar主题，并且使用startSupportActionMode(使用这个menu可以显示超过2个，否则只能显示2个，其他的折叠了)才能使toolbar正常被覆盖
+ * The toolbar is only overlaid correctly with the system default action bar theme plus startSupportActionMode (which also lets the menu show more than 2 items; otherwise only 2 are shown and the rest collapse).
  */
 abstract class MultiSelectAdapter<T : RecyclerView.ViewHolder?>(
-    private val activity: AppCompatActivity, //0代表没有
+    private val activity: AppCompatActivity, //0 means none
     @param:MenuRes private val menuResId: Int
 ) : RecyclerView.Adapter<T>() {
     private var actionMode: ActionMode? = null

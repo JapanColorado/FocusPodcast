@@ -60,14 +60,14 @@ object TopSnackbarUtil {
                     val textView =
                         snackbarView.findViewById(com.androidadvance.topsnackbar.R.id.snackbar_text) as TextView
                     val marginLayoutParams = (textView.layoutParams as? LinearLayout.LayoutParams)
-                    //设置margintop的值大约是导航栏的值，设置paddingtop没效果
+                    // The top margin is roughly the navigation bar height; setting paddingTop has no effect
                     marginLayoutParams?.topMargin = dp2Px(this, 18f)
                     textView.textSize = 16f
                     textView.setTextColor(Color.WHITE)
                     snackbar.show()
 
                 } catch (e: Exception) {
-                    //如果遇到异常降级为Toast处理
+                    // Fall back to a Toast on error
                     Timber.i("show toast instead")
                     Toast.makeText(
                         activity,
