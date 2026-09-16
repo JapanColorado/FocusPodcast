@@ -7,7 +7,6 @@ import android.os.Parcelable;
 
 import androidx.core.content.ContextCompat;
 
-import allen.town.focus_common.ad.InterstitialAdManager;
 import allen.town.podcast.core.service.playback.PlaybackService;
 import allen.town.podcast.model.playback.Playable;
 
@@ -45,9 +44,6 @@ public class PlaybackServiceStarter {
     public void start() {
         if (PlaybackService.isRunning && !callEvenIfRunning) {
             return;
-        }
-        if (context instanceof Activity) {
-            InterstitialAdManager.loadAd((Activity) context, true);
         }
         ContextCompat.startForegroundService(context, getIntent());
     }

@@ -45,14 +45,6 @@
             app:layout_behavior="allen.town.podcast.view.LockableBottomSheetBehavior" />
 
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
-        <FrameLayout
-            android:id="@+id/bottom_adView"
-            android:layout_width="wrap_content"
-            android:visibility="gone"
-            android:layout_height="60dp"
-            android:layout_centerHorizontal="true"
-            android:layout_alignParentBottom="true">
-        </FrameLayout>
     </LinearLayout>
 
 </LinearLayout>

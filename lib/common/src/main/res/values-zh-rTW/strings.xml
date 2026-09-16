@@ -41,8 +41,6 @@
     <string name="others_app_of_us">我們的其他應用</string>
     <string name="check_upgrade">檢查更新</string>
 
-    <string name="disable_firebase_crashlytics_title">禁用 firebase crashlytics</string>
-    <string name="disable_firebase_crashlytics_summary">我建議保留此選項，這會幫助我分析app的問題</string>
 
     <string name="cancel_any_time">%1$s，隨時取消</string>
     <string name="premium_pro_tip">您的高級會員身份已激活</string>

@@ -160,8 +160,6 @@ public class CustomCrashHandler implements Thread.UncaughtExceptionHandler {
     }
 
     private void reportToBugly(Throwable ex) {
-        Crashlytics.getInstance().recordException(ex);
-        //java.net.UnknownHostException不会被记录，如果发现这里堆栈为空，那么就是这个异常，网络不可用
         Timber.e(ex, "report");
     }
 

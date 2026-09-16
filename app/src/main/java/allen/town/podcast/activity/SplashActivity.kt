@@ -1,6 +1,5 @@
 package allen.town.podcast.activity
 
-import allen.town.focus_common.crash.Crashlytics
 import allen.town.focus_common.util.Timber
 import allen.town.focus_common.util.TopSnackbarUtil.showSnack
 import allen.town.podcast.R
@@ -44,7 +43,6 @@ class SplashActivity : AppCompatActivity() {
                     }, 200)
                 }) { error: Throwable ->
                 Timber.e(error, "init")
-                Crashlytics.getInstance().recordException(error)
                 showSnack(this, error.localizedMessage, Toast.LENGTH_LONG)
                 finish()
             }

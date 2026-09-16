@@ -1,17 +1,11 @@
 package allen.town.podcast.activity
 
-import allen.town.focus_common.ad.BannerAdManager
-import allen.town.focus_common.ad.ConsentRequestManager
-import allen.town.focus_common.ad.InterstitialAdManager
-import allen.town.focus_common.ad.RewardedAdManager
-import allen.town.focus_common.dialog.RatingDialog
 import allen.town.focus_common.extensions.notificationRequestCode
 import allen.town.focus_common.extensions.requestNotificationPermission
 import allen.town.focus_common.extensions.setLightNavigationBarAuto
 import allen.town.focus_common.extensions.setLightStatusBarAuto
 import allen.town.focus_common.extensions.setNavigationBarColor
 import allen.town.focus_common.extensions.surfaceColor
-import allen.town.focus_common.inappupdate.InAppPlayUpdateUtil.checkGooglePlayInAppUpdate
 import allen.town.focus_common.util.BasePreferenceUtil.libraryCategory
 import allen.town.focus_common.util.BasePreferenceUtil.materialYou
 import allen.town.focus_common.util.RetroUtil
@@ -70,7 +64,6 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup.MarginLayoutParams
 import android.widget.EditText
-import android.widget.FrameLayout
 import android.widget.Toast
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
@@ -106,7 +99,6 @@ class MainActivity : SimpleToolbarActivity(), OnSharedPreferenceChangeListener {
     private var drawerLayout: DrawerLayout? = null
     private var drawerToggle: ActionBarDrawerToggle? = null
     private lateinit var navDrawer: View
-    private lateinit var bottomAdView: FrameLayout
     var bottomSheet: BottomSheetBehavior<View>? = null
         private set
     private var lastBackButtonPressTime: Long = 0
@@ -141,7 +133,6 @@ class MainActivity : SimpleToolbarActivity(), OnSharedPreferenceChangeListener {
             .registerOnSharedPreferenceChangeListener(this)
         drawerLayout = findViewById(R.id.drawer_layout)
         navDrawer = findViewById(R.id.navDrawerFragment)
-        bottomAdView = findViewById(R.id.bottom_adView)
         setNavDrawerSize()
         Timber.d("app version %s , %s", BuildConfig.VERSION_NAME, BuildConfig.VERSION_CODE)
         Timber.d("Android: " + Build.VERSION.RELEASE + " " + Build.MANUFACTURER + " " + Build.MODEL)
@@ -213,10 +204,6 @@ class MainActivity : SimpleToolbarActivity(), OnSharedPreferenceChangeListener {
             AutoUpdateManager.runImmediate(this)
         }
 
-        //不要放在onresume中，否则即使点击不更新会一直走这个回调并且弹窗
-        checkGooglePlayInAppUpdate(this, BuildConfig.VERSION_CODE)
-        RewardedAdManager.loadRewardedAd(this)
-        InterstitialAdManager.loadAd(this)
         requestNotificationPermission()
     }
 
@@ -595,18 +582,10 @@ class MainActivity : SimpleToolbarActivity(), OnSharedPreferenceChangeListener {
         }
     }
 
-    public override fun onStart() {
-        super.onStart()
-        RatingDialog.init(this)
-    }
-
     override fun onResume() {
         super.onResume()
         StorageUtils.checkStorageAvailability(this)
         handleNavIntent()
-        RatingDialog.check()
-        ConsentRequestManager().showConsentForm(this)
-        BannerAdManager.showBannerAd(this, bottomAdView)
     }
 
     override fun onStop() {

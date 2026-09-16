@@ -1,6 +1,5 @@
 package allen.town.focus_common
 
-import allen.town.focus_common.ad.AppOpenAdManager
 import allen.town.focus_common.crash.CustomCrashHandler
 import allen.town.focus_common.error.RxJavaErrorHandlerSetup
 import allen.town.focus_common.util.BasePreferenceUtil
@@ -13,29 +12,8 @@ import android.os.Bundle
 import androidx.multidex.MultiDexApplication
 import com.wyjson.router.GoRouter
 
-const val PRODUCT_CHINA = "free"
-const val PRODUCT_DROID = "fdroid"
 open class BaseApplication: MultiDexApplication() {
     open val wallpaperAccentManager = WallpaperAccentManager(this)
-    var isAlipay = false
-    var isDroid = false
-    open var needOpenPurchaseWhenAppOpen = false
-
-    //打开开关后调试支付宝支付,上线前一定要置为false
-    private val debugAlipay = false
-    private fun setAlipay() {
-        if (PRODUCT_CHINA.equals(BuildConfig.FLAVOR, ignoreCase = true) || debugAlipay) {
-            isAlipay = true
-        }
-    }
-
-    private fun setDroid() {
-        if (PRODUCT_DROID.equals(BuildConfig.FLAVOR, ignoreCase = true)) {
-            isDroid = true
-        }
-    }
-
-
     private fun setArouter() {
         if (BuildConfig.DEBUG) {           // 这两行必须写在init之前，否则这些配置在init过程中将无效
             GoRouter.openDebug()   // 开启调试模式(如果在InstantRun模式下运行，必须开启调试模式！线上版本需要关闭,否则有安全风险)
@@ -54,61 +32,9 @@ open class BaseApplication: MultiDexApplication() {
         })
     }
 
-    lateinit var openAdManager: AppOpenAdManager
-    fun isAdBlockUser(): Boolean {
-        return checkAdSupporter() || isRemoveAdToady()
-    }
-
-
-    //---------------------订阅----------------------
-
-    //是否是订阅用户，不能直接读
-    protected var isSupporter = false
-
-    /**
-     * 设置是否是订阅用户
-     */
-    fun setSubSupporter(flag: Boolean) {
-        isSupporter = flag
-    }
-
-
-
-    /**
-     * 因为看了广告的临时会员，有效期不超过1小时
-     */
-    fun temporarySupporter(): Boolean {
-        return BasePreferenceUtil.isRewardAdProValid()
-    }
-
-    //--------------------去广告----------------
-    //购买了去广告
-    protected var isAdRemover = false
-
-    /**
-     * 检查是否去去广告用户（包括内购和购买了去广告）
-     */
-    private fun checkAdSupporter(): Boolean {
-        return isSupporter || isAdRemover || isDroid
-    }
-
-    fun setAdSupporter(flag: Boolean) {
-        isAdRemover = flag
-    }
-
-
-
-
     override fun onTerminate() {
         super.onTerminate()
         wallpaperAccentManager.release()
-    }
-
-    /**
-     * 看了激励广告，10分钟内不再显示广告
-     */
-    private fun isRemoveAdToady(): Boolean {
-        return BasePreferenceUtil.isRewardAdProValid()
     }
 
     var activityCounter = 0
@@ -175,12 +101,7 @@ open class BaseApplication: MultiDexApplication() {
         if (!BuildConfig.DEBUG) {
             CustomCrashHandler.getInstance().setCustomCrashHandler()
         }
-        setAlipay()
-        setDroid()
         setArouter()
-        needOpenPurchaseWhenAppOpen()
-        //--------------------------------------------------
-
         setLog()
         RxJavaErrorHandlerSetup.setupRxJavaErrorHandler()
         if(needInitDefaultWallpaperAccent()){
@@ -189,17 +110,6 @@ open class BaseApplication: MultiDexApplication() {
         }
 
         registerActivityLifecycleCallbacks(ActivityLifecycleCallbacksImpl())
-        openAdManager = AppOpenAdManager(this)
-
-    }
-
-    private fun needOpenPurchaseWhenAppOpen() {
-        //when app opened secondly, open purchase page
-        val count = BasePreferenceUtil.appOpenCount + 1
-        if (count < 3) {
-            BasePreferenceUtil.appOpenCount = count
-        }
-        needOpenPurchaseWhenAppOpen = count == 2
     }
 
     open fun needInitDefaultWallpaperAccent(): Boolean {

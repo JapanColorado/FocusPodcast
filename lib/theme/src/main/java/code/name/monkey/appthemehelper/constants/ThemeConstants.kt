@@ -27,9 +27,6 @@ object ThemeConstants {
     const val THEME_LIGHT_VALUE = "light"
     const val THEME_DARK_VALUE = "dark"
 
-    const val VIEW_VIDEO_AD_TIME = "view_video_ad_time"
-    const val REWARD_PRO_VALID_TIME = "reward_pro_valid_time"
-    const val FIRST_TO_VIEW_VIDEO_AD = "first_to_view_video"
 
     const val INTERSTITIAL_AD_TIME = "interstitial_Ad_Time"
     const val FIRST_INSTALL_AND_LAUNCH = "first_install_and_launch"
@@ -38,15 +35,8 @@ object ThemeConstants {
     const val WEBDEV_SERVER_USER = "webdev_server_user"
     const val WEBDEV_SERVER_PASS = "webdev_server_pass"
 
-    const val ADMOB_OPEN_KEY = "open"
-    const val ADMOB_REWARD_KEY = "reward"
-    const val ADMOB_BANNER_KEY = "banner"
-    const val ADMOB_INTERSTITIAL_KEY = "interstitial"
-    const val ADMOB_NATIVE_KEY = "native"
     const val TAB_TEXT_MODE = "tab_text_mode"
-    const val DISABLE_FIREBASE = "prefDisableFirebase"
 
-    const val LAST_ADMOB_CHECK = "last_admob_check"
     const val LAST_CHECK_APP_VERSION = "last_check_app_version"
 
 

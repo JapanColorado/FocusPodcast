@@ -34,8 +34,6 @@
     <string name="others_app_of_us">我们的其他应用</string>
     <string name="check_upgrade">检查更新</string>
     <string name="others">其它</string>
-    <string name="disable_firebase_crashlytics_title">禁用 firebase crashlytics</string>
-    <string name="disable_firebase_crashlytics_summary">我建议保留此选项，这会帮助我分析app的问题</string>
     <string name="restore">恢复</string>
     <string name="purchase">购买</string>
 

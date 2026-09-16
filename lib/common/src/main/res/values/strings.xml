@@ -46,8 +46,6 @@
     <string name="communication">Communication</string>
     <string name="change_log">Changelog</string>
     <string name="others">Others</string>
-    <string name="disable_firebase_crashlytics_title">Disable firebase crashlytics</string>
-    <string name="disable_firebase_crashlytics_summary">I suggest to keep this option, it will help me analyze the problem of the app</string>
     <string name="restore">Restore</string>
     <string name="purchase">Purchase</string>
     <string name="month">month</string>

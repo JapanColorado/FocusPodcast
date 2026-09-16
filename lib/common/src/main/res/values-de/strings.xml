@@ -53,8 +53,6 @@
     <string name="communication">Kommunikation</string>
     <string name="change_log">Änderungsprotokoll</string>
     <string name="others">Andere</string>
-    <string name="disable_firebase_crashlytics_title">Firebase-Crashlytics deaktivieren</string>
-    <string name="disable_firebase_crashlytics_summary">Ich schlage vor, diese Option beizubehalten, sie hilft mir, das Problem der App zu analysieren</string>
     <string name="restore">Wiederherstellen</string>
     <string name="purchase">Kauf</string>
     <string name="month">Monat</string>

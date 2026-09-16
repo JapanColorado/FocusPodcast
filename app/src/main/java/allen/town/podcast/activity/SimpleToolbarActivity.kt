@@ -54,6 +54,5 @@ abstract class SimpleToolbarActivity : CastEnabledActivity() {
         }
         super.attachBaseContext(LanguageContextWrapper.wrap(newBase, locale))
         //和Android APP Bundle有关，加载资源用的，对apk方式有没有影响
-        installSplitCompat()
     }
 }

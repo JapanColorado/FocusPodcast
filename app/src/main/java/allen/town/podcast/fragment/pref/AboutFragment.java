@@ -37,11 +37,9 @@ public class AboutFragment extends AppCompatDialogFragment {
     RelativeLayout policy;
     @BindView(R.id.version_text)
     TextView version;
-    @BindView(R.id.check_upgrade)
-    View checkUpradeView;
     @BindView(R.id.opensource)
     View opensourceView;
-    @BindViews({R.id.twitter_image, R.id.rate_image, R.id.privacy_policy_image,R.id.more_apps_of_us_image,R.id.check_upgrade_image
+    @BindViews({R.id.twitter_image, R.id.rate_image, R.id.privacy_policy_image,R.id.more_apps_of_us_image
             ,R.id.share_app_image,R.id.opensource_image})
     List<ImageView> styleButtons;
 
@@ -93,22 +91,12 @@ public class AboutFragment extends AppCompatDialogFragment {
 
     }
 
-    @OnClick(R.id.check_upgrade)
-    public void checkUpgrade() {
-        Uri parse = Uri.parse("https://www.pgyer.com/focuspodcast");
-        Intent intent = new Intent("android.intent.action.VIEW");
-        intent.setData(parse);
-        Intents.startActivity(getContext(), intent);
-
-    }
-
     @Override
     // android.support.v7.app.AppCompatDialogFragment, android.support.v4.app.DialogFragment
     public Dialog onCreateDialog(Bundle bundle) {
         View inflate = LayoutInflater.from(getActivity()).inflate(R.layout.fragment_about, (ViewGroup) null);
         ButterKnife.bind(this, inflate);
         this.version.setText(getString(R.string.version, BuildConfig.VERSION_NAME));
-        checkUpradeView.setVisibility(View.GONE);
         butterknife.ViewCollections.run(this.styleButtons, (view, i) -> ((ImageView) view)
                 .setColorFilter(ThemeStore.accentColor(getContext()), PorterDuff.Mode.SRC_IN));
         return new AccentMaterialDialog(getContext(),R.style.MaterialAlertDialogTheme).setView(inflate).create();

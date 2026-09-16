@@ -24,7 +24,6 @@ import org.greenrobot.eventbus.ThreadMode;
 import java.util.Collections;
 import java.util.List;
 
-import allen.town.focus_common.ad.InterstitialAdManager;
 import allen.town.podcast.core.feed.util.PlaybackSpeedUtils;
 import allen.town.podcast.core.pref.PlaybackPreferences;
 import allen.town.podcast.core.pref.Prefs;
@@ -352,11 +351,9 @@ public abstract class PlaybackController {
         switch (status) {
             case PLAYING:
                 playbackService.pause(true, false);
-                InterstitialAdManager.loadAd(activity,true);
                 break;
             case PAUSED:
             case PREPARED:
-                InterstitialAdManager.loadAd(activity,true);
                 playbackService.resume();
                 break;
             case PREPARING:

@@ -35,8 +35,6 @@
     <string name="others_app_of_us">その他のアプリ</string>
     <string name="check_upgrade">アップデートを確認する</string>
     <string name="others">その他</string>
-    <string name="disable_firebase_crashlytics_title">firebase crashlytics を無効にする</string>
-    <string name="disable_firebase_crashlytics_summary">アプリの問題の分析に役立つため、このオプションを保持することをお勧めします</string>
     <string name="restore">復元</string>
     <string name="purchase">購入</string>
 

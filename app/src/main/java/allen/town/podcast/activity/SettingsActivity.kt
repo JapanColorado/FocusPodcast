@@ -1,6 +1,5 @@
 package allen.town.podcast.activity
 
-import allen.town.focus_common.ad.BannerAdManager
 import allen.town.focus_common.views.AccentMaterialDialog
 import allen.town.podcast.MyApp
 import allen.town.podcast.R
@@ -13,7 +12,6 @@ import android.provider.Settings
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
-import androidx.fragment.app.FragmentContainerView
 import androidx.preference.PreferenceFragmentCompat
 import allen.town.focus_common.extensions.applyToolbar
 import code.name.monkey.retromusic.fragments.settings.ThemeSettingsFragment
@@ -42,24 +40,6 @@ open class SettingsActivity : SimpleToolbarActivity(), SearchPreferenceResultLis
         if (intent.getBooleanExtra(OPEN_AUTO_DOWNLOAD_SETTINGS, false)) {
             openScreen(R.xml.pref_auto_download)
         }
-        setPaddingBottom()
-    }
-
-    /**
-     * 为底部横幅广告预留位置
-     */
-    private fun setPaddingBottom(){
-        val mainView = findViewById<FragmentContainerView>(R.id.settingsContainer)
-        val params = mainView.layoutParams as ViewGroup.MarginLayoutParams
-        params.setMargins(
-            0,
-            0,
-            0,
-            0
-        )
-        mainView.layoutParams = params
-
-        BannerAdManager.showBannerAd(this,findViewById(R.id.bottom_adView))
     }
 
     override fun setTitle(titleId: Int) {

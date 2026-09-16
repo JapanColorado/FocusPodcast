@@ -38,8 +38,6 @@
     <string name="communication">Communication</string>
     <string name="change_log">Journal des modifications</string>
     <string name="others">Autres</string>
-    <string name="disable_firebase_crashlytics_title">Désactiver Firebase Crashlytics</string>
-    <string name="disable_firebase_crashlytics_summary">Je suggère de conserver cette option, cela m\'aidera à analyser le problème de l\'application</string>
     <string name="restore">Restaurer</string>
     <string name="purchase">Achat</string>
     <string name="month">mois</string>
