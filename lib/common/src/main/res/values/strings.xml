@@ -68,24 +68,12 @@
     <string name="then_price_year">then %1$s / year</string>
     <string name="try_it_free">Try it free</string>
 
-    <string name="billing_des">Subscription automatically renews until you cancel it in your <a
-        href='https://play.google.com/store/account/subscriptions'> Google Play account </a> anytime before the current billing period ends.</string>
-    <string name="billing_policy">Policy</string>
-    <string name="billing_terms_service">Terms of Service</string>
     <string name="thanks_purchase">Subscription successful , Thank you for your purchase</string>
 
-    <string name="input_ordid">Please enter the Alipay order number</string>
     <string name="restore_purchase">Restore Purchase</string>
     <string name="restore_tip">I already paid,click to restore purchase</string>
-    <string name="query_alipay_order_failed">query failed</string>
-    <string name="query_alipay_order_no">Transaction does not exist</string>
-    <string name="alipay_purchase">Alipay purchase</string>
     <string name="expired_time">Valid until：</string>
 
-    <string name="ali_pay_tip">Payment method:\n1. Press the volume + and power buttons at the same time to take a
-        screenshot, open Alipay and scan, select the screenshot in the album, and pay\n2. Use someone else\'s mobile phone, open Alipay, scan it, and pay</string>
-    <string name="ali_pay_time_tip">Please complete the payment within 30 minutes,Don\'t close this interface until
-        the payment is successful</string>
     <string name="google_service_not_install">Google service may not be installed , Will not be able to pay</string>
 
     <string name="subscribe_monthly">1 Month\n</string>

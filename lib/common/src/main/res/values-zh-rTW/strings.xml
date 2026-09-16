@@ -53,23 +53,11 @@
     <string name="try_it_free">免費試用</string>
 
     <string name="restore_tip">我已經付款了，點擊恢復購買</string>
-    <string name="input_ordid">請輸入支付寶訂單號</string>
     <string name="restore_purchase">恢復購買</string>
-    <string name="query_alipay_order_failed">查詢失敗</string>
-    <string name="query_alipay_order_no">交易不存在</string>
-    <string name="alipay_purchase">支付寶支付</string>
     <string name="expired_time">有效期至：</string>
-    <string name="ali_pay_tip">支付方式：\n
-1、同時按音量+和電源鍵截圖，打開支付寶掃一掃，選擇相冊中的截圖，付款即可\n
-2、用他人手機，打開支付寶掃一掃，付款即可</string>
-    <string name="ali_pay_time_tip">請在30分鐘內完成付款，付款成功以前不要關閉此界面</string>
     <string name="google_service_not_install">Google service 可能沒有安裝 , 將無法完成支付</string>
 
 
-    <string name="billing_des">訂閱自動更新，您可以在下一次自動更新前，隨時在<a
-        href='https://play.google.com/store/account/subscriptions'> Google Play賬戶 </a>中取消訂閱。</string>
-    <string name="billing_policy">政策</string>
-    <string name="billing_terms_service">服務條款</string>
     <string name="thanks_purchase">訂閱成功 ， 感謝您的購買</string>
 
     <string name="search_history">搜索歷史</string>

@@ -60,23 +60,11 @@
     <string name="then_price_year">然后 %1$s /年</string>
     <string name="try_it_free">免费试用</string>
 
-    <string name="billing_des">订阅自动更新，您可以在下一次自动更新前，随时在<a
-        href='https://play.google.com/store/account/subscriptions'> Google Play账户 </a>中取消订阅。</string>
-    <string name="billing_policy">政策</string>
-    <string name="billing_terms_service">服务条款</string>
     <string name="thanks_purchase">订阅成功 ， 感谢您的购买</string>
 
     <string name="restore_tip">我已经付款了，点击恢复购买</string>
-    <string name="input_ordid">请输入支付宝订单号</string>
     <string name="restore_purchase">恢复购买</string>
-    <string name="query_alipay_order_failed">查询失败</string>
-    <string name="query_alipay_order_no">交易不存在</string>
-    <string name="alipay_purchase">支付宝支付</string>
     <string name="expired_time">有效期至：</string>
-    <string name="ali_pay_tip">支付方式：\n
-1、同时按音量+和电源键截图，打开支付宝扫一扫，选择相册中的截图，付款即可\n
-2、用他人手机，打开支付宝扫一扫，付款即可</string>
-    <string name="ali_pay_time_tip">请在30分钟内完成付款，付款成功以前不要关闭此界面</string>
     <string name="google_service_not_install">Google service 可能没有安装 , 将无法完成支付</string>
 
     <string name="subscribe_yearly">1年\n</string>

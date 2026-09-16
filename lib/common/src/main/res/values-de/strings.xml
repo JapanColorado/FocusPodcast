@@ -74,24 +74,12 @@
     <string name="then_price">dann %1$s</string>
     <string name="then_price_year">dann %1$s / Jahr</string>
     <string name="try_it_free">Kostenlos testen</string>
-    <string name="billing_des">Abonnement verlängert sich automatisch, bis Sie es in Ihrem <a
-        href='https://play.google.com/store/account/subscriptions'> Google Play-Konto </a> jederzeit vor Ablauf des aktuellen Abrechnungszeitraums.</string>
-    <string name="billing_policy">Richtlinie</string>
-    <string name="billing_terms_service">Nutzungsbedingungen</string>
     <string name="thanks_purchase">Abonnement erfolgreich, vielen Dank für Ihren Einkauf</string>
 
-    <string name="input_ordid">Bitte geben Sie die Alipay-Bestellnummer ein</string>
     <string name="restore_purchase">Kauf wiederherstellen</string>
     <string name="restore_tip">Ich habe bereits bezahlt, klicken Sie hier, um den Kauf wiederherzustellen</string>
-    <string name="query_alipay_order_failed">Abfrage fehlgeschlagen</string>
-    <string name="query_alipay_order_no">Transaktion existiert nicht</string>
-    <string name="alipay_purchase">Alipay-Kauf</string>
     <string name="expired_time">Gültig bis：</string>
 
-    <string name="ali_pay_tip">Zahlungsmethode:\n1. Drücken Sie gleichzeitig die Tasten Lautstärke + und Ein/Aus, um eine Aufnahme zu machen
-         Screenshot, Alipay öffnen und scannen, Screenshot im Album auswählen und bezahlen\n2. Benutze das Handy einer anderen Person, öffne Alipay, scanne es und bezahle</string>
-    <string name="ali_pay_time_tip">Bitte schließen Sie die Zahlung innerhalb von 30 Minuten ab. Schließen Sie diese Schnittstelle nicht bis
-         Die Zahlung ist erfolgreich</string>
     <string name="google_service_not_install">Der Google-Dienst ist möglicherweise nicht installiert, kann nicht bezahlen</string>
 
     <string name="subscribe_monthly">1 Monat\n</string>

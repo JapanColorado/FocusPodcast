@@ -60,23 +60,11 @@
     <string name="then_price">その後 %1$s</string>
     <string name="then_price_year">その後 %1$s /年</string>
     <string name="try_it_free">無料トライアル</string>
-    <string name="billing_des">自動更新を購読できます。<a
-        href='https://play.google.com/store/account/subscriptions'> Google Play アカウント </a> で定期購入をキャンセルします。 </string>
-    <string name="billing_policy">ポリシー</string>
-    <string name="billing_terms_service">利用規約</string>
     <string name="thanks_purchase">定期購入が完了しました。ご購入いただきありがとうございます</string>
 
     <string name="restore_tip">支払いました。クリックして購入を復元します</string>
-    <string name="input_ordid">Alipay 注文番号を入力してください</string>
     <string name="restore_purchase">購入を復元</string>
-    <string name="query_alipay_order_failed">クエリが失敗しました</string>
-    <string name="query_alipay_order_no">トランザクションが存在しません</string>
-    <string name="alipay_purchase">Alipay での支払い</string>
     <string name="expired_time">有効期限:</string>
-    <string name="ali_pay_tip">支払い方法:\n
-1. 音量 + キーと電源キーを同時に押してスクリーンショットを撮り、Alipay を開いてスキャンし、アルバム内のスクリーンショットを選択して支払います\n
-2. 他人の携帯電話を使用して Alipay を開き、スキャンして支払います。</string>
-    <string name="ali_pay_time_tip">30 分以内にお支払いを完了してください。支払いが成功するまでこのインターフェースを閉じないでください。</string>
     <string name="google_service_not_install">Google サービスがインストールされず、支払いが完了しない可能性があります</string>
 
     <string name="subscribe_yearly">1 年\n</string>

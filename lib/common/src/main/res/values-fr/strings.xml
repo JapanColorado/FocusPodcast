@@ -60,23 +60,11 @@
     <string name="then_price_year">puis %1$s / an</string>
     <string name="try_it_free">Essayez-le gratuitement</string>
 
-    <string name="billing_des">L\'abonnement se renouvelle automatiquement jusqu\'à ce que vous l\'annuliez dans votre <a
-        href='https://play.google.com/store/account/subscriptions\'> compte Google Play </a> à tout moment avant la fin de la période de facturation en cours.</string>
-    <string name="billing_policy">Politique</string>
-    <string name="billing_terms_service">Conditions d\'utilisation</string>
     <string name="thanks_purchase">Abonnement réussi, merci pour votre achat</string>
-    <string name="input_ordid">Veuillez saisir le numéro de commande Alipay</string>
     <string name="restore_purchase">Restaurer l\'achat</string>
     <string name="restore_tip">J\'ai déjà payé, cliquez pour restaurer l\'achat</string>
-    <string name="query_alipay_order_failed">échec de la requête</string>
-    <string name="query_alipay_order_no">La transaction n\'existe pas</string>
-    <string name="alipay_purchase">Achat Alipay</string>
     <string name="expired_time">Valable jusqu\'au：</string>
 
-    <string name="ali_pay_tip">Méthode de paiement:\n1. Appuyez simultanément sur les boutons volume + et power pour prendre une
-         capture d\'écran, ouvrez Alipay et numérisez, sélectionnez la capture d\'écran dans l\'album et payez\n2. Utilisez le téléphone portable de quelqu\'un d\'autre, ouvrez Alipay, scannez-le et payez</string>
-    <string name="ali_pay_time_tip">Veuillez effectuer le paiement dans les 30 minutes, ne fermez pas cette interface avant
-         le paiement est réussi</string>
     <string name="google_service_not_install">Le service Google n\'est peut-être pas installé, ne pourra pas payer</string>
 
     <string name="subscribe_monthly">1 mois\n</string>

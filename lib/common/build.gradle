@@ -10,20 +10,8 @@ repositories {
 //    }
 }
 android {
-    def secrets = new Properties()
-    File secretsFile = rootProject.file('secrets.properties')
-
     defaultConfig {
         namespace "allen.town.focus_common"
-
-        if (secretsFile.exists()) {
-            secrets.load(new FileInputStream(secretsFile))
-            buildConfigField "String", "LEAN_ID", secrets['leanId']
-            buildConfigField "String", "LEAN_KEY", secrets['leanKey']
-            buildConfigField "String", "LEAN_ABROAD_ID", secrets['leanAbroadId']
-            buildConfigField "String", "LEAN_ABROAD_KEY", secrets['leanAbroadKey']
-        }
-
     }
 }
 
@@ -50,36 +38,8 @@ dependencies {
     api "com.github.Redman1037:TSnackBar:V2.0.0"
     implementation "io.reactivex.rxjava2:rxandroid:$rxAndroidVersion"
     implementation "io.reactivex.rxjava2:rxjava:$rxJavaVersion"
-    implementation "com.squareup.retrofit2:retrofit:2.9.0"
-    implementation "com.squareup.retrofit2:adapter-rxjava2:2.9.0"
-    implementation "com.squareup.retrofit2:converter-gson:2.9.0"
-
-    playApi 'com.google.firebase:firebase-crashlytics:18.2.12'
-    freeApi 'com.google.firebase:firebase-crashlytics:18.2.12'
-
     api 'com.beloo.widget:ChipsLayoutManager:0.3.7@aar'
-    playApi 'com.google.android.play:asset-delivery:2.1.0'
-    playApi 'com.google.android.play:feature-delivery:2.1.0'
-    playApi 'com.google.android.play:review:2.0.1'
-    playApi 'com.google.android.play:app-update:2.1.0'
-
-    playApi 'com.google.android.gms:play-services-ads:22.6.0'
-
-//    playImplementation 'com.google.ads.mediation:facebook:6.11.0.1'
-    playImplementation 'com.google.ads.mediation:applovin:11.4.4.0'
-    playImplementation 'com.unity3d.ads:unity-ads:4.3.0'
-    playImplementation 'com.google.ads.mediation:unity:4.3.0.0'
-    playImplementation 'com.google.ads.mediation:inmobi:10.6.0.0'
-    playImplementation 'com.google.ads.mediation:vungle:6.12.0.0'
-//    playImplementation 'com.vungle:publisher-sdk-android:6.12.0.0'
-
-
-    freeApi(name: 'csj_ad_sdk_220819', ext: 'aar')
-    freeApi(name: 'GDTSDK.unionNormal.4.500.1370', ext: 'aar')
-//    freeImplementation(name: 'ks_ad_sdk_220808', ext: 'aar')
-    freeApi(name: 'pocket_ad_sdk_3.2.0', ext: 'aar')
     api 'com.orhanobut:logger:1.15'
-    api 'com.squareup.okhttp3:logging-interceptor:3.5.0'
     implementation "androidx.lifecycle:lifecycle-extensions:$lifecycle_version"
     implementation "androidx.lifecycle:lifecycle-runtime:$lifecycle_version"
     annotationProcessor "androidx.lifecycle:lifecycle-compiler:$lifecycle_version"

@@ -27,7 +27,6 @@ android {
             }
             free {
                 dimension "market"
-                targetSdk rootProject.ext.targetFreeSdkVersion
             }
         }
 
