@@ -1,5 +1,6 @@
 package allen.town.podcast.fragment
 
+import android.annotation.SuppressLint
 import allen.town.focus_common.util.DoubleClickBackToContentTopListener
 import allen.town.focus_common.util.ImageUtils.getColoredDrawable
 import allen.town.focus_common.util.MenuIconUtil.showToolbarMenuIcon
@@ -122,6 +123,7 @@ class FeedItemlistFragment() : Fragment(), OnItemClickListener, Toolbar.OnMenuIt
     private lateinit var subscribe_button: SubscribeButton
     private var isDownloadingFeed = false
     private var updateDownloadStatus: Disposable? = null
+    private val uiHandler = Handler(Looper.getMainLooper())
     private var iconTintManager: FeedItemListToolbarIconTintHelper? = null
     private lateinit var appBar: AppBarLayout
     private lateinit var skeletonRecyclerDelay: SkeletonRecyclerDelay
@@ -232,7 +234,7 @@ class FeedItemlistFragment() : Fragment(), OnItemClickListener, Toolbar.OnMenuIt
                 Timber.e("not going to refresh feed becasue is null")
             }
 
-            Handler(Looper.getMainLooper()).postDelayed(
+            uiHandler.postDelayed(
                 Runnable { swipeRefreshLayout.setRefreshing(false) },
                 getResources().getInteger(R.integer.swipe_to_refresh_duration_in_ms).toLong()
             )
@@ -274,6 +276,7 @@ class FeedItemlistFragment() : Fragment(), OnItemClickListener, Toolbar.OnMenuIt
 
     override fun onDestroyView() {
         super.onDestroyView()
+        uiHandler.removeCallbacksAndMessages(null)
         //restore when the screen is closed
         onPanelCollapsed((activity as AppCompatActivity?)!!)
         EventBus.getDefault().unregister(this)
@@ -298,7 +301,7 @@ class FeedItemlistFragment() : Fragment(), OnItemClickListener, Toolbar.OnMenuIt
     }
 
     private val updateRefreshMenuItemChecker = UpdateRefreshMenuItemChecker {
-        DownloadService.isRunning && DownloadService.isDownloadingFile(
+        DownloadService.isRunning() && DownloadService.isDownloadingFile(
             feed!!.getDownload_url()
         )
     }
@@ -708,6 +711,7 @@ class FeedItemlistFragment() : Fragment(), OnItemClickListener, Toolbar.OnMenuIt
     }
 
     private var finalGetFeedUrl = false
+    @SuppressLint("CheckResult") // fire-and-forget: app-scoped DB work with its own onError; nothing to dispose
     private fun loadData(): Feed? {
         if (feedID > 0) {
             //a feedId means the feed exists in the database

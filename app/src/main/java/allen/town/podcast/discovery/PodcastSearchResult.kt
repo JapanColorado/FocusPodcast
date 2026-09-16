@@ -127,7 +127,8 @@ open class PodcastSearchResult(
             try {
                 summary = json.getJSONObject("summary").getString("label")
             } catch (e: Exception) {
-                // Some feeds have empty summary
+                // safe to continue: some feeds have no summary, and the field is optional
+                Timber.d(e, "iTunes toplist entry without a summary")
             }
             var imageUrl: String? = null
             val images = json.getJSONArray("im:image")
@@ -155,7 +156,8 @@ open class PodcastSearchResult(
             try {
                 author = json.getJSONObject("im:artist").getString("label")
             } catch (e: Exception) {
-                // Some feeds have empty artist
+                // safe to continue: some feeds have no artist, and the field is optional
+                Timber.d(e, "iTunes toplist entry without an artist")
             }
             return PodcastSearchResult(
                 title,

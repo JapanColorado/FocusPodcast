@@ -123,7 +123,7 @@ class DownloadLogFragment : Fragment(), IBackToContentTopView {
     }
 
     private val updateRefreshMenuItemChecker =
-        UpdateRefreshMenuItemChecker { DownloadService.isRunning && DownloadService.isDownloadingFeeds() }
+        UpdateRefreshMenuItemChecker { DownloadService.isRunning() && DownloadService.isDownloadingFeeds() }
 
     private fun loadDownloadLog() {
         if (disposable != null) {

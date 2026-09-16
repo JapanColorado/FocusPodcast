@@ -5,6 +5,7 @@ import android.content.Context;
 import android.graphics.Paint;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
@@ -43,6 +44,7 @@ import allen.town.podcast.sync.gpoddernet.model.GpodnetDevice;
 import io.reactivex.Completable;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
 
 /**
@@ -66,6 +68,15 @@ public class GpodderAuthFragment extends DialogFragment {
     private volatile String password;
     private volatile GpodnetDevice selectedDevice;
     private List<GpodnetDevice> devices;
+
+    /** Login and device-creation calls; every view they touch dies with this dialog. */
+    private final CompositeDisposable pendingCalls = new CompositeDisposable();
+
+    @Override
+    public void onDestroyView() {
+        pendingCalls.clear();
+        super.onDestroyView();
+    }
 
     @NonNull
     @Override
@@ -149,7 +160,7 @@ public class GpodderAuthFragment extends DialogFragment {
                     .getSystemService(Context.INPUT_METHOD_SERVICE);
             inputManager.hideSoftInputFromWindow(login.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
 
-            Completable.fromAction(() -> {
+            pendingCalls.add(Completable.fromAction(() -> {
                 service.setCredentials(usernameStr, passwordStr);
                 service.login();
                 devices = service.getDevices();
@@ -163,11 +174,14 @@ public class GpodderAuthFragment extends DialogFragment {
                         progressBar.setVisibility(View.GONE);
                         advance();
                     }, error -> {
+                            Log.e(TAG, "gpodder login failed", error);
                             login.setEnabled(true);
                             progressBar.setVisibility(View.GONE);
-                            txtvError.setText(error.getCause().getMessage());
+                            // the cause carries the server's message when there is one
+                            Throwable shown = error.getCause() != null ? error.getCause() : error;
+                            txtvError.setText(shown.getMessage());
                             txtvError.setVisibility(View.VISIBLE);
-                        });
+                        }));
 
         });
     }
@@ -205,7 +219,7 @@ public class GpodderAuthFragment extends DialogFragment {
         txtvError.setVisibility(View.GONE);
         deviceName.setEnabled(false);
 
-        Observable.fromCallable(() -> {
+        pendingCalls.add(Observable.fromCallable(() -> {
             String deviceId = generateDeviceId(deviceNameStr);
             service.configureDevice(deviceId, deviceNameStr, GpodnetDevice.DeviceType.MOBILE);
             return new GpodnetDevice(deviceId, deviceNameStr, GpodnetDevice.DeviceType.MOBILE.toString(), 0);
@@ -217,11 +231,12 @@ public class GpodderAuthFragment extends DialogFragment {
                     selectedDevice = device;
                     advance();
                 }, error -> {
+                        Log.e(TAG, "creating a gpodder device failed", error);
                         deviceName.setEnabled(true);
                         progBarCreateDevice.setVisibility(View.GONE);
                         txtvError.setText(error.getMessage());
                         txtvError.setVisibility(View.VISIBLE);
-                    });
+                    }));
     }
 
     private String generateDeviceName() {

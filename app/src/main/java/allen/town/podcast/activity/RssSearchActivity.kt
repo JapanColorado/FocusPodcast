@@ -29,6 +29,8 @@ import android.view.View
 import androidx.annotation.UiThread
 import androidx.appcompat.app.AlertDialog
 import androidx.core.app.NavUtils
+import io.reactivex.Single
+import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import org.greenrobot.eventbus.EventBus
@@ -107,21 +109,23 @@ class RssSearchActivity : DialogActivity() {
     /**
      * Dialog shown when the podcast was not found
      */
+    @UiThread
     fun showNoPodcastFoundError() {
-        runOnUiThread {
-            AccentMaterialDialog(
-                this@RssSearchActivity,
-                R.style.MaterialAlertDialogTheme
-            )
-                .setNeutralButton(android.R.string.ok) { dialog: DialogInterface?, which: Int -> finish() }
-                .setTitle(R.string.error_label)
-                .setMessage(R.string.null_value_podcast_error)
-                .setOnDismissListener { dialog1: DialogInterface? ->
-                    setResult(RESULT_ERROR)
-                    finish()
-                }
-                .show()
+        if (isFinishing || isDestroyed) {
+            return
         }
+        AccentMaterialDialog(
+            this@RssSearchActivity,
+            R.style.MaterialAlertDialogTheme
+        )
+            .setNeutralButton(android.R.string.ok) { dialog: DialogInterface?, which: Int -> finish() }
+            .setTitle(R.string.error_label)
+            .setMessage(R.string.null_value_podcast_error)
+            .setOnDismissListener { dialog1: DialogInterface? ->
+                setResult(RESULT_ERROR)
+                finish()
+            }
+            .show()
     }
 
     /**
@@ -190,22 +194,21 @@ class RssSearchActivity : DialogActivity() {
     private fun lookupUrlAndDownload(url: String) {
         download = PodcastSearcherRegistry.lookupUrl(url)
             .subscribeOn(Schedulers.io())
-            .observeOn(Schedulers.io())
-            .subscribe(
-                { url: String -> startFeedDownload(url) }
-            ) { error: Throwable? ->
+            // the fallback search blocks, so it has to stay on the io thread the lookup failed on
+            .onErrorResumeNext { error: Throwable ->
                 if (error is FeedUrlNotFoundException) {
-                    val retrieveFeedUrl =
-                        RetrieveFeedUtil.tryToRetrieveFeedUrlBySearch(error)
-                    if (!TextUtils.isEmpty(retrieveFeedUrl)) {
-                        startFeedDownload(retrieveFeedUrl!!)
-                    } else {
-                        showNoPodcastFoundError()
-                    }
+                    val retrieved = RetrieveFeedUtil.tryToRetrieveFeedUrlBySearch(error)
+                    if (TextUtils.isEmpty(retrieved)) Single.error(error) else Single.just(retrieved)
                 } else {
-                    showNoPodcastFoundError()
-                    Log.e(TAG, Log.getStackTraceString(error))
+                    Single.error(error)
                 }
+            }
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(
+                { resolved: String -> startFeedDownload(resolved) }
+            ) { error: Throwable? ->
+                Log.e(TAG, "looking up the feed url failed", error)
+                showNoPodcastFoundError()
             }
     }
 

@@ -34,6 +34,9 @@ class FeedItemDescriptionFragment : Fragment() {
     private var webViewLoader: Disposable? = null
     private var controller: PlaybackController? = null
     lateinit var skeletonLayout: SkeletonLayout
+
+    /** Kept so the pending post can be cancelled when the WebView goes away. */
+    private val restoreScrollPosition = Runnable { restoreFromPreference() }
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -62,7 +65,7 @@ class FeedItemDescriptionFragment : Fragment() {
         })
         webvDescription.setPageFinishedListener(Runnable {
             // Restoring the scroll position might not always work
-            webvDescription.postDelayed(Runnable { restoreFromPreference() }, 50)
+            webvDescription.postDelayed(restoreScrollPosition, 50)
         })
         root.addOnLayoutChangeListener(object : View.OnLayoutChangeListener {
             override fun onLayoutChange(
@@ -81,8 +84,9 @@ class FeedItemDescriptionFragment : Fragment() {
 
     override fun onDestroy() {
         super.onDestroy()
-            webvDescription.removeAllViews()
-            webvDescription.destroy()
+        webvDescription.removeCallbacks(restoreScrollPosition)
+        webvDescription.removeAllViews()
+        webvDescription.destroy()
     }
 
     override fun onContextItemSelected(item: MenuItem): Boolean {

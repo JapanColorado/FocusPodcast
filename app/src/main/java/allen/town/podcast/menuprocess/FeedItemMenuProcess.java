@@ -2,6 +2,7 @@ package allen.town.podcast.menuprocess;
 
 import android.content.Context;
 import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -236,11 +237,14 @@ public class FeedItemMenuProcess {
         // but they don't want it considered 'NEW' anymore
         DBWriter.markItemPlayed(playState, item.getId());
 
-        final Handler h = new Handler(fragment.requireContext().getMainLooper());
+        // The application context, not the fragment's: the delayed delete must neither keep the
+        // fragment alive nor throw when the user has navigated away before it fires.
+        final Context appContext = fragment.requireContext().getApplicationContext();
+        final Handler h = new Handler(Looper.getMainLooper());
         final Runnable r = () -> {
             FeedMedia media = item.getMedia();
             if (media != null && FeedItemUtil.hasAlmostEnded(media) && Prefs.isAutoDelete()) {
-                DBWriter.deleteFeedMediaOfItem(fragment.requireContext(), media.getId());
+                DBWriter.deleteFeedMediaOfItem(appContext, media.getId());
             }
         };
 
@@ -257,7 +261,7 @@ public class FeedItemMenuProcess {
 
         int duration = Snackbar.LENGTH_LONG;
 
-        if (showSnackbar) {
+        if (showSnackbar && fragment.getActivity() instanceof MainActivity) {
             ((MainActivity) fragment.getActivity()).showSnackbarAbovePlayer(
                     playStateStringRes, duration)
                     .setAction(fragment.getString(R.string.undo), v -> {

@@ -83,6 +83,7 @@ abstract class EpisodesListFragment : Fragment(), OnSelectModeListener, DoubleCl
     private var isUpdatingFeeds = false
     protected var disposable: Disposable? = null
     private var loadMoreDisposable: Disposable? = null
+    private val uiHandler = Handler(Looper.getMainLooper())
     @JvmField
     protected var txtvInformation: TextView? = null
     open val prefName: String
@@ -115,7 +116,7 @@ abstract class EpisodesListFragment : Fragment(), OnSelectModeListener, DoubleCl
     }
 
     private val updateRefreshMenuItemChecker =
-        UpdateRefreshMenuItemChecker { DownloadService.isRunning && DownloadService.isDownloadingFeeds() }
+        UpdateRefreshMenuItemChecker { DownloadService.isRunning() && DownloadService.isDownloadingFeeds() }
 
     override fun onPrepareOptionsMenu(menu: Menu) {
         isUpdatingFeeds = MenuItemUtils.updateRefreshMenuItem(
@@ -209,7 +210,7 @@ abstract class EpisodesListFragment : Fragment(), OnSelectModeListener, DoubleCl
         swipeRefreshLayout.setDistanceToTriggerSync(resources.getInteger(R.integer.swipe_refresh_distance))
         swipeRefreshLayout.setOnRefreshListener {
             AutoUpdateManager.runImmediate(requireContext())
-            Handler(Looper.getMainLooper()).postDelayed(
+            uiHandler.postDelayed(
                 { swipeRefreshLayout.isRefreshing = false },
                 resources.getInteger(R.integer.swipe_to_refresh_duration_in_ms).toLong()
             )
@@ -346,6 +347,7 @@ abstract class EpisodesListFragment : Fragment(), OnSelectModeListener, DoubleCl
 
     override fun onDestroyView() {
         super.onDestroyView()
+        uiHandler.removeCallbacksAndMessages(null)
         if (listAdapter != null) {
             listAdapter!!.endSelectMode()
         }

@@ -91,6 +91,7 @@ class PlaylistFragment : Fragment(), Toolbar.OnMenuItemClickListener, OnSelectMo
     private var queue: MutableList<FeedItem>? = null
     private var isUpdatingFeeds = false
     private var disposable: Disposable? = null
+    private val uiHandler = Handler(Looper.getMainLooper())
     private lateinit var swipeActions: SwipeActions
     private var prefs: SharedPreferences? = null
     private lateinit var topAppBarLayout: TopAppBarLayout
@@ -243,6 +244,7 @@ class PlaylistFragment : Fragment(), Toolbar.OnMenuItemClickListener, OnSelectMo
 
     override fun onDestroyView() {
         super.onDestroyView()
+        uiHandler.removeCallbacksAndMessages(null)
         if (recyclerAdapter != null) {
             recyclerAdapter!!.endSelectMode()
         }
@@ -254,7 +256,7 @@ class PlaylistFragment : Fragment(), Toolbar.OnMenuItemClickListener, OnSelectMo
     }
 
     private val updateRefreshMenuItemChecker =
-        UpdateRefreshMenuItemChecker { DownloadService.isRunning && DownloadService.isDownloadingFeeds() }
+        UpdateRefreshMenuItemChecker { DownloadService.isRunning() && DownloadService.isDownloadingFeeds() }
 
     private fun refreshToolbarState() {
         isUpdatingFeeds = MenuItemUtils.updateRefreshMenuItem(
@@ -382,7 +384,7 @@ class PlaylistFragment : Fragment(), Toolbar.OnMenuItemClickListener, OnSelectMo
         swipeRefreshLayout.setDistanceToTriggerSync(resources.getInteger(R.integer.swipe_refresh_distance))
         swipeRefreshLayout.setOnRefreshListener {
             AutoUpdateManager.runImmediate(requireContext())
-            Handler(Looper.getMainLooper()).postDelayed(
+            uiHandler.postDelayed(
                 { swipeRefreshLayout.isRefreshing = false },
                 resources.getInteger(R.integer.swipe_to_refresh_duration_in_ms).toLong()
             )
@@ -725,11 +727,16 @@ class PlaylistFragment : Fragment(), Toolbar.OnMenuItemClickListener, OnSelectMo
             }
 
             override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-                holder.chip.text = sortItems[holder.adapterPosition]
-                holder.chip.isChecked = selectedIndex == holder.adapterPosition
+                holder.chip.text = sortItems[position]
+                holder.chip.isChecked = selectedIndex == position
                 holder.chip.isCheckedIconVisible = holder.chip.isChecked
                 holder.chip.setOnClickListener {
-                    selectedIndex = holder.adapterPosition
+                    // the row can be detached by the time the tap lands
+                    val pos = holder.bindingAdapterPosition
+                    if (pos == RecyclerView.NO_POSITION || pos >= sortItems.size) {
+                        return@setOnClickListener
+                    }
+                    selectedIndex = pos
                     setOrderGroupVisibility()
                     adapter!!.notifyDataSetChanged()
                 }

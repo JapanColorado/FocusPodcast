@@ -23,8 +23,11 @@ import allen.town.podcast.MyApp
 import allen.town.podcast.core.glide.palette.BitmapPaletteTarget
 import allen.town.podcast.core.glide.palette.BitmapPaletteWrapper
 import allen.town.podcast.util.MediaNotificationProcessor
+import io.reactivex.disposables.Disposable
 
 abstract class RetroMusicColoredTarget(view: ImageView) : BitmapPaletteTarget(view) {
+
+    private var paletteDisposable: Disposable? = null
 
     protected val defaultFooterColor: Int
         get() = getView().context.colorControlNormal()
@@ -41,8 +44,17 @@ abstract class RetroMusicColoredTarget(view: ImageView) : BitmapPaletteTarget(vi
         transition: Transition<in BitmapPaletteWrapper>?
     ) {
         super.onResourceReady(resource, transition)
-        MediaNotificationProcessor(MyApp.instance).getPaletteAsync({
-            onColorReady(it,resource.bitmap)
+        paletteDisposable?.dispose()
+        paletteDisposable = MediaNotificationProcessor(MyApp.instance).getPaletteAsync({
+            onColorReady(it, resource.bitmap)
         }, resource.bitmap)
+    }
+
+    override fun onLoadCleared(placeholder: Drawable?) {
+        // the target is recycled with the row; a palette still in flight would call back into a
+        // view that now shows a different episode
+        paletteDisposable?.dispose()
+        paletteDisposable = null
+        super.onLoadCleared(placeholder)
     }
 }

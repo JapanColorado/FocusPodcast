@@ -1,5 +1,6 @@
 package allen.town.podcast.dialog
 
+import android.annotation.SuppressLint
 import allen.town.focus_common.util.TopSnackbarUtil.showSnack
 import allen.town.podcast.R
 import allen.town.podcast.core.dialog.ConfirmationDialog
@@ -43,6 +44,7 @@ object RemoveFeedDialog {
     ) {
         val dialog: ConfirmationDialog =
             object : ConfirmationDialog(context, R.string.remove_feed_label, message) {
+                @SuppressLint("CheckResult") // fire-and-forget: app-scoped DB work with its own onError; nothing to dispose
                 override fun onConfirmButtonPressed(clickedDialog: DialogInterface) {
                     clickedDialog.dismiss()
                     showSnack(context, R.string.feed_remover_msg, Toast.LENGTH_SHORT)

@@ -1,5 +1,6 @@
 package allen.town.podcast.fragment
 
+import allen.town.focus_common.util.Timber
 import allen.town.podcast.core.view.TopAppBarLayout
 import allen.town.focus_common.util.MenuIconUtil.showToolbarMenuIcon
 import allen.town.podcast.fragment.FeedItemFragment.Companion.newInstance
@@ -99,7 +100,7 @@ class FeedItemsViewPagerFragment : Fragment(), Toolbar.OnMenuItemClickListener {
             .subscribe({ result: FeedItem? ->
                 item = result
                 refreshToolbarState()
-            }) { obj: Throwable -> obj.printStackTrace() }
+            }) { error: Throwable -> Timber.e(error, "loading the episode for the pager failed") }
     }
 
     fun refreshToolbarState() {

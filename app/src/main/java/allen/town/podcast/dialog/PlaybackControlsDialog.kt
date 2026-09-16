@@ -24,12 +24,15 @@ import androidx.fragment.app.DialogFragment
 import io.reactivex.Maybe
 import io.reactivex.MaybeEmitter
 import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 
 class PlaybackControlsDialog : DialogFragment() {
     private var controller: PlaybackController? = null
     private var dialog: AlertDialog? = null
     private var feedId = 0L
+    private val uiHandler = Handler(Looper.getMainLooper())
+    private var disposable: Disposable? = null
     private var feed: Feed? = null
         set(value) {
             field = value
@@ -43,7 +46,7 @@ class PlaybackControlsDialog : DialogFragment() {
         }
         controller!!.init()
 
-        Maybe.create { emitter: MaybeEmitter<Feed?> ->
+        disposable = Maybe.create { emitter: MaybeEmitter<Feed?> ->
             feed = DBReader.getFeed(feedId)
             if (feed != null) {
                 emitter.onSuccess(feed!!)
@@ -67,6 +70,9 @@ class PlaybackControlsDialog : DialogFragment() {
 
     override fun onStop() {
         super.onStop()
+        uiHandler.removeCallbacksAndMessages(null)
+        disposable?.dispose()
+        disposable = null
         controller!!.release()
         controller = null
     }
@@ -178,7 +184,7 @@ class PlaybackControlsDialog : DialogFragment() {
         butAudioTracks.text = audioTracks[selectedAudioTrack]
         butAudioTracks.setOnClickListener { v: View? ->
             controller!!.setAudioTrack((selectedAudioTrack + 1) % audioTracks.size)
-            Handler(Looper.getMainLooper()).postDelayed({ setupAudioTracks() }, 500)
+            uiHandler.postDelayed({ setupAudioTracks() }, 500)
         }
     }
 

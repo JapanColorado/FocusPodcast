@@ -4,6 +4,7 @@ import allen.town.podcast.core.view.TopAppBarLayout
 import allen.town.focus_common.util.DoubleClickBackToContentTopListener
 import allen.town.focus_common.util.MenuIconUtil.showToolbarMenuIcon
 import allen.town.focus_common.util.Timber
+import allen.town.focus_common.util.TopSnackbarUtil.showSnack
 import allen.town.podcast.R
 import allen.town.podcast.activity.MainActivity
 import allen.town.podcast.adapter.MultiSelectAdapter
@@ -32,7 +33,6 @@ import allen.town.podcast.fragment.actions.FeedMultiSelectActionHandler
 import allen.town.podcast.statistics.StatisticsFragment
 import allen.town.podcast.util.SkeletonRecyclerDelay
 import allen.town.podcast.view.EmptyViewHandler
-import android.annotation.SuppressLint
 import android.content.Context
 import android.content.DialogInterface
 import android.content.SharedPreferences
@@ -43,6 +43,7 @@ import android.util.Log
 import android.view.*
 import android.view.ContextMenu.ContextMenuInfo
 import android.view.animation.AnimationUtils
+import android.widget.Toast
 import androidx.annotation.StringRes
 import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
@@ -54,6 +55,7 @@ import com.faltenreich.skeletonlayout.applySkeleton
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import org.greenrobot.eventbus.EventBus
@@ -76,6 +78,10 @@ class SubFeedsFragment : Fragment(), Toolbar.OnMenuItemClickListener, OnSelectMo
     private var isUpdatingFeeds = false
     private var displayUpArrow = false
     private var disposable: Disposable? = null
+
+    /** Confirmed destructive actions; they call back into this fragment when they finish. */
+    private val userActions = CompositeDisposable()
+    private val uiHandler = Handler(Looper.getMainLooper())
     private lateinit var prefs: SharedPreferences
     private lateinit var skeleton: Skeleton
     private var listItems: List<DrawerItem>? = null
@@ -124,13 +130,19 @@ class SubFeedsFragment : Fragment(), Toolbar.OnMenuItemClickListener, OnSelectMo
         swipeRefreshLayout.setDistanceToTriggerSync(resources.getInteger(R.integer.swipe_refresh_distance))
         swipeRefreshLayout.setOnRefreshListener {
             AutoUpdateManager.runImmediate(requireContext())
-            Handler(Looper.getMainLooper()).postDelayed(
+            uiHandler.postDelayed(
                 { swipeRefreshLayout.isRefreshing = false },
                 resources.getInteger(R.integer.swipe_to_refresh_duration_in_ms).toLong()
             )
         }
         toolbar.setTitle(getString(R.string.subscriptions_label))
         return root
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        uiHandler.removeCallbacksAndMessages(null)
+        userActions.clear()
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -350,14 +362,16 @@ class SubFeedsFragment : Fragment(), Toolbar.OnMenuItemClickListener, OnSelectMo
         task: Callable<out T?>
     ) {
         val dialog: ConfirmationDialog = object : ConfirmationDialog(activity, title, message) {
-            @SuppressLint("CheckResult")
             override fun onConfirmButtonPressed(clickedDialog: DialogInterface) {
                 clickedDialog.dismiss()
-                Observable.fromCallable(task)
+                userActions.add(Observable.fromCallable(task)
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe({ result: T? -> loadSubscriptions() }
-                    ) { error: Throwable? -> Log.e(TAG, Log.getStackTraceString(error)) }
+                    ) { error: Throwable ->
+                        Log.e(TAG, "the confirmed subscription action failed", error)
+                        showSnack(requireContext(), error.localizedMessage, Toast.LENGTH_LONG)
+                    })
             }
         }
         dialog.createNewDialog().show()
@@ -381,7 +395,7 @@ class SubFeedsFragment : Fragment(), Toolbar.OnMenuItemClickListener, OnSelectMo
     }
 
     private val updateRefreshMenuItemChecker =
-        UpdateRefreshMenuItemChecker { DownloadService.isRunning && DownloadService.isDownloadingFeeds() }
+        UpdateRefreshMenuItemChecker { DownloadService.isRunning() && DownloadService.isDownloadingFeeds() }
 
     override fun onEndSelectMode() {
         subscriptionAdapter!!.setItems(listItems!!)

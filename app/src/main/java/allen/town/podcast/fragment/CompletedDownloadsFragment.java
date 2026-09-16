@@ -146,7 +146,7 @@ public class CompletedDownloadsFragment extends Fragment implements DoubleClickB
     }
 
     private final MenuItemUtils.UpdateRefreshMenuItemChecker updateRefreshMenuItemChecker =
-            () -> DownloadService.isRunning && DownloadService.isDownloadingFeeds();
+            () -> DownloadService.isRunning() && DownloadService.isDownloadingFeeds();
 
     @Override
     public boolean onContextItemSelected(@NonNull MenuItem item) {

@@ -106,7 +106,9 @@ public class ImportExportPreferencesFragment extends AbsSettingsFragment {
                     try {
                         chooseOpmlImportPathLauncher.launch("*/*");
                     } catch (ActivityNotFoundException e) {
-                        Log.e(TAG, "No activity found. Should never happen...");
+                        Log.e(TAG, "no file manager to pick an OPML file with", e);
+                        TopSnackbarUtil.showSnack(getActivity(),
+                                R.string.unable_to_start_system_file_manager, Toast.LENGTH_LONG);
                     }
                     return true;
                 });
@@ -201,6 +203,7 @@ public class ImportExportPreferencesFragment extends AbsSettingsFragment {
     }
 
     private void showExportErrorDialog(final Throwable error) {
+        Log.e(TAG, "import/export failed", error);
         progressDialog.dismiss();
         final AlertDialog.Builder alert =            new AccentMaterialDialog(
                     getContext(),
@@ -278,7 +281,8 @@ public class ImportExportPreferencesFragment extends AbsSettingsFragment {
             result.launch(intentPickAction);
             return;
         } catch (ActivityNotFoundException e) {
-            Log.e(TAG, "No activity found. Should never happen...");
+            // safe to continue: the legacy export below writes to the app's own folder instead
+            Log.w(TAG, "no file manager to pick an export folder with, exporting to storage", e);
         }
 
         // If we are using a SDK lower than API 21 or the implicit intent failed

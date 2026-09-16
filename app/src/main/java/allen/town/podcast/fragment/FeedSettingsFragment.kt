@@ -35,17 +35,18 @@ import androidx.preference.ListPreference
 import androidx.preference.Preference
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.appbar.CollapsingToolbarLayout
+import io.reactivex.Completable
 import io.reactivex.Maybe
 import io.reactivex.MaybeEmitter
 import io.reactivex.MaybeOnSubscribe
 import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
 import java.util.*
-import java.util.concurrent.ExecutionException
 
 class FeedSettingsFragment : Fragment() {
     private var disposable: Disposable? = null
@@ -108,6 +109,7 @@ class FeedSettingsFragment : Fragment() {
     class FeedSettingsPreferenceFragment : AbsSettingsFragment() {
         private var feed: Feed? = null
         private var disposable: Disposable? = null
+        private val preferenceWrites = CompositeDisposable()
         private var feedPreferences: FeedPreferences? = null
         override fun onResume() {
             super.onResume()
@@ -174,6 +176,7 @@ class FeedSettingsFragment : Fragment() {
             if (disposable != null) {
                 disposable!!.dispose()
             }
+            preferenceWrites.dispose()
         }
 
         private fun setupFeedAutoSkipPreference() {
@@ -271,17 +274,26 @@ class FeedSettingsFragment : Fragment() {
                             feedPreferences!!.username = username
                             feedPreferences!!.password = password
                             val setPreferencesFuture = DBWriter.setFeedPreferences(feedPreferences)
-
-                            Thread({
-                                try {
+                            // the refresh has to wait for the new credentials to be written,
+                            // otherwise it authenticates with the old ones
+                            val context = requireContext().applicationContext
+                            val refreshedFeed = feed
+                            preferenceWrites.add(
+                                Completable.fromAction {
                                     setPreferencesFuture.get()
-                                } catch (e: InterruptedException) {
-                                    e.printStackTrace()
-                                } catch (e: ExecutionException) {
-                                    e.printStackTrace()
+                                    DBTasks.forceRefreshFeed(context, refreshedFeed, true)
                                 }
-                                DBTasks.forceRefreshFeed(requireContext(), feed, true)
-                            }, "RefreshAfterCredentialChange").start()
+                                    .subscribeOn(Schedulers.io())
+                                    .subscribe(
+                                        { },
+                                        { error: Throwable ->
+                                            Log.e(
+                                                TAG,
+                                                "refreshing after a credential change failed",
+                                                error
+                                            )
+                                        })
+                            )
                         }
                     }.show()
                     false

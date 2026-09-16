@@ -1,5 +1,6 @@
 package allen.town.podcast.activity
 
+import android.annotation.SuppressLint
 import allen.town.focus_common.extensions.notificationRequestCode
 import allen.town.focus_common.extensions.requestNotificationPermission
 import allen.town.focus_common.extensions.setLightNavigationBarAuto
@@ -97,6 +98,9 @@ import org.greenrobot.eventbus.ThreadMode
  */
 class MainActivity : SimpleToolbarActivity(), OnSharedPreferenceChangeListener {
     private var drawerLayout: DrawerLayout? = null
+
+    /** Kept so the delayed nav-drawer attach can be cancelled when the activity goes away. */
+    private var attachNavDrawer: Runnable? = null
     private var drawerToggle: ActionBarDrawerToggle? = null
     private lateinit var navDrawer: View
     var bottomSheet: BottomSheetBehavior<View>? = null
@@ -105,6 +109,7 @@ class MainActivity : SimpleToolbarActivity(), OnSharedPreferenceChangeListener {
     val recycledViewPool = RecycledViewPool()
     private val lastTheme = 0
 
+    @SuppressLint("CheckResult") // fire-and-forget: app-scoped DB work with its own onError; nothing to dispose
     public override fun onCreate(savedInstanceState: Bundle?) {
         if (savedInstanceState != null) {
             ensureGeneratedViewIdGreaterThan(savedInstanceState.getInt(KEY_GENERATED_VIEW_ID, 0))
@@ -172,8 +177,8 @@ class MainActivity : SimpleToolbarActivity(), OnSharedPreferenceChangeListener {
         transaction.commit()
 
 
-        navDrawer.postDelayed({
-            //load this fragment with a delay so the UI shows first; too short a delay makes the subscription screen animation skip or stutter
+        //load this fragment with a delay so the UI shows first; too short a delay makes the subscription screen animation skip or stutter
+        attachNavDrawer = Runnable {
             Timber.v("post nav inti on ui thread")
             fm.beginTransaction().replace(
                 R.id.navDrawerFragment,
@@ -181,7 +186,8 @@ class MainActivity : SimpleToolbarActivity(), OnSharedPreferenceChangeListener {
                 NavigationDrawerFragment.TAG
             ).commitAllowingStateLoss()
             Timber.v("nav inti finished")
-        }, 1000)
+        }
+        navDrawer.postDelayed(attachNavDrawer, 1000)
 
 
 
@@ -587,6 +593,8 @@ class MainActivity : SimpleToolbarActivity(), OnSharedPreferenceChangeListener {
     override fun onDestroy() {
         Timber.d("onDestroy")
         super.onDestroy()
+        attachNavDrawer?.let { navDrawer.removeCallbacks(it) }
+        attachNavDrawer = null
         if (drawerLayout != null) {
             drawerLayout!!.removeDrawerListener(drawerToggle!!)
         }
@@ -596,13 +604,6 @@ class MainActivity : SimpleToolbarActivity(), OnSharedPreferenceChangeListener {
         if (isFinishing) {
             //this branch means the activity was destroyed by pressing back, not recreated like on a theme change; only do this in the former case
             Timber.i("isFinishing")
-            Observable.fromCallable {
-            }
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe {
-                }
-
         }
     }
 

@@ -24,6 +24,7 @@ import allen.town.focus_common.views.ItemOffsetDecoration
 import allen.town.podcast.MyApp
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 
 class TagEditDialog : DialogFragment() {
@@ -34,6 +35,12 @@ class TagEditDialog : DialogFragment() {
     private var allTags: ArrayList<String> = ArrayList()
     private var viewBinding: EditTagsDialogLayoutBinding? = null
     private var adapter: TagSelectionAdapter? = null
+    private var loadTagsDisposable: Disposable? = null
+
+    override fun onDestroy() {
+        loadTagsDisposable?.dispose()
+        super.onDestroy()
+    }
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val feedPreferencesList =
             requireArguments().getSerializable(ARG_FEED_PREFERENCES) as ArrayList<FeedPreferences>?
@@ -81,7 +88,8 @@ class TagEditDialog : DialogFragment() {
     }
 
     private fun loadTags() {
-        Observable.fromCallable<ArrayList<String>> {
+        loadTagsDisposable?.dispose()
+        loadTagsDisposable = Observable.fromCallable<ArrayList<String>> {
             val data = DBReader.getNavDrawerData(true)
             val items = data.items
             val folders: ArrayList<String> = ArrayList()

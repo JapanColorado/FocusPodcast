@@ -70,9 +70,9 @@ android {
     }
 
     lintOptions {
-        disable 'ObsoleteLintCustomCheck', 'CheckResult', 'UnusedAttribute', 'BatteryLife', 'InflateParams',
+        disable 'ObsoleteLintCustomCheck', 'UnusedAttribute', 'BatteryLife', 'InflateParams',
                 'RestrictedApi', 'TrustAllX509TrustManager', 'ExportedReceiver', 'AllowBackup', 'VectorDrawableCompat',
-                'StaticFieldLeak', 'UseCompoundDrawables', 'NestedWeights', 'Overdraw', 'UselessParent', 'TextFields',
+                'UseCompoundDrawables', 'NestedWeights', 'Overdraw', 'UselessParent', 'TextFields',
                 'AlwaysShowAction', 'Autofill', 'ClickableViewAccessibility', 'ContentDescription',
                 'KeyboardInaccessibleWidget', 'LabelFor', 'SetTextI18n', 'HardcodedText', 'RelativeOverlap',
                 'RtlCompat', 'RtlHardcoded', 'MissingMediaBrowserServiceIntentFilter', 'VectorPath',

@@ -15,8 +15,11 @@
 package allen.town.podcast.view;
 
 import android.graphics.drawable.GradientDrawable;
+import android.util.Log;
 
 public class DrawableGradient extends GradientDrawable {
+  private static final String TAG = "DrawableGradient";
+
   public DrawableGradient(Orientation orientations, int[] colors, int shape) {
     super(orientations, colors);
     try {
@@ -24,7 +27,8 @@ public class DrawableGradient extends GradientDrawable {
       setGradientType(GradientDrawable.LINEAR_GRADIENT);
       setCornerRadius(0);
     } catch (Exception e) {
-      e.printStackTrace();
+      // safe to continue: the drawable still paints, just with the default shape/corners
+      Log.w(TAG, "could not apply the gradient shape", e);
     }
   }
 

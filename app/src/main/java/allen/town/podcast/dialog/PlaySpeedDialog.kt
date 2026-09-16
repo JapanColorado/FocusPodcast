@@ -34,6 +34,7 @@ class PlaySpeedDialog : BottomSheetDialogFragment() {
     private val selectedSpeeds: MutableList<Float>
     private var speedSeekBar: PlaybackSpeedSlider? = null
     private var addCurrentSpeedChip: Chip? = null
+    private val uiHandler = Handler(Looper.getMainLooper())
     override fun onStart() {
         super.onStart()
         controller = object : PlaybackController(requireActivity()) {
@@ -50,6 +51,11 @@ class PlaySpeedDialog : BottomSheetDialogFragment() {
         controller!!.release()
         controller = null
         EventBus.getDefault().unregister(this)
+    }
+
+    override fun onDestroyView() {
+        uiHandler.removeCallbacksAndMessages(null)
+        super.onDestroyView()
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
@@ -120,7 +126,7 @@ class PlaySpeedDialog : BottomSheetDialogFragment() {
                 true
             }
             holder.chip.setOnClickListener { v: View? ->
-                Handler(Looper.getMainLooper()).postDelayed(
+                uiHandler.postDelayed(
                     {
                         if (controller != null) {
                             dismiss()

@@ -1,5 +1,6 @@
 package allen.town.podcast.activity
 
+import android.annotation.SuppressLint
 import allen.town.focus_common.activity.DialogActivity
 import allen.town.podcast.R
 import allen.town.podcast.core.service.download.DownloadRequest
@@ -25,6 +26,7 @@ class FeedAuthenticationActivity : DialogActivity() {
         Validate.isTrue(intent.hasExtra(ARG_DOWNLOAD_REQUEST), "Download request missing")
         val request = intent.getParcelableExtra<DownloadRequest>(ARG_DOWNLOAD_REQUEST)
         object : AuthenticationDialog(this, R.string.authentication_label, true, "", "") {
+            @SuppressLint("CheckResult") // fire-and-forget: app-scoped DB work with its own onError; nothing to dispose
             override fun onConfirmed(username: String?, password: String?) {
                 Completable.fromAction {
                     request!!.username = username

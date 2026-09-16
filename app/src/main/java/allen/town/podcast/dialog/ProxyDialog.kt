@@ -1,5 +1,6 @@
 package allen.town.podcast.dialog
 
+import allen.town.focus_common.util.Timber
 import allen.town.focus_common.views.AccentMaterialDialog
 import allen.town.podcast.R
 import android.widget.EditText
@@ -217,7 +218,8 @@ class ProxyDialog(private val context: Context) {
                 try {
                     return port.toInt()
                 } catch (e: NumberFormatException) {
-                    // ignore
+                    // safe to continue: 0 below means "no explicit port", the caller's default
+                    Timber.d(e, "ignoring an unparsable proxy port")
                 }
             }
             return 0
@@ -304,7 +306,7 @@ class ProxyDialog(private val context: Context) {
                     setTestRequired(false)
                 }
             ) { error: Throwable ->
-                error.printStackTrace()
+                Timber.e(error, "the proxy test failed")
                 txtvMessage!!.setTextColor(
                     ContextCompat.getColor(
                         context,

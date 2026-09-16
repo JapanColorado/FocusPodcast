@@ -31,6 +31,14 @@ public class TagsSectionView extends LinearLayout {
     private ViewTagsSectionBinding binding;
     private List<EnumItuneCategory> mTags;
 
+    /** Kept so the pending scroll can be cancelled when the view is detached. */
+    private final Runnable scrollToEnd = new Runnable() {
+        @Override
+        public void run() {
+            binding.scrollView.fullScroll(View.FOCUS_RIGHT);
+        }
+    };
+
     public TagsSectionView(Context context) {
         super(context);
         inflateContent();
@@ -38,12 +46,7 @@ public class TagsSectionView extends LinearLayout {
 
     private void inflateTagsViewBalanced(List<EnumItuneCategory> list) {
         if (LanguagesHelper.isCurrentLanguageRtlAndSupported(getContext())) {
-            this.binding.scrollView.postDelayed(new Runnable() { // from class: fm.player.ui.discover.TagsSectionView.1
-                @Override // java.lang.Runnable
-                public void run() {
-                    TagsSectionView.this.binding.scrollView.fullScroll(66);
-                }
-            }, 10L);
+            this.binding.scrollView.postDelayed(scrollToEnd, 10L);
         } else {
             this.binding.scrollView.scrollTo(0, 0);
         }
@@ -154,6 +157,12 @@ public class TagsSectionView extends LinearLayout {
     public void onFinishInflate() {
         super.onFinishInflate();
         init();
+    }
+
+    @Override
+    protected void onDetachedFromWindow() {
+        binding.scrollView.removeCallbacks(scrollToEnd);
+        super.onDetachedFromWindow();
     }
 
     private int categoryCode;

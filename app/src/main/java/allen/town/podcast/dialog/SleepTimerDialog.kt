@@ -1,5 +1,6 @@
 package allen.town.podcast.dialog
 
+import allen.town.focus_common.util.Timber
 import allen.town.focus_common.util.TopSnackbarUtil.showSnack
 import allen.town.focus_common.views.AccentMaterialDialog
 import allen.town.focus_common.views.ItemOffsetDecoration
@@ -154,7 +155,7 @@ class SleepTimerDialog : DialogFragment() {
                 }
                 closeKeyboard(content)
             } catch (e: NumberFormatException) {
-                e.printStackTrace()
+                Timber.w(e, "the sleep timer input is not a usable number")
                 showSnack(activity, R.string.time_dialog_invalid_input, Toast.LENGTH_LONG)
             }
         }
@@ -187,12 +188,16 @@ class SleepTimerDialog : DialogFragment() {
         }
 
         override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-            holder.chip.text =
-                spinnerContent[holder.adapterPosition] + getString(R.string.time_minutes)
-            holder.chip.isChecked = selectedIndex == holder.adapterPosition
+            holder.chip.text = spinnerContent[position] + getString(R.string.time_minutes)
+            holder.chip.isChecked = selectedIndex == position
             holder.chip.isCheckedIconVisible = holder.chip.isChecked
             holder.chip.setOnClickListener {
-                selectedIndex = holder.adapterPosition
+                // the row can be detached by the time the tap lands
+                val pos = holder.bindingAdapterPosition
+                if (pos == RecyclerView.NO_POSITION || pos >= spinnerContent.size) {
+                    return@setOnClickListener
+                }
+                selectedIndex = pos
                 adapter!!.notifyDataSetChanged()
             }
         }

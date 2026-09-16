@@ -48,6 +48,7 @@ import com.bumptech.glide.request.RequestOptions
 import com.google.android.material.card.MaterialCardView
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
 
 class ItunesAdapter(
@@ -63,6 +64,17 @@ class ItunesAdapter(
     val typeEpisodes: Boolean
 ) : RecyclerView.Adapter<PodcastViewHolder>() {
     private var subscribedFeedsList: List<Feed> = ArrayList()
+
+    /**
+     * Row-scoped lookups and subscribe actions. Cleared when the adapter leaves its RecyclerView,
+     * so a late callback cannot bind into a recycled row or touch a finished activity.
+     */
+    private val pendingWork = CompositeDisposable()
+
+    override fun onDetachedFromRecyclerView(recyclerView: RecyclerView) {
+        pendingWork.clear()
+        super.onDetachedFromRecyclerView(recyclerView)
+    }
 
     fun addAll(newData: List<PodcastSearchResult>?) {
         data.clear()
@@ -167,7 +179,7 @@ class ItunesAdapter(
             viewHolder.bindFeedItem(item)
         } else {
             //look it up in the database and cache the result
-            Observable.fromCallable {
+            pendingWork.add(Observable.fromCallable {
                 val feedItemFromDb = DBReader.getFeedItemByGuidOrEpisodeUrl(
                     episodeSearchResult.episodeUuid,
                     episodeSearchResult.episodeUrl
@@ -181,7 +193,10 @@ class ItunesAdapter(
                     feedItems.add(it)
                     viewHolder.bindFeedItem(it)
                 }) {
-                    Observable.fromCallable {
+                    // fromCallable treats a null row as an error, so this is also the
+                    // "episode not in the database yet" path
+                    Timber.v(it, "no cached FeedItem for {${episodeSearchResult.title}}")
+                    pendingWork.add(Observable.fromCallable {
                         val feedFromDb = DBReader.getFeed(
                             episodeSearchResult.feedUrl,
                             false
@@ -197,8 +212,10 @@ class ItunesAdapter(
                             DBWriter.setFeedItemExcludeFeed(feedItemToInsert)
                             feedItems.add(feedItemToInsert)
                             viewHolder.bindFeedItem(feedItemToInsert)
-                        }, {
-
+                        }, { notFound: Throwable? ->
+                            // fromCallable treats a null row as an error, so this is also the
+                            // "feed not in the database yet" path
+                            Timber.v(notFound, "no Feed in db for {${episodeSearchResult.title}}")
                             val feedToInsert = Feed().also {
                                 it.title = episodeSearchResult.title
                                 it.description = episodeSearchResult.description
@@ -219,8 +236,8 @@ class ItunesAdapter(
                             Timber.v("we found nothing in db , insert feed and item !! {${episodeSearchResult.title}}")
                             //no feed in the database for this item, so build one
 //                            notifyItemChanged(viewHolder.bindingAdapterPosition, "search_episodes")
-                        })
-                }
+                        }))
+                })
         }
     }
 
@@ -270,7 +287,7 @@ class ItunesAdapter(
             if (!podcast.itunesFeedId.isNullOrEmpty() && !podcast.feedUrl.isNullOrEmpty()) {
                 //for an iTunes feed, resolve the real url first, then check the database for a subscription; if subscribed, update the iTunes id and refresh this item
 
-                PodcastSearcherRegistry.lookupUrl(podcast.feedUrl)
+                pendingWork.add(PodcastSearcherRegistry.lookupUrl(podcast.feedUrl)
                     .subscribeOn(Schedulers.io())
                     .observeOn(Schedulers.io())
                     .subscribe(
@@ -290,7 +307,10 @@ class ItunesAdapter(
 
                         }
                     ) { error2: Throwable? ->
-                    }
+                        // only used to keep an already-subscribed feed's iTunes id in sync;
+                        // failing to resolve the url just leaves the row as it is
+                        Timber.d(error2, "could not resolve the iTunes url for ${podcast.title}")
+                    })
             }
         }
         viewHolder.subscribe_button.setOnClickListener { v: View? ->
@@ -306,7 +326,7 @@ class ItunesAdapter(
                     }
                 )
             } else {
-                Observable.fromCallable {
+                pendingWork.add(Observable.fromCallable {
                     val feedFromDb = DBReader.getFeedByItunesFeedId(feedToRemove.itunesId, true)
                     feedFromDb
                 }
@@ -319,7 +339,10 @@ class ItunesAdapter(
                                 viewHolder.itemView.context
                             )
                         }) { error: Throwable? ->
-                        PodcastSearcherRegistry.lookupUrl(feedToRemove.download_url)
+                        // fromCallable treats a null row as an error, so this is also the
+                        // "not subscribed yet" path: resolve the real url and download it
+                        Timber.d(error, "feed ${podcast.title} not found by iTunes id")
+                        pendingWork.add(PodcastSearcherRegistry.lookupUrl(feedToRemove.download_url)
                             .subscribeOn(Schedulers.io())
                             .observeOn(Schedulers.io())
                             .subscribe(
@@ -333,9 +356,9 @@ class ItunesAdapter(
                                     )
                                 }
                             ) { error2: Throwable? ->
-                                if (error is FeedUrlNotFoundException) {
+                                if (error2 is FeedUrlNotFoundException) {
                                     val retrieveFeedUrl =
-                                        RetrieveFeedUtil.tryToRetrieveFeedUrlBySearch(error2 as FeedUrlNotFoundException)
+                                        RetrieveFeedUtil.tryToRetrieveFeedUrlBySearch(error2)
                                     if (!TextUtils.isEmpty(retrieveFeedUrl)) {
                                         feedToRemove.download_url = retrieveFeedUrl
                                         feedToRemove.isNeedAutoSubscribe = true
@@ -350,14 +373,14 @@ class ItunesAdapter(
                                 } else {
                                     Log.e(TAG, Log.getStackTraceString(error2))
                                 }
-                            }
+                            })
 
                         showSnack(
                             viewHolder.itemView.context,
                             R.string.subscribing_label,
                             Toast.LENGTH_SHORT
                         )
-                    }
+                    })
             }
         }
         viewHolder.itemView.setOnClickListener { v: View ->

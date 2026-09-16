@@ -104,6 +104,12 @@ class PodcastSearchChooseAdapter : RecyclerView.Adapter<PodcastSearchChooseAdapt
     }
 
     override fun onViewMoved(oldPosition: Int, newPosition: Int) {
+        // a detached row reports NO_POSITION, and a drag can outlive a list change
+        if (oldPosition < 0 || oldPosition >= itemCount
+            || newPosition < 0 || newPosition >= itemCount
+        ) {
+            return
+        }
         //if the target is the last row and the last row is not draggable, it cannot be reordered
         if (newPosition == itemCount - 1 && !categoryInfos[newPosition].dragAble) {
             return

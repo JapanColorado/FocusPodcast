@@ -24,7 +24,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
-import android.os.Handler;
+import android.util.Log;
 
 import androidx.annotation.ColorInt;
 import androidx.annotation.FloatRange;
@@ -33,12 +33,19 @@ import androidx.palette.graphics.Palette;
 
 import java.util.List;
 
+import io.reactivex.Single;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.schedulers.Schedulers;
+
 import code.name.monkey.appthemehelper.util.ATHUtil;
 import code.name.monkey.appthemehelper.util.ColorUtil;
 import allen.town.podcast.R;
 
 /** A class the processes media notifications and extracts the right text and background colors. */
 public class MediaNotificationProcessor {
+
+  private static final String TAG = "MediaNotifProcessor";
 
   /** The fraction below which we select the vibrant instead of the light/dark vibrant color */
   private static final float POPULATION_FRACTION_FOR_MORE_VIBRANT = 1.0f;
@@ -131,22 +138,29 @@ public class MediaNotificationProcessor {
     RGBToXYZ(Color.red(color), Color.green(color), Color.blue(color), outXyz);
   }
 
-  public void getPaletteAsync(
+  /**
+   * Extracts the palette off the main thread. The returned {@link Disposable} must be disposed by
+   * the caller when its view goes away, otherwise the callback fires into a dead view.
+   */
+  public Disposable getPaletteAsync(
       final OnPaletteLoadedListener onPaletteLoadedListener, Drawable drawable) {
     this.drawable = drawable;
-    final Handler handler = new Handler();
-    new Thread(
+    return Single.fromCallable(
             () -> {
               getMediaPalette();
-              handler.post(
-                      () -> onPaletteLoadedListener.onPaletteLoaded(MediaNotificationProcessor.this));
+              return MediaNotificationProcessor.this;
             })
-        .start();
+        .subscribeOn(Schedulers.io())
+        .observeOn(AndroidSchedulers.mainThread())
+        .subscribe(
+            onPaletteLoadedListener::onPaletteLoaded,
+            error -> Log.e(TAG, "extracting the cover palette failed", error));
   }
 
-  public void getPaletteAsync(OnPaletteLoadedListener onPaletteLoadedListener, Bitmap bitmap) {
+  public Disposable getPaletteAsync(
+      OnPaletteLoadedListener onPaletteLoadedListener, Bitmap bitmap) {
     this.drawable = new BitmapDrawable(context.getResources(), bitmap);
-    getPaletteAsync(onPaletteLoadedListener, this.drawable);
+    return getPaletteAsync(onPaletteLoadedListener, this.drawable);
   }
 
   /** Processes a drawable and calculates the appropriate colors that should be used. */

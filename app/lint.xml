@@ -11,4 +11,8 @@
     <issue id="UnusedResources" severity="error">
         <ignore path="**/values-**/strings.xml" />
     </issue>
+
+    <!-- Hardening ratchet: static Context fields are errors here. -->
+    <issue id="StaticFieldLeak" severity="error" />
+    <issue id="CheckResult" severity="error" />
 </lint>

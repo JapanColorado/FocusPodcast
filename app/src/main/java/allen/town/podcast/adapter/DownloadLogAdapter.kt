@@ -1,5 +1,6 @@
 package allen.town.podcast.adapter
 
+import android.annotation.SuppressLint
 import allen.town.focus_common.util.ImageUtils.getColoredVectorDrawable
 import allen.town.focus_common.util.TopSnackbarUtil.showSnack
 import allen.town.podcast.R
@@ -145,6 +146,7 @@ class DownloadLogAdapter(private val context: Activity) :
         }
     }
 
+    @SuppressLint("CheckResult") // fire-and-forget: app-scoped DB work with its own onError; nothing to dispose
     private fun bind(holder: DownloadLogViewHolder, downloader: Downloader?, position: Int) {
         val request = downloader!!.downloadRequest
         holder.title.text = request.title

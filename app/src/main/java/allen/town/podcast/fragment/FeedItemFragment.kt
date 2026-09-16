@@ -89,6 +89,9 @@ class FeedItemFragment : Fragment() {
     private var controller: PlaybackController? = null
     private var floatingPlayActionButton: ExtendedFloatingActionButton? = null
     private var skeletonLayout: SkeletonLayout? = null
+
+    /** Kept so the pending post can be cancelled when the view goes away. */
+    private val hideSkeleton = Runnable { skeletonLayout?.visibility = View.GONE }
     private lateinit var feedItemListFragmentBinding: FeeditemFragmentBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -160,7 +163,7 @@ class FeedItemFragment : Fragment() {
                 super.onProgressChanged(view, newProgress)
                 if (newProgress == 100) {
                     //the ScrollView nests other layouts, so the WebView takes a while to actually appear
-                    skeletonLayout!!.postDelayed({skeletonLayout!!.visibility = View.GONE},350)
+                    skeletonLayout!!.postDelayed(hideSkeleton, 350)
                 }
             }
         }
@@ -213,6 +216,7 @@ class FeedItemFragment : Fragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
+        skeletonLayout?.removeCallbacks(hideSkeleton)
         sizeDisposable?.dispose()
         if (disposable != null) {
             disposable!!.dispose()

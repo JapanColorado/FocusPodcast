@@ -70,6 +70,7 @@ import allen.town.podcast.view.TagsSectionView;
 import code.name.monkey.appthemehelper.util.scroll.ThemedFastScroller;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 
@@ -177,6 +178,9 @@ public class DiscoverFragment extends Fragment implements Toolbar.OnMenuItemClic
 
     private Disposable getFeedsListDisposable;
 
+    /** One-off user actions; they touch the activity, so they must not outlive it. */
+    private final CompositeDisposable userActions = new CompositeDisposable();
+
     private void getSubedFeedsList() {
         getFeedsListDisposable = Observable.fromCallable(DBReader::getFeedList)
                 .subscribeOn(Schedulers.io())
@@ -252,7 +256,7 @@ public class DiscoverFragment extends Fragment implements Toolbar.OnMenuItemClic
         if (uri == null) {
             return;
         }
-        Observable.fromCallable(() -> addLocalFolder(uri))
+        userActions.add(Observable.fromCallable(() -> addLocalFolder(uri))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
@@ -260,9 +264,9 @@ public class DiscoverFragment extends Fragment implements Toolbar.OnMenuItemClic
                             Fragment fragment = FeedItemlistFragment.newInstance(feed.getId());
                             ((MainActivity) getActivity()).loadChildFragment(fragment);
                         }, error -> {
-                            Log.e(TAG, Log.getStackTraceString(error));
+                            Log.e(TAG, "adding a local folder failed", error);
                             TopSnackbarUtil.showSnack(getActivity(), error.getLocalizedMessage(), Toast.LENGTH_LONG);
-                        });
+                        }));
     }
 
     private void loadToplist(String country) {
@@ -390,6 +394,7 @@ public class DiscoverFragment extends Fragment implements Toolbar.OnMenuItemClic
         if (getFeedsListDisposable != null) {
             getFeedsListDisposable.dispose();
         }
+        userActions.dispose();
     }
 
 

@@ -143,6 +143,13 @@ class VideoPlayerActivity : ToolbarBaseActivity(), OnSeekBarChangeListener {
         EventBus.getDefault().register(this)
     }
 
+    override fun onDestroy() {
+        // onStop leaves the toggler running while in picture-in-picture mode
+        videoControlsHider.removeCallbacksAndMessages(null)
+        disposable?.dispose()
+        super.onDestroy()
+    }
+
     override fun onPause() {
         if (!PictureInPictureUtil.isInPictureInPictureMode(this)) {
             if (controller != null && controller!!.status == PlayerStatus.PLAYING) {

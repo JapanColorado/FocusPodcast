@@ -1,5 +1,6 @@
 package allen.town.podcast.discovery
 
+import allen.town.focus_common.util.Timber
 import allen.town.podcast.BuildConfig
 import allen.town.podcast.core.ClientConfig
 import allen.town.podcast.core.service.download.PodcastHttpClient
@@ -97,8 +98,9 @@ class PodcastIndexPodcastSearcher : PodcastSearcher {
                 val messageDigest = MessageDigest.getInstance("SHA-1")
                 messageDigest.update(clearString.toByteArray(charset("UTF-8")))
                 toHex(messageDigest.digest())
-            } catch (ignored: Exception) {
-                ignored.printStackTrace()
+            } catch (e: Exception) {
+                // no SHA-1 means no API signature, so the caller cannot build a request
+                Timber.e(e, "hashing the Podcast Index API credentials failed")
                 null
             }
         }

@@ -158,6 +158,7 @@ class LocalSearchFragment constructor() : Fragment() {
 
     public override fun onDestroyView() {
         super.onDestroyView()
+        automaticSearchDebouncer?.removeCallbacksAndMessages(null)
         EventBus.getDefault().unregister(this)
     }
 

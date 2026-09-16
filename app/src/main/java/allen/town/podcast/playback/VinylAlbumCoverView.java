@@ -9,6 +9,7 @@ import android.graphics.Matrix;
 import android.graphics.Point;
 import android.graphics.drawable.Drawable;
 import android.os.Handler;
+import android.os.Looper;
 import android.util.AttributeSet;
 import android.view.View;
 
@@ -26,7 +27,7 @@ public class VinylAlbumCoverView extends View implements ValueAnimator.AnimatorU
     private static final float DISC_ROTATION_INCREASE = 0.3f;
     private static final float NEEDLE_ROTATION_PLAY = 0.0f;
     private static final float NEEDLE_ROTATION_PAUSE = -25.0f;
-    private Handler mHandler = new Handler();
+    private final Handler mHandler = new Handler(Looper.getMainLooper());
     private Bitmap mDiscBitmap;
     private Bitmap mCoverBitmap;
     private Bitmap mNeedleBitmap;
@@ -164,6 +165,21 @@ public class VinylAlbumCoverView extends View implements ValueAnimator.AnimatorU
         isPlaying = false;
         mHandler.removeCallbacks(mRotationRunnable);
         mPauseAnimator.start();
+    }
+
+    @Override
+    protected void onDetachedFromWindow() {
+        // the rotation runnable re-posts itself, so it would keep ticking (and keep this view
+        // alive) after the player screen is gone
+        isPlaying = false;
+        mHandler.removeCallbacksAndMessages(null);
+        if (mPlayAnimator != null) {
+            mPlayAnimator.cancel();
+        }
+        if (mPauseAnimator != null) {
+            mPauseAnimator.cancel();
+        }
+        super.onDetachedFromWindow();
     }
 
     @Override

@@ -1,5 +1,6 @@
 package allen.town.podcast.fragment.pref;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
@@ -38,6 +39,7 @@ public class StoragePrefFragment extends AbsSettingsFragment {
         setDataFolderText();
     }
 
+    @SuppressLint("CheckResult") // fire-and-forget: app-scoped DB work with its own onError; nothing to dispose
     private void setupStorageScreen() {
         findPreference(PREF_CHOOSE_DATA_DIR).setOnPreferenceClickListener(
                 preference -> {

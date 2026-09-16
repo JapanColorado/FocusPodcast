@@ -39,9 +39,25 @@ open class SubFeedsAdapter(mainActivity: MainActivity) :
     private var listItems: List<DrawerItem>
     var selectedItem: DrawerItem? = null
         private set
-    var longPressedPosition = 0 // used to init actionMode
+    var longPressedPosition = RecyclerView.NO_POSITION // used to init actionMode
     fun getItem(position: Int): Any {
         return listItems[position]
+    }
+
+    /**
+     * bindingAdapterPosition is NO_POSITION while the holder is detached or the list changed since
+     * the last layout (e.g. a feed removed by a refresh event during a long press).
+     */
+    private fun rememberLongPressed(position: Int, isFeed: Boolean) {
+        if (!isValidPosition(position)) {
+            longPressedPosition = RecyclerView.NO_POSITION
+            selectedItem = null
+            return
+        }
+        if (isFeed) {
+            longPressedPosition = position
+        }
+        selectedItem = getItem(position) as DrawerItem
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SubscriptionViewHolder {
@@ -84,10 +100,7 @@ open class SubFeedsAdapter(mainActivity: MainActivity) :
         }
         holder.itemView.setOnLongClickListener { v: View? ->
             if (!inActionMode()) {
-                if (isFeed) {
-                    longPressedPosition = holder.bindingAdapterPosition
-                }
-                selectedItem = getItem(holder.bindingAdapterPosition) as DrawerItem
+                rememberLongPressed(holder.bindingAdapterPosition, isFeed)
             }
             false
         }
@@ -97,10 +110,7 @@ open class SubFeedsAdapter(mainActivity: MainActivity) :
                     && e.buttonState == MotionEvent.BUTTON_SECONDARY
                 ) {
                     if (!inActionMode()) {
-                        if (isFeed) {
-                            longPressedPosition = holder.bindingAdapterPosition
-                        }
-                        selectedItem = getItem(holder.bindingAdapterPosition) as DrawerItem
+                        rememberLongPressed(holder.bindingAdapterPosition, isFeed)
                     }
                 }
             }

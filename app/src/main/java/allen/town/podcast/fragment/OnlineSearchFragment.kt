@@ -226,11 +226,16 @@ constructor() : Fragment() {
         }
 
         public override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-            holder.chip.setText(searchKeywordHistory!!.get(holder.getAdapterPosition()))
+            holder.chip.setText(searchKeywordHistory!!.get(position))
             holder.chip.setCheckedIconVisible(holder.chip.isChecked())
             holder.chip.setOnClickListener(object : View.OnClickListener {
                 public override fun onClick(v: View) {
-                    sv!!.setQuery(searchKeywordHistory!!.get(holder.getAdapterPosition()), true)
+                    // the row can be detached or the history rewritten between bind and click
+                    val pos: Int = holder.bindingAdapterPosition
+                    if (pos == RecyclerView.NO_POSITION || pos >= searchKeywordHistory!!.size) {
+                        return
+                    }
+                    sv!!.setQuery(searchKeywordHistory!!.get(pos), true)
                 }
             })
         }

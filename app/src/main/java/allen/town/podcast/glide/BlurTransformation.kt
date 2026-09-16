@@ -1,5 +1,6 @@
 package allen.town.podcast.glide
 
+import allen.town.focus_common.util.Timber
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Canvas
@@ -116,7 +117,8 @@ class BlurTransformation : BitmapTransformation {
             return out
         } catch (e: RSRuntimeException) {
             // on some devices RenderScript.create() throws: android.support.v8.renderscript.RSRuntimeException: Error loading libRSSupport library
-            if (BuildConfig.DEBUG) e.printStackTrace()
+            // safe to continue: the pure-Java StackBlur below produces the same image
+            Timber.w(e, "RenderScript blur is unavailable, falling back to StackBlur")
         }
 
         return StackBlur.blur(out, blurRadius)

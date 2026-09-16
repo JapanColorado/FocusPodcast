@@ -5,6 +5,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.preference.Preference;
 import android.text.InputFilter;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.EditText;
@@ -13,6 +14,8 @@ import allen.town.focus_common.views.AccentMaterialDialog;
 import allen.town.podcast.R;
 
 public class NumberPickerPreference extends Preference {
+    private static final String TAG = "NumberPickerPreference";
+
     private Context context;
     private int defaultValue = 0;
     private int minValue = 0;
@@ -74,7 +77,8 @@ public class NumberPickerPreference extends Preference {
                     return null;
                 }
             } catch (NumberFormatException nfe) {
-                nfe.printStackTrace();
+                // not a number yet (empty field, a lone minus sign, ...): reject the keystroke
+                Log.d(TAG, "rejecting non-numeric input: " + nfe.getMessage());
             }
             return "";
         }});
@@ -101,7 +105,9 @@ public class NumberPickerPreference extends Preference {
                             getOnPreferenceChangeListener().onPreferenceChange(this, value);
                         }
                     } catch (NumberFormatException e) {
-                        // Do not set value
+                        // safe to continue: the field was left empty or invalid, so the stored
+                        // preference keeps its previous value
+                        Log.d(TAG, "not storing an unparsable number: " + e.getMessage());
                     }
                 })
                 .create();

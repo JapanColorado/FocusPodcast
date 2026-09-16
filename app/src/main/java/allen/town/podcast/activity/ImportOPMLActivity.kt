@@ -37,10 +37,12 @@ import androidx.activity.result.contract.ActivityResultContracts.RequestPermissi
 import androidx.appcompat.app.AlertDialog
 import androidx.core.app.ActivityCompat
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import code.name.monkey.appthemehelper.util.scroll.ThemedFastScroller.create
 import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
 import org.apache.commons.io.input.BOMInputStream
 import java.io.*
@@ -56,6 +58,14 @@ class ImportOPMLActivity : SimpleToolbarActivity() {
     private var deselectAll: MenuItem? = null
     private var readElements: ArrayList<OpmlElement>? = null
     private val checked: ArrayList<Boolean?> = ArrayList<Boolean?>()
+
+    /** Parse and import runs; both touch the view binding, so they die with the activity. */
+    private val pendingWork = CompositeDisposable()
+
+    override fun onDestroy() {
+        pendingWork.dispose()
+        super.onDestroy()
+    }
     override fun onCreate(savedInstanceState: Bundle?) {
         setTheme(Prefs.theme)
         super.onCreate(savedInstanceState)
@@ -66,7 +76,7 @@ class ImportOPMLActivity : SimpleToolbarActivity() {
         create(viewBinding!!.scrollView)
         viewBinding!!.butConfirm.setOnClickListener { v: View? ->
             viewBinding!!.progressBar.visibility = View.VISIBLE
-            Completable.fromAction {
+            pendingWork.add(Completable.fromAction {
                 val toAdd: MutableList<DownloadRequest> = ArrayList()
                 for (i in checked.indices) {
                     if (!checked[i]!!) {
@@ -91,9 +101,10 @@ class ImportOPMLActivity : SimpleToolbarActivity() {
                         startActivity(intent)
                         finish()
                     }) { e: Throwable ->
+                    Log.e(TAG, "importing the selected feeds failed", e)
                     viewBinding!!.progressBar.visibility = View.GONE
                     showSnack(this, e.message, Toast.LENGTH_LONG)
-                }
+                })
         }
         var uri = intent.data
         if (uri != null && uri.toString().startsWith("/")) {
@@ -217,7 +228,7 @@ class ImportOPMLActivity : SimpleToolbarActivity() {
      */
     private fun startImport() {
         viewBinding!!.progressBar.visibility = View.VISIBLE
-        Observable.fromCallable {
+        pendingWork.add(Observable.fromCallable {
             val opmlFileStream: InputStream?
             opmlFileStream = if ("content" != uri!!.scheme) {
                 FileInputStream(File(uri!!.encodedPath))
@@ -252,6 +263,7 @@ class ImportOPMLActivity : SimpleToolbarActivity() {
                     //select all by default
                     selectAllItems(true)
                 }) { e: Throwable ->
+                Log.e(TAG, "reading the OPML file failed", e)
                 viewBinding!!.progressBar.visibility = View.GONE
                 val alert: AlertDialog.Builder = AccentMaterialDialog(
                     this,
@@ -261,7 +273,7 @@ class ImportOPMLActivity : SimpleToolbarActivity() {
                 alert.setMessage(getString(R.string.opml_reader_error) + e.message)
                 alert.setNeutralButton(android.R.string.ok) { dialog: DialogInterface, which: Int -> dialog.dismiss() }
                 alert.create().show()
-            }
+            })
     }
 
     inner class FeedAdapter(context: Context?) :
@@ -286,10 +298,19 @@ class ImportOPMLActivity : SimpleToolbarActivity() {
         private val cb: CheckBox
         override fun bindTo(s: String?) {
             title.text = s
-            cb.isChecked = checked[bindingAdapterPosition]!!
+            val boundPosition = bindingAdapterPosition
+            if (boundPosition == RecyclerView.NO_POSITION || boundPosition >= checked.size) {
+                return
+            }
+            cb.isChecked = checked[boundPosition]!!
             itemView.setOnClickListener {
+                // the list is rebuilt on every parse, so re-read the position at click time
+                val pos = bindingAdapterPosition
+                if (pos == RecyclerView.NO_POSITION || pos >= checked.size) {
+                    return@setOnClickListener
+                }
                 cb.isChecked = !cb.isChecked
-                checked[bindingAdapterPosition] = cb.isChecked
+                checked[pos] = cb.isChecked
                 updateSum()
                 var checkedCount = 0
                 for (i in checked.indices) {

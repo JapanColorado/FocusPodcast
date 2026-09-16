@@ -21,6 +21,7 @@ import androidx.core.content.pm.ShortcutInfoCompat
 import androidx.core.content.pm.ShortcutManagerCompat
 import androidx.core.graphics.drawable.IconCompat
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import code.name.monkey.appthemehelper.util.scroll.ThemedFastScroller.create
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -118,9 +119,15 @@ class CreateSubscriptionShortcutActivity : DialogActivity() {
                 if (Intent.ACTION_CREATE_SHORTCUT ==
                     intent.action
                 ) {
+                    // the row can be detached by the time the tap lands
+                    val pos = bindingAdapterPosition
+                    val feeds = listItems
+                    if (pos == RecyclerView.NO_POSITION || feeds == null || pos >= feeds.size) {
+                        return@setOnClickListener
+                    }
                     SubscriptionActivityStarter.getBitmapFromUrl(
                         v.context,
-                        listItems!![bindingAdapterPosition]
+                        feeds[pos]
                     ) { feed: Feed, bitmap: Bitmap -> addShortcut(feed, bitmap) }
                 }
             }

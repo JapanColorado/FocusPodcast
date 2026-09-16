@@ -22,7 +22,19 @@ abstract class MultiSelectAdapter<T : RecyclerView.ViewHolder?>(
     private var onSelectModeListener: OnSelectModeListener? = null
     private var onPrepareActionModeListener: OnPrepareActionModeListener? = null
     private var onMenuItemClickListener: OnMenuItemClickListener? = null
+    /**
+     * A holder's bindingAdapterPosition is NO_POSITION while it is detached, and stale positions
+     * outlive a list change; every position that reaches getItemId() has to be checked first or
+     * the backing list throws.
+     */
+    protected fun isValidPosition(pos: Int): Boolean {
+        return pos != RecyclerView.NO_POSITION && pos >= 0 && pos < itemCount
+    }
+
     fun startSelectMode(pos: Int) {
+        if (!isValidPosition(pos)) {
+            return
+        }
         if (inActionMode()) {
             endSelectMode()
         }
@@ -90,7 +102,7 @@ abstract class MultiSelectAdapter<T : RecyclerView.ViewHolder?>(
     }
 
     fun isSelected(pos: Int): Boolean {
-        return selectedIds.contains(getItemId(pos))
+        return isValidPosition(pos) && selectedIds.contains(getItemId(pos))
     }
 
     /**
@@ -100,6 +112,9 @@ abstract class MultiSelectAdapter<T : RecyclerView.ViewHolder?>(
      * @param selected true for selected state and false for unselected
      */
     open fun setSelected(pos: Int, selected: Boolean) {
+        if (!isValidPosition(pos)) {
+            return
+        }
         if (selected) {
             selectedIds.add(getItemId(pos))
         } else {
@@ -127,6 +142,9 @@ abstract class MultiSelectAdapter<T : RecyclerView.ViewHolder?>(
     }
 
     protected fun toggleSelection(pos: Int) {
+        if (!isValidPosition(pos)) {
+            return
+        }
         setSelected(pos, !isSelected(pos))
         notifyItemChanged(pos)
         if (selectedIds.size == 0) {

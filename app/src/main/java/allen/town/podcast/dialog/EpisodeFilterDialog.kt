@@ -1,5 +1,6 @@
 package allen.town.podcast.dialog
 
+import allen.town.focus_common.util.Timber
 import allen.town.focus_common.views.AccentMaterialDialog
 import allen.town.focus_common.views.ItemOffsetDecoration
 import allen.town.podcast.R
@@ -93,7 +94,9 @@ abstract class EpisodeFilterDialog(context: Context?, private val filter: FeedFi
                 minimalDuration =
                     viewBinding.episodeFilterDurationText.getText().toString().toInt() * 60
             } catch (e: NumberFormatException) {
-                // Do not change anything on error
+                // safe to continue: an unparsable duration means "no duration filter", which is
+                // what minimalDuration already holds
+                Timber.d(e, "ignoring an unparsable episode duration filter")
             }
         }
         var excludeFilter: String? = ""

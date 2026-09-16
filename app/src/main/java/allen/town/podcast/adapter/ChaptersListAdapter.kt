@@ -137,6 +137,11 @@ class ChaptersListAdapter(private val context: Context, private val callback: Ca
     }
 
     fun notifyChapterChanged(newChapterIndex: Int) {
+        // the chapter list can be replaced between the position event and this call
+        if (newChapterIndex < 0 || newChapterIndex >= itemCount) {
+            currentChapterIndex = RecyclerView.NO_POSITION
+            return
+        }
         currentChapterIndex = newChapterIndex
         currentChapterPosition = getItem(newChapterIndex).start
         notifyDataSetChanged()
@@ -144,6 +149,10 @@ class ChaptersListAdapter(private val context: Context, private val callback: Ca
 
     fun notifyTimeChanged(timeMs: Long) {
         currentChapterPosition = timeMs
+        if (currentChapterIndex < 0 || currentChapterIndex >= itemCount) {
+            // no chapter focused yet, or the list shrank; nothing to repaint
+            return
+        }
         // Passing an argument prevents flickering.
         // See EpisodeItemListAdapter.notifyItemChangedCompat.
         notifyItemChanged(currentChapterIndex, "foo")
