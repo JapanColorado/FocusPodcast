@@ -1,6 +1,5 @@
 package allen.town.podcast.core.pref
 
-import allen.town.core.service.PayService
 import allen.town.focus_common.model.CategoryInfo
 import allen.town.focus_common.util.BasePreferenceUtil.instance
 import allen.town.focus_common.util.BasePreferenceUtil.materialYou

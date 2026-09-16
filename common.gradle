@@ -16,19 +16,6 @@ android {
         testApplicationId "allen.town.podcast.core.tests"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
-        kapt {
-            arguments {
-                arg("GOROUTER_MODULE_NAME", project.getName())
-            }
-        }
-
-        //阿里路由需要
-        javaCompileOptions {
-            annotationProcessorOptions {
-                arguments = [GOROUTER_MODULE_NAME: project.getName()]
-            }
-        }
-
         flavorDimensions "market"
         productFlavors {
             fdroid {
@@ -92,6 +79,4 @@ dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     api "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
     api "androidx.core:core-ktx:1.7.0"
-    api 'com.github.wyjsonGo.GoRouter:GoRouter-Api:2.5.1'
-    kapt 'com.github.wyjsonGo.GoRouter:GoRouter-Compiler:2.5.1'
 }

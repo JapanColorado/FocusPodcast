@@ -10,17 +10,9 @@ import android.app.ActivityManager
 import android.content.Context
 import android.os.Bundle
 import androidx.multidex.MultiDexApplication
-import com.wyjson.router.GoRouter
 
 open class BaseApplication: MultiDexApplication() {
     open val wallpaperAccentManager = WallpaperAccentManager(this)
-    private fun setArouter() {
-        if (BuildConfig.DEBUG) {           // 这两行必须写在init之前，否则这些配置在init过程中将无效
-            GoRouter.openDebug()   // 开启调试模式(如果在InstantRun模式下运行，必须开启调试模式！线上版本需要关闭,否则有安全风险)
-        }
-        GoRouter.autoLoadRouteModule(this) // 尽可能早，推荐在Application中初始化
-    }
-
     private fun setLog() {
         Timber.plant(object : Timber.DebugTree() {
             override fun log(priority: Int, tag: String?, message: String?, t: Throwable?) {
@@ -101,7 +93,6 @@ open class BaseApplication: MultiDexApplication() {
         if (!BuildConfig.DEBUG) {
             CustomCrashHandler.getInstance().setCustomCrashHandler()
         }
-        setArouter()
         setLog()
         RxJavaErrorHandlerSetup.setupRxJavaErrorHandler()
         if(needInitDefaultWallpaperAccent()){
