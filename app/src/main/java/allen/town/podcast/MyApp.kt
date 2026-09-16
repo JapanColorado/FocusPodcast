@@ -9,7 +9,6 @@ import allen.town.focus_common.util.BasePreferenceUtil
 import allen.town.focus_common.util.JsonHelper
 import allen.town.focus_common.util.PodcastSearchPreferenceUtil
 import allen.town.focus_common.util.Timber
-import allen.town.focus_purchase.iap.SupporterManagerWrap
 import allen.town.podcast.activity.SplashActivity
 import allen.town.podcast.appshortcuts.ShortcutsDefaultList
 import allen.town.podcast.config.CategoriesDefaultList
@@ -35,7 +34,6 @@ import com.joanzapata.iconify.fonts.FontAwesomeModule
 import com.joanzapata.iconify.fonts.MaterialModule
 import io.reactivex.android.schedulers.AndroidSchedulers
 import org.greenrobot.eventbus.EventBus
-import rx.schedulers.Schedulers
 
 /** Main application class.  */
 class MyApp : BaseApplication() {
@@ -80,7 +78,6 @@ class MyApp : BaseApplication() {
         //--------------------------------------------------
 
         ProductWrap.setBaiduStat(this)
-        checkPurchase()
 
         // default theme
         if (!ThemeStore.isConfigured(this, 1)) {
@@ -179,30 +176,6 @@ class MyApp : BaseApplication() {
         }
         return isSupporter || temporarySupporter() || isDroid
     }
-
-    private fun checkPurchase() {
-        //查询是否是订阅用户
-        val supporterManager = SupporterManagerWrap.getSupporterManger(this)
-        supporterManager.isSupporter.observeOn(Schedulers.immediate())
-            .subscribe({ aBoolean: Boolean? -> supporterManager.dispose() }) { throwable: Throwable? ->
-                //必须实现onError方法否则会抛异常
-                supporterManager.dispose()
-                Timber.w(throwable, "checkPurchase")
-            }
-        if (!isSupporter) {
-            //不是订阅用户才会查询是否去除了广告
-            Timber.i("query if remove ads")
-            //不要共用一个supporterManager，那样容易出问题
-            val inAppSupporterManager = SupporterManagerWrap.getSupporterManger(this)
-            inAppSupporterManager.isRemoveAdsSupporter.observeOn(Schedulers.immediate())
-                .subscribe({ aBoolean: Boolean? -> inAppSupporterManager.dispose() }) { throwable: Throwable? ->
-                    //必须实现onError方法否则会抛异常
-                    inAppSupporterManager.dispose()
-                    Timber.w(throwable, "checkRemoveAdsPurchase")
-                }
-        }
-    }
-
 
 
 }

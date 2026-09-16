@@ -1,0 +1,19 @@
+plugins {
+    id 'com.android.library'
+}
+apply from: "../../common.gradle"
+android {
+    defaultConfig {
+        namespace "code.name.monkey.appthemehelper"
+    }
+}
+dependencies {
+    implementation "androidx.appcompat:appcompat:$appcompatVersion"
+    implementation "com.google.android.material:material:$googleMaterialVersion"
+    implementation "androidx.preference:preference:$preferenceVersion"
+    implementation "androidx.palette:palette:$paletteVersion"
+    api 'me.zhanghai.android.fastscroll:library:1.1.8'
+    testImplementation 'junit:junit:4.13.2'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.3'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
+}

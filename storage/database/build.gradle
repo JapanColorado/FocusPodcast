@@ -14,7 +14,7 @@ android {
 
 dependencies {
     implementation project(':model')
-    implementation project(':focus-common')
+    implementation project(':lib:common')
 
     kapt "androidx.annotation:annotation:$annotationVersion"
     implementation "commons-io:commons-io:$commonsioVersion"

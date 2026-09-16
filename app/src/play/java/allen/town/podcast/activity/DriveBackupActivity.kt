@@ -417,9 +417,9 @@ class DriveBackupActivity : SimpleToolbarActivity() {
 
         val progressDialog =
             AccentProgressDialog.show(this, "", getString(R.string.backup), true, false)
-        rx.Observable.just(0).subscribeOn(rx.schedulers.Schedulers.io())
+        Observable.just(0).subscribeOn(Schedulers.io())
             .map { integer: Int? -> packData().absolutePath }
-            .observeOn(rx.android.schedulers.AndroidSchedulers.mainThread()).subscribe({
+            .observeOn(AndroidSchedulers.mainThread()).subscribe({
 
                 syncManager.uploadFile(
                     BACKUP_FILE_NAME,
@@ -478,7 +478,7 @@ class DriveBackupActivity : SimpleToolbarActivity() {
 
         progressDialog2.show()
 
-        rx.Observable.just(0).subscribeOn(rx.schedulers.Schedulers.io()).subscribe({
+        Observable.just(0).subscribeOn(Schedulers.io()).subscribe({
 
             syncManager.downloadFile(
                 BACKUP_FILE_NAME,

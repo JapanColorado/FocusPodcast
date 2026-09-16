@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="utf-8"?>
+    <!--
+
+
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+  -->
+<resources>
+    <string name="you_have_to_select_at_least_one_category">Du musst mindestens eine auswählen</string>
+    <string name="library_categories">Kategorien</string>
+    <string name="reset_action">Zurücksetzen</string>
+    <string name="done">Fertig</string>
+    <string name="pref_language_name">Sprache auswählen</string>
+    <string name="add_action">Hinzufügen</string>
+    <string name="email_app_not_found">E-Mail-App kann nicht gestartet werden</string>
+    <string name="copied_to_clipboard">In die Zwischenablage kopiert</string>
+    <string name="share">Teilen</string>
+    <string name="send_file">Bitte senden Sie mir eine E-Mail, und die E-Mail-Adresse wurde kopiert</string>
+    <string name="asc">Aufsteigend</string>
+    <string name="desc">Absteigend</string>
+    <string name="title">Titel</string>
+    <string name="backup">Sicherung</string>
+    <string name="google_drive" translateable="false">Google Drive</string>
+    <string name="one_drive" translateable="false">Ein Laufwerk</string>
+    <string name="dropbox" translateable="false">Dropbox</string>
+    <string name="connect">Verbinden mit</string>
+    <string name="already_connect">verbunden</string>
+    <string name="backup_failed">Sicherung fehlgeschlagen</string>
+    <string name="already_backup_dropbox">Auf Dropbox gesichert</string>
+    <string name="already_backup_webdav">Auf WebDAV gesichert</string>
+    <string name="restore_success">Wiederherstellung erfolgreich, bitte App neu starten</string>
+    <string name="restore_failed">Wiederherstellung fehlgeschlagen</string>
+    <string name="already_backup_one_drive">Auf einem Laufwerk gesichert</string>
+    <string name="backup_not_found">Keine Sicherungsdatei gefunden</string>
+    <string name="already_backup_google_drive">Auf Google Drive gesichert</string>
+    <string name="select">Auswählen</string>
+    <string name="made_by">Von Allen Town</string>
+    <string name="twitter_follow_me">Folge mir</string>
+    <string name="others_app_of_us">Unsere anderen Apps</string>
+    <string name="check_upgrade">Nach Updates suchen</string>
+    <string name="rate_me">Bewerten</string>
+    <string name="version" translateable="false">Version %s</string>
+    <string name="pref_header_general">Design</string>
+    <string name="communication">Kommunikation</string>
+    <string name="change_log">Änderungsprotokoll</string>
+    <string name="others">Andere</string>
+    <string name="disable_firebase_crashlytics_title">Firebase-Crashlytics deaktivieren</string>
+    <string name="disable_firebase_crashlytics_summary">Ich schlage vor, diese Option beizubehalten, sie hilft mir, das Problem der App zu analysieren</string>
+    <string name="restore">Wiederherstellen</string>
+    <string name="purchase">Kauf</string>
+    <string name="month">Monat</string>
+    <string name="months">Monate</string>
+    <string name="day_trial">%1$d-Tage-Testversion</string>
+    <string name="premium">Premium</string>
+    <string name="annually">jährlich</string>
+    <string name="free">Kostenlos</string>
+    <string name="colors">Farben</string>
+
+    <string name="today">Heute</string>
+    <string name="not_today">Nicht heute</string>
+    <string name="yesterday">Gestern</string>
+
+    <string name="cancel_any_time">%1$s, jederzeit kündigen.</string>
+    <string name="premium_pro_tip">Dein Premium Pro ist aktiviert</string>
+
+    <string name="payment_iap_sucess">GEKAUFT</string>
+    <string name="payment_price_3month">%1$s / 3 Monate</string>
+    <string name="payment_price_6month">%1$s / 6 Monate</string>
+    <string name="payment_price_month">%1$s / Monat</string>
+    <string name="payment_price_week">%1$s / Woche</string>
+    <string name="payment_price_year">%1$s / Jahr</string>
+    <string name="then_price">dann %1$s</string>
+    <string name="then_price_year">dann %1$s / Jahr</string>
+    <string name="try_it_free">Kostenlos testen</string>
+    <string name="billing_des">Abonnement verlängert sich automatisch, bis Sie es in Ihrem <a
+        href='https://play.google.com/store/account/subscriptions'> Google Play-Konto </a> jederzeit vor Ablauf des aktuellen Abrechnungszeitraums.</string>
+    <string name="billing_policy">Richtlinie</string>
+    <string name="billing_terms_service">Nutzungsbedingungen</string>
+    <string name="thanks_purchase">Abonnement erfolgreich, vielen Dank für Ihren Einkauf</string>
+
+    <string name="input_ordid">Bitte geben Sie die Alipay-Bestellnummer ein</string>
+    <string name="restore_purchase">Kauf wiederherstellen</string>
+    <string name="restore_tip">Ich habe bereits bezahlt, klicken Sie hier, um den Kauf wiederherzustellen</string>
+    <string name="query_alipay_order_failed">Abfrage fehlgeschlagen</string>
+    <string name="query_alipay_order_no">Transaktion existiert nicht</string>
+    <string name="alipay_purchase">Alipay-Kauf</string>
+    <string name="expired_time">Gültig bis：</string>
+
+    <string name="ali_pay_tip">Zahlungsmethode:\n1. Drücken Sie gleichzeitig die Tasten Lautstärke + und Ein/Aus, um eine Aufnahme zu machen
+         Screenshot, Alipay öffnen und scannen, Screenshot im Album auswählen und bezahlen\n2. Benutze das Handy einer anderen Person, öffne Alipay, scanne es und bezahle</string>
+    <string name="ali_pay_time_tip">Bitte schließen Sie die Zahlung innerhalb von 30 Minuten ab. Schließen Sie diese Schnittstelle nicht bis
+         Die Zahlung ist erfolgreich</string>
+    <string name="google_service_not_install">Der Google-Dienst ist möglicherweise nicht installiert, kann nicht bezahlen</string>
+
+    <string name="subscribe_monthly">1 Monat\n</string>
+    <string name="subscribe_weekly">1 Woche\n</string>
+    <string name="subscribe_yearly">1 Jahr\n</string>
+    <string name="subscribe_quaterly">3 Monate\n</string>
+    <string name="recommend">Empfohlen</string>
+
+    <string name="search_history">Suchverlauf</string>
+    <string name="expanded">Erweitert</string>
+    <string name="compact">Kompakt</string>
+    <string name="compact_fixed">Kompakt korrigiert</string>
+    <string name="pref_title_appbar_mode">App-Bar-Modus</string>
+    <string name="pref_language_names_default">Systemstandard</string>
+    <string name="pref_language_names_simple_chinese">Vereinfachtes Chinesisch</string>
+    <string name="pref_language_names_tradition_chinese">Traditionelles Chinesisch</string>
+    <string name="share_to_friends">Mit Freunden teilen</string>
+    <string name="share_to_friends_tip">Hallo! Hier ist der Link zum Herunterladen der %s-App. Ich mag diese App sehr und hoffe, dass sie dir auch gefällt.</string>
+
+    <string name="rewarded_title">Belohnte Anzeige</string>
+    <string name="rewarded_ad_not_ready">Die Anzeige mit Prämie war noch nicht fertig, bitte schließen Sie die App und versuchen Sie es erneut</string>
+    <string name="rewarded_ad_tip">Du siehst dir einige Sekunden lang eine Anzeige mit Prämie an und nach jedem Ansehen wirst du belohnt:\n1. Heute werden keine Anzeigen mehr geschaltet\n2. Sie werden alle Funktionen der Premium-Version für eine Stunde freischalten\n\n
+Du kannst wiederholt zusehen, um diese Belohnung wiederholt zu erhalten</string>
+    <string name="rewarded_ad_one_hour_tip">Du siehst dir einige Sekunden lang eine Anzeige mit Prämie an und nach jedem Ansehen
+         wird belohnt:\n1. Du entsperrst Premium-Funktionen für 10 Minuten\n\n
+Bis zu 2 Mal pro Tag werden die Belohnungen nach jedem Ansehen addiert</string>
+
+    <string name="rewarded_locked">Du hast Premium-Funktionen bis %s freigeschaltet</string>
+    <string name="pref_title_tab_text_mode">Tab-Titelmodus</string>
+    <string name="auto">Automatisch</string>
+    <string name="labeled">Beschriftet</string>
+    <string name="selected">Ausgewählt</string>
+    <string name="unlabeled">Ohne Label</string>
+
+    <string name="preference_search_hint">Suche…</string>
+    <string name="preference_search_no_results">Keine Ergebnisse</string>
+    <string name="searchpreference_clear_history">Verlauf löschen</string>
+    <string name="documentation_support">FAQ &amp; Hilfe</string>
+    <string name="bug_report_title">Fehler melden</string>
+
+    <!-- Info-Bildschirm -->
+    <string name="about_pref">Über</string>
+    <string name="privacy_policy">Datenschutzerklärung</string>
+    <string name="buy_now">Alle erweiterten Funktionen anzeigen</string>
+    <string name="help_me_translate_tip">hilf uns zu übersetzen</string>
+    <string name="remove_ads_modest">Modesty</string>
+    <string name="remove_ads_suggested">Empfehlungen 🙏 </string>
+    <string name="remove_ads_generous">Großzügigkeit 👑</string>
+    <string name="remove_ads_tip">Entfernen Sie Anzeigen, indem Sie die folgende Spende leisten</string>
+    <string name="pref_custom_launcher_title">Benutzerdefinierter Launcher</string>
+    <string name="pref_custom_launcher_summary">Nicht alle Handys unterstützen diese Funktion, bitte testen Sie selbst</string>
+    <string name="memory_manage">Speicherverwaltung</string>
+    <string name="backup_category">Sicherung und Wiederherstellung</string>
+    <string name="clear_memory">Leere den Zwischenspeicher</string>
+    <string name="delete_cache">Zwischenspeicher leeren</string>
+    <string name="cache_dialog">Zwischenspeicher leeren?</string>
+    <string name="not_cache">Dies hat keine Auswirkungen auf den App-Cache.</string>
+    <string name="current_cache_size">Aktuelle Zwischenspeichergröße:</string>
+    <string name="cache_dialog_summary">Dieser Vorgang kann nicht rückgängig gemacht werden.</string>
+    <string name="trimming">Wird getrimmt...</string>
+    <string name="trim_success">Trimmen abgeschlossen</string>
+    <string name="pro_tip_fonts">Weitere Schriftartoptionen</string>
+    <string name="pro_tip_custom_icon">Benutzerdefiniertes App-Symbol</string>
+    <string name="pro_tip_lazy_mode">Lazy-Modus, Artikel automatisch scrollen, sodass du spannende Inhalte genießen kannst, ohne deinen Daumen zu bewegen</string>
+    <string name="pro_tip_remove_ads">Anzeigen entfernen</string>
+    <string name="pro_tip_switch_account">Wechsle beim Verfassen von Kommentaren und Posts schnell zwischen Konten</string>
+    <string name="next">Weiter</string>
+    <string name="loading_instance">Server-Informationen werden abgerufen …</string>
+    <string name="not_a_mastodon_instance">%s scheint kein Mastodon-Server zu sein.</string>
+    <string name="server_rules_disagree">Ablehnen</string>
+    <string name="i_agree">Ich stimme zu</string>
+</resources>

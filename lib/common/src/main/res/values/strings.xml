@@ -1,0 +1,174 @@
+<resources>
+    <string name="grid_size_1" translatable="false">1</string>
+    <string name="grid_size_2" translatable="false">2</string>
+    <string name="grid_size_3" translatable="false">3</string>
+    <string name="grid_size_4" translatable="false">4</string>
+    <string name="grid_size_5" translatable="false">5</string>
+    <string name="grid_size_6" translatable="false">6</string>
+    <string name="grid_size_7" translatable="false">7</string>
+    <string name="grid_size_8" translatable="false">8</string>
+
+    <string name="you_have_to_select_at_least_one_category">You have to select at least one</string>
+    <string name="library_categories">Categories</string>
+    <string name="reset_action">Reset</string>
+    <string name="done">Done</string>
+    <string name="pref_language_name">Select language</string>
+    <string name="add_action">Add</string>
+    <string name="email_app_not_found">Cannot launch email app</string>
+    <string name="copied_to_clipboard">Copied to clipboard</string>
+    <string name="share">Share</string>
+    <string name="send_file">Please send me an email, and the email address has been copied</string>
+    <string name="asc">Ascending</string>
+    <string name="desc">Descending</string>
+    <string name="title">Title</string>
+    <string name="backup">Backup</string>
+    <string name="google_drive" translatable="false">Google Drive</string>
+    <string name="one_drive" translatable="false">One Drive</string>
+    <string name="dropbox" translatable="false">Dropbox</string>
+    <string name="connect">Connect to</string>
+    <string name="already_connect">connected</string>
+    <string name="backup_failed">Backup failed</string>
+    <string name="already_backup_dropbox">Backed up to Dropbox</string>
+    <string name="already_backup_webdav">Backed up to WebDAV</string>
+    <string name="restore_success">Restore succeeded , please restart app</string>
+    <string name="restore_failed">Restore failed</string>
+    <string name="already_backup_one_drive">Backed up to One Drive</string>
+    <string name="backup_not_found">No backup file found</string>
+    <string name="already_backup_google_drive">Backed up to Google Drive</string>
+    <string name="select">Select</string>
+    <string name="made_by">By allen town</string>
+    <string name="twitter_follow_me">Follow me</string>
+    <string name="others_app_of_us">Our other apps</string>
+    <string name="check_upgrade">Check for updates</string>
+    <string name="rate_me">Rate</string>
+    <string name="version" translatable="false">Version %s</string>
+    <string name="pref_header_general">Theme</string>
+    <string name="communication">Communication</string>
+    <string name="change_log">Changelog</string>
+    <string name="others">Others</string>
+    <string name="disable_firebase_crashlytics_title">Disable firebase crashlytics</string>
+    <string name="disable_firebase_crashlytics_summary">I suggest to keep this option, it will help me analyze the problem of the app</string>
+    <string name="restore">Restore</string>
+    <string name="purchase">Purchase</string>
+    <string name="month">month</string>
+    <string name="months">months</string>
+    <string name="day_trial">%1$d-day Trial</string>
+    <string name="premium">Premium</string>
+    <string name="annually">annually</string>
+    <string name="free">Free</string>
+    <string name="colors">Colors</string>
+
+    <string name="today">Today</string>
+    <string name="not_today">Not Today</string>
+    <string name="yesterday">Yesterday</string>
+
+    <string name="cancel_any_time">%1$s, cancel any time.</string>
+    <string name="premium_pro_tip">Your premium pro is activated</string>
+
+    <string name="payment_iap_sucess">PURCHASED</string>
+    <string name="payment_price_3month">%1$s / 3 months</string>
+    <string name="payment_price_6month">%1$s / 6 months</string>
+    <string name="payment_price_month">%1$s / month</string>
+    <string name="payment_price_week">%1$s / week</string>
+    <string name="payment_price_year">%1$s / year</string>
+    <string name="then_price">then %1$s</string>
+    <string name="then_price_year">then %1$s / year</string>
+    <string name="try_it_free">Try it free</string>
+
+    <string name="billing_des">Subscription automatically renews until you cancel it in your <a
+        href='https://play.google.com/store/account/subscriptions'> Google Play account </a> anytime before the current billing period ends.</string>
+    <string name="billing_policy">Policy</string>
+    <string name="billing_terms_service">Terms of Service</string>
+    <string name="thanks_purchase">Subscription successful , Thank you for your purchase</string>
+
+    <string name="input_ordid">Please enter the Alipay order number</string>
+    <string name="restore_purchase">Restore Purchase</string>
+    <string name="restore_tip">I already paid,click to restore purchase</string>
+    <string name="query_alipay_order_failed">query failed</string>
+    <string name="query_alipay_order_no">Transaction does not exist</string>
+    <string name="alipay_purchase">Alipay purchase</string>
+    <string name="expired_time">Valid until：</string>
+
+    <string name="ali_pay_tip">Payment method:\n1. Press the volume + and power buttons at the same time to take a
+        screenshot, open Alipay and scan, select the screenshot in the album, and pay\n2. Use someone else\'s mobile phone, open Alipay, scan it, and pay</string>
+    <string name="ali_pay_time_tip">Please complete the payment within 30 minutes,Don\'t close this interface until
+        the payment is successful</string>
+    <string name="google_service_not_install">Google service may not be installed , Will not be able to pay</string>
+
+    <string name="subscribe_monthly">1 Month\n</string>
+    <string name="subscribe_weekly">1 Week\n</string>
+    <string name="subscribe_yearly">1 Year\n</string>
+    <string name="subscribe_quaterly">3 Months\n</string>
+    <string name="recommend">Recommended</string>
+
+    <string name="search_history">Search History</string>
+    <string name="expanded">Expanded</string>
+    <string name="compact">Compact</string>
+    <string name="compact_fixed">Compact fixed</string>
+    <string name="pref_title_appbar_mode">App bar mode</string>
+    <string name="pref_language_names_default">System default</string>
+    <string name="pref_language_names_simple_chinese">Simplified Chinese</string>
+    <string name="pref_language_names_tradition_chinese">Traditional Chinese</string>
+    <string name="share_to_friends">Share with friends</string>
+    <string name="share_to_friends_tip">Hey! Here is the link to download the %s app. I like this app very much and I hope you like it too.</string>
+
+    <string name="rewarded_title">Rewarded ad</string>
+    <string name="rewarded_ad_not_ready">The rewarded ad wasn\'t ready yet , please close the app and try again</string>
+    <string name="rewarded_ad_tip">You will watch a rewarded ad for a few seconds, and after each view you will be rewarded:\n1. There will be no more ads today\n2. You will unlock all the features of the premium version for one hour\n\n
+You can watch repeatedly to get this reward repeatedly</string>
+    <string name="rewarded_ad_one_hour_tip">You will watch a rewarded ad for a few seconds, and after each view you
+        will be rewarded:\n1.  You will unlock Premium features for 10 minutes\n\n
+Up to 2 times per day, rewards will be added up after each viewing</string>
+
+    <string name="rewarded_locked">You have unlocked Premium features until %s</string>
+    <string name="pref_title_tab_text_mode">TabBar titles mode</string>
+    <string name="auto">Auto</string>
+    <string name="labeled">Labeled</string>
+    <string name="selected">Selected</string>
+    <string name="unlabeled">Unlabeled</string>
+
+    <string name="preference_search_hint">Search…</string>
+    <string name="preference_search_no_results">No results</string>
+    <string name="searchpreference_clear_history">Clear history</string>
+    <string name="documentation_support">FAQ &amp; Help</string>
+    <string name="bug_report_title">Report bug</string>
+
+    <!-- About screen -->
+    <string name="about_pref">About</string>
+    <string name="privacy_policy">Privacy policy</string>
+    <string name="buy_now">View all advanced features</string>
+    <string name="help_me_translate_tip">Help us translate</string>
+
+    <string name="remove_ads_modest">Modest</string>
+    <string name="remove_ads_suggested">Suggested 🙏 </string>
+    <string name="remove_ads_generous">Generous 👑</string>
+    <string name="remove_ads_tip">Remove ads by the following contributions</string>
+    <string name="remove_ads_summary">Remove ads is a one-time purchase, after payment all ads in the app will be removed.</string>
+    <string name="pref_custom_launcher_title">Custom Launcher</string>
+    <string name="pref_custom_launcher_summary">Not all mobile phone support this feature, please test by yourself</string>
+    <string name="memory_manage">App Memory</string>
+    <string name="backup_category">Backup and Restore Options</string>
+    <string name="clear_memory">Clear Memory</string>
+    <string name="pro_tip_remove_ads">Remove Ads</string>
+
+    <string name="delete_cache">Delete Cache Now</string>
+    <string name="cache_dialog">Delete Cache?</string>
+    <string name="not_cache">This does not apply to the app cache.</string>
+    <string name="current_cache_size">Current cache size</string>
+    <string name="cache_dialog_summary">This action cannot be un-done.</string>
+    <string name="trimming">Trimming...</string>
+    <string name="trim_success">Trim successful</string>
+    <string name="pro_tip_custom_icon">Custom app icons</string>
+    <string name="pro_tip_fonts">More fonts</string>
+    <string name="pro_tip_lazy_mode">Lazy mode, Automatic scrolling of posts enables you to enjoy amazing content without moving your thumb</string>
+    <string name="pro_tip_switch_account">Quickly change between accounts when commenting or posting</string>
+    <string name="next">Next</string>
+    <string name="loading_instance">Retrieving server info…</string>
+    <string name="not_a_mastodon_instance">%s doesn\'t appear to be a Mastodon server.</string>
+    <string name="server_rules_disagree">Disagree</string>
+    <string name="i_agree">I Agree</string>
+    <string name="error_empty">Content cannot be empty</string>
+    <string name="opensource" translatable="false">GitHub</string>
+    <string name="donate">Donate</string>
+    <string name="donate_summary">Buy our devs a coffee</string>
+</resources>

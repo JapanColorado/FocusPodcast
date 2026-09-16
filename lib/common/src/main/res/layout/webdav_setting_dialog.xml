@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="20dp">
+
+    <allen.town.focus_common.views.CursorAccentEditText
+        android:id="@+id/server"
+        android:layout_width="match_parent"
+        android:layout_height="?android:attr/listPreferredItemHeight"
+        android:hint="url" />
+
+    <allen.town.focus_common.views.CursorAccentEditText
+        android:id="@+id/user"
+        android:layout_width="match_parent"
+        android:layout_height="?android:attr/listPreferredItemHeight"
+        android:hint="username" />
+
+    <allen.town.focus_common.views.CursorAccentEditText
+        android:id="@+id/password"
+        android:layout_width="match_parent"
+        android:layout_height="?android:attr/listPreferredItemHeight"
+        android:hint="password"
+        android:inputType="textPassword" />
+
+    <allen.town.focus_common.views.AccentMaterialButton
+        android:id="@+id/login"
+        style="@style/Widget.Material3.Button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="@android:string/ok"
+        android:textAllCaps="false"
+        android:textSize="16sp"
+        app:cornerRadius="8dp" />
+
+</LinearLayout>

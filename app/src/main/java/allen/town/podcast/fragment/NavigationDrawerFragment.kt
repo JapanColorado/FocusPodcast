@@ -1,6 +1,5 @@
 package allen.town.podcast.fragment
 
-import allen.town.core.service.GooglePayService
 import allen.town.focus_common.ad.RewardedAdManager
 import allen.town.focus_common.ads.OnUserEarnedRewardListener
 import allen.town.focus_common.util.BasePreferenceUtil
@@ -9,9 +8,6 @@ import allen.town.focus_common.util.MenuIconUtil.showContextMenuIcon
 import allen.town.focus_common.util.Timber
 import allen.town.focus_common.util.TopSnackbarUtil
 import allen.town.focus_common.views.AccentMaterialDialog
-import allen.town.focus_purchase.data.db.table.GooglePlayInAppTable
-import allen.town.focus_purchase.iap.SupporterManager
-import allen.town.focus_purchase.iap.SupporterManagerWrap
 import allen.town.podcast.MyApp
 import allen.town.podcast.MyApp.Companion.instance
 import allen.town.podcast.R
@@ -60,9 +56,7 @@ import com.airbnb.lottie.LottieAnimationView
 import com.airbnb.lottie.LottieProperty
 import com.airbnb.lottie.model.KeyPath
 import com.airbnb.lottie.value.SimpleLottieValueCallback
-import com.android.billingclient.api.SkuDetails
 import com.google.android.material.bottomsheet.BottomSheetBehavior
-import com.wyjson.router.GoRouter
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
@@ -84,7 +78,6 @@ class NavigationDrawerFragment : Fragment(), OnSharedPreferenceChangeListener {
     private var lottieVip: LottieAnimationView? = null
     private lateinit var removeAdIv: LottieAnimationView
     private lateinit var viewVideoAdIv: LottieAnimationView
-    private lateinit var supporterManager: SupporterManager
 
 
     override fun onCreateView(
@@ -94,8 +87,6 @@ class NavigationDrawerFragment : Fragment(), OnSharedPreferenceChangeListener {
         super.onCreateView(inflater, container, savedInstanceState)
         val root = inflater.inflate(R.layout.nav_list, container, false)
         val preferences = requireContext().getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
-
-        supporterManager = SupporterManagerWrap.getSupporterManger(requireContext())
 
         openFolders =
             HashSet(preferences.getStringSet(PREF_OPEN_FOLDERS, HashSet())) // Must not modify
@@ -471,61 +462,7 @@ class NavigationDrawerFragment : Fragment(), OnSharedPreferenceChangeListener {
     }
 
     private fun setRemoveAdButton() {
-        if (instance.isAdBlockUser()) {
-            removeAdIv.visibility = View.GONE
-        } else {
-            removeAdIv.visibility = View.VISIBLE
-            removeAdIv.setOnClickListener {
-                (activity as MainActivity?)!!.closeDrawer {
-                    if (instance.isAlipay) {
-                        goToProVersion(requireContext(), true)
-                    } else {
-                        supporterManager.supporterInAppItem.subscribeOn(rx.schedulers.Schedulers.io())
-                            .observeOn(
-                                rx.android.schedulers.AndroidSchedulers.mainThread()
-                            ).subscribe(
-                                { skuDetails: List<SkuDetails> ->
-                                    for (detail in skuDetails) {
-                                        if (GoRouter.getInstance().getService(GooglePayService::class.java)!!.getRemoveAdsId().contains(detail.sku)) {
-                                            supporterManager.becomeInAppSubSupporter(
-                                                activity,
-                                                detail,
-                                                GooglePlayInAppTable.TYPE_REMOVE_ADS
-                                            ).subscribeOn(rx.schedulers.Schedulers.io()).observeOn(
-                                                rx.android.schedulers.AndroidSchedulers.mainThread()
-                                            )
-                                                .subscribe({ aBoolean: Boolean ->
-                                                    if (aBoolean) {
-                                                        TopSnackbarUtil.showSnack(
-                                                            activity,
-                                                            R.string.thanks_purchase,
-                                                            Toast.LENGTH_LONG
-                                                        )
-                                                        setRemoveAdButton()
-                                                        EventBus.getDefault().post(
-                                                            RemoveAdsPurchaseEvent()
-                                                        )
-                                                    }
-                                                }) { throwable: Throwable? ->
-                                                    Timber.d(
-                                                        throwable,
-                                                        "There was an error while purchasing remove ads supporter item"
-                                                    )
-                                                }
-                                        } else {
-                                            Timber.e("unknown remove ads sku %s", detail.sku)
-                                        }
-                                    }
-                                }) { throwable: Throwable? ->
-                                Timber.e(
-                                    throwable, "There was an error while retrieving " +
-                                            "remove ads supporter sub item"
-                                )
-                            }
-                    }
-                }
-            }
-        }
+        removeAdIv.visibility = View.GONE
     }
 
     companion object {

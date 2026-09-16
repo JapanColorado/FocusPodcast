@@ -50,3 +50,8 @@ libs
 
 # pixi
 .pixi/
+
+# Vendored ad-SDK aars used by the `free` flavor (flatDir in the root build.gradle).
+# They live in a `libs` directory, which the blanket `libs` rule above would drop.
+!lib/common/libs/
+!lib/common/libs/*.aar

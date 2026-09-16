@@ -1,0 +1,267 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/container"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_margin="8dp"
+        android:orientation="horizontal"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp">
+
+        <FrameLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@color/transparent">
+
+            <androidx.cardview.widget.CardView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                app:cardBackgroundColor="@color/transparent"
+                app:cardCornerRadius="@dimen/card_corner_radius"
+                app:cardElevation="0dp"
+                app:cardMaxElevation="0dp"
+                app:cardPreventCornerOverlap="false">
+
+                <FrameLayout
+                    android:id="@+id/one_month_layout"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:background="@drawable/bg_premium_item_pro"
+                    android:foreground="@drawable/alpha54black"
+                    android:scaleX="0.8"
+                    android:scaleY="0.8">
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:gravity="center"
+                        android:orientation="vertical"
+                        android:padding="@dimen/padding_4">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:autoSizeMaxTextSize="100dp"
+                            android:autoSizeMinTextSize="2dp"
+                            android:autoSizeTextType="uniform"
+                            android:text="1"
+                            android:textColor="@android:color/white"
+                            android:textSize="36sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginBottom="8dp"
+                            android:autoSizeMaxTextSize="100dp"
+                            android:autoSizeMinTextSize="2dp"
+                            android:autoSizeTextType="uniform"
+                            android:text="@string/month"
+                            android:textColor="@android:color/white"
+                            android:textSize="22sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/one_month_price"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:autoSizeMaxTextSize="100dp"
+                            android:autoSizeMinTextSize="2dp"
+                            android:autoSizeTextType="uniform"
+                            android:gravity="center"
+                            android:maxLines="1"
+                            android:textColor="@android:color/white"
+                            android:textSize="22sp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+                </FrameLayout>
+            </androidx.cardview.widget.CardView>
+        </FrameLayout>
+
+        <FrameLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@color/transparent">
+
+            <androidx.cardview.widget.CardView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                app:cardBackgroundColor="@color/transparent"
+                app:cardCornerRadius="@dimen/card_corner_radius"
+                app:cardElevation="0dp"
+                app:cardMaxElevation="0dp"
+                app:cardPreventCornerOverlap="false">
+
+                <FrameLayout
+                    android:id="@+id/one_year_layout"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:background="@drawable/bg_premium_item_pro"
+                    android:scaleX="1"
+                    android:scaleY="1">
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:gravity="center"
+                        android:orientation="vertical"
+                        android:padding="@dimen/padding_4">
+
+                        <TextView
+                            android:id="@+id/day_trial_tv"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginBottom="6dp"
+                            android:autoSizeMaxTextSize="100dp"
+                            android:autoSizeMinTextSize="2dp"
+                            android:autoSizeTextType="uniform"
+                            android:gravity="center"
+                            android:text="@string/day_trial"
+                            android:textColor="@android:color/white"
+                            android:textSize="18sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/price"
+                            style="@style/TextStyleW8"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:layout_marginBottom="4dp"
+                            android:autoSizeMaxTextSize="100dp"
+                            android:autoSizeMinTextSize="2dp"
+                            android:autoSizeTextType="uniform"
+                            android:gravity="center"
+                            android:visibility="gone" />
+
+                        <TextView
+                            android:id="@+id/one_year_introductory_price"
+                            style="@style/TextStyleW3"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:autoSizeMaxTextSize="100dp"
+                            android:autoSizeMinTextSize="2dp"
+                            android:autoSizeTextType="uniform"
+                            android:gravity="center"
+                            android:text="@string/premium" />
+
+                        <TextView
+                            style="@style/TextStyleW3"
+                            android:id="@+id/one_year_tip_tv"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:autoSizeMaxTextSize="100dp"
+                            android:autoSizeMinTextSize="2dp"
+                            android:autoSizeTextType="uniform"
+                            android:gravity="center"
+                            android:text="@string/annually" />
+
+                        <TextView
+                            android:id="@+id/day_trial_free_tv"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="bottom|center_horizontal"
+                            android:layout_marginTop="4dp"
+                            android:autoSizeMaxTextSize="100dp"
+                            android:autoSizeMinTextSize="2dp"
+                            android:autoSizeTextType="uniform"
+                            android:text="@string/free"
+                            android:textAllCaps="true"
+                            android:textColor="@color/premium_pro_free"
+                            android:textSize="32sp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+                </FrameLayout>
+            </androidx.cardview.widget.CardView>
+        </FrameLayout>
+
+        <FrameLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@color/transparent">
+
+            <androidx.cardview.widget.CardView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                app:cardBackgroundColor="@color/transparent"
+                app:cardCornerRadius="@dimen/card_corner_radius"
+                app:cardElevation="0dp"
+                app:cardMaxElevation="0dp"
+                app:cardPreventCornerOverlap="false">
+
+                <FrameLayout
+                    android:id="@+id/three_month_layout"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:background="@drawable/bg_premium_item_pro"
+                    android:foreground="@drawable/alpha54black"
+                    android:scaleX="0.8"
+                    android:scaleY="0.8">
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:gravity="center"
+                        android:orientation="vertical"
+                        android:padding="@dimen/padding_4">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:autoSizeMaxTextSize="100dp"
+                            android:autoSizeMinTextSize="2dp"
+                            android:autoSizeTextType="uniform"
+                            android:text="3"
+                            android:textColor="@android:color/white"
+                            android:textSize="36sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginBottom="8dp"
+                            android:autoSizeMaxTextSize="100dp"
+                            android:autoSizeMinTextSize="2dp"
+                            android:autoSizeTextType="uniform"
+                            android:text="@string/months"
+                            android:textColor="@android:color/white"
+                            android:textSize="22sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/three_month_price"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:autoSizeMaxTextSize="100dp"
+                            android:autoSizeMinTextSize="2dp"
+                            android:autoSizeTextType="uniform"
+                            android:gravity="center"
+                            android:maxLines="1"
+                            android:textColor="@android:color/white"
+                            android:textSize="22sp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+                </FrameLayout>
+            </androidx.cardview.widget.CardView>
+        </FrameLayout>
+    </LinearLayout>
+</androidx.core.widget.NestedScrollView>

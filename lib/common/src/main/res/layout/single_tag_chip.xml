@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<allen.town.focus_common.views.AccentChip
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/chip"
+    style="@style/Widget.Material3.Chip.Filter"
+    app:checkedIconVisible="false"
+    android:checkable="true"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content" />

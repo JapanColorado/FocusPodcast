@@ -8,7 +8,7 @@ android {
     }
 }
 dependencies {
-    implementation project(path: ':focus-common')
+    implementation project(path: ':lib:common')
     kapt "androidx.annotation:annotation:$annotationVersion"
     implementation "androidx.appcompat:appcompat:$appcompatVersion"
     implementation "androidx.viewpager2:viewpager2:$viewPager2Version"

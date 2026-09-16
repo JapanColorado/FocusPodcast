@@ -1,0 +1,141 @@
+<resources>
+    <string name="you_have_to_select_at_least_one_category">您必須選擇最少一項</string>
+    <string name="library_categories">類別</string>
+    <string name="reset_action">重置</string>
+    <string name="done">完成</string>
+    <string name="add_action">添加</string>
+    <string name="email_app_not_found">未找到 app</string>
+    <string name="copied_to_clipboard">已複製</string>
+    <string name="share">分享</string>
+    <string name="send_file">请给我发送邮件，邮件地址已複製</string>
+
+    <string name="asc">升序</string>
+    <string name="desc">降序</string>
+    <string name="title">標題</string>
+    <string name="pref_language_name">選擇語言</string>
+    <string name="select">选择</string>
+    <string name="made_by">作者 allen town</string>
+    <string name="communication">溝通與交流</string>
+    <string name="change_log">更新日誌</string>
+    <string name="others">其它</string>
+    <string name="restore">恢復</string>
+    <string name="purchase">購買</string>
+
+    <string name="today">今日</string>
+    <string name="not_today">不是今日</string>
+    <string name="yesterday">昨日</string>
+
+    <string name="backup">備份</string>
+    <string name="connect">連接</string>
+    <string name="already_connect">已連接</string>
+    <string name="backup_failed">備份失敗</string>
+    <string name="already_backup_dropbox">已備份到 Dropbox</string>
+    <string name="already_backup_webdav">已備份到 WebDAV</string>
+    <string name="restore_success">恢復成功</string>
+    <string name="restore_failed">恢復失敗</string>
+    <string name="already_backup_one_drive">已備份到 One Drive</string>
+    <string name="backup_not_found">沒有找到備份文件</string>
+    <string name="already_backup_google_drive">已備份到谷歌云盤</string>
+    <string name="twitter_follow_me">關注我</string>
+    <string name="rate_me">打分</string>
+    <string name="others_app_of_us">我們的其他應用</string>
+    <string name="check_upgrade">檢查更新</string>
+
+    <string name="disable_firebase_crashlytics_title">禁用 firebase crashlytics</string>
+    <string name="disable_firebase_crashlytics_summary">我建議保留此選項，這會幫助我分析app的問題</string>
+
+    <string name="cancel_any_time">%1$s，隨時取消</string>
+    <string name="premium_pro_tip">您的高級會員身份已激活</string>
+
+    <string name="payment_iap_sucess">已購買</string>
+    <string name="payment_price_3month">%1$s /3個月</string>
+    <string name="payment_price_6month">%1$s /6個月</string>
+    <string name="payment_price_month">%1$s /月</string>
+    <string name="payment_price_week">%1$s /周</string>
+    <string name="payment_price_year">%1$s /年</string>
+    <string name="then_price">然後 %1$s</string>
+    <string name="then_price_year">之後 %1$s /年</string>
+    <string name="try_it_free">免費試用</string>
+
+    <string name="restore_tip">我已經付款了，點擊恢復購買</string>
+    <string name="input_ordid">請輸入支付寶訂單號</string>
+    <string name="restore_purchase">恢復購買</string>
+    <string name="query_alipay_order_failed">查詢失敗</string>
+    <string name="query_alipay_order_no">交易不存在</string>
+    <string name="alipay_purchase">支付寶支付</string>
+    <string name="expired_time">有效期至：</string>
+    <string name="ali_pay_tip">支付方式：\n
+1、同時按音量+和電源鍵截圖，打開支付寶掃一掃，選擇相冊中的截圖，付款即可\n
+2、用他人手機，打開支付寶掃一掃，付款即可</string>
+    <string name="ali_pay_time_tip">請在30分鐘內完成付款，付款成功以前不要關閉此界面</string>
+    <string name="google_service_not_install">Google service 可能沒有安裝 , 將無法完成支付</string>
+
+
+    <string name="billing_des">訂閱自動更新，您可以在下一次自動更新前，隨時在<a
+        href='https://play.google.com/store/account/subscriptions'> Google Play賬戶 </a>中取消訂閱。</string>
+    <string name="billing_policy">政策</string>
+    <string name="billing_terms_service">服務條款</string>
+    <string name="thanks_purchase">訂閱成功 ， 感謝您的購買</string>
+
+    <string name="search_history">搜索歷史</string>
+    <string name="expanded">展開</string>
+    <string name="compact">緊湊</string>
+    <string name="compact_fixed">緊湊-固定</string>
+    <string name="pref_title_appbar_mode">應用程式列模式</string>
+    <string name="pref_language_names_default">系統默認</string>
+    <string name="pref_language_names_simple_chinese">簡體中文</string>
+    <string name="pref_language_names_tradition_chinese">繁體中文</string>
+    <string name="share_to_friends">分享給朋友</string>
+    <string name="share_to_friends_tip">嘿！這是下載 %s 應用的鏈接。我非常喜歡這個應用，希望您也喜歡。</string>
+    <string name="rewarded_ad_not_ready">激勵廣告還未準備好，请关闭app后再试</string>
+    <string name="rewarded_title">激勵廣告</string>
+    <string name="rewarded_ad_tip">您將觀看一段幾秒鐘的激勵廣告，每一次觀看後您將獲得獎勵：\n1、今天將不會再出現任何廣告\n2、您將解鎖1小時高級版的全部功能\n\n您可以重複觀看，重複獲得此獎勵</string>
+    <string name="rewarded_ad_one_hour_tip">您將觀看一段幾秒鐘的激勵廣告，每一次觀看後您將獲得獎勵：\n1、您將解鎖10分钟高級版的全部功能\n\n每天最多观看2
+        次，每次观看后奖励会累加</string>
+    <string name="rewarded_locked">您已经解锁了高级版功能直到 %s</string>
+    <string name="pref_title_tab_text_mode">标签页标题模式</string>
+    <string name="auto">自动</string>
+    <string name="labeled">有标签</string>
+    <string name="selected">仅选中</string>
+    <string name="unlabeled">无标签</string>
+    <string name="preference_search_hint">搜索</string>
+    <string name="preference_search_no_results">无结果</string>
+    <string name="searchpreference_clear_history">清除历史记录</string>
+    <string name="documentation_support">常见问题 &amp; 帮助</string>
+    <string name="bug_report_title">报告Bug</string>
+    <!--About screen-->
+    <string name="about_pref">关于</string>
+    <string name="privacy_policy">隐私政策</string>
+    <string name="buy_now">查看所有高级特性</string>
+    <string name="help_me_translate_tip">幫助我們翻譯</string>
+
+    <string name="remove_ads_modest">謙虛</string>
+    <string name="remove_ads_suggested">建議 🙏 </string>
+    <string name="remove_ads_generous">慷慨 👑</string>
+    <string name="remove_ads_tip">通過以下捐款刪除廣告</string>
+    <string name="pref_custom_launcher_title">自定義啟動器圖標</string>
+    <string name="pref_custom_launcher_summary">並非所有手機都支持此功能，請自行測試</string>
+    <string name="memory_manage">存儲管理</string>
+    <string name="backup_category">備份和還原</string>
+    <string name="clear_memory">清理存儲</string>
+    <string name="pro_tip_remove_ads">去廣告</string>
+    <string name="delete_cache">清除當前緩存</string>
+    <string name="cache_dialog">清除緩存？ </string>
+    <string name="not_cache">這將不會影響到應用緩存</string>
+    <string name="current_cache_size">當前緩存大小</string>
+    <string name="cache_dialog_summary">該操作將無法撤銷</string>
+    <string name="trimming">優化中…</string>
+    <string name="trim_success">優化成功</string>
+    <string name="pro_tip_fonts">更多字體選擇</string>
+    <string name="pro_tip_custom_icon">自定義app圖標</string>
+    <string name="pro_tip_lazy_mode">懶人模式，自動滾動文章，讓你無需移動拇指就能享受到精彩的內容</string>
+    <string name="pro_tip_switch_account">發表評論和帖子時在帳戶之間快速切換</string>
+    <string name="next">下一步</string>
+    <string name="loading_instance">正在取得伺服器資訊...</string>
+    <string name="not_a_mastodon_instance">%s 似乎不是 Mastodon 站台。</string>
+    <string name="i_agree">我已閱讀並同意</string>
+    <string name="server_rules_disagree">不同意</string>
+    <string name="error_empty">內容不能為空</string>
+    <string name="donate">捐贈</string>
+    <string name="donate_summary">為開發者購買咖啡</string>
+</resources>

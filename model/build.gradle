@@ -8,7 +8,7 @@ android {
     }
 }
 dependencies {
-    api project(':focus-common')
+    api project(':lib:common')
     kapt "androidx.annotation:annotation:$annotationVersion"
     implementation "androidx.media:media:$mediaVersion"
 

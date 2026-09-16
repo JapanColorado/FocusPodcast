@@ -11,7 +11,7 @@ dependencies {
     implementation project(':event')
     implementation project(':model')
     implementation project(':playback:base')
-    implementation project(':focus-common')
+    implementation project(':lib:common')
 
     kapt "androidx.annotation:annotation:$annotationVersion"
     implementation "androidx.appcompat:appcompat:$appcompatVersion"

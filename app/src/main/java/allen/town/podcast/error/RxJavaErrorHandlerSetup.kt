@@ -14,7 +14,7 @@ object RxJavaErrorHandlerSetup {
                 Log.d(TAG, "ignored exception: " + Log.getStackTraceString(exception))
                 return@setErrorHandler
             }
-            if (exception is OnErrorNotImplementedException || exception is rx.exceptions.OnErrorNotImplementedException) {
+            if (exception is OnErrorNotImplementedException) {
                 // 两个版本的此异常打印即可
                 Log.w(TAG, "ignored exception: OnErrorNotImplementedException")
                 return@setErrorHandler

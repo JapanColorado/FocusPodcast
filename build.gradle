@@ -39,7 +39,7 @@ allprojects {
         maven { url "https://maven.aliyun.com/repository/apache-snapshots" }
         //[Android]依赖了包含aar包的库后出现Failed to resolve库aar包问题的解决办法
         flatDir {
-            dirs project(':focus-common').file('libs')
+            dirs project(':lib:common').file('libs')
         }
     }
 

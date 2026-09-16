@@ -129,9 +129,8 @@ dependencies {
     implementation project(':ui:app-start-intent')
     implementation project(':ui:common')
     implementation project(':ui:i18n')
-    implementation project(':focus-common')
-    implementation project(':focus-purchase')
-    implementation project(':searchpreference')
+    implementation project(':lib:common')
+    implementation project(':lib:searchpreference')
 //    implementation 'com.google.android.play:feature-delivery:2.0.0'
 //    implementation 'com.google.android.play:review:2.0.0'
 

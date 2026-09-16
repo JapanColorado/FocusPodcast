@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <drawable name="alpha16white">#29ffffff</drawable>
+    <drawable name="alpha54black">#8a000000</drawable>
+    <drawable name="alpha60gray">#8abfbfbf</drawable>
+    <drawable name="alpha70black">#b2000000</drawable>
+    <drawable name="alpha87black">#de000000</drawable>
+    <drawable name="black">#000000</drawable>
+    <drawable name="discover_bg_vblock_bg">#1a1c2b</drawable>
+    <drawable name="notification_template_icon_bg">#3333b5e5</drawable>
+    <drawable name="notification_template_icon_low_bg">#0cffffff</drawable>
+    <drawable name="place_holder_card1">#b5b5c6</drawable>
+    <drawable name="place_holder_card2">#dfe2db</drawable>
+    <drawable name="place_holder_card3">#f1b5b5</drawable>
+    <drawable name="place_holder_card4">#c6dadb</drawable>
+    <drawable name="place_holder_card5">#f1c8b3</drawable>
+    <drawable name="place_holder_card6">#c6d2c6</drawable>
+    <drawable name="theme_orange">#f55b23</drawable>
+    <drawable name="transparent">#00000000</drawable>
+    <drawable name="white">#ffffff</drawable>
+</resources>

@@ -1,0 +1,17 @@
+apply plugin: 'com.android.library'
+
+apply from: "../../common.gradle"
+//apply from: "../../playFlavor.gradle"
+android {
+    defaultConfig {
+        namespace "com.bytehamster.lib.preferencesearch"
+    }
+}
+dependencies {
+    implementation project(':lib:common')
+    implementation "androidx.appcompat:appcompat:$appcompatVersion"
+    implementation "com.google.android.material:material:$googleMaterialVersion"
+    implementation "androidx.preference:preference-ktx:$preferenceVersion"
+    implementation 'org.apache.commons:commons-text:1.3'
+
+}
