@@ -83,7 +83,6 @@ FocusPodcast is licensed under the GNU General Public License (GPL-3.0). You can
 The build is driven by [pixi](https://pixi.sh), which provides JDK 17. You need an Android SDK with platform 35 and build-tools 34.0.0 (default location `~/Android/Sdk`, override with `ANDROID_HOME`).
 
 ```bash
-git submodule update --init
 pixi install          # one-time: fetches the JDK
 pixi run build        # debug APK
 pixi run test         # JVM unit tests

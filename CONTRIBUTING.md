@@ -41,7 +41,7 @@ Submit a pull request
 
 Building From Source
 --------------------------
-1. Clone the repository and initialise the submodules: `git submodule update --init`.
+1. Clone the repository. There are no submodules; the vendored libraries live in-tree under `lib/`.
 1. Install [pixi](https://pixi.sh) and an Android SDK with platform 35 and build-tools 34.0.0
    (default location `~/Android/Sdk`; set `ANDROID_HOME` to override).
 1. `pixi install` downloads JDK 17 into the project environment.

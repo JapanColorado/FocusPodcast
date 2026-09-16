@@ -4,80 +4,76 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What this is
 
-FocusPodcast is an Android podcast app (app id `allen.town.focus.podcast`, packages `allen.town.podcast.*`). It is a heavily modified fork of AntennaPod: the structure and most core classes match AntennaPod, but several were renamed (`PodDBAdapter` → `Db`, `UserPreferences` → `Prefs`, `de.danoeh.antennapod` → `allen.town.podcast`), so upstream docs do not map 1:1. Mixed Kotlin/Java: `app` is Kotlin-leaning, `core`/`model`/`parser`/`storage` are almost all Java. Many comments and some commit messages are in Chinese.
+FocusPodcast is an Android podcast app (app id `allen.town.focus.podcast`, packages `allen.town.podcast.*`). It is a heavily modified fork of AntennaPod: the structure and most core classes match AntennaPod, but several were renamed (`PodDBAdapter` → `Db`, `UserPreferences` → `Prefs`, `de.danoeh.antennapod` → `allen.town.podcast`), so upstream docs do not map 1:1. Mixed Kotlin/Java: `app` is Kotlin-leaning, `core`/`model`/`parser`/`storage` are almost all Java. Many comments are in Chinese.
 
-## Build prerequisites (the build fails out of the box)
+The app is F-Droid-only: there are no build flavors, no Google Play / Firebase / ads / in-app-purchase code, and no pro gating.
 
-1. **Init submodules.** `focus-common`, `focus-theme`, `focus-purchase`, `searchpreference` are empty git submodules (all from github.com/allentown521) and are imported everywhere (`allen.town.focus_common.*`, `allen.town.core.service.*`, `allen.town.focus_purchase.*`, `com.bytehamster.lib.preferencesearch.*`, `code.name.monkey.appthemehelper.*`). Root `build.gradle` also has a `flatDir` pointing into `focus-common/libs`.
-   ```
-   git submodule update --init
-   ```
-2. **Create `secrets.properties`** at repo root from `secrets.properties.sample`. `app/build.gradle` reads it for `buildConfigField`s, manifest placeholders, and **both** `debug` and `release` signing configs, so a keystore path is needed even for debug builds. The `googleAdsKey`/`dropboxScheme` placeholders and `google-services.json` (gitignored, needed by the applied `com.google.gms.google-services` plugin) are also missing from a fresh clone.
-3. **JDK 17** (`compileSdk 35`, Gradle 8.7, AGP 8.4.1, Kotlin 1.9.23). Use pixi: `pixi install` fetches JDK 17 from conda-forge and `scripts/env.sh` exports `JAVA_HOME`/`ANDROID_HOME` on activation, so run every Gradle command as `pixi run <task>` (or `pixi shell` then `./gradlew ...`). `scripts/check-env.sh` writes `local.properties` (gitignored) pointing at `$ANDROID_HOME` (default `~/Android/Sdk`, which must have platform 35 and build-tools 34.0.0). The Debian SDK at `/usr/lib/android-sdk` has no platforms and is unusable.
-4. Dependency resolution goes through ~13 Aliyun mirrors plus `jcenter()` in root `build.gradle`. Expect slow or flaky resolution outside China; do not "clean up" the mirror list without checking every old artifact still resolves.
+## Build prerequisites
+
+1. **JDK 17** (`compileSdk 35`, Gradle 8.7, AGP 8.4.1, Kotlin 1.9.23). Use pixi: `pixi install` fetches JDK 17 from conda-forge and `scripts/env.sh` exports `JAVA_HOME`/`ANDROID_HOME` on activation, so run every Gradle command as `pixi run <task>` (or `pixi shell` then `./gradlew ...`).
+2. `scripts/check-env.sh` (a `depends-on` of most pixi tasks) verifies JDK 17 and the SDK and writes `local.properties` (gitignored) pointing at `$ANDROID_HOME` (default `~/Android/Sdk`, which must have platform 35 and build-tools 34.0.0). The Debian SDK at `/usr/lib/android-sdk` has no platforms and is unusable.
+3. **Debug builds need no secrets.** `app/build.gradle` reads `secrets.properties` if it exists; if it does not, it prints a notice, uses placeholder PodcastIndex API keys, and falls back to Gradle's default debug signing config. **Release builds need a real keystore**: copy `secrets.properties.sample` to `secrets.properties` and fill in `storeFile`/`storePassword`/`keyAlias`/`keyPassword` (the same entry drives both the release and debug signing configs when present).
+4. There are no git submodules. The three vendored libraries live in-tree under `lib/`.
+5. Dependency resolution uses `google()`, `mavenCentral()`, `gradlePluginPortal()` and JitPack, plus one Aliyun mirror (`maven.aliyun.com/repository/public`) that exists solely because `com.beloo.widget:ChipsLayoutManager:0.3.7` (an ex-jcenter artifact) is not on Maven Central. Do not remove that entry without finding another source for it.
 
 ## Commands
 
-Flavor dimension `market` has three flavors: `fdroid`, `play`, `free`. Task names are `<flavor><BuildType>`, e.g. `assemblePlayDebug`.
+There is no flavor dimension, so task names are just `<buildType>`, e.g. `assembleDebug`.
 
 ```bash
-pixi run build      # assembleFdroidDebug
-pixi run test       # testFdroidDebugUnitTest
+pixi run build      # assembleDebug
+pixi run test       # testDebugUnitTest
 pixi run lint       # ./gradlew lint
 pixi run nn         # !! ratchet (scripts/count-bangbang.sh)
 pixi run check      # build + test + lint + nn
-pixi run release    # assembleFdroidRelease (needs secrets.properties)
+pixi run release    # assembleRelease (needs secrets.properties)
 pixi run install    # adb install the debug APK
 pixi run clean
 
 # Raw Gradle equivalents (inside `pixi shell`):
-./gradlew assembleFdroidDebug            # most self-contained flavor (no Google/ads/purchase deps)
-./gradlew assemblePlayDebug              # full Google build (Cast, Firebase, Play Billing, Drive/Dropbox backup)
-./gradlew assembleFreeRelease            # Chinese-market build; targetSdk 33, Alipay, Baidu stats, self-hosted updater
+./gradlew assembleDebug
+./gradlew assembleRelease
 
 ./gradlew test                           # all JVM unit tests (JUnit4 + Robolectric)
-./gradlew :parser:feed:testFdroidDebugUnitTest
-./gradlew :parser:feed:testFdroidDebugUnitTest --tests "allen.town.podcast.parser.feed.element.namespace.RssParserTest"
-./gradlew :playback:base:testFdroidDebugUnitTest --tests "*RewindAfterPauseUtilTest"
-./gradlew :core:testFdroidDebugUnitTest
+./gradlew :parser:feed:testDebugUnitTest
+./gradlew :parser:feed:testDebugUnitTest --tests "allen.town.podcast.parser.feed.element.namespace.RssParserTest"
+./gradlew :playback:base:testDebugUnitTest --tests "*RewindAfterPauseUtilTest"
+./gradlew :core:testDebugUnitTest
 
 ./gradlew lint                           # per-module lint.xml in app/, core/, ui/i18n/; abortOnError=true but ignoreWarnings=true
 ./gradlew checkstyle                     # root task, checkstyle 8.24 over the whole tree
-./gradlew :app:connectedFdroidDebugAndroidTest   # Espresso/Robotium instrumentation tests (device required)
+./gradlew :app:connectedDebugAndroidTest # Espresso/Robotium instrumentation tests (device required)
 ```
 
 JVM unit tests exist in `parser/feed`, `playback/base`, and `core` (`core/src/test`). Robolectric 4.12.2 works under JDK 17 but only emulates up to API 34, so every module with Robolectric tests has `src/test/resources/robolectric.properties` pinning `sdk=34`. Prefer plain JUnit4 for pure logic; use `@RunWith(RobolectricTestRunner.class)` when the code under test needs real Android classes (SQLite, `TextUtils`, resources).
 
 ## Module architecture
 
-`settings.gradle` includes 16 in-tree modules plus the 4 submodules. Every module applies `common.gradle`, which supplies the Kotlin/kapt/parcelize plugins, the three flavors, Java 17, viewBinding, and a GoRouter `api` + `kapt` dependency for every module. All shared versions (SDK levels, `versionCode`/`versionName`, library versions) live in `project.ext` in the root `build.gradle`.
+`settings.gradle` includes 18 modules: 15 app modules plus the three vendored libraries under `lib/`. Every module applies `common.gradle`, which supplies the Kotlin/kapt/parcelize plugins, Java 17, viewBinding and the shared `packagingOptions`/`lintOptions`. All shared versions (SDK levels, `versionCode`/`versionName`, library versions) live in `project.ext` in the root `build.gradle`.
 
 Dependency direction (top depends on bottom):
 
-- **app** — Activities/fragments/adapters, `MyApp` Application, flavor-specific purchase/ads/cloud code. Depends on core and nearly everything else.
+- **app** — Activities/fragments/adapters, `MyApp` Application. Depends on core and nearly everything else.
 - **core** — the workhorse: `DBReader`/`DBWriter`/`DBTasks`, `PlaybackService` + `LocalPSMP` + `ExoPlayerWrapper`, `DownloadService`, `FeedUpdateWorker`, `SyncService`, `Prefs`, widgets, Glide setup, backup/OPML.
-- **playback/base** (abstract `PlaybackServiceMediaPlayer`, `PlayerStatus`), **playback/cast** (Chromecast; real impl only in `play`, stubs in `fdroid`/`free`)
-- **storage/database** — raw SQLite `Db.java` (`focusPodcastApp.db`, `VERSION = 3`, renumbered from AntennaPod), `DBUpgrade.java` hand-written ALTER ladder, `mapper/*CursorMapper`. No Room.
+- **playback/base** — abstract `PlaybackServiceMediaPlayer`, `PlayerStatus`.
+- **storage/database** — raw SQLite `Db.java` (package `allen.town.podcast.storage.db`, `focusPodcastApp.db`, `VERSION = 3`, renumbered from AntennaPod), `DBUpgrade.java` hand-written ALTER ladder, `mapper/*CursorMapper`. No Room.
 - **parser/feed** (RSS/Atom), **parser/media** (ID3/Vorbis chapters), **net/ssl**, **net/sync/model** + **net/sync/gpoddernet**
 - **event** — EventBus payload classes only. **model** — POJOs (`Feed`, `FeedItem`, `FeedMedia`, ...).
 - **ui/common** (shared views), **ui/app-start-intent** (typed Intent builders so lower modules can launch app Activities without depending on `app`), **ui/i18n** and **ui/png-icons** (resources only).
+- **lib/common** (`allen.town.focus_common.*` — base Activity/Application, dialogs, utils), **lib/theme** (`code.name.monkey.appthemehelper.*`), **lib/searchpreference** (`com.bytehamster.lib.preferencesearch.*`). These were git submodules until Phase 1; they are now ordinary in-tree modules and may be edited freely.
 
 ### How the layers talk to each other
 
-- **core → app callbacks via `ClientConfig`.** `core/.../ClientConfig.java` is a static registry of callback interfaces. `app/.../config/ClientConfigurator.java` fills it in a static initializer, which `MyApp` forces to run with `Class.forName("allen.town.podcast.config.ClientConfigurator")`. If core needs something only app knows, add it here rather than a module dependency.
-- **Lower modules → app services via GoRouter as a service locator.** GoRouter is *not* used for activity routing (no `@Route` annotations). Service interfaces (`PayService`, `AdService`, `AliPayService`, `GooglePayService`, `AppService`) live in `allen.town.core.service` from `focus-common`; implementations are in `app/src/main/java/allen/town/podcast/service/*Impl.kt` annotated `@Service(remark = "/app/...")`. Callers do `GoRouter.getInstance().getService(PayService::class.java)` — this is how `Db.java`, `Prefs.kt`, `DBWriter`, `DownloadService`, and widgets check pro/purchase status from below `app`. Each module passes `GOROUTER_MODULE_NAME` to kapt (see `common.gradle`).
+- **core → app callbacks via `ClientConfig`.** `core/.../ClientConfig.java` is a static registry of callback interfaces (`applicationCallbacks`, `downloadServiceCallbacks`). `app/.../config/ClientConfigurator.java` fills it in a static initializer, which `MyApp` forces to run with `Class.forName("allen.town.podcast.config.ClientConfigurator")`. If core needs something only app knows, add it here rather than a module dependency.
 - **EventBus (greenrobot) is the main cross-layer channel.** Subscriber indexes are kapt-generated: `allen.town.podcast.ApEventBusIndex` (arg in `app/build.gradle`) and `allen.town.podcast.core.ApCoreEventBusIndex` (arg in `core/build.gradle`), both installed in `MyApp.onCreate`. A `@Subscribe` method in a module without an `eventBusIndex` kapt arg will not be indexed.
 - **RxJava2** for DB/network work off the main thread (`subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())`), with a global handler in `app/.../error/RxJavaErrorHandlerSetup`.
 - **Background work:** `DownloadService` is a foreground Service, not WorkManager. WorkManager is used for `FeedUpdateWorker` (scheduled by `core/util/download/AutoUpdateManager.java`) and `WidgetUpdaterWorker`.
 
-### Flavor-specific source sets
-
-Flavor directories exist under `app/src/{fdroid,play,free}`, `core/src/{fdroid,play,free}`, `net/ssl/src/*`, and `playback/cast/src/*`. The same class name (e.g. `PurchaseActivity`, `DriveBackupActivity`, `ProductWrap`, `SslProviderInstaller`, `WearMediaSession`, `CastPsmp`) is implemented per flavor, with `fdroid` usually a stub. When adding a class to one flavor's source set, add the counterpart to the others or the other flavors will not compile.
-
 ## Gotchas
 
-- `app/build.gradle` has a `copyLicense` task hooked to `preBuild` that writes `LICENSE` into `app/src/main/assets/LICENSE.txt` (a source-tree write).
-- ProGuard rules are in `app/proguard.cfg`; release enables `minifyEnabled` and `shrinkResources`. Crashlytics mapping upload is force-disabled via a `taskGraph.whenReady` hook.
-- ButterKnife and ViewBinding coexist in `app`; prefer ViewBinding for new UI. kapt runs four processors (ButterKnife, Glide, EventBus, GoRouter) and is the usual source of opaque build errors.
-- `CONTRIBUTING.md` asks not to upgrade dependencies or build tools without a concrete reason; several pinned versions (e.g. ExoPlayer 2.15.1, `appupdate` 4.3.1) have comments explaining why newer versions break.
-- `CONTRIBUTING.md` describes a `develop`/`master` branch flow inherited from AntennaPod, but this repo's only long-lived branch is `main` (plus an `androidx-media3` migration branch on origin).
+- `app/build.gradle` has a `copyLicense` task hooked to `preBuild` that copies the root `LICENSE` to `app/build/generated/license-assets/LICENSE.txt`; that directory is registered as an extra `assets` srcDir. It no longer writes into the source tree — do not reintroduce a source-tree write.
+- ProGuard rules are in `app/proguard.cfg`; release enables `minifyEnabled` and `shrinkResources`.
+- ButterKnife and ViewBinding coexist in `app`; prefer ViewBinding for new UI. kapt runs three processors (ButterKnife, Glide, EventBus) and is the usual source of opaque build errors.
+- **`pixi run lint` currently fails.** `:lib:theme:lintDebug` reports 43 errors (39 `RestrictedApi`, 3 `SoonBlockedPrivateApi`, 1 `BlockedPrivateApi`), the first being reflective access to `TextView.mCursorDrawable` in `lib/theme/src/main/java/code/name/monkey/appthemehelper/util/EditTextUtil.java:61`. This is pre-existing vendored code and is scheduled to be fixed in Phase 4; until then `pixi run check` cannot pass.
+- `CONTRIBUTING.md` asks not to upgrade dependencies or build tools without a concrete reason; several pinned versions (e.g. ExoPlayer 2.15.1) have comments explaining why newer versions break.
+- The only long-lived branch is `main`.

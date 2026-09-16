@@ -8,18 +8,20 @@ because it is deleted outright.
 
 | Metric | Baseline | Now |
 |---|---:|---:|
-| First-party source lines (java + kt) | 71,121 | 71,121 |
-| Kotlin `!!` assertions (app, core, lib) | 1,865 | 1,865 |
-| `printStackTrace()` calls | 135 | 135 |
-| Chinese (CJK) lines outside translation resources | 626 | 626 |
+| First-party source lines (java + kt) | 71,121 | 66,282 |
+| Kotlin `!!` assertions (app, core, lib) | 1,865 | 1,694 |
+| `printStackTrace()` calls | 135 | 129 |
+| Chinese (CJK) lines outside translation resources | 626 | 471 |
 | Rx `subscribe(` with no error handler | ~11 | ~11 |
-| Build flavors | 3 | 3 |
-| Git submodules | 4 | 4 |
-| Unit test files (passing tests) | 15 (51) | 15 (54) |
+| Build flavors | 3 | 1 |
+| Git submodules | 4 | 0 |
+| Unit test files (passing tests) | 15 (51) | 10 (58) |
 
 Commands used:
 
 ```bash
+find app core model storage parser playback net ui event -name '*.java' -o -name '*.kt' \
+  | grep -v /build/ | xargs cat | wc -l
 grep -rho '!!' --include='*.kt' app core lib | grep -v /build/ | wc -l
 grep -rn 'printStackTrace' --include='*.java' --include='*.kt' . | grep -v /build/ | wc -l
 grep -rnP '[\x{4e00}-\x{9fff}]' --include='*.java' --include='*.kt' --include='*.xml' \
