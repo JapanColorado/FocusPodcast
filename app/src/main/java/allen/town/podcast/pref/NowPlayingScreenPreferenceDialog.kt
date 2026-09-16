@@ -17,7 +17,6 @@ package allen.town.podcast.pref
 import allen.town.focus_common.common.prefs.supportv7.ATEDialogPreference
 import allen.town.focus_common.extensions.colorControlNormal
 import allen.town.focus_common.extensions.hide
-import allen.town.focus_common.extensions.show
 import allen.town.focus_common.util.Util
 import allen.town.podcast.R
 import allen.town.podcast.core.playback.NowPlayingScreen

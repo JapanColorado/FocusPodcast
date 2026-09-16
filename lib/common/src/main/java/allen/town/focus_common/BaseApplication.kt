@@ -6,8 +6,6 @@ import allen.town.focus_common.util.BasePreferenceUtil
 import allen.town.focus_common.util.Timber
 import allen.town.focus_common.util.WallpaperAccentManager
 import android.app.Activity
-import android.app.ActivityManager
-import android.content.Context
 import android.os.Bundle
 import androidx.multidex.MultiDexApplication
 
@@ -46,18 +44,6 @@ open class BaseApplication: MultiDexApplication() {
      */
     fun isAppOnFront(): Boolean {
         return onFront
-    }
-
-    /**
-     *
-     * Whether the given activity is on top of the stack.
-     * @return true if it is on top, false otherwise
-     */
-    private fun isActivityTop(cls: Class<*>, context: Context): Boolean {
-        val manager: ActivityManager =
-            context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
-        val name: String? = manager.getRunningTasks(1).get(0).topActivity?.className
-        return name == cls.name
     }
 
     private inner class ActivityLifecycleCallbacksImpl : ActivityLifecycleCallbacks {

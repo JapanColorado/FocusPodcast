@@ -5,7 +5,6 @@ import allen.town.podcast.core.storage.DBReader
 import allen.town.podcast.core.storage.DBReader.StatisticsResult
 import allen.town.podcast.core.storage.StatisticsItem
 import allen.town.podcast.util.SkeletonRecyclerDelay
-import android.content.Context
 import android.os.Bundle
 import android.util.Log
 import android.view.*
@@ -80,10 +79,6 @@ abstract class SubscriptionStatisticsBaseFragment : Fragment() {
     abstract val headStrRes: Int
     private fun loadStatistics() {
         disposable?.dispose()
-        val prefs = requireContext().getSharedPreferences(
-            StatisticsFragment.Companion.PREF_NAME,
-            Context.MODE_PRIVATE
-        )
         disposable = Observable.fromCallable {
             val statisticsData = DBReader.getStatistics(
                 false, timeFrom, timeTo

@@ -493,7 +493,6 @@ abstract class EpisodesListFragment : Fragment(), OnSelectModeListener, DoubleCl
         const val PREF_NAME = "pref_episodes_listFragment"
         @JvmStatic
         protected val EPISODES_PER_PAGE = if (BuildConfig.DEBUG) 20 else 150
-        private const val PREF_LAST_TAB_POSITION = "tab_position"
         private const val KEY_UP_ARROW = "up_arrow"
     }
 }

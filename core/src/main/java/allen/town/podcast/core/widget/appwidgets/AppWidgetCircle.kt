@@ -27,7 +27,7 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.MultiTransformation
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.bumptech.glide.request.RequestOptions
-import com.bumptech.glide.request.target.SimpleTarget
+import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.target.Target
 import com.bumptech.glide.request.transition.Transition
 import allen.town.podcast.core.R
@@ -56,7 +56,6 @@ class AppWidgetCircle : AppWidgetMD() {
 
         private var mInstance: AppWidgetCircle? = null
         private var imageSize = 0
-        private var cardRadius = 0f
 
         @JvmStatic
         val instance: AppWidgetCircle
@@ -153,11 +152,6 @@ class AppWidgetCircle : AppWidgetMD() {
                         Glide.with(appContext).clear(target)
                     }
 
-                    if (widgetState.media == null) {
-                        Log.w(TAG, "widgetState.media is null")
-                        return@subscribe
-                    }
-
                     target = Glide.with(appContext).`as`(BitmapPaletteWrapper::class.java)
                         .load(
                             if (widgetState.media.imageLocation.isNullOrEmpty()) ImageResourceUtils.getFallbackImageLocation(
@@ -166,7 +160,11 @@ class AppWidgetCircle : AppWidgetMD() {
                         )
                         .apply(RequestOptions.bitmapTransform(multi)/*.circleCrop()*/)
                         //.checkIgnoreMediaStore()
-                        .into(object : SimpleTarget<BitmapPaletteWrapper>(imageSize, imageSize) {
+                        .into(object : CustomTarget<BitmapPaletteWrapper>(imageSize, imageSize) {
+                            override fun onLoadCleared(placeholder: Drawable?) {
+                                // Nothing to release: the RemoteViews bitmap is owned by the widget host.
+                            }
+
                             override fun onResourceReady(
                                 resource: BitmapPaletteWrapper,
                                 transition: Transition<in BitmapPaletteWrapper>?

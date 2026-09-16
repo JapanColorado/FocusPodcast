@@ -9,6 +9,10 @@ import java.lang.reflect.Field
 import kotlin.Any
 import kotlin.Exception
 
+// detekt: every method here reflects into @RestrictTo / hidden platform menu internals,
+// which can fail in a different way on every OEM and AppCompat version. Menu icons are
+// cosmetic, so each call site logs and carries on.
+@Suppress("TooGenericExceptionCaught")
 object MenuIconUtil {
     /**
      * Show the toolbar option menu icons, even for items with showAsAction="never".

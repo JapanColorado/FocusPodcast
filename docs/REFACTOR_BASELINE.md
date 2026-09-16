@@ -15,7 +15,14 @@ because it is deleted outright.
 | Rx `subscribe(` with no error handler | ~11 | 0 |
 | Build flavors | 3 | 1 |
 | Git submodules | 4 | 0 |
-| Unit test files (passing tests) | 15 (51) | 10 (58) |
+| Unit test files (passing tests) | 10 (58) | 16 (162) |
+| detekt findings (`pixi run detekt`) | 202 | 0 |
+
+The detekt figure is the count on the first run of the gate, immediately after the config
+in `config/detekt/detekt.yml` was written (Phase 7A) and before anything was fixed: 190
+from the classpath-free pass plus 12 more that only the type-resolved `detektDebug` pass
+can see. There is no `config/detekt/baseline.xml` -- every finding was either fixed or
+given a targeted `@Suppress("RuleName")` next to a `// detekt: ...` justification.
 
 Commands used:
 
@@ -27,4 +34,5 @@ grep -rn 'printStackTrace' --include='*.java' --include='*.kt' . | grep -v /buil
 grep -rnP '[\x{4e00}-\x{9fff}]' --include='*.java' --include='*.kt' --include='*.xml' \
   --include='*.gradle' --include='*.cfg' --include='*.properties' . \
   | grep -v /build/ | grep -v values-zh | grep -v values-ja | wc -l
+pixi run detekt
 ```

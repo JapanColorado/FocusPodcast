@@ -122,7 +122,7 @@ class EpisodeItemViewHolder(private val activity: MainActivity, parent: ViewGrou
             duration.visibility = View.GONE
         }
         if (coverHolder.visibility == View.VISIBLE) {
-            CoverLoader(activity)
+            CoverLoader()
                 .withUri(ImageResourceUtils.getEpisodeListImageLocation(item))
                 .withFallbackUri(item.feed.imageUrl)
                 .withPlaceholderView(placeholder)
@@ -227,7 +227,7 @@ class EpisodeItemViewHolder(private val activity: MainActivity, parent: ViewGrou
     fun hideSeparatorIfNecessary() {
         val hasIcons =
             isInQueue.visibility == View.VISIBLE || isVideo.visibility == View.VISIBLE || isFavorite.visibility == View.VISIBLE
-        separatorIcons.visibility = View.GONE
+        separatorIcons.visibility = if (hasIcons) View.VISIBLE else View.GONE
     }
 
     companion object {

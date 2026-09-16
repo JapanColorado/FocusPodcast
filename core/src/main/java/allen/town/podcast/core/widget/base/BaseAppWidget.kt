@@ -32,8 +32,6 @@ import code.name.monkey.appthemehelper.util.VersionUtils
 import allen.town.podcast.core.R
 import allen.town.podcast.core.widget.WidgetUpdater
 import allen.town.podcast.core.widget.WidgetUpdaterWorker
-import allen.town.podcast.core.widget.appwidgets.AppWidgetClassic
-import allen.town.podcast.core.widget.appwidgets.AppWidgetText
 import allen.town.podcast.model.playback.MediaType
 import allen.town.podcast.playback.base.PlayerStatus
 import allen.town.podcast.ui.startintent.MainActivityStarter

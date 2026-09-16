@@ -23,13 +23,6 @@ object ColorUtil {
         return -0x1000000 or color
     }
 
-    /**
-     * Change a color's alpha.
-     */
-    private fun getColorWithAlpha(color: Int, opacity: Int): Int {
-        return Math.round(0xFF * (0.01 * opacity)).toInt() * 0x1000000 + color
-    }
-
     @ColorInt
     fun shiftColor(@ColorInt color: Int, @FloatRange(from = 0.0, to = 2.0) by: Float): Int {
         if (by == 1f) return color
@@ -145,15 +138,6 @@ object ColorUtil {
         val g = Color.green(color1) * inverseRatio + Color.green(color2) * ratio
         val b = Color.blue(color1) * inverseRatio + Color.blue(color2) * ratio
         return Color.argb(a.toInt(), r.toInt(), g.toInt(), b.toInt())
-    }
-
-    private fun getColorDarkness(@ColorInt color: Int): Double {
-        return if (color == Color.BLACK)
-            1.0
-        else if (color == Color.WHITE || color == Color.TRANSPARENT)
-            0.0
-        else
-            1 - (0.299 * Color.red(color) + 0.587 * Color.green(color) + 0.114 * Color.blue(color)) / 255
     }
 
     @ColorInt

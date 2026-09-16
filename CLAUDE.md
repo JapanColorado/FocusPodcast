@@ -25,7 +25,8 @@ pixi run build      # assembleDebug
 pixi run test       # testDebugUnitTest
 pixi run lint       # ./gradlew lint
 pixi run nn         # !! ratchet (scripts/count-bangbang.sh)
-pixi run check      # build + test + lint + nn
+pixi run detekt     # detekt static analysis (config/detekt/detekt.yml)
+pixi run check      # build + test + lint + nn + detekt
 pixi run release    # assembleRelease (needs secrets.properties)
 pixi run install    # adb install the debug APK
 pixi run clean
@@ -41,7 +42,8 @@ pixi run clean
 ./gradlew :core:testDebugUnitTest
 
 ./gradlew lint                           # per-module lint.xml in app/, core/, ui/i18n/; abortOnError=true but ignoreWarnings=true
-./gradlew checkstyle                     # root task, checkstyle 8.24 over the whole tree
+./gradlew detekt                         # detekt over every Kotlin module; also runs detektDebug (type resolution)
+./gradlew :app:detektDebug               # just the type-resolved pass for one module
 ./gradlew :app:connectedDebugAndroidTest # Espresso/Robotium instrumentation tests (device required)
 ```
 
@@ -73,6 +75,19 @@ Dependency direction (top depends on bottom):
 
 - `app/build.gradle` has a `copyLicense` task hooked to `preBuild` that copies the root `LICENSE` to `app/build/generated/license-assets/LICENSE.txt`; that directory is registered as an extra `assets` srcDir. It no longer writes into the source tree — do not reintroduce a source-tree write.
 - ProGuard rules are in `app/proguard.cfg`; release enables `minifyEnabled` and `shrinkResources`.
+- **detekt is a build gate.** Config lives in `config/detekt/detekt.yml`; it starts from detekt's
+  default config and switches off everything stylistic (naming, complexity, `MagicNumber`,
+  `MaxLineLength`, ...) so the gate only reports likely bugs. `maxIssues: 0`, so any finding fails.
+  `UnsafeCallOnNullableType`, `PrintStackTrace` and `EmptyCatchBlock` must stay at zero with no
+  baseline entry; there is no `config/detekt/baseline.xml` and adding one for those three is not
+  allowed. Deliberate exceptions carry `@Suppress("RuleName")` next to a `// detekt: ...` comment
+  saying why. Note that `UnsafeCallOnNullableType` needs type resolution, so the root
+  `build.gradle` chains `detektDebug` onto `detekt`; running detekt therefore compiles first.
+- **The Kotlin `!!` count is 0 and ratcheted there.** `scripts/bangbang.max` holds `0`, enforced by
+  `pixi run nn` (a grep) and, independently, by detekt's `UnsafeCallOnNullableType`. Do not raise
+  the max; rewrite the null handling instead.
+- **`core` compiles Kotlin with `allWarningsAsErrors`** (`core/build.gradle`). It has only a
+  handful of Kotlin files, so keeping them warning-free is cheap. `app` deliberately does not.
 - All UI uses ViewBinding (ButterKnife was removed). kapt runs two processors (Glide, EventBus) and is the usual source of opaque build errors.
 - **`pixi run lint` passes.** Three modules carry deliberate suppressions: `lib/theme/lint.xml` and `lib/common/lint.xml` downgrade `RestrictedApi` to a warning (vendored theme/preference code reaches into androidx internals that have no public equivalent), and `PlaybackService`/`PlaybackController`/`DownloadService` carry `@SuppressLint("UnspecifiedRegisterReceiverFlag")` on their pre-Android-13 `registerReceiver` branch (androidx.core 1.7.0 has no `ContextCompat.registerReceiver`). Cursor tinting now uses `TextView.setTextCursorDrawable` on API 29+ and only falls back to reflection below that.
 - `CONTRIBUTING.md` asks not to upgrade dependencies or build tools without a concrete reason; several pinned versions (e.g. ExoPlayer 2.15.1) have comments explaining why newer versions break.

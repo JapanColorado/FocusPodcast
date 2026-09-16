@@ -1,5 +1,8 @@
 buildscript {
     ext.kotlin_version = '1.9.23'
+    // 1.23.8 is the last 1.23.x; it embeds the Kotlin 1.9 compiler, which is what
+    // this project builds with. Do not jump to 2.x without moving Kotlin first.
+    ext.detekt_version = '1.23.8'
     repositories {
         google()
         mavenCentral()
@@ -10,6 +13,7 @@ buildscript {
         classpath 'com.android.tools.build:gradle:8.4.1'
         classpath 'org.codehaus.groovy:groovy-xml:3.0.9'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+        classpath "io.gitlab.arturbosch.detekt:detekt-gradle-plugin:$detekt_version"
     }
 }
 
@@ -45,6 +49,7 @@ project.ext {
     annotationVersion = "1.8.0"
     appcompatVersion = "1.4.2"
     coreVersion = "1.5.0"
+    coreKtxVersion = "1.7.0"
     fragmentVersion = "1.3.6"
     mediaVersion = "1.4.3"
     paletteVersion = "1.0.0"
@@ -81,14 +86,50 @@ project.ext {
     rulesVersion = "1.2.0"
 }
 
-apply plugin: "checkstyle"
-checkstyle {
-    toolVersion '8.24'
-}
 
-task checkstyle(type: Checkstyle) {
-    classpath = files()
-    source "${project.rootDir}"
-    exclude("**/gen/**")
-    exclude("**/generated/**")
+// ---------------------------------------------------------------------------
+// detekt: static analysis for the Kotlin sources.
+//
+// The config in config/detekt/detekt.yml builds on detekt's default config but
+// switches off every stylistic rule, so this gate only reports likely bugs
+// (unsafe !!, swallowed/over-broad exceptions, empty blocks, dead code).
+// Test sources are excluded on purpose: test code legitimately catches broad
+// exceptions and keeps deliberately empty stubs.
+// ---------------------------------------------------------------------------
+subprojects {
+    apply plugin: "io.gitlab.arturbosch.detekt"
+
+    detekt {
+        toolVersion = rootProject.ext.detekt_version
+        buildUponDefaultConfig = true
+        config.setFrom(rootProject.file("config/detekt/detekt.yml"))
+        // There is deliberately no baseline: every finding is either fixed or carries a
+        // targeted @Suppress with a `// detekt: ...` justification. If one is ever added,
+        // set `baseline = rootProject.file("config/detekt/baseline.xml")` here -- but never
+        // for UnsafeCallOnNullableType, PrintStackTrace or EmptyCatchBlock.
+        ignoreFailures = false
+        parallel = true
+        source.setFrom(
+                files("src/main/java", "src/main/kotlin").filter { it.exists() }
+        )
+    }
+
+    // The plain `detekt` task analyses sources without a compile classpath, which silently
+    // disables every rule that needs type resolution -- UnsafeCallOnNullableType, the `!!`
+    // gate, above all. `detektDebug` is the same analysis with the debug variant's
+    // classpath, so chain it in and `./gradlew detekt` checks both.
+    plugins.withId("com.android.base") {
+        tasks.named("detekt") { dependsOn("detektDebug") }
+    }
+
+    tasks.withType(io.gitlab.arturbosch.detekt.Detekt).configureEach {
+        jvmTarget = "17"
+        reports {
+            html.required = true
+            xml.required = false
+            txt.required = true
+            sarif.required = false
+            md.required = false
+        }
+    }
 }

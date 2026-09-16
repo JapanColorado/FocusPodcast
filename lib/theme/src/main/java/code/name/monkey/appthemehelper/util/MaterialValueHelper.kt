@@ -5,8 +5,6 @@ import android.content.Context
 import androidx.annotation.ColorInt
 import androidx.core.content.ContextCompat
 
-import code.name.monkey.appthemehelper.R
-
 object MaterialValueHelper {
 
     @SuppressLint("PrivateResource")

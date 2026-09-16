@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.children
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.RecyclerView
@@ -27,8 +26,6 @@ class FeedItemExtraInfoFragment
     private lateinit var bottomSheetBehavior: BottomSheetBehavior<*>
     private lateinit var tabLayout: TabLayout
     private lateinit var viewPager: ViewPager2
-    private lateinit var tabViewPagerLayout: View
-    private var windowInsets: WindowInsetsCompat? = null
     private var selectedPosition = 0
 
 
@@ -103,7 +100,6 @@ class FeedItemExtraInfoFragment
     }
 
     companion object {
-        private const val TAG = "FeedItemExtraInfoFragment"
         const val DESC_POS = 0
         const val CHAPTERS_POS = 1
     }

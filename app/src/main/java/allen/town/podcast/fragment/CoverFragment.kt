@@ -9,7 +9,6 @@ import allen.town.podcast.core.glide.palette.BitmapPaletteWrapper
 import allen.town.podcast.core.playback.AlbumCoverStyle
 import allen.town.podcast.core.pref.Prefs.albumCoverStyle
 import allen.town.podcast.core.util.ChapterUtils
-import allen.town.podcast.core.util.DateFormatter
 import allen.town.podcast.core.util.playback.PlaybackController
 import allen.town.podcast.event.CoverColorChangeEvent
 import allen.town.podcast.event.playback.PlaybackPositionEvent
@@ -174,7 +173,6 @@ class CoverFragment : Fragment {
     }
 
     private fun displayMediaInfo(media: Playable) {
-        val pubDateStr: String = DateFormatter.formatAbbrev(getActivity(), media.getPubDate())
         txtvPodcastTitle.setText(
             StringUtils.stripToEmpty(media.getFeedTitle()) /*+ "\u00A0"
                 + "・"

@@ -23,7 +23,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.DimenRes
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationManagerCompat
 import code.name.monkey.appthemehelper.util.ToolbarContentTintHelper
 import com.google.android.material.appbar.MaterialToolbar

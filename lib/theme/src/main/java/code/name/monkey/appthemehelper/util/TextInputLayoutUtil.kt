@@ -8,6 +8,9 @@ import com.google.android.material.textfield.TextInputLayout
 /**
  * @author Aidan Follestad (afollestad)
  */
+// detekt: both methods reflect into private Material Components fields; when they are
+// missing the hint simply keeps the theme default, so there is nothing to propagate.
+@Suppress("TooGenericExceptionCaught")
 object TextInputLayoutUtil {
     val TAG = "TextInputLayoutUtil"
 

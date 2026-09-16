@@ -4,9 +4,7 @@ import allen.town.focus_common.adapter.BindableViewHolder
 import allen.town.focus_common.adapter.ReactiveListAdapter
 import allen.town.focus_common.util.TopSnackbarUtil.showSnack
 import allen.town.focus_common.views.AccentMaterialDialog
-import allen.town.podcast.MyApp.Companion.instance
 import allen.town.podcast.R
-import allen.town.podcast.activity.MainActivity
 import allen.town.podcast.core.export.opml.OpmlElement
 import allen.town.podcast.core.export.opml.OpmlReader
 import allen.town.podcast.core.pref.Prefs
@@ -17,7 +15,6 @@ import allen.town.podcast.core.storage.DBReader
 import allen.town.podcast.databinding.OpmlSelectionBinding
 import allen.town.podcast.model.feed.Feed
 import android.Manifest
-import android.content.ClipData
 import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent

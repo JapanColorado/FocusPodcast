@@ -39,7 +39,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import code.name.monkey.appthemehelper.util.EditTextUtil
 import code.name.monkey.appthemehelper.util.scroll.ThemedFastScroller.create
-import com.faltenreich.skeletonlayout.Skeleton
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
@@ -62,8 +61,6 @@ class LocalSearchFragment constructor() : Fragment() {
     private lateinit var searchView: SearchView
     private lateinit var automaticSearchDebouncer: Handler
     private var lastQueryChange: Long = 0
-    private val feedSkeleton: Skeleton? = null
-    private val itemSkeleton: Skeleton? = null
     private lateinit var prefs: SharedPreferences
     private var searchFeeds: Boolean = false
     public override fun onCreate(savedInstanceState: Bundle?) {

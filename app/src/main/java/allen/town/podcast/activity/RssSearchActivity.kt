@@ -5,37 +5,28 @@ import allen.town.focus_common.views.AccentMaterialDialog
 import allen.town.podcast.R
 import allen.town.podcast.activity.MainActivity.Companion.getIntentToOpenFeed
 import allen.town.podcast.core.feed.FeedUrlNotFoundException
-import allen.town.podcast.core.pref.PlaybackPreferences
 import allen.town.podcast.core.service.download.Downloader
 import allen.town.podcast.core.util.StorageUtils
 import allen.town.podcast.core.util.URLChecker
 import allen.town.podcast.databinding.RssSearchActivityBinding
 import allen.town.podcast.discovery.PodcastSearcherRegistry
 import allen.town.podcast.discovery.RetrieveFeedUtil
-import allen.town.podcast.event.PlayerStatusEvent
 import allen.town.podcast.model.feed.Feed
-import allen.town.podcast.model.playback.RemoteMedia
 import android.app.Dialog
 import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
-import android.text.Spannable
-import android.text.SpannableString
 import android.text.TextUtils
-import android.text.style.ForegroundColorSpan
 import android.util.Log
 import android.view.MenuItem
 import android.view.View
 import androidx.annotation.UiThread
-import androidx.appcompat.app.AlertDialog
 import androidx.core.app.NavUtils
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import org.greenrobot.eventbus.EventBus
-import org.greenrobot.eventbus.Subscribe
-import org.greenrobot.eventbus.ThreadMode
 
 /**
  * Downloads a feed from a feed URL and parses it. Subclasses can display the
@@ -49,12 +40,10 @@ import org.greenrobot.eventbus.ThreadMode
 class RssSearchActivity : DialogActivity() {
     private val feeds: List<Feed>? = null
     private var feed: Feed? = null
-    private val selectedDownloadUrl: String? = null
     private val downloader: Downloader? = null
     private var username: String? = null
     private var password: String? = null
     private var isPaused = false
-    private val didPressSubscribe = false
     private var dialog: Dialog? = null
     private var download: Disposable? = null
     private val parser: Disposable? = null
@@ -243,11 +232,6 @@ class RssSearchActivity : DialogActivity() {
     }
 
 
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    fun playbackStateChanged(event: PlayerStatusEvent?) {
-        val isPlayingPreview =
-            PlaybackPreferences.getCurrentlyPlayingMediaType() == RemoteMedia.PLAYABLE_TYPE_REMOTE_MEDIA.toLong()
-    }
 
     companion object {
         const val ARG_FEEDURL = "arg.feedurl"
@@ -258,8 +242,6 @@ class RssSearchActivity : DialogActivity() {
         // Optional argument: specify a title for the actionbar.
         private const val RESULT_ERROR = 2
         private const val TAG = "OnlineFeedViewActivity"
-        private const val PREFS = "OnlineFeedViewActivityPreferences"
-        private const val PREF_LAST_AUTO_DOWNLOAD = "lastAutoDownload"
         fun newFeedParams(
             intent: Intent,
             feedAuthor: String?,

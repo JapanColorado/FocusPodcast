@@ -197,6 +197,20 @@ object Prefs {
         createNoMediaFile()
     }
 
+    /**
+     * Drops the process-wide state so that a unit test can assert the uninitialised behaviour.
+     * Robolectric reuses one class loader for every test class with the same configuration, so
+     * without this hook the "not initialised" branch would only ever be reachable in whichever
+     * test happened to run first.
+     */
+    @VisibleForTesting(otherwise = VisibleForTesting.NONE)
+    @JvmStatic
+    fun resetForTests() {
+        applicationContext = null
+        sharedPrefs = null
+        themePrefs = null
+    }
+
     /** Reads a string preference that always has a non-null default. */
     private fun getString(key: String, defaultValue: String): String =
         prefs.getString(key, defaultValue) ?: defaultValue
@@ -436,7 +450,7 @@ object Prefs {
             val valStr = getString(PREF_ENQUEUE_LOCATION, EnqueueLocation.BACK.name)
             return try {
                 EnqueueLocation.valueOf(valStr)
-            } catch (t: Throwable) {
+            } catch (t: IllegalArgumentException) {
                 // should never happen but just in case
                 Log.e(TAG, "getEnqueueLocation: invalid value '$valStr' Use default.", t)
                 EnqueueLocation.BACK
@@ -536,7 +550,7 @@ object Prefs {
      */
     @JvmStatic
     private val audioPlaybackSpeed: Float
-        private get() = try {
+        get() = try {
             getString(PREF_PLAYBACK_SPEED, "1.00").toFloat()
         } catch (e: NumberFormatException) {
             Log.e(TAG, Log.getStackTraceString(e))
@@ -629,8 +643,12 @@ object Prefs {
             }
         }
     @JvmStatic
+    /**
+     * True when automatic feed refresh is off. Uses the same default as [updateInterval]
+     * so a pristine install reports "disabled"; a time-of-day schedule ("HH:mm") is not disabled.
+     */
     val isAutoUpdateDisabled: Boolean
-        get() = getString(PREF_UPDATE_INTERVAL, "") == "0"
+        get() = getString(PREF_UPDATE_INTERVAL, "0") == "0"
 
     private fun isAllowMobileFor(type: String): Boolean {
         val defaultValue = HashSet<String>()

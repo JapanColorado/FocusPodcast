@@ -16,6 +16,7 @@ import java.io.IOException
 import java.io.UnsupportedEncodingException
 import java.net.URLEncoder
 import java.security.MessageDigest
+import java.security.NoSuchAlgorithmException
 import java.util.*
 
 class PodcastIndexPodcastSearcher : PodcastSearcher {
@@ -39,8 +40,8 @@ class PodcastIndexPodcastSearcher : PodcastSearcher {
                 val encodedQuery: String?
                 encodedQuery = try {
                     URLEncoder.encode(query, "UTF-8")
-                } catch (e: UnsupportedEncodingException) {
-                    // this won't ever be thrown
+                } catch (ignored: UnsupportedEncodingException) {
+                    // UTF-8 is always available, so this branch is unreachable in practice.
                     query
                 }
                 val formattedUrl = String.format(PODCASTINDEX_API_URL, encodedQuery)
@@ -105,7 +106,7 @@ class PodcastIndexPodcastSearcher : PodcastSearcher {
                 val messageDigest = MessageDigest.getInstance("SHA-1")
                 messageDigest.update(clearString.toByteArray(charset("UTF-8")))
                 toHex(messageDigest.digest())
-            } catch (e: Exception) {
+            } catch (e: NoSuchAlgorithmException) {
                 // no SHA-1 means no API signature, so the caller cannot build a request
                 Timber.e(e, "hashing the Podcast Index API credentials failed")
                 null

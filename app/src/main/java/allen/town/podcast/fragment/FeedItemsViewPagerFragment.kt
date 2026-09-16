@@ -11,7 +11,6 @@ import org.greenrobot.eventbus.ThreadMode
 import allen.town.podcast.event.FeedItemEvent
 import allen.town.podcast.event.UnreadItemsUpdateEvent
 import allen.town.podcast.R
-import allen.town.podcast.activity.MainActivity
 import allen.town.podcast.menuprocess.FeedItemMenuProcess
 import allen.town.podcast.core.storage.DBReader
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
@@ -132,14 +131,6 @@ class FeedItemsViewPagerFragment : Fragment(), Toolbar.OnMenuItemClickListener {
     @Subscribe(threadMode = ThreadMode.MAIN)
     fun onUnreadItemsChanged(event: UnreadItemsUpdateEvent?) {
         refreshToolbarState()
-    }
-
-    private fun openPodcast() {
-        val item = this.item ?: return
-        val fragment: Fragment = FeedItemlistFragment.Companion.newInstance(
-            item.feedId
-        )
-        (requireActivity() as MainActivity).loadChildFragment(fragment)
     }
 
     private inner class ItemPagerAdapter internal constructor(fragment: Fragment) :

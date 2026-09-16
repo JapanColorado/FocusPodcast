@@ -25,7 +25,7 @@ object ATHUtil {
         context.theme.obtainStyledAttributes(intArrayOf(attr)).use {
             return try {
                 it.getColor(0, fallback);
-            } catch (e: Exception) {
+            } catch (ignored: Exception) {
                 // The attribute resolved to something that is not a color (a reference to a
                 // state list, say). Black is the documented fallback for an unreadable theme
                 // attribute; callers only need *a* color, so there is nothing to propagate.

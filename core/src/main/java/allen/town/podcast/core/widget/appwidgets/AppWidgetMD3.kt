@@ -25,7 +25,7 @@ import code.name.monkey.appthemehelper.util.ImageUtil
 import code.name.monkey.appthemehelper.util.MaterialValueHelper
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
-import com.bumptech.glide.request.target.SimpleTarget
+import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.target.Target
 import com.bumptech.glide.request.transition.Transition
 import allen.town.podcast.core.R
@@ -99,11 +99,6 @@ class AppWidgetMD3 : AppWidgetMD() {
                         Glide.with(appContext).clear(target)
                     }
 
-                    if (widgetState.media == null) {
-                        Log.w(TAG, "widgetState.media is null")
-                        return@subscribe
-                    }
-
                     target = Glide.with(appContext).`as`(BitmapPaletteWrapper::class.java)
                         .apply(RequestOptions().centerCrop())
                         .load(
@@ -113,7 +108,11 @@ class AppWidgetMD3 : AppWidgetMD() {
                         )
                         //.checkIgnoreMediaStore()
 
-                        .into(object : SimpleTarget<BitmapPaletteWrapper>(imageSize, imageSize) {
+                        .into(object : CustomTarget<BitmapPaletteWrapper>(imageSize, imageSize) {
+                            override fun onLoadCleared(placeholder: Drawable?) {
+                                // Nothing to release: the RemoteViews bitmap is owned by the widget host.
+                            }
+
                             override fun onResourceReady(
                                 resource: BitmapPaletteWrapper,
                                 transition: Transition<in BitmapPaletteWrapper>?

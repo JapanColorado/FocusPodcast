@@ -4,7 +4,6 @@ import allen.town.focus_common.extensions.getStringOrDefault
 import allen.town.focus_common.model.CategoryInfo
 import android.content.Context
 import android.content.SharedPreferences
-import android.text.format.DateUtils
 import androidx.core.content.edit
 import androidx.preference.PreferenceManager
 import code.name.monkey.appthemehelper.ThemeStoreHack

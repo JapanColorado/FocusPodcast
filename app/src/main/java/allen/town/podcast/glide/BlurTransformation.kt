@@ -10,7 +10,6 @@ import androidx.annotation.FloatRange
 import code.name.monkey.appthemehelper.util.ImageUtil
 import com.bumptech.glide.load.engine.bitmap_recycle.BitmapPool
 import com.bumptech.glide.load.resource.bitmap.BitmapTransformation
-import allen.town.podcast.BuildConfig
 import java.security.MessageDigest
 
 

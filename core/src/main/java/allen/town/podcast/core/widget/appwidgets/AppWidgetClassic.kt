@@ -21,6 +21,10 @@ class AppWidgetClassic : BaseAppWidget() {
         return R.layout.app_widget_classic
     }
 
+    // detekt: a widget update runs in the home screen's process and must never throw.
+    // Glide's blocking submit() can fail with anything up to OutOfMemoryError, and the
+    // fallback path below is exactly what those failures exist for.
+    @Suppress("TooGenericExceptionCaught")
     override fun processRemoteViewIfNeeded(
         context: Context,
         remoteViews: RemoteViews,
@@ -38,20 +42,21 @@ class AppWidgetClassic : BaseAppWidget() {
                     .load(widgetState.media.imageLocation)
                     .apply(
                         RequestOptions.diskCacheStrategyOf(ApGlideSettings.AP_DISK_CACHE_STRATEGY)
-                            .transforms(
+                            .transform(
                                 RoundedCorners((8 * context.resources.displayMetrics.density).toInt())
                             )
                     )
                     .submit(iconSize, iconSize)[500, TimeUnit.MILLISECONDS]
                 remoteViews.setImageViewBitmap(R.id.imgvCover, icon)
-            } catch (tr1: Throwable) {
+            } catch (ignored: Throwable) {
+                // The primary cover could not be loaded; the fallback below reports for both.
                 try {
                     icon = Glide.with(context)
                         .asBitmap()
                         .load(ImageResourceUtils.getFallbackImageLocation(widgetState.media))
                         .apply(
                             RequestOptions.diskCacheStrategyOf(ApGlideSettings.AP_DISK_CACHE_STRATEGY)
-                                .transforms(
+                                .transform(
                                     RoundedCorners((8 * context.resources.displayMetrics.density).toInt())
                                 )
                         )
@@ -71,8 +76,6 @@ class AppWidgetClassic : BaseAppWidget() {
         const val NAME = "app_widget_classic"
 
         private var mInstance: AppWidgetClassic? = null
-        private var imageSize = 0
-        private var cardRadius = 0f
 
         @JvmStatic
         val instance: AppWidgetClassic

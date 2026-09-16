@@ -836,7 +836,7 @@ class FeedItemlistFragment() : Fragment(), OnItemClickListener, Toolbar.OnMenuIt
             if (detailInfoView.isCollapsed) {
                 detailInfoView.expandCollapseContent(true, false)
             }
-            animateSeriesInfoView("openAbout", null)
+            animateSeriesInfoView(null)
         }
     }
 
@@ -844,7 +844,7 @@ class FeedItemlistFragment() : Fragment(), OnItemClickListener, Toolbar.OnMenuIt
         mInfoViewToggleButton.rotation = (valueAnimator.animatedValue as Float).toFloat()
     }
 
-    private fun animateSeriesInfoView(str: String, animatorListener: Animator.AnimatorListener?) {
+    private fun animateSeriesInfoView(animatorListener: Animator.AnimatorListener?) {
         val feed = this.feed ?: return
         if (!feed.isLocalFeed) {
             val z = detailInfoView.visibility == View.VISIBLE

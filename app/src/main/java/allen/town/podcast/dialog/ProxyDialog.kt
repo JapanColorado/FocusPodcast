@@ -25,6 +25,7 @@ import io.reactivex.CompletableEmitter
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
+import java.util.Locale
 import okhttp3.Credentials
 import okhttp3.Request
 import okhttp3.Response
@@ -286,6 +287,7 @@ class ProxyDialog(private val context: Context) {
                         )
                     )
                     val message = String.format(
+                        Locale.getDefault(),
                         "%s %s", "{fa-check}",
                         context.getString(R.string.proxy_test_successful)
                     )
@@ -301,6 +303,7 @@ class ProxyDialog(private val context: Context) {
                     )
                 )
                 val message = String.format(
+                    Locale.getDefault(),
                     "%s %s: %s", "{fa-close}",
                     context.getString(R.string.proxy_test_failed), error.message
                 )

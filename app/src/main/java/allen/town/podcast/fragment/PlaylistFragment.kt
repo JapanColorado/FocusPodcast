@@ -2,7 +2,6 @@ package allen.town.podcast.fragment
 
 import allen.town.focus_common.util.DoubleClickBackToContentTopListener
 import allen.town.focus_common.util.MenuIconUtil.showToolbarMenuIcon
-import allen.town.focus_common.util.Timber
 import allen.town.focus_common.util.TopSnackbarUtil.showSnack
 import allen.town.focus_common.views.AccentMaterialDialog
 import allen.town.focus_common.views.ItemOffsetDecoration
@@ -94,7 +93,6 @@ class PlaylistFragment : Fragment(), Toolbar.OnMenuItemClickListener, OnSelectMo
     private val uiHandler = Handler(Looper.getMainLooper())
     private lateinit var swipeActions: SwipeActions
     private lateinit var prefs: SharedPreferences
-    private lateinit var topAppBarLayout: TopAppBarLayout
     private lateinit var skeleton: Skeleton
     private lateinit var skeletonRecyclerDelay: SkeletonRecyclerDelay
     override fun onCreate(savedInstanceState: Bundle?) {

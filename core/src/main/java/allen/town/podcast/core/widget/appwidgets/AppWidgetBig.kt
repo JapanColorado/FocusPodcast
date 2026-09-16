@@ -28,7 +28,7 @@ import android.widget.RemoteViews
 import code.name.monkey.appthemehelper.util.MaterialValueHelper
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
-import com.bumptech.glide.request.target.SimpleTarget
+import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.target.Target
 import com.bumptech.glide.request.transition.Transition
 import io.reactivex.Completable
@@ -52,7 +52,6 @@ class AppWidgetBig : BaseAppWidget() {
 
         private var mInstance: AppWidgetBig? = null
         private var imageSize = 0
-        private var cardRadius = 0f
 
         @JvmStatic
         val instance: AppWidgetBig
@@ -140,15 +139,6 @@ class AppWidgetBig : BaseAppWidget() {
                         Glide.with(appContext).clear(target)
                     }
 
-                    if (widgetState.media == null) {
-                        Log.w(TAG, "widgetState.media is null")
-                    }
-
-                    if (widgetState.media == null) {
-                        Log.w(TAG, "widgetState.media is null")
-                        return@subscribe
-                    }
-
                     // Combined with centerCrop, there is no blur effect here
                     target = Glide.with(appContext).asBitmap()
                         .apply(RequestOptions.centerCropTransform())
@@ -157,7 +147,11 @@ class AppWidgetBig : BaseAppWidget() {
                                 widgetState.media
                             ) else widgetState.media.imageLocation
                         )
-                        .into(object : SimpleTarget<Bitmap>(imageSize, imageSize) {
+                        .into(object : CustomTarget<Bitmap>(imageSize, imageSize) {
+                            override fun onLoadCleared(placeholder: Drawable?) {
+                                // Nothing to release: the RemoteViews bitmap is owned by the widget host.
+                            }
+
                             override fun onResourceReady(
                                 resource: Bitmap,
                                 transition: Transition<in Bitmap>?

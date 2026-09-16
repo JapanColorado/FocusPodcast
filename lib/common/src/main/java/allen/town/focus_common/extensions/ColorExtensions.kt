@@ -16,7 +16,6 @@
 
 package allen.town.focus_common.extensions
 
-import allen.town.focus_common.R
 import allen.town.focus_common.util.BasePreferenceUtil.materialYou
 import android.app.Dialog
 import android.content.Context

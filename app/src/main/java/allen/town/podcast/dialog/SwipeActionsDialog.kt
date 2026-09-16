@@ -150,12 +150,6 @@ class SwipeActionsDialog(private val context: Context, private val tag: String) 
         picker.pickerGridLayout.rowCount = (keys.size + 1) / 2
     }
 
-    private fun populateMockEpisode(view: FeeditemlistItemBinding) {
-        view.container.alpha = 0.3f
-        view.dragHandle.visibility = View.GONE
-        view.txtvTitle.text = "███████"
-    }
-
     private fun savePrefs(tag: String, right: String, left: String) {
         val prefs = context.getSharedPreferences(SwipeActions.PREF_NAME, Context.MODE_PRIVATE)
         prefs.edit().putString(SwipeActions.KEY_PREFIX_SWIPEACTIONS + tag, "$right,$left").apply()

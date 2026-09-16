@@ -1,7 +1,5 @@
 package allen.town.podcast.core.sync
 
-import allen.town.podcast.core.sync.SynchronizationSettings
-import allen.town.podcast.core.sync.SynchronizationProviderViewData
 import android.content.SharedPreferences
 import android.content.Context
 

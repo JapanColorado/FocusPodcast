@@ -8,7 +8,6 @@ import allen.town.podcast.core.pref.UsageStatistics
 import allen.town.podcast.core.util.NetworkUtils
 import allen.town.podcast.core.service.download.DownloadRequestCreator
 import allen.town.podcast.core.storage.DBWriter
-import android.content.Context
 import android.view.View
 import android.widget.Toast
 import androidx.annotation.DrawableRes

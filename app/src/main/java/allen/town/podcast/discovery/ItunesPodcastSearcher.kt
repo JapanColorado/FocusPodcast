@@ -24,8 +24,8 @@ open class ItunesPodcastSearcher : PodcastSearcher {
                 val encodedQuery: String?
                 encodedQuery = try {
                     URLEncoder.encode(query, "UTF-8")
-                } catch (e: UnsupportedEncodingException) {
-                    // this won't ever be thrown
+                } catch (ignored: UnsupportedEncodingException) {
+                    // UTF-8 is always available, so this branch is unreachable in practice.
                     query
                 }
                 val formattedUrl = String.format(apiUrl, encodedQuery)

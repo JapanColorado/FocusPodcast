@@ -6,7 +6,6 @@ import android.content.pm.PackageManager
 import android.content.Context
 
 object IntentUtils {
-    private const val TAG = "IntentUtils"
 
     /*
      *  Checks if there is at least one exported activity that can be performed for the intent

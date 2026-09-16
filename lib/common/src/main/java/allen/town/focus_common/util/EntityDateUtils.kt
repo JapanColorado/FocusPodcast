@@ -7,6 +7,9 @@ import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.*
 
+// detekt: these are date parsing/formatting helpers over untrusted strings. Every one of
+// them documents a fallback value for unparseable input, so a broad catch is the contract.
+@Suppress("TooGenericExceptionCaught")
 object EntityDateUtils {
     @JvmStatic
     fun isCurrentYear(time: Long): Boolean {

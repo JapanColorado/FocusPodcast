@@ -4,7 +4,6 @@ import allen.town.podcast.core.view.TopAppBarLayout
 import allen.town.focus_common.util.DoubleClickBackToContentTopListener
 import allen.town.focus_common.util.MenuIconUtil.showToolbarMenuIcon
 import allen.town.focus_common.util.Timber
-import allen.town.focus_common.util.TopSnackbarUtil.showSnack
 import allen.town.podcast.R
 import allen.town.podcast.activity.MainActivity
 import allen.town.podcast.adapter.MultiSelectAdapter
@@ -12,7 +11,6 @@ import allen.town.podcast.adapter.MultiSelectAdapter.OnSelectModeListener
 import allen.town.podcast.adapter.SubFeedsAdapter
 import allen.town.podcast.adapter.SubFeedsAdapter.GridDividerItemDecorator
 import allen.town.podcast.appshortcuts.SubscriptionActivityStarter
-import allen.town.podcast.core.dialog.ConfirmationDialog
 import allen.town.podcast.core.event.DownloadEvent
 import allen.town.podcast.core.pref.Prefs.subscriptionsFilter
 import allen.town.podcast.core.service.download.DownloadService
@@ -34,7 +32,6 @@ import allen.town.podcast.statistics.StatisticsFragment
 import allen.town.podcast.util.SkeletonRecyclerDelay
 import allen.town.podcast.view.EmptyViewHandler
 import android.content.Context
-import android.content.DialogInterface
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.os.Handler
@@ -43,8 +40,6 @@ import android.util.Log
 import android.view.*
 import android.view.ContextMenu.ContextMenuInfo
 import android.view.animation.AnimationUtils
-import android.widget.Toast
-import androidx.annotation.StringRes
 import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
@@ -62,7 +57,6 @@ import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
 import java.util.*
-import java.util.concurrent.Callable
 
 /**
  * Fragment for displaying feed subscriptions
@@ -347,27 +341,6 @@ class SubFeedsFragment : Fragment(), Toolbar.OnMenuItemClickListener, OnSelectMo
             return subscriptionAdapter.onContextItemSelected(item)
         }
         return super.onContextItemSelected(item)
-    }
-
-    private fun <T> displayConfirmationDialog(
-        @StringRes title: Int,
-        @StringRes message: Int,
-        task: Callable<out T?>
-    ) {
-        val dialog: ConfirmationDialog = object : ConfirmationDialog(activity, title, message) {
-            override fun onConfirmButtonPressed(clickedDialog: DialogInterface) {
-                clickedDialog.dismiss()
-                userActions.add(Observable.fromCallable(task)
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe({ result: T? -> loadSubscriptions() }
-                    ) { error: Throwable ->
-                        Log.e(TAG, "the confirmed subscription action failed", error)
-                        showSnack(requireContext(), error.localizedMessage, Toast.LENGTH_LONG)
-                    })
-            }
-        }
-        dialog.createNewDialog().show()
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)

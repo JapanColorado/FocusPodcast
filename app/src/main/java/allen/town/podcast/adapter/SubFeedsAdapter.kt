@@ -226,13 +226,13 @@ open class SubFeedsAdapter(mainActivity: MainActivity) :
                 val feed = (drawerItem as FeedDrawerItem).feed
                 val textAndImageCombind = (feed.isLocalFeed
                         && feed.imageUrl != null && feed.imageUrl.startsWith(Feed.PREFIX_GENERATIVE_COVER))
-                CoverLoader(mainActivityRef.get())
+                CoverLoader()
                     .withUri(feed.imageUrl)
                     .withPlaceholderView(feedTitle, textAndImageCombind)
                     .withCoverView(imageView)
                     .load()
             } else {
-                CoverLoader(mainActivityRef.get())
+                CoverLoader()
                     .withResource(R.drawable.ic_tag)
                     .withPlaceholderView(feedTitle, true)
                     .withCoverView(imageView)

@@ -4,9 +4,17 @@ plugins {
 apply from: "../common.gradle"
 
 android {
+    // core is the module everything else depends on, and it is almost entirely Java --
+    // only a handful of Kotlin files. Keeping those warning-free is cheap here, so the
+    // gate is on for core only (app has far too much legacy Kotlin for this today).
+    // jvmTarget comes from the allprojects block in the root build.gradle.
+    kotlinOptions {
+        allWarningsAsErrors = true
+    }
+
     lintOptions {
-        disable "InvalidPeriodicWorkRequestInterval", "ObsoleteLintCustomCheck", "DefaultLocale", "UnusedAttribute",
-                "ParcelClassLoader", "TrustAllX509TrustManager",
+        disable "ObsoleteLintCustomCheck", "DefaultLocale", "UnusedAttribute",
+                "ParcelClassLoader",
                 "IconDensities", "IconDuplicates"
     }
 

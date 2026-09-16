@@ -121,8 +121,7 @@ open class EpisodeItemListAdapter(mainActivity: MainActivity, @MenuRes menuResId
     }
 
     override fun getItemId(position: Int): Long {
-        val item = episodes[position]
-        return item?.id ?: RecyclerView.NO_POSITION.toLong()
+        return episodes[position].id
     }
 
     override fun getItemCount(): Int {

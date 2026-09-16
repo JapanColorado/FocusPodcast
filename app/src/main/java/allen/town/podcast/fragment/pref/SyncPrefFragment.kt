@@ -2,7 +2,6 @@ package allen.town.podcast.fragment.pref
 
 import allen.town.focus_common.util.TopSnackbarUtil.showSnack
 import allen.town.focus_common.views.AccentMaterialDialog
-import allen.town.podcast.MyApp
 import allen.town.podcast.R
 import allen.town.podcast.activity.SettingsActivity
 import allen.town.podcast.core.sync.SyncService
@@ -13,7 +12,6 @@ import allen.town.podcast.dialog.AuthenticationDialog
 import allen.town.podcast.event.SyncServiceEvent
 import android.app.Activity
 import android.content.DialogInterface
-import android.content.Intent
 import android.os.Bundle
 import android.text.format.DateUtils
 import android.view.LayoutInflater
@@ -27,6 +25,7 @@ import androidx.core.graphics.BlendModeCompat
 import androidx.core.text.HtmlCompat
 import androidx.preference.Preference
 import code.name.monkey.appthemehelper.ThemeStore.Companion.accentColor
+import java.util.Locale
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
@@ -223,6 +222,7 @@ class SyncPrefFragment : AbsSettingsFragment() {
 
     private fun updateLastSyncReport(successful: Boolean, lastTime: Long) {
         val status = String.format(
+            Locale.getDefault(),
             "%1\$s - %2\$s",
             getString(if (successful) R.string.gpodnetsync_pref_report_successful else R.string.gpodnetsync_pref_report_failed),
             DateUtils.getRelativeDateTimeString(

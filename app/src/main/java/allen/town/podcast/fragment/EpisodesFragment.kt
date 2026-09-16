@@ -1,7 +1,6 @@
 package allen.town.podcast.fragment
 
 import allen.town.podcast.R
-import allen.town.podcast.core.pref.Prefs
 import allen.town.podcast.core.storage.DBReader
 import allen.town.podcast.dialog.FilterDialog
 import allen.town.podcast.model.feed.FeedItem
@@ -9,7 +8,6 @@ import allen.town.podcast.model.feed.FeedItemFilter
 import android.content.Context
 import android.os.Bundle
 import android.view.*
-import com.joanzapata.iconify.Iconify
 import org.apache.commons.lang3.StringUtils
 
 /**

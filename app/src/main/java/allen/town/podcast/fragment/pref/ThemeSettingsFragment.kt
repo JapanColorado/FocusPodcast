@@ -58,7 +58,6 @@ class ThemeSettingsFragment : AbsSettingsFragment() {
         generalTheme?.let {
             setSummary(it)
             it.setOnPreferenceChangeListener { _, newValue ->
-                val theme = newValue as String
                 setSummary(it, newValue)
                 ThemeStore.markChanged(requireContext())
 

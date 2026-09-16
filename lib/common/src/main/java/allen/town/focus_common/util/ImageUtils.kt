@@ -117,7 +117,7 @@ object ImageUtils {
         canvas.drawBitmap(bitmap, 0.0f, 0.0f, null as Paint?)
         val f = height.toFloat()
         val f2 = width.toFloat()
-        val f3 = (height + 4) as Float
+        val f3 = (height + 4).toFloat()
         canvas.drawRect(0.0f, f, f2, f3, Paint())
         canvas.drawBitmap(createBitmap, 0.0f, f3, null as Paint?)
         val paint = Paint()

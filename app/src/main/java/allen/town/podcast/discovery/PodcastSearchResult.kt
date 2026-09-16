@@ -85,7 +85,8 @@ open class PodcastSearchResult(
             val episodeUrl = json.optString("episodeUrl")
             try {
                 duration = json.getLong("trackTimeMillis")
-            } catch (unused2: Throwable) {
+            } catch (ignored: JSONException) {
+                // No trackTimeMillis in the result; -1 is the "unknown duration" value.
                 duration = -1
             } finally {
                 if (duration <= 0) {
@@ -126,7 +127,7 @@ open class PodcastSearchResult(
             var summary: String? = null
             try {
                 summary = json.getJSONObject("summary").getString("label")
-            } catch (e: Exception) {
+            } catch (e: JSONException) {
                 // safe to continue: some feeds have no summary, and the field is optional
                 Timber.d(e, "iTunes toplist entry without a summary")
             }
@@ -155,7 +156,7 @@ open class PodcastSearchResult(
             var author: String? = null
             try {
                 author = json.getJSONObject("im:artist").getString("label")
-            } catch (e: Exception) {
+            } catch (e: JSONException) {
                 // safe to continue: some feeds have no artist, and the field is optional
                 Timber.d(e, "iTunes toplist entry without an artist")
             }

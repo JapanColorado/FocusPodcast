@@ -3,7 +3,6 @@ package allen.town.podcast.activity
 import allen.town.focus_common.util.Timber
 import allen.town.focus_common.util.TopSnackbarUtil.showSnack
 import allen.town.podcast.R
-import allen.town.podcast.activity.MainActivity
 import allen.town.podcast.storage.db.Db
 import android.content.Intent
 import android.os.Bundle
@@ -39,6 +38,9 @@ class SplashActivity : AppCompatActivity() {
                 {
                     startActivity(Intent(this@SplashActivity, MainActivity::class.java))
                     overridePendingTransition(0, 0)
+                    // detekt: finish() may race with the activity already being gone; the
+                    // splash screen must never crash the app on its way out.
+                    @Suppress("TooGenericExceptionCaught")
                     uiHandler.postDelayed({
                         try {
                             finish()

@@ -123,7 +123,7 @@ class ItunesAdapter(
             )
             .into(viewHolder.coverView)
         if (typeEpisodes) {
-            bindEpisodesView(podcast, isSubscribedOut, viewHolder)
+            bindEpisodesView(podcast, viewHolder)
         } else {
             bindFeedView(podcast, isSubscribedOut, viewHolder)
         }
@@ -143,7 +143,6 @@ class ItunesAdapter(
 
     fun bindEpisodesView(
         podcast: PodcastSearchResult,
-        isSub: Boolean,
         viewHolder: PodcastViewHolder
     ) {
         val episodeSearchResult = podcast as EpisodeSearchResult

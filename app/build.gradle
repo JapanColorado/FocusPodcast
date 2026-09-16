@@ -71,12 +71,15 @@ android {
 
     lintOptions {
         disable 'ObsoleteLintCustomCheck', 'UnusedAttribute', 'BatteryLife', 'InflateParams',
-                'RestrictedApi', 'TrustAllX509TrustManager', 'ExportedReceiver', 'AllowBackup', 'VectorDrawableCompat',
+                'RestrictedApi', 'VectorDrawableCompat',
                 'UseCompoundDrawables', 'NestedWeights', 'Overdraw', 'UselessParent', 'TextFields',
                 'AlwaysShowAction', 'Autofill', 'ClickableViewAccessibility', 'ContentDescription',
                 'KeyboardInaccessibleWidget', 'LabelFor', 'SetTextI18n', 'HardcodedText', 'RelativeOverlap',
-                'RtlCompat', 'RtlHardcoded', 'MissingMediaBrowserServiceIntentFilter', 'VectorPath',
-                'InvalidPeriodicWorkRequestInterval'
+                'RtlCompat', 'RtlHardcoded',
+                // False positive: PlaybackService does declare the android.media.browse
+                // .MediaBrowserService intent-filter, but it is declared in core's manifest and
+                // lint only sees app's own when checkDependencies is off.
+                'MissingMediaBrowserServiceIntentFilter'
     }
 
     aaptOptions {

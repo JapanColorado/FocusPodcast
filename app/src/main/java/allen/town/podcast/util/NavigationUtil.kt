@@ -33,7 +33,8 @@ object NavigationUtil {
             val effects = Intent(AudioEffect.ACTION_DISPLAY_AUDIO_EFFECT_CONTROL_PANEL)
             effects.putExtra(AudioEffect.EXTRA_CONTENT_TYPE, AudioEffect.CONTENT_TYPE_MUSIC)
             activity.startActivityForResult(effects, 0)
-        } catch (notFound: ActivityNotFoundException) {
+        } catch (ignored: ActivityNotFoundException) {
+            // No system equalizer on this device; the snackbar is the whole error report.
             TopSnackbarUtil.showSnack(activity, R.string.no_equalizer, Toast.LENGTH_LONG)
         }
     }

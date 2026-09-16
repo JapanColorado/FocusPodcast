@@ -5,7 +5,6 @@ import android.view.ViewGroup
 import com.google.android.material.chip.Chip
 import allen.town.podcast.R
 import android.content.Context
-import android.view.LayoutInflater
 import android.view.View
 
 abstract class SimpleChipAdapter(private val context: Context) :

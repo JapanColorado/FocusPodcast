@@ -1,7 +1,6 @@
 package allen.town.podcast.fragment.pref
 
 import allen.town.focus_common.extensions.installLanguageAndRecreate
-import allen.town.podcast.MyApp.Companion.instance
 import allen.town.podcast.R
 import allen.town.podcast.activity.SettingsActivity
 import allen.town.podcast.core.pref.Prefs

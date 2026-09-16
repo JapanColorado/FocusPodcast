@@ -252,7 +252,6 @@ constructor() : Fragment() {
     }
 
     companion object {
-        private val TAG: String = "OnlineSearchFragment"
         private val ARG_SEARCHER: String = "searcher"
         private val ARG_QUERY: String = "query"
 

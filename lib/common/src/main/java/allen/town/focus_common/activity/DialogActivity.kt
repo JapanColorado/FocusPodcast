@@ -1,7 +1,6 @@
 package allen.town.focus_common.activity
 
 import allen.town.focus_common.util.BasePreferenceUtil
-import android.app.Application
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate

@@ -4,9 +4,7 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.LinearLayoutManager
 import allen.town.podcast.R
 import allen.town.focus_common.util.Timber
-import allen.town.podcast.view.StorePositionRecyclerView
 import android.content.Context
-import android.content.SharedPreferences
 import android.content.res.Configuration
 import android.util.AttributeSet
 

@@ -1,7 +1,6 @@
 package allen.town.focus_common.util
 
 
-import android.net.Uri
 import android.text.TextUtils
 import com.google.gson.*
 import com.google.gson.reflect.TypeToken
@@ -11,6 +10,9 @@ import org.json.JSONObject
 import java.lang.reflect.Type
 import java.util.*
 
+// detekt: Gson turns malformed input into a wide range of unchecked exceptions. Every
+// method here documents an empty/null fallback rather than propagating a parse failure.
+@Suppress("TooGenericExceptionCaught")
 object JsonHelper {
 
     private val gson = Gson()
@@ -30,9 +32,6 @@ object JsonHelper {
         } catch (e: Exception) {
             Timber.e(e, "toJSONString failed cause")
             return ""
-        } catch (e: Throwable) {
-            Timber.e(e, "toJSONString failed cause")
-            return ""
         }
 
     }
@@ -48,9 +47,6 @@ object JsonHelper {
         } catch (e: Exception) {
             Timber.e(e, "toJSONString failed cause")
             return ""
-        } catch (e: Throwable) {
-            Timber.e(e, "toJSONString failed cause")
-            return ""
         }
 
     }
@@ -64,9 +60,6 @@ object JsonHelper {
         } catch (e: Exception) {
             Timber.e(e, "parseObject failed cause")
             return null
-        } catch (e: Throwable) {
-            Timber.e(e, "parseObject failed cause")
-            return null
         }
 
     }
@@ -78,9 +71,6 @@ object JsonHelper {
             return gson.fromJson<T>(text, typeOfT)
         } catch (e: Exception) {
             Timber.e(e, "parseObjectList failed cause")
-            return null
-        } catch (e: Throwable) {
-            Timber.e(e, "toJSONString failed cause")
             return null
         }
 
@@ -96,9 +86,6 @@ object JsonHelper {
             return list
         } catch (e: Exception) {
             Timber.e(e, "parseObjectList failed cause")
-            return ArrayList()
-        } catch (e: Throwable) {
-            Timber.e(e, "toJSONString failed cause")
             return ArrayList()
         }
 
@@ -187,40 +174,12 @@ object JsonHelper {
         return null
     }
 
-    /**
-     * for serializer Uri
-     */
-    private class UriSerializer : JsonSerializer<Uri> {
-        override fun serialize(
-            src: Uri, typeOfSrc: Type,
-            context: JsonSerializationContext
-        ): JsonElement {
-            return JsonPrimitive(src.toString())
-        }
-    }
-
-    /**
-     * for deserializer Uri
-     */
-    private class UriDeserializer : JsonDeserializer<Uri> {
-        @Throws(JsonParseException::class)
-        override fun deserialize(
-            src: JsonElement, srcType: Type,
-            context: JsonDeserializationContext
-        ): Uri {
-            return Uri.parse(src.asString)
-        }
-    }
-
     @JvmStatic
     fun parseMap(json: String?, type: Type): Map<String, Int>? {
         try {
             return gson.fromJson(json, type)
         } catch (e: Exception) {
             Timber.e(e, "parseObjectList failed cause")
-            return null
-        } catch (e: Throwable) {
-            Timber.e(e, "toJSONString failed cause")
             return null
         }
     }

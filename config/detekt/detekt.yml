@@ -1,0 +1,248 @@
+# detekt configuration for FocusPodcast.
+#
+# This file is merged on top of detekt's built-in default config
+# (`buildUponDefaultConfig = true` in the root build.gradle), so anything not
+# mentioned here keeps its detekt default.
+#
+# The goal of this gate is *bugs, not taste*. Everything stylistic is switched
+# off: naming, magic numbers, line length, method/class size and
+# every complexity threshold. What stays on is the set of rules that flag code
+# which is likely wrong at runtime -- unsafe `!!`, swallowed or over-broad
+# exception handling, `printStackTrace`, empty blocks and dead code.
+#
+# The rules the project treats as hard gates are marked `severity: error`
+# below. `maxIssues: 0` means *any* finding fails the build, so a finding that
+# is genuinely intentional needs either a targeted `@Suppress("RuleName")` with
+# a comment explaining why, or an entry in config/detekt/baseline.xml.
+#
+# Three rules must always report zero with no baseline entry:
+# UnsafeCallOnNullableType, PrintStackTrace and EmptyCatchBlock.
+#
+# UnsafeCallOnNullableType (and a handful of other potential-bugs rules) only work with
+# type resolution, which the bare `detekt` task does not do. The root build.gradle
+# therefore makes `detekt` depend on the per-variant `detektDebug` task, so
+# `./gradlew detekt` runs both the classpath-free and the type-resolved analysis.
+
+build:
+  maxIssues: 0
+  excludeCorrectable: false
+
+config:
+  validation: true
+  warningsAsErrors: false
+  checkExhaustiveness: false
+
+processors:
+  active: true
+
+console-reports:
+  active: true
+
+# --- stylistic rule sets: off ------------------------------------------------
+
+comments:
+  active: false
+
+complexity:
+  active: false
+
+naming:
+  active: false
+
+performance:
+  active: false
+
+# --- correctness rule sets ---------------------------------------------------
+
+coroutines:
+  # The project is RxJava2-based and has no coroutines; leaving this on costs
+  # nothing and catches misuse if coroutines ever arrive.
+  active: true
+
+empty-blocks:
+  active: true
+  EmptyCatchBlock:
+    active: true
+    severity: error
+    allowedExceptionNameRegex: '_|(ignore|expected).*'
+  EmptyFunctionBlock:
+    active: true
+    severity: error
+    # An empty override is a legitimate way to opt out of a framework callback
+    # (TextWatcher, ViewPager.OnPageChangeListener, animation listeners...).
+    ignoreOverridden: true
+  # The remaining empty-block rules are noise on Android boilerplate.
+  EmptyClassBlock:
+    active: false
+  EmptyDefaultConstructor:
+    active: false
+  EmptyDoWhileBlock:
+    active: false
+  EmptyElseBlock:
+    active: false
+  EmptyFinallyBlock:
+    active: false
+  EmptyForBlock:
+    active: false
+  EmptyIfBlock:
+    active: false
+  EmptyInitBlock:
+    active: false
+  EmptyKtFile:
+    active: false
+  EmptySecondaryConstructor:
+    active: false
+  EmptyTryBlock:
+    active: false
+  EmptyWhenBlock:
+    active: false
+  EmptyWhileBlock:
+    active: false
+
+exceptions:
+  active: true
+  PrintStackTrace:
+    active: true
+    severity: error
+  SwallowedException:
+    active: true
+    severity: error
+    ignoredExceptionTypes:
+      - 'InterruptedException'
+      - 'MalformedURLException'
+      - 'NumberFormatException'
+      - 'ParseException'
+    allowedExceptionNameRegex: '_|(ignore|expected).*'
+  TooGenericExceptionCaught:
+    active: true
+    severity: error
+    exceptionNames:
+      - 'ArrayIndexOutOfBoundsException'
+      - 'Error'
+      - 'Exception'
+      - 'IndexOutOfBoundsException'
+      - 'NullPointerException'
+      - 'RuntimeException'
+      - 'Throwable'
+    allowedExceptionNameRegex: '_|(ignore|expected).*'
+  # Left at their detekt defaults: ExceptionRaisedInUnexpectedLocation,
+  # InstanceOfCheckForException, RethrowCaughtException, ReturnFromFinally,
+  # ThrowingExceptionFromFinally, ThrowingNewInstanceOfSameException.
+  # Turned off: these two are about API taste rather than correctness.
+  ThrowingExceptionsWithoutMessageOrCause:
+    active: false
+  TooGenericExceptionThrown:
+    active: false
+
+potential-bugs:
+  active: true
+  UnsafeCallOnNullableType:
+    active: true
+    severity: error
+  # `var` holding a MutableList is a style preference, not a bug.
+  DoubleMutabilityForCollection:
+    active: false
+  # Android lint's own CheckResult check already runs over this code (see `pixi run
+  # lint`), and the deliberate fire-and-forget Rx subscriptions carry
+  # @SuppressLint("CheckResult") with a comment explaining why nothing is disposed.
+  # Keeping this on would mean annotating every one of those a second time.
+  IgnoredReturnValue:
+    active: false
+
+style:
+  active: true
+  # Dead code -- the only part of the `style` rule set this project gates on.
+  UnusedImports:
+    active: true
+    severity: error
+  UnusedParameter:
+    active: true
+    severity: error
+    # An EventBus @Subscribe handler declares its parameter to select the event
+    # type it wants; the body does not have to read it.
+    ignoreAnnotated:
+      - 'Subscribe'
+  UnusedPrivateClass:
+    active: true
+    severity: error
+  UnusedPrivateMember:
+    active: true
+    severity: error
+  UnusedPrivateProperty:
+    active: true
+    severity: error
+  # Everything else in `style` is taste, not correctness.
+  DestructuringDeclarationWithTooManyEntries:
+    active: false
+  EqualsNullCall:
+    active: false
+  ExplicitItLambdaParameter:
+    active: false
+  ForbiddenComment:
+    active: false
+  ForbiddenVoid:
+    active: false
+  FunctionOnlyReturningConstant:
+    active: false
+  LoopWithTooManyJumpStatements:
+    active: false
+  MagicNumber:
+    active: false
+  MaxLineLength:
+    active: false
+  MayBeConst:
+    active: false
+  ModifierOrder:
+    active: false
+  NestedClassesVisibility:
+    active: false
+  NewLineAtEndOfFile:
+    active: false
+  ObjectLiteralToLambda:
+    active: false
+  OptionalAbstractKeyword:
+    active: false
+  ProtectedMemberInFinalClass:
+    active: false
+  RedundantHigherOrderMapUsage:
+    active: false
+  ReturnCount:
+    active: false
+  SafeCast:
+    active: false
+  SerialVersionUIDInSerializableClass:
+    active: false
+  ThrowsCount:
+    active: false
+  UnnecessaryAbstractClass:
+    active: false
+  UnnecessaryApply:
+    active: false
+  UnnecessaryFilter:
+    active: false
+  UnnecessaryInheritance:
+    active: false
+  UseAnyOrNoneInsteadOfFind:
+    active: false
+  UseArrayLiteralsInAnnotations:
+    active: false
+  UseCheckNotNull:
+    active: false
+  UseCheckOrError:
+    active: false
+  UseIsNullOrEmpty:
+    active: false
+  UseOrEmpty:
+    active: false
+  UseRequire:
+    active: false
+  UseRequireNotNull:
+    active: false
+  UselessCallOnNotNull:
+    active: false
+  UtilityClassWithPublicConstructor:
+    active: false
+  VarCouldBeVal:
+    active: false
+  WildcardImport:
+    active: false

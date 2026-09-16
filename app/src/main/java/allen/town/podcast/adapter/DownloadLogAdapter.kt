@@ -147,7 +147,7 @@ class DownloadLogAdapter(private val context: Activity) :
     }
 
     @SuppressLint("CheckResult") // fire-and-forget: app-scoped DB work with its own onError; nothing to dispose
-    private fun bind(holder: DownloadLogViewHolder, downloader: Downloader, position: Int) {
+    private fun bind(holder: DownloadLogViewHolder, downloader: Downloader) {
         val request = downloader.downloadRequest
         holder.title.text = request.title
         holder.secondaryActionButton.setPlayPauseDrawable(
@@ -247,7 +247,7 @@ class DownloadLogAdapter(private val context: Activity) :
         // A stale position after the log changed has no row to show; leave the holder as it is.
         when (item) {
             is DownloadStatus -> bind(holder, item, position)
-            is Downloader -> bind(holder, item, position)
+            is Downloader -> bind(holder, item)
             else -> return
         }
     }

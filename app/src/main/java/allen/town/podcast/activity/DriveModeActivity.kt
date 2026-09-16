@@ -39,7 +39,6 @@ class DriveModeActivity : SimpleToolbarActivity() {
 
     private lateinit var binding: ActivityDriveModeBinding
     private var lastPlaybackControlsColor: Int = Color.GRAY
-    private var lastDisabledPlaybackControlsColor: Int = Color.GRAY
     private lateinit var libraryViewModel: LibraryViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {

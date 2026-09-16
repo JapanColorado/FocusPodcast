@@ -71,12 +71,8 @@ open class BlurCardAudioPlayerFragment : AudioPlayerFragment(false) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        initBlur()
     }
     private var lastRequest: GlideRequest<Drawable>? = null
-    private fun initBlur() {
-
-    }
 
 
 

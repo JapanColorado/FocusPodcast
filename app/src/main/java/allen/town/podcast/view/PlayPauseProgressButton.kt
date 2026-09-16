@@ -55,7 +55,6 @@ class PlayPauseProgressButton : View, ItemActionButton {
     private var mInnerSize = 0
     private var mIsAnimatedPlayPauseDrawable = false
     private var mIsBuffering = false
-    private val mIsDownloaded = false
     private var mIsDownloading = false
     private var mIsPaused = false
     var isPlayed = false
@@ -205,48 +204,6 @@ class PlayPauseProgressButton : View, ItemActionButton {
             drawCircleFill(canvas, f)
         }
         drawProgress(canvas, f)
-    }
-
-    private fun drawPlaying(canvas: Canvas) {
-        val d: Double
-        val width = width.toFloat()
-        val height = height.toFloat()
-        Math.min(width, height)
-        val f = mInnerSize * 0.55f
-        canvas.save()
-        canvas.translate(width / 2.0f, height / 2.0f)
-        val f2 = mAnimationFrame % 122.0f
-        d = if (f2 <= 60.0f) {
-            Math.cos(f2 * 3.141592653589793 / 60.0f)
-        } else {
-            Math.cos((1.0f - (f2 - 60.0f) / 60.0f) * 3.141592653589793)
-        }
-        canvas.drawCircle(
-            0.0f,
-            0.0f,
-            ((0.5f - d.toFloat() * 0.5f) * 0.23000002f + 1.0f) * f,
-            mThrobPaint
-        )
-        val cos =
-            0.5f - Math.cos(mAnimationFrame % 80.0f * 3.141592653589793 / 79.0).toFloat() * 0.5f
-        mPulseRingPaint.alpha = ((1.0f - cos) * 255.0f).toInt()
-        canvas.drawCircle(0.0f, 0.0f, (0.43f * cos + 0.9f) * f, mPulseRingPaint)
-        canvas.restore()
-        val rectF = mTempRectF
-        val i = mInnerSize
-        rectF[-0.5f, -0.5f, i + 0.5f] = i + 0.5f
-        mTempRectF.offset(
-            ((getWidth() - mInnerSize) / 2).toFloat(),
-            ((getHeight() - mInnerSize) / 2).toFloat()
-        )
-        var f3 = (mProgress * 360 / mMax).toFloat()
-        if (mCircleFillPaint != null) {
-            drawCircleFill(canvas, f3)
-        }
-        if (f3 < 5.0f) {
-            f3 = 5.0f
-        }
-        drawProgress(canvas, f3)
     }
 
     private fun drawPlayingNoAnimation(canvas: Canvas) {
@@ -415,7 +372,6 @@ class PlayPauseProgressButton : View, ItemActionButton {
                     R.styleable.PlayPauseProgressButton_focusable,
                     true
                 )
-                obtainStyledAttributes.recycle()
                 mAnimationFrame = 0.0f
                 if (API_17) {
                     i = accentColor
@@ -488,9 +444,8 @@ class PlayPauseProgressButton : View, ItemActionButton {
                 isClickable = z
                 isFocusable = z2
                 setButtonContentDescription()
-            } catch (th: Throwable) {
+            } finally {
                 obtainStyledAttributes.recycle()
-                throw th
             }
         }
     }
@@ -1149,8 +1104,6 @@ class PlayPauseProgressButton : View, ItemActionButton {
         private const val API_17 = true
         const val CIRCLE_PROGRESS_BG_ALPHA_DARK_BACKGROUND = 0.5f
         const val CIRCLE_PROGRESS_BG_ALPHA_LIGHT_BACKGROUND = 0.3f
-        private const val MAX_PROGRESS_CICRCLE = 100
-        private const val MIN_PROGRESS_CICRCLE = 0
         private const val TAG = "PlayPauseProgressButton"
         fun m30854l(sb2: StringBuilder, i: Int, str: String?): String {
             sb2.append(i)

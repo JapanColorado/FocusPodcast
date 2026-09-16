@@ -1,7 +1,6 @@
 package allen.town.podcast.activity
 
 import allen.town.focus_common.views.AccentMaterialDialog
-import allen.town.podcast.MyApp
 import allen.town.podcast.R
 import allen.town.podcast.databinding.SettingsActivityBinding
 import allen.town.podcast.fragment.pref.*
@@ -10,7 +9,6 @@ import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
 import android.view.View
-import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import androidx.preference.PreferenceFragmentCompat
 import allen.town.focus_common.extensions.applyToolbar

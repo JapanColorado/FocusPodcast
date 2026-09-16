@@ -21,17 +21,13 @@ import android.graphics.Bitmap
 import android.widget.RemoteViews
 import androidx.core.content.ContextCompat
 import code.name.monkey.appthemehelper.util.ImageUtil
-import com.bumptech.glide.request.target.Target
 import allen.town.podcast.core.R
-import allen.town.podcast.core.glide.palette.BitmapPaletteWrapper
 import allen.town.podcast.core.widget.WidgetUpdater
 import allen.town.podcast.core.widget.base.BaseAppWidget
 import allen.town.podcast.playback.base.PlayerStatus
 
 open class AppWidgetText : BaseAppWidget() {
-    private var target: Target<BitmapPaletteWrapper>? = null // for cancellation
 
-    private val TAG = "AppWidgetText"
 
     /**
      * Link up various button actions using [PendingIntent].
@@ -132,7 +128,6 @@ open class AppWidgetText : BaseAppWidget() {
         }
 
         // Load the album cover async and push the update on completion
-        val appContext = context.applicationContext
 
         // Set correct drawable for pause state
         val playPauseRes =

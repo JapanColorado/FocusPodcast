@@ -76,11 +76,8 @@ class CustomLauncherIconMakerDialog(
         binding = views
         val alertDialog = AccentMaterialDialog(requireActivity(), R.style.MaterialAlertDialogTheme)
             .setTitle(custom_launcher_title)
-            .setPositiveButton(android.R.string.ok) { dialogInterface: DialogInterface, i: Int ->
-                onConfirmDialog(
-                    dialogInterface,
-                    i
-                )
+            .setPositiveButton(android.R.string.ok) { dialogInterface: DialogInterface, _: Int ->
+                onConfirmDialog(dialogInterface)
             }
             .setView(views.root).create()
         views.rSeekView.addAccentColor()
@@ -96,7 +93,7 @@ class CustomLauncherIconMakerDialog(
         super.onDestroyView()
     }
 
-    fun onConfirmDialog(dialogInterface: DialogInterface, i: Int) {
+    fun onConfirmDialog(dialogInterface: DialogInterface) {
         val views = binding
         val obj = views?.nameView?.text?.toString().orEmpty()
         var drawable: Drawable? = views?.iconView?.drawable

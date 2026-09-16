@@ -14,6 +14,9 @@ import androidx.fragment.app.FragmentActivity
 import code.name.monkey.appthemehelper.ThemeStore
 import com.androidadvance.topsnackbar.TSnackbar
 
+// detekt: TSnackbar inflates into the activity's content view and throws a different
+// exception for every way that can fail; the Toast fallback handles all of them.
+@Suppress("TooGenericExceptionCaught")
 object TopSnackbarUtil {
     @JvmStatic
     fun showSnack(context: Context?, resId: Int, duration: Int = Toast.LENGTH_SHORT) {

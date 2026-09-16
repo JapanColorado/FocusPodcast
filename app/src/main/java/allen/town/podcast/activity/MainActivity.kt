@@ -14,7 +14,6 @@ import allen.town.focus_common.util.Timber
 import allen.town.focus_common.util.TopSnackbarUtil.showSnack
 import allen.town.focus_common.views.AccentMaterialDialog
 import allen.town.podcast.BuildConfig
-import allen.town.podcast.MyApp.Companion.instance
 import allen.town.podcast.R
 import allen.town.podcast.core.pref.Prefs
 import allen.town.podcast.core.pref.Prefs.BackButtonBehavior
@@ -44,7 +43,6 @@ import allen.town.podcast.playback.getSelectedAudioPlayerFragment
 import allen.town.podcast.playback.onPaletteColorChanged
 import allen.town.podcast.pref.PreferenceUpgrader
 import allen.town.podcast.ui.startintent.MainActivityStarter
-import android.Manifest
 import android.app.Activity
 import android.content.Context
 import android.content.DialogInterface
@@ -57,7 +55,6 @@ import android.media.AudioManager
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.text.TextUtils
 import android.util.DisplayMetrics
 import android.util.Log
 import android.view.KeyEvent
@@ -83,8 +80,6 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetBehavior.BottomSheetCallback
 import com.google.android.material.snackbar.Snackbar
 import io.reactivex.Completable
-import io.reactivex.Observable
-import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import org.apache.commons.lang3.ArrayUtils
 import org.apache.commons.lang3.Validate
@@ -107,7 +102,6 @@ class MainActivity : SimpleToolbarActivity(), OnSharedPreferenceChangeListener {
         private set
     private var lastBackButtonPressTime: Long = 0
     val recycledViewPool = RecycledViewPool()
-    private val lastTheme = 0
 
     @SuppressLint("CheckResult") // fire-and-forget: app-scoped DB work with its own onError; nothing to dispose
     public override fun onCreate(savedInstanceState: Bundle?) {
@@ -218,16 +212,6 @@ class MainActivity : SimpleToolbarActivity(), OnSharedPreferenceChangeListener {
         if(requestCode == notificationRequestCode()){
             //written this way because requesting both permissions together only asks for the notification one the first time; the phone one is not asked until the app is opened again (reason unknown)
 //            requestPhonePermission()
-        }
-    }
-
-    private fun requestPhonePermission(){
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
-        ) {
-            requestPermissions(
-                arrayOf(Manifest.permission.READ_PHONE_STATE),
-                PERMISSIONS_REQUEST_PHONE
-            )
         }
     }
 
@@ -851,7 +835,6 @@ class MainActivity : SimpleToolbarActivity(), OnSharedPreferenceChangeListener {
         const val EXTRA_FRAGMENT_ARGS = "fragment_args"
         const val EXTRA_FEED_ID = "fragment_feed_id"
         const val EXTRA_FEED = "fragment_feed"
-        const val PERMISSIONS_REQUEST_PHONE = 1005
 
         //when true, it is opened as a child fragment so back navigation works
         const val EXTRA_STARTED_FROM_SEARCH = "started_from_search"

@@ -1,7 +1,6 @@
 package allen.town.podcast.adapter
 
 import allen.town.podcast.R
-import allen.town.podcast.activity.MainActivity
 import allen.town.podcast.core.glide.ApGlideSettings
 import allen.town.podcast.core.glide.PaletteBitmap
 import allen.town.podcast.core.pref.Prefs
@@ -17,7 +16,7 @@ import com.bumptech.glide.request.target.CustomViewTarget
 import com.bumptech.glide.request.transition.Transition
 import java.lang.ref.WeakReference
 
-class CoverLoader(private val activity: MainActivity?) {
+class CoverLoader {
     private var resource = 0
     private var uri: String? = null
     private var fallbackUri: String? = null

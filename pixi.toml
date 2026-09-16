@@ -23,7 +23,8 @@ clean = { cmd = "./gradlew clean", description = "Delete all Gradle build output
 test = { cmd = "./gradlew testDebugUnitTest", depends-on = ["check-env"], description = "Run all JVM unit tests" }
 lint = { cmd = "./gradlew lint", depends-on = ["check-env"], description = "Run Android lint on every module" }
 nn = { cmd = "bash scripts/count-bangbang.sh", description = "Fail if the Kotlin !! count exceeds scripts/bangbang.max" }
-check = { depends-on = ["build", "test", "lint", "nn"], description = "Everything CI would run" }
+detekt = { cmd = "./gradlew detekt", depends-on = ["check-env"], description = "Run detekt static analysis (config/detekt/detekt.yml)" }
+check = { depends-on = ["build", "test", "lint", "nn", "detekt"], description = "Everything CI would run" }
 
 # Device
 install = { cmd = "bash scripts/install.sh", depends-on = ["build"], description = "Install the debug APK on the connected adb device" }
