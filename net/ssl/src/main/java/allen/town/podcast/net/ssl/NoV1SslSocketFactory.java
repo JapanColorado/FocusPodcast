@@ -24,7 +24,7 @@ public class NoV1SslSocketFactory extends SSLSocketFactory {
                 sslContext = SSLContext.getInstance("TLSv1.3");
             } catch (NoSuchAlgorithmException e) {
                 e.printStackTrace();
-                // In the play flavor (security provider can vary), some devices only support TLSv1.2.
+                // The security provider can vary; some devices only support TLSv1.2.
                 sslContext = SSLContext.getInstance("TLSv1.2");
             }
 
@@ -87,7 +87,7 @@ public class NoV1SslSocketFactory extends SSLSocketFactory {
             s.setEnabledProtocols(new String[]{"TLSv1.3", "TLSv1.2"});
         } catch (IllegalArgumentException e) {
             e.printStackTrace();
-            // In play flavor, supported cipher suites may vary.
+            // Supported cipher suites may vary between devices.
             // Old protocols might be necessary to keep things working.
             s.setEnabledProtocols(new String[] { "TLSv1.2", "TLSv1.1", "TLSv1" });
         }

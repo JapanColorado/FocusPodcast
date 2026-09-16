@@ -15,21 +15,6 @@ android {
 
         testApplicationId "allen.town.podcast.core.tests"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-
-        flavorDimensions "market"
-        productFlavors {
-            fdroid {
-                dimension "market"
-            }
-
-            play {
-                dimension "market"
-            }
-            free {
-                dimension "market"
-            }
-        }
-
     }
 
 

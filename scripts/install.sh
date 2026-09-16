@@ -3,7 +3,7 @@
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
-apk="$(ls app/build/outputs/apk/*/debug/*.apk app/build/outputs/apk/debug/*.apk 2>/dev/null | head -n1 || true)"
+apk="$(ls app/build/outputs/apk/debug/*.apk 2>/dev/null | head -n1 || true)"
 [ -n "$apk" ] || { echo "install: no debug APK found; run 'pixi run build' first" >&2; exit 1; }
 
 devices="$(adb devices | awk 'NR>1 && $2=="device" {print $1}')"

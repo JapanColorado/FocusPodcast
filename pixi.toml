@@ -15,12 +15,12 @@ scripts = ["scripts/env.sh"]
 check-env = "bash scripts/check-env.sh"
 
 # Build
-build = { cmd = "./gradlew assembleFdroidDebug", depends-on = ["check-env"], description = "Assemble the debug APK" }
-release = { cmd = "./gradlew assembleFdroidRelease", depends-on = ["check-env"], description = "Assemble the signed, minified release APK (needs secrets.properties)" }
+build = { cmd = "./gradlew assembleDebug", depends-on = ["check-env"], description = "Assemble the debug APK" }
+release = { cmd = "./gradlew assembleRelease", depends-on = ["check-env"], description = "Assemble the signed, minified release APK (needs secrets.properties)" }
 clean = { cmd = "./gradlew clean", description = "Delete all Gradle build outputs" }
 
 # Verification
-test = { cmd = "./gradlew testFdroidDebugUnitTest", depends-on = ["check-env"], description = "Run all JVM unit tests" }
+test = { cmd = "./gradlew testDebugUnitTest", depends-on = ["check-env"], description = "Run all JVM unit tests" }
 lint = { cmd = "./gradlew lint", depends-on = ["check-env"], description = "Run Android lint on every module" }
 nn = { cmd = "bash scripts/count-bangbang.sh", description = "Fail if the Kotlin !! count exceeds scripts/bangbang.max" }
 check = { depends-on = ["build", "test", "lint", "nn"], description = "Everything CI would run" }

@@ -3,7 +3,6 @@ plugins {
     id 'org.jetbrains.kotlin.android'
 }
 apply from: "../common.gradle"
-//apply from: "../playFlavor.gradle"
 
 android {
     def secrets = new Properties()
@@ -178,12 +177,17 @@ dependencies {
 }
 
 
+// The app bundles the project LICENSE as an asset. It is generated into the build
+// directory rather than the source tree, and that directory is registered as an
+// extra assets source.
 task copyLicense(type: Copy) {
-    from "../LICENSE"
-    into "src/main/assets/"
+    from "$rootDir/LICENSE"
+    into "$buildDir/generated/license-assets/"
     rename { String fileName ->
         fileName + ".txt"
     }
 }
+
+android.sourceSets.main.assets.srcDirs += "$buildDir/generated/license-assets"
 
 preBuild.dependsOn copyLicense
