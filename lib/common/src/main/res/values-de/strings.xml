@@ -29,24 +29,19 @@
     <string name="desc">Absteigend</string>
     <string name="title">Titel</string>
     <string name="backup">Sicherung</string>
-    <string name="google_drive" translateable="false">Google Drive</string>
     <string name="one_drive" translateable="false">Ein Laufwerk</string>
-    <string name="dropbox" translateable="false">Dropbox</string>
     <string name="connect">Verbinden mit</string>
     <string name="already_connect">verbunden</string>
     <string name="backup_failed">Sicherung fehlgeschlagen</string>
-    <string name="already_backup_dropbox">Auf Dropbox gesichert</string>
     <string name="already_backup_webdav">Auf WebDAV gesichert</string>
     <string name="restore_success">Wiederherstellung erfolgreich, bitte App neu starten</string>
     <string name="restore_failed">Wiederherstellung fehlgeschlagen</string>
     <string name="already_backup_one_drive">Auf einem Laufwerk gesichert</string>
     <string name="backup_not_found">Keine Sicherungsdatei gefunden</string>
-    <string name="already_backup_google_drive">Auf Google Drive gesichert</string>
     <string name="select">Auswählen</string>
     <string name="made_by">Von Allen Town</string>
     <string name="twitter_follow_me">Folge mir</string>
     <string name="others_app_of_us">Unsere anderen Apps</string>
-    <string name="check_upgrade">Nach Updates suchen</string>
     <string name="rate_me">Bewerten</string>
     <string name="version" translateable="false">Version %s</string>
     <string name="pref_header_general">Design</string>

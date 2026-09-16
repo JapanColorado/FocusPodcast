@@ -18,13 +18,11 @@
     <string name="connect">接続</string>
     <string name="already_connect">すでに接続されています</string>
     <string name="backup_failed">バックアップに失敗しました</string>
-    <string name="already_backup_dropbox">すでに Dropbox にバックアップされています</string>
     <string name="already_backup_webdav">すでに WebDAV にバックアップされています</string>
     <string name="restore_success">復元に成功しました</string>
     <string name="restore_failed">復元に失敗しました</string>
     <string name="already_backup_one_drive">すでに One Drive にバックアップされています</string>
     <string name="backup_not_found">バックアップ ファイルが見つかりません</string>
-    <string name="already_backup_google_drive">すでに Google Cloud Drive にバックアップされています</string>
     <string name="select">選択</string>
     <string name="made_by">著者アレン・タウン</string>
     <string name="twitter_follow_me">フォローしてください</string>
@@ -33,7 +31,6 @@
     <string name="communication">コミュニケーション</string>
     <string name="change_log">ログを更新</string>
     <string name="others_app_of_us">その他のアプリ</string>
-    <string name="check_upgrade">アップデートを確認する</string>
     <string name="others">その他</string>
     <string name="restore">復元</string>
     <string name="purchase">購入</string>

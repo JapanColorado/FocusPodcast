@@ -12,10 +12,10 @@ import code.name.monkey.appthemehelper.util.VersionUtils
 import code.name.monkey.retromusic.util.theme.ThemeManager
 import allen.town.podcast.R
 import allen.town.podcast.core.pref.Prefs
-import allen.town.podcast.playback.cast.CastEnabledActivity
+import allen.town.focus_common.activity.ToolbarBaseActivity
 import java.util.*
 
-abstract class SimpleToolbarActivity : CastEnabledActivity() {
+abstract class SimpleToolbarActivity : ToolbarBaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         updateTheme()
 //        hideStatusBar(R.id.status_bar)

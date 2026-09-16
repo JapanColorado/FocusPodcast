@@ -93,8 +93,6 @@ import allen.town.podcast.model.playback.MediaType;
 import allen.town.podcast.model.playback.Playable;
 import allen.town.podcast.playback.base.PlaybackServiceMediaPlayer;
 import allen.town.podcast.playback.base.PlayerStatus;
-import allen.town.podcast.playback.cast.CastPsmp;
-import allen.town.podcast.playback.cast.CastStateListener;
 import allen.town.podcast.ui.startintent.LockScreenActivityStarter;
 import allen.town.podcast.ui.startintent.MainActivityStarter;
 import allen.town.podcast.ui.startintent.VideoPlayerActivityStarter;
@@ -196,7 +194,6 @@ public class PlaybackService extends MediaBrowserServiceCompat {
     private PlaybackServiceStateManager stateManager;
     private Disposable positionEventTimer;
     private PlaybackServiceNotificationBuilder notificationBuilder;
-    private CastStateListener castStateListener;
 
     private String autoSkippedFeedMediaId = null;
 
@@ -289,12 +286,6 @@ public class PlaybackService extends MediaBrowserServiceCompat {
         PreferenceManager.getDefaultSharedPreferences(this)
                 .registerOnSharedPreferenceChangeListener(prefListener);
         recreateMediaSessionIfNeeded();
-        castStateListener = new CastStateListener(this) {
-            @Override
-            public void onSessionStartedOrEnded() {
-                recreateMediaPlayer();
-            }
-        };
         EventBus.getDefault().post(new PlaybackServiceEvent(PlaybackServiceEvent.Action.SERVICE_STARTED));
     }
 
@@ -340,10 +331,7 @@ public class PlaybackService extends MediaBrowserServiceCompat {
             mediaPlayer.pause(true, false);
             mediaPlayer.shutdown();
         }
-        mediaPlayer = CastPsmp.getInstanceIfConnected(this, mediaPlayerCallback);
-        if (mediaPlayer == null) {
-            mediaPlayer = new LocalPSMP(this, mediaPlayerCallback); // Cast not supported or not connected
-        }
+        mediaPlayer = new LocalPSMP(this, mediaPlayerCallback);
         if (media != null) {
             mediaPlayer.playMediaObject(media, !media.localFileAvailable(), wasPlaying, true);
         }
@@ -366,9 +354,6 @@ public class PlaybackService extends MediaBrowserServiceCompat {
         if (playableIconLoaderThread != null) {
             // otherwise a Glide load still in flight re-posts the notification on a dead service
             playableIconLoaderThread.interrupt();
-        }
-        if (castStateListener != null) {
-            castStateListener.destroy();
         }
 
         cancelPositionObserver();

@@ -17,13 +17,11 @@
     <string name="connect">连接</string>
     <string name="already_connect">已连接</string>
     <string name="backup_failed">备份失败</string>
-    <string name="already_backup_dropbox">已备份到 Dropbox</string>
     <string name="already_backup_webdav">已备份到 WebDAV</string>
     <string name="restore_success">恢复成功</string>
     <string name="restore_failed">恢复失败</string>
     <string name="already_backup_one_drive">已备份到 One Drive</string>
     <string name="backup_not_found">没有找到备份文件</string>
-    <string name="already_backup_google_drive">已备份到谷歌云盘</string>
     <string name="select">选择</string>
     <string name="made_by">作者 allen town</string>
     <string name="twitter_follow_me">关注我</string>
@@ -32,7 +30,6 @@
     <string name="communication">沟通和交流</string>
     <string name="change_log">更新日志</string>
     <string name="others_app_of_us">我们的其他应用</string>
-    <string name="check_upgrade">检查更新</string>
     <string name="others">其它</string>
     <string name="restore">恢复</string>
     <string name="purchase">购买</string>

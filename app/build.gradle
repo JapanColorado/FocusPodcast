@@ -124,7 +124,6 @@ dependencies {
     implementation project(':net:sync:model')
     implementation project(':parser:feed')
     implementation project(':playback:base')
-    implementation project(':playback:cast')
     implementation project(':storage:database')
     implementation project(':ui:app-start-intent')
     implementation project(':ui:common')

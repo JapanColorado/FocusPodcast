@@ -29,17 +29,14 @@
     <string name="connect">連接</string>
     <string name="already_connect">已連接</string>
     <string name="backup_failed">備份失敗</string>
-    <string name="already_backup_dropbox">已備份到 Dropbox</string>
     <string name="already_backup_webdav">已備份到 WebDAV</string>
     <string name="restore_success">恢復成功</string>
     <string name="restore_failed">恢復失敗</string>
     <string name="already_backup_one_drive">已備份到 One Drive</string>
     <string name="backup_not_found">沒有找到備份文件</string>
-    <string name="already_backup_google_drive">已備份到谷歌云盤</string>
     <string name="twitter_follow_me">關注我</string>
     <string name="rate_me">打分</string>
     <string name="others_app_of_us">我們的其他應用</string>
-    <string name="check_upgrade">檢查更新</string>
 
 
     <string name="cancel_any_time">%1$s，隨時取消</string>

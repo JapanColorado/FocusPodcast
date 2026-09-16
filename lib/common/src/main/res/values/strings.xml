@@ -22,24 +22,19 @@
     <string name="desc">Descending</string>
     <string name="title">Title</string>
     <string name="backup">Backup</string>
-    <string name="google_drive" translatable="false">Google Drive</string>
     <string name="one_drive" translatable="false">One Drive</string>
-    <string name="dropbox" translatable="false">Dropbox</string>
     <string name="connect">Connect to</string>
     <string name="already_connect">connected</string>
     <string name="backup_failed">Backup failed</string>
-    <string name="already_backup_dropbox">Backed up to Dropbox</string>
     <string name="already_backup_webdav">Backed up to WebDAV</string>
     <string name="restore_success">Restore succeeded , please restart app</string>
     <string name="restore_failed">Restore failed</string>
     <string name="already_backup_one_drive">Backed up to One Drive</string>
     <string name="backup_not_found">No backup file found</string>
-    <string name="already_backup_google_drive">Backed up to Google Drive</string>
     <string name="select">Select</string>
     <string name="made_by">By allen town</string>
     <string name="twitter_follow_me">Follow me</string>
     <string name="others_app_of_us">Our other apps</string>
-    <string name="check_upgrade">Check for updates</string>
     <string name="rate_me">Rate</string>
     <string name="version" translatable="false">Version %s</string>
     <string name="pref_header_general">Theme</string>

@@ -476,9 +476,6 @@
     <string name="synchronization_full_sync_title">Force full synchronization</string>
     <string name="synchronization_login_status"><![CDATA[Logged in as <i>%1$s</i> on <i>%2$s</i>. <br/><br/>You can choose your synchronization provider again once you have logged out]]></string>
     <string name="synchronization_episodes_sync">Subscriptions and Episodes Sync</string>
-    <string name="synchronization_all_data_sync">All Data Synchronization</string>
-    <string name="synchronization_all_data_sync_select">Select Google Drive, One Drive, Dropbox, WebDAV</string>
-    <string name="synchronization_all_data_sync_select_summary">Synchronize the app Settings, Subscriptions , Episodes, the app will be closed after successful recovery, please open it manually</string>
     <string name="synchronization_summary_unchoosen">Choose from multiple providers to synchronize subscriptions and episodes</string>
     <string name="gpodsync_synchronization_sum">Gpoddersync is an open source Nextcloud application that you need to deploy on your own server, if you know enough then you can continue</string>
     <string name="synchronization_nextcloud_authenticate_browser">Grant access using the opened web browser and come back to FocusPodcast.</string>
@@ -837,19 +834,6 @@
     <string name="pro_summary">More Themes, Now playing themes, Custom homepage, and more... to create your own unique podcast app</string>
     <string name="buy_now">View all advanced features</string>
 
-    <string name="pro_feature_no_ads">Remove ads</string>
-    <string name="pro_feature_theme">More themes (theme color can be adjusted arbitrarily)</string>
-    <string name="pro_feature_custom_logo">Custom app icon</string>
-    <string name="pro_feature_sub_tags">Manage subscription groups</string>
-    <string name="pro_feature_advanced_playback_settings">Advanced playback settings (custom playback speed, volume boost, skip silence, drop mix (Mono), skip start and end for each channel)</string>
-    <string name="pro_feature_unlimited_subscriptions">Unlimited subscriptions (up to 100 for free version)</string>
-    <string name="pro_feature_custom_home_page">Custom home page, custom drawer navigation bar order and visibility</string>
-    <string name="pro_feature_now_playing_theme">More now playing themes, more beautiful desktop widgets</string>
-    <string name="pro_feature_backupto_cloud">Backup data to cloud storage (OneDrive, Dropbox, GoogleDrive, WebDAV)</string>
-    <string name="pro_feature_support_me">Support developers, buy me a cup of coffee</string>
-    <string name="pro_feature_set_podcast_search_engine">Customize the podcast search engine and find the most suitable one from multiple search engines</string>
-    <string name="pro_feature_local_feed">Add virtual podcasts (import local audio and video, audio ebooks), benefit from advanced playback features such as silent skip, volume boost and sleep timer, all in one podcast and media player</string>
-    <string name="pro_feature_full_search">Full text (Shownotes for full podcasts) search across all content (any playlist or subscription) to find the podcast episode you\'re looking for</string>
 
     <!-- itunes category -->
     <string name="all">All</string>

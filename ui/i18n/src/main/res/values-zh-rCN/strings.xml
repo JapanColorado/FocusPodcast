@@ -430,9 +430,6 @@
   <string name="synchronization_login_status"><![CDATA[登录为 <i>%2$s</i>上的 <i>%1$s</i><br/><br/>退出后，您可以再次选择同步提供商]]></string>
   <string name="synchronization_summary_unchoosen">从多个提供商中选择一个用来同步订阅和剧集</string>
   <string name="synchronization_episodes_sync">剧集和订阅同步</string>
-  <string name="synchronization_all_data_sync">所有数据同步</string>
-  <string name="synchronization_all_data_sync_select">选择 Google Drive、One Drive、Dropbox、WebDAV</string>
-  <string name="synchronization_all_data_sync_select_summary">同步app的设置、订阅、剧集，恢复成功后将会关闭app，请手动打开</string>
   <string name="gpodsync_synchronization_sum">Gpoddersync 是一个开源的 Nextcloud 应用程序，您需要在自己的服务器上部署，如果您足够了解那么可以继续</string>
   <string name="synchronization_nextcloud_authenticate_browser">使用打开的网页浏览器授予访问权限，然后返回到 FocusPodcast</string>
   <string name="synchronization_choose_title">选择同步供应商</string>
@@ -758,18 +755,6 @@
   <string name="pro_summary">更多主题、正在播放主题、自定义首页等等，打造专属于自己的独一无二的播客app</string>
   <string name="buy_now">查看所有高级特性</string>
 
-  <string name="pro_feature_no_ads">去广告</string>
-  <string name="pro_feature_theme">更多主题（主题色任意调整）</string>
-  <string name="pro_feature_custom_logo">自定义app图标</string>
-  <string name="pro_feature_sub_tags">管理订阅分组</string>
-  <string name="pro_feature_advanced_playback_settings">高级播放设置（为每个频道自定义播放速度、音量增强、跳过静默，下降混合（Mono）、跳过开头和结尾）</string>
-  <string name="pro_feature_unlimited_subscriptions">订阅数不受限制（免费版最多100个）</string>
-  <string name="pro_feature_custom_home_page">自定义首页、自定义抽屉导航栏的顺序和可见性</string>
-  <string name="pro_feature_now_playing_theme">更多正在播放主题、更多精美桌面小组件</string>
-  <string name="pro_feature_backupto_cloud">备份数据到云存储（OneDrive、Dropbox、GoogleDrive、WebDAV）</string>
-  <string name="pro_feature_support_me">支持开发者，为我买杯咖啡</string>
-  <string name="pro_feature_local_feed">添加虚拟播客（导入本地音视频、有声电子书），受益于高级播放功能，比如静音跳过，音量提升和睡眠定时器，集播客和媒体播放器于一身</string>
-  <string name="pro_feature_full_search">在所有的内容（任何播放列表或订阅）中进行全文（完整播客的Shownotes）搜索，以寻找您要的播客单集</string>
 
   <string name="app_widget_classic_name">经典</string>
   <string name="app_widget_md_name">MD (FocusPodcast 高级版)</string>
@@ -826,7 +811,6 @@
   <string name="opml_sum_free">%1$d 订阅剩余 %2$d 订阅数目</string>
   <string name="opml_sum_pro">您拥有无限订阅数</string>
 
-  <string name="pro_feature_set_podcast_search_engine">自定义播客搜索引擎，从多个搜索引擎中找到最适合自己的</string>
 
   <string name="feed_url_copied_tip">或许您想通过已复制的 URL 来订阅，我们已为您自动填入搜索框</string>
 

@@ -468,9 +468,6 @@
     <string name="synchronization_full_sync_title">Tam senkronizasyon zorla</string>
     <string name="synchronization_login_status"><![CDATA[<i>%1$s</i> olarak <i>%2$s</i> üzerinde giriş yapıldı. <br/><br/>Çıkış yaptıktan sonra senkronizasyon sağlayıcınızı yeniden seçebilirsiniz]]></string>
     <string name="synchronization_episodes_sync">Abonelikler ve Bölümler Senkronizasyonu</string>
-    <string name="synchronization_all_data_sync">Tüm Verilerin Senkronizasyonu</string>
-    <string name="synchronization_all_data_sync_select">Google Drive, One Drive, Dropbox, WebDAV\'ı seçin</string>
-    <string name="synchronization_all_data_sync_select_summary">Uygulama Ayarları, Abonelikler, Bölümler senkronize edin, başarılı kurtarma sonrası uygulama kapanacaktır, lütfen manuel olarak açın</string>
     <string name="synchronization_summary_unchoosen">Abonelikleri ve bölümleri senkronize etmek için birden fazla sağlayıcıdan seçim yapın</string>
     <string name="gpodsync_synchronization_sum">Gpoddersync, kendi sunucunuza dağıtmanız gereken açık kaynaklı bir Nextcloud uygulamasıdır, yeterince bilgi sahibiyseniz devam edebilirsiniz</string>
     <string name="synchronization_nextcloud_authenticate_browser">Açılan web tarayıcısını kullanarak erişimi yetkilendirin ve FocusPodcast\'e geri dönün.</string>
@@ -824,19 +821,6 @@
     <string name="pro_summary">Daha fazla tema, Şimdi oynatılan temalar, Özel ana sayfa ve daha fazlası... kendi benzersiz podcast uygulamanızı oluşturun</string>
     <string name="buy_now">Tüm gelişmiş özellikleri görüntüle</string>
 
-    <string name="pro_feature_no_ads">Reklamları kaldır</string>
-    <string name="pro_feature_theme">Daha fazla tema (tema rengi isteğe bağlı olarak ayarlanabilir)</string>
-    <string name="pro_feature_custom_logo">Özel uygulama simgesi</string>
-    <string name="pro_feature_sub_tags">Abonelik gruplarını yönetin</string>
-    <string name="pro_feature_advanced_playback_settings">Gelişmiş oynatma ayarları (özel oynatma hızı, ses artırma, sessiz geçiş, karışımı kes (Mono), her kanal için başlatma ve bitirme noktalarını atla)</string>
-    <string name="pro_feature_unlimited_subscriptions">Sınırsız abonelik (ücretsiz sürümde en fazla 100)</string>
-    <string name="pro_feature_custom_home_page">Özel ana sayfa, özel çekmece navigasyon çubuğu sırası ve görünürlüğü</string>
-    <string name="pro_feature_now_playing_theme">Daha fazla şimdi oynatılan tema, daha güzel masaüstü widget\'ları</string>
-    <string name="pro_feature_backupto_cloud">Verileri bulut depolamaya yedekleme (OneDrive, Dropbox, GoogleDrive, WebDAV)</string>
-    <string name="pro_feature_support_me">Geliştiricileri destekle, bana bir kahve ısmarla</string>
-    <string name="pro_feature_set_podcast_search_engine">Podcast arama motorunu özelleştir ve birden fazla arama motoru arasından en uygun olanı bul</string>
-    <string name="pro_feature_local_feed">Sanal podcast\'ler ekleyin (yerel ses ve videoları, sesli e-kitapları içe aktarın), sessiz atlama, ses artırma ve uyku zamanlayıcı gibi gelişmiş oynatma özelliklerinden yararlanın, hepsi bir arada podcast ve medya oynatıcı</string>
-    <string name="pro_feature_full_search">Tüm içerik (herhangi bir çalma listesi veya abonelik) genelinde tam metin (Podkastların gösteri notları) araması yaparak aradığınız podcast bölümünü bulun</string>
 
     <!-- itunes kategorisi -->
     <string name="all">Tümü</string>

@@ -78,7 +78,6 @@ import allen.town.podcast.model.feed.FeedItem;
 import allen.town.podcast.model.feed.FeedMedia;
 import allen.town.podcast.model.playback.Playable;
 import allen.town.podcast.playback.LibraryViewModel;
-import allen.town.podcast.playback.cast.CastEnabledActivity;
 import allen.town.podcast.view.DrawableGradient;
 import allen.town.podcast.view.PlayButton;
 import code.name.monkey.appthemehelper.ThemeStore;
@@ -658,8 +657,6 @@ public class AudioPlayerFragment extends Fragment implements
         toolbar.getMenu().findItem(R.id.disable_sleeptimer_item).setVisible(controller.sleepTimerActive());
         toolbar.getMenu().findItem(R.id.driver_mode).setVisible(true);
         MenuIconUtil.showToolbarMenuIcon(toolbar);
-
-        ((CastEnabledActivity) getActivity()).requestCastButton(toolbar.getMenu());
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)

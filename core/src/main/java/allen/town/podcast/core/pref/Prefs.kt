@@ -60,8 +60,6 @@ object Prefs {
     const val PREF_DRAWER_FEED_ORDER_METHOD = "pref_feed_order_method"
 
     //drive
-    const val PREF_DROPBOX_REDENTIAL = "pref_dropbox_credential"
-    const val PREF_DROPBOX_ACCESS_TOKEN = "pref_dropbox_access_token"
     const val PREF_QUEUE_KEEP_SORTED = "pref_queue_keep_sorted"
     
     //app启动首页
@@ -211,26 +209,7 @@ object Prefs {
                 R.style.Theme_FocusPodcast_Light
             }
         }
-    @JvmStatic
-    fun getDropboxCredential(context: Context?): String? {
-        return android.preference.PreferenceManager.getDefaultSharedPreferences(context)
-            .getString(PREF_DROPBOX_REDENTIAL, null)
-    }
-    @JvmStatic
-    fun setDropboxCredential(context: Context?, value: String?) {
-        android.preference.PreferenceManager.getDefaultSharedPreferences(context)
-            .edit().putString(PREF_DROPBOX_REDENTIAL, value).commit()
-    }
-    @JvmStatic
-    fun getDropboxAccessToken(context: Context?): String? {
-        return android.preference.PreferenceManager.getDefaultSharedPreferences(context)
-            .getString(PREF_DROPBOX_ACCESS_TOKEN, null)
-    }
-    @JvmStatic
-    fun setDropboxAccessToken(context: Context?, value: String?) {
-        android.preference.PreferenceManager.getDefaultSharedPreferences(context)
-            .edit().putString(PREF_DROPBOX_ACCESS_TOKEN, value).commit()
-    }
+
     @JvmStatic
     var compactNotificationButtons: List<Int?>?
         get() {

@@ -445,9 +445,6 @@
   <string name="pref_column_display_in_landscape_title">橫屏時使用分欄顯示</string>
   <string name="pref_column_display_in_landscape_sum">當手機橫屏時，顯示兩欄，左側是抽屜欄，右側是內容</string>
   <string name="synchronization_episodes_sync">劇集和訂閱同步</string>
-  <string name="synchronization_all_data_sync">所有數據同步</string>
-  <string name="synchronization_all_data_sync_select">選擇 Google Drive、One Drive、Dropbox、WebDAV</string>
-  <string name="synchronization_all_data_sync_select_summary">同步app的設置、訂閱、劇集，恢復成功後將會關閉app，請手動打開</string>
   <string name="synchronization_choose_title">選擇同步供應商</string>
   <string name="synchronization_force_sync_summary">重新同步所有訂閱和劇集狀態</string>
   <string name="synchronization_sync_summary">同步訂閱和劇集狀態更改</string>
@@ -706,19 +703,6 @@
   <string name="pro_summary">更多主題、正在播放主題、自定義首頁等等，打造專屬於自己的獨一無二的播客app</string>
   <string name="buy_now">查看所有高級特性</string>
 
-  <string name="pro_feature_no_ads">去廣告</string>
-  <string name="pro_feature_theme">更多主題（主題色任意調整）</string>
-  <string name="pro_feature_custom_logo">自定義app圖標</string>
-  <string name="pro_feature_sub_tags">管理訂閱分組</string>
-  <string name="pro_feature_advanced_playback_settings">高級播放設置（為每個頻道自定義播放速度、音量增強、跳過靜默，下降混合（Mono）、跳過開頭和結尾）</string>
-  <string name="pro_feature_unlimited_subscriptions">訂閱數不受限制（免費版最多100個）</string>
-  <string name="pro_feature_custom_home_page">自定義首頁、自定義抽屜導航欄的順序和可見性</string>
-  <string name="pro_feature_now_playing_theme">更多播放界面主題、更多精美桌面小組件</string>
-  <string name="pro_feature_backupto_cloud">備份數據到雲存儲（OneDrive、Dropbox、GoogleDrive、WebDAV）</string>
-  <string name="pro_feature_support_me">支持開發者，為我買杯咖啡</string>
-  <string name="pro_feature_set_podcast_search_engine">自定義播客搜索引擎，從多個搜索引擎中找到最適合自己的</string>
-  <string name="pro_feature_local_feed">添加虛擬播客（導入本地音視頻、有聲電子書），受益於高級播放功能，比如靜音跳過，音量提升和睡眠定時器，集播客和媒體播放器於一身</string>
-  <string name="pro_feature_full_search">在所有的內容（任何播放列表或訂閱）中進行全文（完整播客的Shownotes）搜索，以尋找您要的播客單集</string>
   <string name="pref_custom_launcher_title">自定義啟動器圖標</string>
   <string name="pref_summary_desaturated_color">根據質感設計規範，深色模式下應使用低飽和度顏色</string>
   <string name="feed_refresh_title">刷新播客</string>

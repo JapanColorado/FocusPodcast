@@ -14,24 +14,19 @@
     <string name="desc">Descendant</string>
     <string name="title">Titre</string>
     <string name="backup">Sauvegarde</string>
-    <string name="google_drive" translatable="false">Google Drive</string>
     <string name="one_drive" translatable="false">Un seul disque</string>
-    <string name="dropbox" translatable="false">Dropbox</string>
     <string name="connect">Se connecter à</string>
     <string name="already_connect">connecté</string>
     <string name="backup_failed">Échec de la sauvegarde</string>
-    <string name="already_backup_dropbox">Sauvegardé sur Dropbox</string>
     <string name="already_backup_webdav">Sauvegardé sur WebDAV</string>
     <string name="restore_success">La restauration a réussi, veuillez redémarrer l\'application</string>
     <string name="restore_failed">La restauration a échoué</string>
     <string name="already_backup_one_drive">Sauvegardé sur un lecteur</string>
     <string name="backup_not_found">Aucun fichier de sauvegarde trouvé</string>
-    <string name="already_backup_google_drive">Sauvegardé sur Google Drive</string>
     <string name="select">Sélectionner</string>
     <string name="made_by">Par ville allen</string>
     <string name="twitter_follow_me">Suivez-moi</string>
     <string name="others_app_of_us">Nos autres applications</string>
-    <string name="check_upgrade">Vérifier les mises à jour</string>
     <string name="rate_me">Évaluer</string>
     <string name="version" translatable="false">Version %s</string>
     <string name="pref_header_general">Thème</string>

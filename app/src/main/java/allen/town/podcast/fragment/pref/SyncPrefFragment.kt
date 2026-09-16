@@ -4,7 +4,6 @@ import allen.town.focus_common.util.TopSnackbarUtil.showSnack
 import allen.town.focus_common.views.AccentMaterialDialog
 import allen.town.podcast.MyApp
 import allen.town.podcast.R
-import allen.town.podcast.activity.DriveBackupActivity
 import allen.town.podcast.activity.SettingsActivity
 import allen.town.podcast.core.sync.SyncService
 import allen.town.podcast.core.sync.SynchronizationCredentials
@@ -72,12 +71,6 @@ class SyncPrefFragment : AbsSettingsFragment() {
 
     private fun setupScreen() {
         val activity: Activity? = activity
-        findPreference<Preference>(PREFERENCE_SYNC_ALL_DATA)!!.isVisible = false
-        findPreference<Preference>(PREFERENCE_SYNC_ALL_DATA)!!.onPreferenceClickListener =
-            Preference.OnPreferenceClickListener { preference: Preference? ->
-                activity!!.startActivity(Intent(activity, DriveBackupActivity::class.java))
-                true
-            }
         findPreference<Preference>(PREFERENCE_GPODNET_SETLOGIN_INFORMATION)
             ?.setOnPreferenceClickListener(Preference.OnPreferenceClickListener { preference: Preference? ->
                 val dialog: AuthenticationDialog = object : AuthenticationDialog(
@@ -250,7 +243,6 @@ class SyncPrefFragment : AbsSettingsFragment() {
             "pref_gpodnet_setlogin_information"
         private const val PREFERENCE_SYNC = "pref_synchronization_sync"
         private const val PREFERENCE_FORCE_FULL_SYNC = "pref_synchronization_force_full_sync"
-        private const val PREFERENCE_SYNC_ALL_DATA = "pref_synchronization_all_data_sync"
         private const val PREFERENCE_LOGOUT = "pref_synchronization_logout"
     }
 }

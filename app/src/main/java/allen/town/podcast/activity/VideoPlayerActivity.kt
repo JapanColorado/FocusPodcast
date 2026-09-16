@@ -28,7 +28,7 @@ import allen.town.podcast.model.feed.FeedItem
 import allen.town.podcast.model.feed.FeedMedia
 import allen.town.podcast.model.playback.Playable
 import allen.town.podcast.playback.base.PlayerStatus
-import allen.town.podcast.playback.cast.CastEnabledActivity
+import allen.town.focus_common.activity.ToolbarBaseActivity
 import allen.town.podcast.ui.startintent.MainActivityStarter
 import android.annotation.SuppressLint
 import android.annotation.TargetApi
@@ -63,7 +63,7 @@ import org.greenrobot.eventbus.ThreadMode
 /**
  * Activity for playing video files.
  */
-class VideoPlayerActivity : CastEnabledActivity(), OnSeekBarChangeListener {
+class VideoPlayerActivity : ToolbarBaseActivity(), OnSeekBarChangeListener {
     /**
      * True if video controls are currently visible.
      */
@@ -518,7 +518,6 @@ class VideoPlayerActivity : CastEnabledActivity(), OnSeekBarChangeListener {
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         super.onCreateOptionsMenu(menu)
-        requestCastButton(menu)
         val inflater = menuInflater
         inflater.inflate(R.menu.mediaplayer, menu)
         //        menu.findItem(R.id.audio_controls).setVisible(false);
