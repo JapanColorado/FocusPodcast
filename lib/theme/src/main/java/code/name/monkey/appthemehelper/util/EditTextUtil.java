@@ -73,6 +73,8 @@ public class EditTextUtil {
             cursorDrawable.setAccessible(true);
             cursorDrawable.set(editor, new Drawable[]{drawable, drawable});
         } catch (Exception e) {
+            // Best effort only: on a platform where these fields are gone the cursor keeps its
+            // default color, which is cosmetic, so there is nothing to propagate.
             Log.w(TAG, "could not tint the text cursor", e);
         }
     }

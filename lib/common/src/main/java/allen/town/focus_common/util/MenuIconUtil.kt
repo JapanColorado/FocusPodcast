@@ -1,7 +1,6 @@
 package allen.town.focus_common.util
 
 import android.annotation.SuppressLint
-import android.util.Log
 import android.view.Menu
 import androidx.appcompat.view.menu.MenuBuilder
 import androidx.appcompat.widget.Toolbar
@@ -23,6 +22,9 @@ object MenuIconUtil {
                 (toolbar.menu as MenuBuilder).setOptionalIconsVisible(true)
             }
         } catch (e: Exception) {
+            // setOptionalIconsVisible is @RestrictTo, so it can disappear with an AppCompat
+            // upgrade. Losing it only means overflow items show without their icons.
+            Timber.w(e, "could not show the toolbar menu icons")
         }
     }
 
@@ -38,6 +40,8 @@ object MenuIconUtil {
                 menu.setOptionalIconsVisible(true)
             }
         } catch (e: Exception) {
+            // Same @RestrictTo caveat as above; icons are cosmetic.
+            Timber.w(e, "could not show the menu icons")
         }
     }
 
@@ -54,7 +58,10 @@ object MenuIconUtil {
                 m.isAccessible = true
                 // MenuBuilder implements Menu, so the menu handed to us on creation really is a MenuBuilder
                 m.invoke(menu, true)
-            } catch (ignored: Exception) {
+            } catch (e: Exception) {
+                // com.android.internal.view.menu.MenuBuilder is a hidden platform class; without
+                // it the context menu simply shows no icons.
+                Timber.w(e, "could not show the context menu icons")
             }
         }
     }
@@ -75,8 +82,10 @@ object MenuIconUtil {
                 m.isAccessible = true
                 // MenuBuilder implements Menu, so the menu handed to us on creation really is a MenuBuilder
                 m.invoke(objMenuBuilder, true)
-            } catch (ignored: Exception) {
-                Log.e("",ignored.toString())
+            } catch (e: Exception) {
+                // Reflection into MenuWrapperICS/MenuBuilder internals; without it the action
+                // mode menu simply shows no icons.
+                Timber.w(e, "could not show the action mode menu icons")
             }
         }
     }

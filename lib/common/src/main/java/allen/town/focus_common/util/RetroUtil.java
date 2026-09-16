@@ -235,7 +235,10 @@ public class RetroUtil {
         }
 
       }
-    } catch (Exception ignored) {
+    } catch (Exception e) {
+      // Enumerating interfaces needs no permission but can still fail on a locked-down ROM.
+      // Callers treat "" as "no address", so there is nothing to propagate.
+      Timber.w(e, "could not read the local IP address");
     }
     return "";
   }

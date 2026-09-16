@@ -8,6 +8,8 @@ import android.os.Message;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
+import allen.town.focus_common.util.Timber;
+
 /**
  * Created by wanjian on 2018/5/24.
  * <p>
@@ -27,7 +29,10 @@ public class ActivityKillerV15_V20 implements IActivityKiller {
             IBinder binder = (IBinder) tokenField.get(activityClientRecord);
             finish(binder);
         } catch (Exception e) {
-            e.printStackTrace();
+            // Best effort: we are already unwinding a lifecycle crash, so if the private
+            // ActivityManager internals are out of reach there is nothing left to try;
+            // rethrowing would kill the process this handler exists to keep alive.
+            Timber.e(e, "could not finish the activity whose lifecycle threw");
         }
     }
 
@@ -38,7 +43,10 @@ public class ActivityKillerV15_V20 implements IActivityKiller {
         try {
             finish((IBinder) message.obj);
         } catch (Exception e) {
-            e.printStackTrace();
+            // Best effort: we are already unwinding a lifecycle crash, so if the private
+            // ActivityManager internals are out of reach there is nothing left to try;
+            // rethrowing would kill the process this handler exists to keep alive.
+            Timber.e(e, "could not finish the activity whose lifecycle threw");
         }
     }
 
@@ -49,7 +57,10 @@ public class ActivityKillerV15_V20 implements IActivityKiller {
         try {
             finish((IBinder) message.obj);
         } catch (Exception e) {
-            e.printStackTrace();
+            // Best effort: we are already unwinding a lifecycle crash, so if the private
+            // ActivityManager internals are out of reach there is nothing left to try;
+            // rethrowing would kill the process this handler exists to keep alive.
+            Timber.e(e, "could not finish the activity whose lifecycle threw");
         }
     }
 
@@ -58,7 +69,10 @@ public class ActivityKillerV15_V20 implements IActivityKiller {
         try {
             finish((IBinder) message.obj);
         } catch (Exception e) {
-            e.printStackTrace();
+            // Best effort: we are already unwinding a lifecycle crash, so if the private
+            // ActivityManager internals are out of reach there is nothing left to try;
+            // rethrowing would kill the process this handler exists to keep alive.
+            Timber.e(e, "could not finish the activity whose lifecycle threw");
         }
     }
 

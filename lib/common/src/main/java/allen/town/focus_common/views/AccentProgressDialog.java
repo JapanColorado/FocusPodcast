@@ -84,8 +84,10 @@ public class AccentProgressDialog {
                             ThemeStore.accentColor(progressDialog.getContext()), PorterDuff.Mode.SRC_ATOP));
                 }
             }
-        } catch (Exception unused) {
-            Timber.e(unused, "refresh");
+        } catch (Exception e) {
+            // Purely cosmetic: without the tint the dialog shows the platform's default spinner
+            // color, so there is nothing worth failing the dialog over.
+            Timber.w(e, "could not tint the progress dialog");
         }
     }
 }

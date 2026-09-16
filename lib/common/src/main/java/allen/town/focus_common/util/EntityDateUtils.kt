@@ -21,10 +21,12 @@ object EntityDateUtils {
     fun getTimeFromIso8601(time: String): Long {
         var currentTimeMillis = System.currentTimeMillis()
         try {
-            var simpleDateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSSSS'Z'");
-            simpleDateFormat.setTimeZone(TimeZone.getTimeZone("GMT+0:00"));
-            currentTimeMillis = simpleDateFormat.parse(time).getTime();
+            // ISO 8601 is a machine format: Locale.ROOT keeps the digits and field order fixed.
+            val simpleDateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSSSS'Z'", Locale.ROOT)
+            simpleDateFormat.timeZone = TimeZone.getTimeZone("UTC")
+            currentTimeMillis = simpleDateFormat.parse(time).time
         } catch (e: Exception) {
+            // Unparseable input: fall back to "now", which is what the initial value holds.
             Timber.e(e, "getTimeFromIso8601")
         }
         return currentTimeMillis
@@ -34,33 +36,15 @@ object EntityDateUtils {
     fun get8601Time(time: Long): String {
         var timeStr = ""
         try {
-            var simpleDateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSSSS'Z'")
-            simpleDateFormat.setTimeZone(TimeZone.getTimeZone("GMT+0:00"))
+            // ISO 8601 is a machine format: Locale.ROOT keeps the digits and field order fixed.
+            val simpleDateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSSSS'Z'", Locale.ROOT)
+            simpleDateFormat.timeZone = TimeZone.getTimeZone("UTC")
             timeStr = simpleDateFormat.format(Date(time))
         } catch (e: Exception) {
+            // "" is the documented "no timestamp" answer for callers.
             Timber.e(e, "get8601Time")
         }
         return timeStr
-    }
-
-    /**
-     * Parse a date string into a Date.
-     */
-    @JvmStatic
-    fun parseServerTime(serverTime: String?, format: String?): Date? {
-        var format = format
-        if (format == null || format.isEmpty()) {
-            format = "yyyy-MM-dd HH:mm:ss"
-        }
-        val sdf = SimpleDateFormat(format, Locale.CHINESE)
-        sdf.timeZone = TimeZone.getTimeZone("GMT+8:00")
-        var date: Date? = null
-        try {
-            date = sdf.parse(serverTime)
-        } catch (e: java.lang.Exception) {
-            Timber.e(e, "")
-        }
-        return date
     }
 
     /**
@@ -75,15 +59,17 @@ object EntityDateUtils {
         if (format == null || format.isEmpty()) {
             format = "yyyy-MM-dd"
         }
-        val dft = SimpleDateFormat(format)
+        val dft = SimpleDateFormat(format, Locale.getDefault())
         val date = Calendar.getInstance()
         date.time = beginDate
         date[Calendar.MONTH] = date[Calendar.MONTH] + distanceMonth
-        var endDate: Date? = null
-        try {
-            endDate = dft.parse(dft.format(date.time))
+        val endDate: Date = try {
+            dft.parse(dft.format(date.time))
         } catch (e: java.lang.Exception) {
-            e.printStackTrace()
+            // The caller-supplied pattern cannot round-trip its own output. Answer null rather
+            // than falling through to format(null), which used to throw a NullPointerException.
+            Timber.e(e, "could not apply the %s month offset", distanceMonth)
+            return null
         }
         return dft.format(endDate)
     }
@@ -101,15 +87,16 @@ object EntityDateUtils {
         if (format == null || format.isEmpty()) {
             format = "yyyy-MM-dd"
         }
-        val dft = SimpleDateFormat(format)
+        val dft = SimpleDateFormat(format, Locale.getDefault())
         val date = Calendar.getInstance()
         date.time = beginDate
         date[Calendar.DATE] = date[Calendar.DATE] + distanceDay
-        var endDate: Date? = null
-        try {
-            endDate = dft.parse(dft.format(date.time))
+        val endDate: Date = try {
+            dft.parse(dft.format(date.time))
         } catch (e: java.lang.Exception) {
-            e.printStackTrace()
+            // Same as getOldDateByMonth: answer null instead of formatting a null Date.
+            Timber.e(e, "could not apply the %s day offset", distanceDay)
+            return null
         }
         return dft.format(endDate)
     }
@@ -120,10 +107,12 @@ object EntityDateUtils {
     @JvmStatic
     fun date2TimeStamp(date: String?, format: String?): String? {
         try {
-            val sdf = SimpleDateFormat(format)
+            // Parses a machine-formatted date, so the pattern must not be localised.
+            val sdf = SimpleDateFormat(format, Locale.ROOT)
             return (sdf.parse(date).time / 1000).toString()
         } catch (e: java.lang.Exception) {
-            e.printStackTrace()
+            // Unparseable input; "" is the documented "no timestamp" answer for callers.
+            Timber.e(e, "could not parse %s as %s", date, format)
         }
         return ""
     }
@@ -133,7 +122,7 @@ object EntityDateUtils {
      */
     @JvmStatic
     fun timeStamp2Date(time: Long, format: String? = "yyyy-MM-dd"): String? {
-        val sdf = SimpleDateFormat(format)
+        val sdf = SimpleDateFormat(format, Locale.getDefault())
         return sdf.format(Date(time))
     }
 
@@ -142,12 +131,14 @@ object EntityDateUtils {
      */
     @JvmStatic
     fun addDays(from: String?, days: Int): String? {
-        val f = SimpleDateFormat("yyyy-MM-dd")
+        // "yyyy-MM-dd" is a machine format, so it must not be localised.
+        val f = SimpleDateFormat("yyyy-MM-dd", Locale.ROOT)
         try {
-            val d = Date(f.parse(from).getTime() + 24 * 3600 * 1000 * days)
-            f.format(d)
+            val d = Date(f.parse(from).time + 24L * 3600 * 1000 * days)
+            return f.format(d)
         } catch (ex: Exception) {
-            Timber.e("addOneday", ex)
+            // Unparseable input: "" is the documented "no date" answer for callers.
+            Timber.e(ex, "addDays")
         }
         return ""
     }
@@ -165,7 +156,8 @@ object EntityDateUtils {
                 Timber.i("added time= ${addedTime}")
                 return time + addedTime
             } catch (ex: Exception) {
-                Timber.e("addDays", ex)
+                // 0 is the documented "no date" answer, matching the null-date branch below.
+                Timber.e(ex, "addDays")
             }
 
             0L
@@ -226,7 +218,7 @@ object EntityDateUtils {
             // Yesterday
             return context.getString(R.string.yesterday)
         } else {
-            val df = SimpleDateFormat("MMM dd")
+            val df = SimpleDateFormat("MMM dd", Locale.getDefault())
             return df.format(date)
 
         }
@@ -234,7 +226,7 @@ object EntityDateUtils {
 
     @JvmStatic
     fun getToday(): String {
-        val df = SimpleDateFormat("dd")
+        val df = SimpleDateFormat("dd", Locale.getDefault())
         return df.format(Date())
     }
 
@@ -264,7 +256,9 @@ object EntityDateUtils {
 
     @JvmStatic
     fun inTime(str: String, str2: String?): Boolean {
-        val format = SimpleDateFormat("HH:mm").format(Date())
+        // Compared lexically against caller-supplied "HH:mm" strings, so the digits must not
+        // be localised.
+        val format = SimpleDateFormat("HH:mm", Locale.ROOT).format(Date())
         return if (str.compareTo(str2!!) >= 0) {
             format.compareTo(str) >= 0 || format.compareTo(str2) <= 0
         } else !(format.compareTo(str) < 0 || format.compareTo(str2) > 0)

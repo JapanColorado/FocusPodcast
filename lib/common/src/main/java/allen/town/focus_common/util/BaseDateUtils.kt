@@ -26,15 +26,17 @@ object BaseDateUtils {
         if (format == null || format.isEmpty()) {
             format = "yyyy-MM-dd"
         }
-        val dft = SimpleDateFormat(format)
+        val dft = SimpleDateFormat(format, Locale.getDefault())
         val date = Calendar.getInstance()
         date.time = beginDate
         date[Calendar.MONTH] = date[Calendar.MONTH] + distanceMonth
-        var endDate: Date? = null
-        try {
-            endDate = dft.parse(dft.format(date.time))
+        val endDate: Date = try {
+            dft.parse(dft.format(date.time))
         } catch (e: java.lang.Exception) {
-            e.printStackTrace()
+            // The caller-supplied pattern cannot round-trip its own output. Answer null rather
+            // than falling through to format(null), which used to throw a NullPointerException.
+            Timber.e(e, "could not apply the %s month offset", distanceMonth)
+            return null
         }
         return dft.format(endDate)
     }
@@ -59,15 +61,16 @@ object BaseDateUtils {
         if (format == null || format.isEmpty()) {
             format = "yyyy-MM-dd"
         }
-        val dft = SimpleDateFormat(format)
+        val dft = SimpleDateFormat(format, Locale.getDefault())
         val date = Calendar.getInstance()
         date.time = beginDate
         date[Calendar.DATE] = date[Calendar.DATE] + distanceDay
-        var endDate: Date? = null
-        try {
-            endDate = dft.parse(dft.format(date.time))
+        val endDate: Date = try {
+            dft.parse(dft.format(date.time))
         } catch (e: java.lang.Exception) {
-            e.printStackTrace()
+            // Same as getOldDateByMonth: answer null instead of formatting a null Date.
+            Timber.e(e, "could not apply the %s day offset", distanceDay)
+            return null
         }
         return dft.format(endDate)
     }
@@ -78,10 +81,12 @@ object BaseDateUtils {
     @JvmStatic
     fun date2TimeStamp(date: String?, format: String?): String? {
         try {
-            val sdf = SimpleDateFormat(format)
+            // Parses a machine-formatted date, so the pattern must not be localised.
+            val sdf = SimpleDateFormat(format, Locale.ROOT)
             return (sdf.parse(date).time / 1000).toString()
         } catch (e: java.lang.Exception) {
-            e.printStackTrace()
+            // Unparseable input; "" is the documented "no timestamp" answer for callers.
+            Timber.e(e, "could not parse %s as %s", date, format)
         }
         return ""
     }
@@ -91,7 +96,7 @@ object BaseDateUtils {
      */
     @JvmStatic
     fun timeStamp2Date(time: Long, format: String? = "yyyy-MM-dd"): String? {
-        val sdf = SimpleDateFormat(format)
+        val sdf = SimpleDateFormat(format, Locale.getDefault())
         return sdf.format(Date(time))
     }
 
@@ -135,7 +140,9 @@ object BaseDateUtils {
 
     @JvmStatic
     fun inTime(str: String, str2: String?): Boolean {
-        val format = SimpleDateFormat("HH:mm").format(Date())
+        // Compared lexically against caller-supplied "HH:mm" strings, so the digits must not
+        // be localised.
+        val format = SimpleDateFormat("HH:mm", Locale.ROOT).format(Date())
         return if (str.compareTo(str2!!) >= 0) {
             format.compareTo(str) >= 0 || format.compareTo(str2) <= 0
         } else !(format.compareTo(str) < 0 || format.compareTo(str2) > 0)

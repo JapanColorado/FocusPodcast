@@ -43,6 +43,8 @@ import code.name.monkey.appthemehelper.R;
  */
 public final class TintHelper {
 
+    private static final String TAG = "TintHelper";
+
     @SuppressWarnings("JavaReflectionMemberAccess")
     public static void colorHandles(@NonNull TextView view, int color) {
         try {
@@ -81,7 +83,9 @@ public final class TintHelper {
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            // Reflection into the hidden TextView/Editor selection-handle fields is blocked from
+            // API 29 on; failing means the handles keep their default tint, which is cosmetic only.
+            Log.w(TAG, "could not tint the text selection handles", e);
         }
     }
 
@@ -153,7 +157,8 @@ public final class TintHelper {
             drawables[1] = createTintedDrawable(drawables[1], color);
             fCursorDrawable.set(editor, drawables);
         } catch (Exception e) {
-            Log.w("TintHelper", "could not tint the text cursor", e);
+            // Same hidden-field caveat as above: an untinted cursor is cosmetic only.
+            Log.w(TAG, "could not tint the text cursor", e);
         }
     }
 

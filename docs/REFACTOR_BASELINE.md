@@ -9,10 +9,10 @@ because it is deleted outright.
 | Metric | Baseline | Now |
 |---|---:|---:|
 | First-party source lines (java + kt) | 71,121 | 65,483 |
-| Kotlin `!!` assertions (app, core, lib) | 1,865 | 1,690 |
-| `printStackTrace()` calls | 135 | 126 |
+| Kotlin `!!` assertions (app, core, lib) | 1,865 | 1,687 |
+| `printStackTrace()` calls | 135 | 0 |
 | Chinese (CJK) lines outside translation resources | 626 | 0 |
-| Rx `subscribe(` with no error handler | ~11 | ~11 |
+| Rx `subscribe(` with no error handler | ~11 | 0 |
 | Build flavors | 3 | 1 |
 | Git submodules | 4 | 0 |
 | Unit test files (passing tests) | 15 (51) | 10 (58) |

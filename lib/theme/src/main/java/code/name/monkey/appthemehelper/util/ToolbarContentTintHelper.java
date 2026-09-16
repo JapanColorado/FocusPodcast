@@ -3,6 +3,7 @@ package code.name.monkey.appthemehelper.util;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.PorterDuff;
+import android.util.Log;
 import android.graphics.PorterDuffColorFilter;
 import android.graphics.drawable.Drawable;
 import android.view.Menu;
@@ -44,6 +45,8 @@ import code.name.monkey.appthemehelper.ThemeStore;
 
 public final class ToolbarContentTintHelper {
 
+    private static final String TAG = "ToolbarTintHelper";
+
     public static class InternalToolbarContentTintUtil {
 
         public static final class SearchViewTintUtil {
@@ -70,7 +73,9 @@ public final class ToolbarContentTintHelper {
                     field = cls.getDeclaredField("mVoiceButton");
                     tintImageView(searchView, field, color);
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    // Every field here is a private SearchView internal; when the support library
+                    // renames one the SearchView simply keeps its default colors.
+                    Log.w(TAG, "could not tint the SearchView contents", e);
                 }
             }
 
@@ -114,7 +119,9 @@ public final class ToolbarContentTintHelper {
                     MenuPopupHelper subMenuPopupHelper = (MenuPopupHelper) f4.get(presenter);
                     setTintForMenuPopupHelper(context, subMenuPopupHelper, color);
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    // Private Toolbar/ActionMenuView internals: failing leaves the overflow popup
+                    // with its default tint, which is cosmetic only.
+                    Log.w(TAG, "could not tint the overflow menu", e);
                 }
             });
         }
@@ -181,14 +188,18 @@ public final class ToolbarContentTintHelper {
                                             }
                                         }
                                     } catch (Exception e) {
-                                        e.printStackTrace();
+                                        // Private ListMenuItemView internals; untinted check boxes
+                                        // and radio buttons are cosmetic only.
+                                        Log.w(TAG, "could not tint the popup menu items", e);
                                     }
                                     listView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
                                 }
                             });
                 }
             } catch (Exception e) {
-                e.printStackTrace();
+                // The popup has no list view yet (or MenuPopupHelper changed shape); nothing to
+                // tint, and the popup still works.
+                Log.w(TAG, "could not reach the popup menu list view", e);
             }
         }
 
@@ -202,7 +213,9 @@ public final class ToolbarContentTintHelper {
                     field.set(toolbar, TintHelper.createTintedDrawable(collapseIcon, color));
                 }
             } catch (Exception e) {
-                e.printStackTrace();
+                // Toolbar.mCollapseIcon is private; an untinted collapse arrow is cosmetic only,
+                // and the menu items below are still tinted.
+                Log.w(TAG, "could not tint the toolbar collapse icon", e);
             }
 
             if (menu != null && menu.size() > 0) {
@@ -462,7 +475,9 @@ public final class ToolbarContentTintHelper {
                 toolbar.setOnMenuItemClickListener(newClickListener);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            // Private Toolbar callback fields; without the hook submenu items keep their default
+            // colors but the menu still opens and dispatches clicks normally.
+            Log.w(TAG, "could not install the tinting menu callbacks", e);
         }
     }
 

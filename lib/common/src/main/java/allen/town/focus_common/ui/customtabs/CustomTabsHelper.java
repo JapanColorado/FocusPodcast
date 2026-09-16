@@ -89,8 +89,10 @@ public class CustomTabsHelper {
                 }
             }
             return false;
-        } catch (RuntimeException unused) {
-            Log.e(TAG, "Runtime exception while getting specialized handlers");
+        } catch (RuntimeException e) {
+            // A huge queryIntentActivities result can blow the binder transaction limit. false
+            // just means "no specialized handler", which only affects which browser we pick.
+            Log.w(TAG, "could not query the specialized intent handlers", e);
             return false;
         }
     }

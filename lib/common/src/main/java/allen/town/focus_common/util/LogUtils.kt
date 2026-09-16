@@ -14,25 +14,24 @@ import java.io.*
 object LogUtils {
     @JvmStatic
     fun logToSd(subscriber: ObservableEmitter<in Uri>, context: Context,providerAuth:String) {
-        val uri: Uri?
+        val uri: Uri
         val sb = StringBuilder()
         uri = try {
-            val bufferedReader = BufferedReader(
+            BufferedReader(
                 InputStreamReader(
                     Runtime.getRuntime()
                         .exec(arrayOf("logcat", "-d", "-v", "threadtime")).inputStream
                 )
-            )
-            while (true) {
-                val readLine = bufferedReader.readLine() ?: break
-                sb.append(readLine)
-                sb.append("\n")
+            ).use { reader ->
+                while (true) {
+                    val readLine = reader.readLine() ?: break
+                    sb.append(readLine)
+                    sb.append("\n")
+                }
             }
             val file = File(context.getExternalCacheDir(), "log.txt")
             Timber.d("log path " + file.absolutePath)
-            val fileWriter = FileWriter(file)
-            fileWriter.write(sb.toString())
-            fileWriter.close()
+            FileWriter(file).use { it.write(sb.toString()) }
             if (Build.VERSION.SDK_INT <= 22) {
 //                6.0 and below
                 Uri.fromFile(file)
@@ -45,10 +44,13 @@ object LogUtils {
                 )
             }
         } catch (e: IOException) {
-            Timber.e(e, "Cannot retrieve logcat", *arrayOfNulls(0))
-            null
+            // The caller cannot do anything with a half-written log, so fail the stream instead
+            // of emitting a null Uri that the subscriber would have to dereference anyway.
+            Timber.e(e, "Cannot retrieve logcat")
+            subscriber.onError(e)
+            return
         }
-        subscriber.onNext(uri!!)
+        subscriber.onNext(uri)
         subscriber.onComplete()
     }
 
@@ -67,14 +69,19 @@ object LogUtils {
             )
         }
             .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread()).subscribe { uri ->
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe({ uri ->
                 EmailUtils.emailToMe(
-                    uri as Uri,
+                    uri,
                     appName,
                     versionName,
                     activity,
                     to
                 )
-            }
+            }, { throwable ->
+                // Without an onError consumer RxJava would rethrow this as an
+                // OnErrorNotImplementedException and crash the app.
+                Timber.e(throwable, "could not attach the log to the feedback mail")
+            })
     }
 }

@@ -61,7 +61,9 @@ public class PhotoSelectUtil {
         try {
             MediaStore.Images.Media.insertImage(this.activity.getContentResolver(), file.getAbsolutePath(), "CropImage.jpeg", (String) null);
         } catch (FileNotFoundException e) {
-            e.printStackTrace();
+            // The gallery entry could not be written; the media scanner broadcast below still
+            // picks the file up, so this is worth logging but not worth failing on.
+            Timber.e(e, "could not add the cropped image to the system gallery");
         }
         this.activity.sendBroadcast(new Intent("android.intent.action.MEDIA_SCANNER_SCAN_FILE", Uri.fromFile(file)));
     }

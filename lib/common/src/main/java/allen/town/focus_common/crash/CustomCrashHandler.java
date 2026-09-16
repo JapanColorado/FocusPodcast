@@ -60,15 +60,18 @@ public class CustomCrashHandler implements Thread.UncaughtExceptionHandler {
      */
     @Override
     public void uncaughtException(Thread thread, Throwable ex) {
-        // This should never be null, but dropping the check might break something, so keep it for now
-        if (mDefaultHandler != null) {
-            // Swallow the exception so the app does not crash
-            reportToBugly(ex);
-        }
+        // Deliberately swallowed: this handler exists to keep the process alive. Logging is the
+        // only fallback available here — rethrowing or delegating to mDefaultHandler would kill
+        // the app, which is exactly what installing this handler opted out of.
+        reportSwallowed(ex, "uncaught exception on " + thread.getName());
     }
 
-    private void reportToBugly(Throwable ex) {
-        Timber.e(ex, "report");
+    /**
+     * The one place a swallowed crash is recorded. There is no crash reporter in this build, so
+     * "handling" an exception here means writing it to the log and carrying on.
+     */
+    private void reportSwallowed(Throwable ex, String what) {
+        Timber.e(ex, "swallowed: %s", what);
     }
 
     /**
@@ -103,7 +106,8 @@ public class CustomCrashHandler implements Thread.UncaughtExceptionHandler {
                     try {
                         Looper.loop();// main thread exceptions are thrown from here
                     } catch (final Error ex) {
-                        // Errors are usually fatal, so do not swallow them
+                        // Errors (OOM, StackOverflow, ...) leave the VM in no state to continue,
+                        // so these are handed to the platform handler and do crash the app.
                         mDefaultHandler.uncaughtException(Looper.getMainLooper().getThread(), ex);
                     } catch (Throwable ex) {
                         if (needCrash(ex)) {
@@ -115,7 +119,7 @@ public class CustomCrashHandler implements Thread.UncaughtExceptionHandler {
                                 if (hasStackTraceElement(ex, ASSET_MANAGER_GET_RESOURCE_VALUE, LOADED_APK_GET_ASSETS)) {
                                     mDefaultHandler.uncaughtException(Looper.getMainLooper().getThread(), ex);
                                 } else {
-                                    reportToBugly(ex);
+                                    reportSwallowed(ex, "main thread NPE");
                                 }
                             } else if (ex instanceof Resources.NotFoundException) {
                                 mDefaultHandler.uncaughtException(Looper.getMainLooper().getThread(), ex);
@@ -125,7 +129,7 @@ public class CustomCrashHandler implements Thread.UncaughtExceptionHandler {
                                         || (isCausedBy(cause, NullPointerException.class) && hasStackTraceElement(ex, LOADED_APK_GET_ASSETS))) {
                                     mDefaultHandler.uncaughtException(Looper.getMainLooper().getThread(), ex);
                                 } else {
-                                    reportToBugly(ex);
+                                    reportSwallowed(ex, "main thread exception");
                                 }
                             }
 
@@ -205,15 +209,20 @@ public class CustomCrashHandler implements Thread.UncaughtExceptionHandler {
             activityThreadClass = Class.forName("android.app.ActivityThread");
             thread = activityThreadClass.getDeclaredMethod("currentActivityThread").invoke(null);
         } catch (final Throwable t2) {
-            Timber.e(t2, "ActivityThread.sCurrentActivityThread is inaccessible");
+            // currentActivityThread() is hidden API; fall back to reading the static field it
+            // returns. If that fails too, `thread` stays null and the hook is skipped below.
+            Timber.w(t2, "ActivityThread.currentActivityThread() is inaccessible");
             try {
                 thread = getStaticFieldValue(activityThreadClass, "sCurrentActivityThread");
             } catch (final Throwable t1) {
+                // Both routes are gone on this ROM: `thread` stays null and the null check
+                // below skips the hook entirely, which is handled and logged there.
                 Timber.e(t1, "ActivityThread.sCurrentActivityThread is inaccessible");
             }
         }
 
         if (null == thread) {
+            // Nothing to hook: lifecycle exceptions will crash the app the normal way.
             Timber.w("ActivityThread instance is inaccessible");
             return;
         }
@@ -224,6 +233,8 @@ public class CustomCrashHandler implements Thread.UncaughtExceptionHandler {
                 Timber.i("Hook ActivityThread.mH.mCallback failed");
             }
         } catch (final Throwable t) {
+            // `hooked` stays false, so lifecycle exceptions are not intercepted; the app keeps
+            // working, it just crashes the normal way instead of recovering.
             Timber.e(t, "Hook ActivityThread.mH.mCallback failed");
         }
         if (hooked) {
@@ -247,6 +258,7 @@ public class CustomCrashHandler implements Thread.UncaughtExceptionHandler {
                 return handler;
             }
         } catch (final ClassNotFoundException e) {
+            // Returning null is the documented "no handler found" answer; hook() logs and skips.
             Timber.e(e, "Main thread handler is inaccessible");
         }
 
@@ -277,7 +289,9 @@ public class CustomCrashHandler implements Thread.UncaughtExceptionHandler {
                     try {
                         mhHandler.handleMessage(msg);
                     } catch (Throwable throwable) {
-                        Timber.e(throwable, "");
+                        // Swallowed on purpose: finish the activity that threw instead of
+                        // crashing, otherwise the user is left staring at a black screen.
+                        Timber.e(throwable, "lifecycle transaction threw");
                         sActivityKiller.finishLaunchActivity(msg);
                     }
                     return true;
@@ -289,7 +303,8 @@ public class CustomCrashHandler implements Thread.UncaughtExceptionHandler {
                     try {
                         mhHandler.handleMessage(msg);
                     } catch (Throwable throwable) {
-                        Timber.e(throwable, "");
+                        // Swallowed on purpose, see above.
+                        Timber.e(throwable, "Activity.onCreate/onStart/onResume threw");
                         sActivityKiller.finishLaunchActivity(msg);
                     }
                     return true;
@@ -297,7 +312,8 @@ public class CustomCrashHandler implements Thread.UncaughtExceptionHandler {
                     try {
                         mhHandler.handleMessage(msg);
                     } catch (Throwable throwable) {
-                        Timber.e(throwable, "");
+                        // Swallowed on purpose, see above.
+                        Timber.e(throwable, "Activity.onResume threw");
                         sActivityKiller.finishResumeActivity(msg);
                     }
                     return true;
@@ -306,7 +322,8 @@ public class CustomCrashHandler implements Thread.UncaughtExceptionHandler {
                     try {
                         mhHandler.handleMessage(msg);
                     } catch (Throwable throwable) {
-                        Timber.e(throwable, "");
+                        // Swallowed on purpose, see above.
+                        Timber.e(throwable, "Activity.onPause threw");
                         sActivityKiller.finishPauseActivity(msg);
                     }
                     return true;
@@ -314,7 +331,8 @@ public class CustomCrashHandler implements Thread.UncaughtExceptionHandler {
                     try {
                         mhHandler.handleMessage(msg);
                     } catch (Throwable throwable) {
-                        Timber.e(throwable, "");
+                        // Swallowed on purpose, see above.
+                        Timber.e(throwable, "Activity.onStop threw");
                         sActivityKiller.finishStopActivity(msg);
                     }
                     return true;
@@ -322,7 +340,9 @@ public class CustomCrashHandler implements Thread.UncaughtExceptionHandler {
                     try {
                         mhHandler.handleMessage(msg);
                     } catch (Throwable throwable) {
-                        Timber.e(throwable, "");
+                        // The activity is being destroyed anyway, so there is nothing left to
+                        // finish; log and let the destroy complete.
+                        Timber.e(throwable, "Activity.onStop/onDestroy threw");
                     }
                     return true;
             }

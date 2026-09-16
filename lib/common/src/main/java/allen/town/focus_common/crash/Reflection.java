@@ -6,6 +6,12 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 
+/**
+ * Reflection helpers for the crash handler. Every lookup here targets private platform internals
+ * that may simply not exist on a given ROM, so failure is an expected outcome rather than an
+ * error: each method logs and answers with its documented "not available" value (null / false),
+ * and the callers in {@link CustomCrashHandler} branch on that.
+ */
 public abstract class Reflection {
     private static final String THIS_FILE = "Reflection";
     @SuppressWarnings("unchecked")
@@ -18,6 +24,7 @@ public abstract class Reflection {
                     return (T) field.get(klass);
                 }
             } catch (final Throwable t) {
+                // Field missing on this ROM: answer null, see the class comment.
                 Log.w(THIS_FILE, "get field " + name + " of " + klass + " error", t);
             }
         }
@@ -35,6 +42,7 @@ public abstract class Reflection {
                     return (T) field.get(obj);
                 }
             } catch (final Throwable t) {
+                // Field missing on this ROM: answer null, see the class comment.
                 Log.w(THIS_FILE, "get field " + name + " of " + obj + " error", t);
             }
         }
@@ -52,6 +60,7 @@ public abstract class Reflection {
                     return (T) field.get(obj);
                 }
             } catch (final Throwable t) {
+                // Field missing on this ROM: answer null, see the class comment.
                 Log.w(THIS_FILE, "get field with type " + type + " of " + obj + " error", t);
             }
         }
@@ -69,6 +78,7 @@ public abstract class Reflection {
                     return true;
                 }
             } catch (final Throwable t) {
+                // Field missing or final on this ROM: answer false, see the class comment.
                 Log.w(THIS_FILE, "set field " + name + " of " + obj + " error", t);
             }
         }
@@ -92,6 +102,7 @@ public abstract class Reflection {
                     return (T) method.invoke(obj, args);
                 }
             } catch (final Throwable e) {
+                // Method missing or threw on this ROM: answer null, see the class comment.
                 Log.w(THIS_FILE, "Invoke " + name + "(" + Arrays.toString(types) + ") of " + obj + " error", e);
             }
         }
@@ -103,6 +114,7 @@ public abstract class Reflection {
         try {
             return klass.getDeclaredField(name);
         } catch (final NoSuchFieldException e) {
+            // Not declared here: keep walking up the hierarchy, null once we run out of parents.
             final Class<?> parent = klass.getSuperclass();
             if (null == parent) {
                 return null;
@@ -134,6 +146,7 @@ public abstract class Reflection {
         try {
             return klass.getDeclaredMethod(name, types);
         } catch (final NoSuchMethodException e) {
+            // Not declared here: keep walking up the hierarchy, null once we run out of parents.
             final Class<?> parent = klass.getSuperclass();
             if (null == parent) {
                 return null;

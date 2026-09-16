@@ -51,7 +51,9 @@ public class Intents {
         try {
             context.startActivity(intent);
         } catch (Exception e) {
-            Timber.w("not found activity to handle");
+            // No app on the device handles this intent (or it is not exported). false is the
+            // documented answer; every caller decides its own fallback.
+            Timber.w(e, "no activity found to handle %s", intent);
             return false;
         }
         return true;

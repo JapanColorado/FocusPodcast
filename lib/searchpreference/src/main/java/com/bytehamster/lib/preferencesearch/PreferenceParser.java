@@ -3,6 +3,8 @@ package com.bytehamster.lib.preferencesearch;
 import android.content.Context;
 import android.text.TextUtils;
 import android.util.Log;
+
+import allen.town.focus_common.util.Timber;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import org.xmlpull.v1.XmlPullParser;
@@ -71,7 +73,9 @@ class PreferenceParser {
                 xpp.next();
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            // A malformed or partly unreadable preference XML only costs search coverage for that
+            // file; return whatever was parsed so far rather than failing the whole search index.
+            Timber.e(e, "could not finish parsing preference file %s", item.getResId());
         }
         return results;
     }
@@ -143,7 +147,9 @@ class PreferenceParser {
                 String[] elements = context.getResources().getStringArray(id);
                 return TextUtils.join(",", elements);
             } catch (Exception e) {
-                e.printStackTrace();
+                // Not a resolvable string-array reference; fall through and index the raw
+                // attribute value, which is still better than dropping the entry.
+                Timber.e(e, "could not resolve string array %s", s);
             }
         }
         return s;
@@ -158,7 +164,9 @@ class PreferenceParser {
                 int id = Integer.parseInt(s.substring(1));
                 return context.getString(id);
             } catch (Exception e) {
-                e.printStackTrace();
+                // Not a resolvable string reference; fall through and index the raw attribute
+                // value, which is still better than dropping the entry.
+                Timber.e(e, "could not resolve string %s", s);
             }
         }
         return s;

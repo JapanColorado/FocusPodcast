@@ -17,7 +17,9 @@ object TextInputLayoutUtil {
             mDefaultTextColorField.isAccessible = true
             mDefaultTextColorField.set(view, ColorStateList.valueOf(hintColor))
         } catch (t: Throwable) {
-            Log.e(TAG,t.stackTraceToString())
+            // mDefaultTextColor is a private Material field; when it is missing the hint simply
+            // keeps the theme's default color, so ignoring this is safe.
+            Log.w(TAG, "could not set the hint color", t)
         }
 
     }
@@ -28,7 +30,9 @@ object TextInputLayoutUtil {
             mFocusedTextColorField.isAccessible = true
             mFocusedTextColorField.set(view, ColorStateList.valueOf(accentColor))
         } catch (t: Throwable) {
-            Log.e(TAG,t.stackTraceToString())
+            // mFocusedTextColor is a private Material field; when it is missing the focused hint
+            // simply keeps the theme's default color, so ignoring this is safe.
+            Log.w(TAG, "could not set the accent color", t)
         }
 
     }

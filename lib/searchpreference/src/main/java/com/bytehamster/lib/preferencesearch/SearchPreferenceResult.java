@@ -10,6 +10,7 @@ import android.os.Build;
 import android.os.Handler;
 import android.util.Log;
 import android.util.TypedValue;
+import android.view.View;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.content.res.AppCompatResources;
 import androidx.fragment.app.FragmentManager;
@@ -76,12 +77,12 @@ public class SearchPreferenceResult {
             final int position = callback.getPreferenceAdapterPosition(prefResult);
             if (position != RecyclerView.NO_POSITION) {
                 recyclerView.scrollToPosition(position);
-                recyclerView.postDelayed(() -> {
+                postDelayedUntilDetached(recyclerView, () -> {
                     RecyclerView.ViewHolder holder = recyclerView.findViewHolderForAdapterPosition(position);
                     if (holder != null) {
                         Drawable background = holder.itemView.getBackground();
                         if (Build.VERSION.SDK_INT >= 21 && background instanceof RippleDrawable) {
-                            forceRippleAnimation((RippleDrawable) background);
+                            forceRippleAnimation(holder.itemView, (RippleDrawable) background);
                             return;
                         }
                     }
@@ -111,18 +112,37 @@ public class SearchPreferenceResult {
         arrow.setColorFilter(color, PorterDuff.Mode.SRC_IN);
         prefResult.setIcon(arrow);
         prefsFragment.scrollToPreference(prefResult);
-        new Handler().postDelayed(() -> {
+        postDelayedUntilDetached(prefsFragment.getListView(), () -> {
             prefResult.setIcon(oldIcon);
             prefResult.setIconSpaceReserved(oldSpaceReserved);
         }, 1000);
     }
 
     @TargetApi(21)
-    protected void forceRippleAnimation(RippleDrawable background) {
-        final RippleDrawable rippleDrawable = background;
-        Handler handler = new Handler();
-        rippleDrawable.setState(new int[]{android.R.attr.state_pressed, android.R.attr.state_enabled});
-        handler.postDelayed(() -> rippleDrawable.setState(new int[]{}), 1000);
+    protected void forceRippleAnimation(View itemView, RippleDrawable background) {
+        background.setState(new int[]{android.R.attr.state_pressed, android.R.attr.state_enabled});
+        postDelayedUntilDetached(itemView, () -> background.setState(new int[]{}), 1000);
+    }
+
+    /**
+     * Posts a delayed highlight step on {@code view} and cancels it again as soon as the view
+     * leaves the window, so the callback (which holds on to the fragment and its preferences)
+     * can never outlive the screen it belongs to.
+     */
+    private static void postDelayedUntilDetached(final View view, final Runnable action, long delay) {
+        view.postDelayed(action, delay);
+        view.addOnAttachStateChangeListener(new View.OnAttachStateChangeListener() {
+            @Override
+            public void onViewAttachedToWindow(View v) {
+                // Nothing to do: the callback is posted once, before the view can be re-attached.
+            }
+
+            @Override
+            public void onViewDetachedFromWindow(View v) {
+                v.removeCallbacks(action);
+                v.removeOnAttachStateChangeListener(this);
+            }
+        });
     }
 
     /**

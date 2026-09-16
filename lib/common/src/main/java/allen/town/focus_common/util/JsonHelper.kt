@@ -119,6 +119,7 @@ object JsonHelper {
                 }
                 return res
             } catch (e: JSONException) {
+                // Malformed JSON: null is the documented "could not parse" answer, see below.
                 Timber.e(e, "parseIntArray failed cause")
             }
 
@@ -138,6 +139,7 @@ object JsonHelper {
                 }
                 return res
             } catch (e: JSONException) {
+                // Malformed JSON: null is the documented "could not parse" answer, see below.
                 Timber.e(e, "parseStringArray failed cause")
             }
 
@@ -158,7 +160,8 @@ object JsonHelper {
                 }
                 return res
             } catch (e: JSONException) {
-                Timber.e(e, "parseIntArray failed cause")
+                // Malformed JSON: null is the documented "could not parse" answer, see below.
+                Timber.e(e, "parseIDArray failed cause")
             }
 
         }
@@ -175,7 +178,8 @@ object JsonHelper {
                     return jsonObject.optString(key)
                 }
             } catch (e: JSONException) {
-                Timber.e(e, "parseIntArray failed cause")
+                // Malformed JSON: null is the documented "could not parse" answer, see below.
+                Timber.e(e, "parseID failed cause")
             }
 
         }

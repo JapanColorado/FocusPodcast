@@ -8,6 +8,8 @@ import android.os.Message;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
+import allen.town.focus_common.util.Timber;
+
 /**
  * Created by wanjian on 2018/5/24.
  * <p>
@@ -30,7 +32,10 @@ public class ActivityKillerV24_V25 implements IActivityKiller {
             IBinder binder = (IBinder) tokenField.get(activityClientRecord);
             finish(binder);
         } catch (Exception e) {
-            e.printStackTrace();
+            // Best effort: we are already unwinding a lifecycle crash, so if the private
+            // ActivityManager internals are out of reach there is nothing left to try;
+            // rethrowing would kill the process this handler exists to keep alive.
+            Timber.e(e, "could not finish the activity whose lifecycle threw");
         }
     }
 
@@ -62,7 +67,8 @@ public class ActivityKillerV24_V25 implements IActivityKiller {
             IBinder binder = (IBinder) arg1Field.get(someArgs);
             finish(binder);
         } catch (Throwable throwable) {
-            throwable.printStackTrace();
+            // Same as above: best effort during crash recovery, nothing to propagate to.
+            Timber.e(throwable, "could not finish the activity whose lifecycle threw");
         }
     }
 

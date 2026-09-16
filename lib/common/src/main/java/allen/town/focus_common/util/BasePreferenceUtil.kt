@@ -58,7 +58,9 @@ object BasePreferenceUtil {
             return try {
                 Gson().fromJson(data, collectionType)
             } catch (e: JsonSyntaxException) {
-                e.printStackTrace()
+                // Stored categories are from an older/incompatible build: fall back to the
+                // defaults rather than leaving the library screen empty.
+                Timber.e(e, "could not read the stored library categories")
                 return defaultCategories!!
             }
         }
