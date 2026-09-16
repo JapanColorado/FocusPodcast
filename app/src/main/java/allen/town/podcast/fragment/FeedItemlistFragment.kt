@@ -33,6 +33,7 @@ import allen.town.podcast.core.util.FeedItemUtil
 import allen.town.podcast.core.util.menuhandler.MenuItemUtils
 import allen.town.podcast.core.util.menuhandler.MenuItemUtils.UpdateRefreshMenuItemChecker
 import allen.town.podcast.core.util.ui.ListFooterUtil
+import allen.town.podcast.databinding.FeedItemListFragmentBinding
 import allen.town.podcast.dialog.RemoveFeedDialog.OnFeedRemovedListener
 import allen.town.podcast.dialog.RemoveFeedDialog.show
 import allen.town.podcast.dialog.RenameItemDialog
@@ -71,10 +72,6 @@ import androidx.appcompat.view.ActionMode
 import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.RecyclerView
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-import butterknife.BindView
-import butterknife.ButterKnife
-import butterknife.OnClick
 import code.name.monkey.appthemehelper.ThemeStore.Companion.accentColor
 import code.name.monkey.appthemehelper.util.ATHUtil.resolveColor
 import code.name.monkey.appthemehelper.util.scroll.ThemedFastScroller.create
@@ -83,7 +80,6 @@ import com.bumptech.glide.request.RequestOptions
 import com.faltenreich.skeletonlayout.Skeleton
 import com.faltenreich.skeletonlayout.applySkeleton
 import com.google.android.material.appbar.AppBarLayout
-import com.google.android.material.appbar.CollapsingToolbarLayout
 import com.joanzapata.iconify.Iconify
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -99,6 +95,7 @@ import org.greenrobot.eventbus.ThreadMode
  */
 class FeedItemlistFragment() : Fragment(), OnItemClickListener, Toolbar.OnMenuItemClickListener,
     OnSelectModeListener , DoubleClickBackToContentTopListener.IBackToContentTopView {
+    private lateinit var binding: FeedItemListFragmentBinding
     private var adapter: FeedItemListAdapter? = null
     private var swipeActions: SwipeActions? = null
     private var nextPageLoader: ListFooterUtil? = null
@@ -129,8 +126,6 @@ class FeedItemlistFragment() : Fragment(), OnItemClickListener, Toolbar.OnMenuIt
     private lateinit var appBar: AppBarLayout
     private lateinit var skeletonRecyclerDelay: SkeletonRecyclerDelay
 
-    @BindView(R.id.filter_items)
-    public lateinit var filterImage:ImageView
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         //keep this line: otherwise items disappear when switching to dark mode on this screen
@@ -145,9 +140,12 @@ class FeedItemlistFragment() : Fragment(), OnItemClickListener, Toolbar.OnMenuIt
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val root = inflater.inflate(R.layout.feed_item_list_fragment, container, false)
-        ButterKnife.bind(this, root)
-        toolbar = root.findViewById(R.id.toolbar)
+        binding = FeedItemListFragmentBinding.inflate(inflater, container, false)
+        val root = binding.root
+        binding.filterItems.setOnClickListener { filterFeedItems() }
+        binding.sortItems.setOnClickListener { sortFeedItems() }
+        binding.actionSearch.setOnClickListener { searchFeedItems() }
+        toolbar = binding.toolbar
         toolbar.inflateMenu(R.menu.feedlist)
         showToolbarMenuIcon(toolbar)
         toolbar.setOnMenuItemClickListener(this)
@@ -158,7 +156,7 @@ class FeedItemlistFragment() : Fragment(), OnItemClickListener, Toolbar.OnMenuIt
         }
         (activity as MainActivity?)!!.setupToolbarToggle(toolbar, displayUpArrow)
         refreshToolbarState()
-        recyclerView = root.findViewById(R.id.recyclerView)
+        recyclerView = binding.recyclerView
         recyclerView.setRecycledViewPool((activity as MainActivity?)!!.recycledViewPool)
         create(recyclerView)
         skeleton = recyclerView.applySkeleton(R.layout.item_small_recyclerview_skeleton, 15)
@@ -172,8 +170,8 @@ class FeedItemlistFragment() : Fragment(), OnItemClickListener, Toolbar.OnMenuIt
         txtvFailure = root.findViewById(R.id.txtvFailure)
         txtvUpdatesDisabled = root.findViewById(R.id.txtvUpdatesDisabled)
         header = root.findViewById(R.id.headerContainer)
-        appBar = root.findViewById<AppBarLayout>(R.id.appBar)
-        val collapsingToolbar = root.findViewById<CollapsingToolbarLayout>(R.id.collapsing_toolbar)
+        appBar = binding.appBar
+        val collapsingToolbar = binding.collapsingToolbar
         detailInfoView = root.findViewById(R.id.detailInfoView)
         mInfoViewToggleButton = root.findViewById(R.id.info_view_toggle_button)
         imgvBackground.setOnClickListener(View.OnClickListener { v: View? -> openAbout() })
@@ -225,7 +223,7 @@ class FeedItemlistFragment() : Fragment(), OnItemClickListener, Toolbar.OnMenuIt
             }
         })
         EventBus.getDefault().register(this)
-        val swipeRefreshLayout = root.findViewById<SwipeRefreshLayout>(R.id.swipeRefresh)
+        val swipeRefreshLayout = binding.swipeRefresh
         swipeRefreshLayout.setDistanceToTriggerSync(resources.getInteger(R.integer.swipe_refresh_distance))
         swipeRefreshLayout.setOnRefreshListener {
             if (feed != null) {
@@ -590,12 +588,12 @@ class FeedItemlistFragment() : Fragment(), OnItemClickListener, Toolbar.OnMenuIt
         txtvAuthor.text = feed!!.author
         if (feed!!.itemFilter != null) {
             if (feed!!.itemFilter!!.values.isNotEmpty()) {
-                filterImage.setImageResource(R.drawable.ic_filter_disable)
+                binding.filterItems.setImageResource(R.drawable.ic_filter_disable)
             } else {
-                filterImage.setImageResource(R.drawable.ic_filter)
+                binding.filterItems.setImageResource(R.drawable.ic_filter)
             }
         } else {
-            filterImage.setImageResource(R.drawable.ic_filter)
+            binding.filterItems.setImageResource(R.drawable.ic_filter)
         }
     }
 
@@ -978,7 +976,6 @@ class FeedItemlistFragment() : Fragment(), OnItemClickListener, Toolbar.OnMenuIt
         }
     }
 
-    @OnClick(R.id.filter_items)
     fun filterFeedItems() {
         if (feed == null) {
             showSnack(activity, R.string.please_wait_for_data, Toast.LENGTH_LONG)
@@ -987,7 +984,6 @@ class FeedItemlistFragment() : Fragment(), OnItemClickListener, Toolbar.OnMenuIt
         FeedMenuProcess.showFilterDialog(context, feed)
     }
 
-    @OnClick(R.id.sort_items)
     fun sortFeedItems() {
         if (feed == null) {
             showSnack(activity, R.string.please_wait_for_data, Toast.LENGTH_LONG)
@@ -996,7 +992,6 @@ class FeedItemlistFragment() : Fragment(), OnItemClickListener, Toolbar.OnMenuIt
         FeedMenuProcess.showSortDialog(context, feed)
     }
 
-    @OnClick(R.id.action_search)
     fun searchFeedItems() {
         if (feed == null) {
             showSnack(activity, R.string.please_wait_for_data, Toast.LENGTH_LONG)

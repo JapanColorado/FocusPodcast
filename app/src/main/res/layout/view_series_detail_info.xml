@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Contents of allen.town.podcast.view.SeriesDetailInfoView, inflated by the view itself. -->
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:parentTag="android.widget.FrameLayout">
+
+    <FrameLayout
+        android:id="@+id/series_info_view_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <LinearLayout
+            android:id="@+id/main_content_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <FrameLayout
+                android:id="@+id/description_container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:id="@+id/description"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:autoLink="web"
+                    android:gravity="start"
+                    android:lineSpacingMultiplier="1.3"
+                    android:orientation="vertical"
+                    android:paddingStart="16dp"
+                    android:paddingTop="4dp"
+                    android:paddingEnd="16dp"
+                    android:textSize="14sp" />
+            </FrameLayout>
+
+            <LinearLayout
+                android:id="@+id/podchaser_rating_and_links_container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingStart="16dp"
+                android:paddingTop="16dp"
+                android:paddingEnd="16dp"
+                android:paddingBottom="2dp">
+
+                <RelativeLayout
+                    android:id="@+id/feed_url_l"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <allen.town.focus_common.views.AccentImageView
+                        android:id="@+id/feedIcon"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:paddingRight="8dp"
+                        android:src="@drawable/ic_podcast" />
+
+                    <com.google.android.material.textview.MaterialTextView
+                        android:id="@+id/txtvFeedUrl"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_toLeftOf="@id/copy_feed_url_item"
+                        android:layout_toRightOf="@id/feedIcon"
+                        android:autoLink="web"
+                        android:background="?rectSelector"
+                        android:paddingLeft="8dp"
+                        android:paddingTop="4dp"
+                        android:paddingRight="8dp"
+                        android:paddingBottom="4dp"
+                        android:singleLine="true"
+                        tools:background="@android:color/holo_green_dark"
+                        tools:text="http://www.example.com/feed" />
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/copy_feed_url_item"
+                        android:layout_width="16dp"
+                        android:layout_height="16dp"
+                        android:layout_alignParentRight="true"
+                        android:layout_centerVertical="true"
+                        android:background="?roundSelector"
+                        android:src="@drawable/ic_round_content_copy_24" />
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:id="@+id/podcast_url_l"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center|left"
+                    android:orientation="horizontal">
+
+                    <allen.town.focus_common.views.AccentImageView
+                        android:id="@+id/podcastUrlIcon"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:paddingRight="8dp"
+                        android:src="@drawable/ic_web" />
+
+                    <com.google.android.material.textview.MaterialTextView
+                        android:id="@+id/txtvPodcastUrl"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_toLeftOf="@id/copy_podcast_url_item"
+                        android:layout_toRightOf="@id/podcastUrlIcon"
+                        android:autoLink="web"
+                        android:background="?attr/selectableItemBackground"
+                        android:maxLines="4"
+                        android:paddingLeft="8dp"
+                        android:paddingTop="4dp"
+                        android:paddingRight="8dp"
+                        android:paddingBottom="4dp"
+                        tools:background="@android:color/holo_green_dark"
+                        tools:text="http://www.example.com/feed" />
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/copy_podcast_url_item"
+                        android:layout_width="16dp"
+                        android:layout_height="16dp"
+                        android:layout_alignParentRight="true"
+                        android:layout_centerVertical="true"
+                        android:background="?roundSelector"
+                        android:src="@drawable/ic_round_content_copy_24" />
+                </RelativeLayout>
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:id="@+id/lblSupport"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginBottom="4dp"
+                    android:text="@string/support_funding_label"
+                    android:textColor="?android:attr/textColorPrimary"
+                    android:textSize="18sp"
+                    tools:background="@android:color/holo_red_light" />
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:id="@+id/txtvFundingUrl"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:autoLink="web"
+                    android:linksClickable="true"
+                    android:maxLines="8"
+                    android:paddingTop="4dp"
+                    android:paddingBottom="4dp"
+                    tools:background="@android:color/holo_green_dark" />
+
+            </LinearLayout>
+        </LinearLayout>
+    </FrameLayout>
+
+    <com.faltenreich.skeletonlayout.SkeletonLayout
+        android:id="@+id/content_placeholder"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <include layout="@layout/item_info_content_placeholder" />
+    </com.faltenreich.skeletonlayout.SkeletonLayout>
+
+    <FrameLayout
+        android:id="@+id/fade_overlay_container"
+        android:layout_width="match_parent"
+        android:layout_height="118dp"
+        android:layout_gravity="bottom"
+        android:visibility="gone">
+
+        <View
+            android:id="@+id/fade_overlay"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="bottom"
+            android:background="@drawable/gradient_white" />
+    </FrameLayout>
+</merge>

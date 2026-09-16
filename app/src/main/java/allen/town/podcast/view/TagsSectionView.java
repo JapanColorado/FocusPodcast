@@ -5,7 +5,6 @@ import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.FrameLayout;
-import android.widget.HorizontalScrollView;
 import android.widget.LinearLayout;
 
 import androidx.annotation.Nullable;
@@ -20,9 +19,8 @@ import java.util.List;
 
 import allen.town.focus_common.util.LanguagesHelper;
 import allen.town.focus_common.util.Util;
-import butterknife.BindView;
-import butterknife.ButterKnife;
 import allen.town.podcast.R;
+import allen.town.podcast.databinding.ViewTagsSectionBinding;
 import allen.town.podcast.discovery.EnumItuneCategory;
 import allen.town.podcast.discovery.ItunesCategoryTopLoader;
 import allen.town.podcast.event.ItunesCategoryChangeEvent;
@@ -30,28 +28,26 @@ import allen.town.podcast.util.BalancedUIHelper;
 
 public class TagsSectionView extends LinearLayout {
     private static final String TAG = "TagsSectionView";
-    @BindView(R.id.scroll_view)
-    public HorizontalScrollView mScrollView;
+    private ViewTagsSectionBinding binding;
     private List<EnumItuneCategory> mTags;
-    @BindView(R.id.tags_container)
-    public LinearLayout mTagsContainer;
 
     public TagsSectionView(Context context) {
         super(context);
+        inflateContent();
     }
 
     private void inflateTagsViewBalanced(List<EnumItuneCategory> list) {
         if (LanguagesHelper.isCurrentLanguageRtlAndSupported(getContext())) {
-            this.mScrollView.postDelayed(new Runnable() { // from class: fm.player.ui.discover.TagsSectionView.1
+            this.binding.scrollView.postDelayed(new Runnable() { // from class: fm.player.ui.discover.TagsSectionView.1
                 @Override // java.lang.Runnable
                 public void run() {
-                    TagsSectionView.this.mScrollView.fullScroll(66);
+                    TagsSectionView.this.binding.scrollView.fullScroll(66);
                 }
             }, 10L);
         } else {
-            this.mScrollView.scrollTo(0, 0);
+            this.binding.scrollView.scrollTo(0, 0);
         }
-        this.mTagsContainer.removeAllViews();
+        this.binding.tagsContainer.removeAllViews();
         int dpToPx = Util.dp2Px(getContext(), 8);
         int dpToPx2 = Util.dp2Px(getContext(), -2);
         ArrayList <FrameLayout> arrayList = new ArrayList();
@@ -87,9 +83,9 @@ public class TagsSectionView extends LinearLayout {
             });
 
             if(selectedIndex == index){
-//                mTagsContainer.post(chip::performClick);
+//                binding.tagsContainer.post(chip::performClick);
                 //without this, the chip does not appear selected after a theme switch on this screen (reason unknown)
-                mTagsContainer.post(() -> {
+                binding.tagsContainer.post(() -> {
                     chip.setChecked(true);
                     chip.setCheckedIconVisible(true);
                 });
@@ -138,22 +134,25 @@ public class TagsSectionView extends LinearLayout {
                     next2.setLayoutParams(layoutParams2);
                 }
             }
-            this.mTagsContainer.addView(linearLayout);
+            this.binding.tagsContainer.addView(linearLayout);
         }
     }
 
     private void init() {
         if (LanguagesHelper.isCurrentLanguageRtlAndSupported(getContext())) {
-            this.mScrollView.setLayoutDirection(LAYOUT_DIRECTION_LTR);
-            this.mTagsContainer.setLayoutDirection(LAYOUT_DIRECTION_LTR);
-            this.mTagsContainer.setGravity(5);
+            this.binding.scrollView.setLayoutDirection(LAYOUT_DIRECTION_LTR);
+            this.binding.tagsContainer.setLayoutDirection(LAYOUT_DIRECTION_LTR);
+            this.binding.tagsContainer.setGravity(5);
         }
+    }
+
+    private void inflateContent() {
+        binding = ViewTagsSectionBinding.inflate(LayoutInflater.from(getContext()), this);
     }
 
     @Override // android.view.View
     public void onFinishInflate() {
         super.onFinishInflate();
-        ButterKnife.bind(this, this);
         init();
     }
 
@@ -171,9 +170,11 @@ public class TagsSectionView extends LinearLayout {
 
     public TagsSectionView(Context context, @Nullable AttributeSet attributeSet) {
         super(context, attributeSet);
+        inflateContent();
     }
 
     public TagsSectionView(Context context, @Nullable AttributeSet attributeSet, int i) {
         super(context, attributeSet, i);
+        inflateContent();
     }
 }

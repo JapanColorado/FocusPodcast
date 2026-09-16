@@ -11,11 +11,11 @@ import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
 import android.util.Patterns;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.ScaleAnimation;
 import android.widget.FrameLayout;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -23,7 +23,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.FragmentActivity;
 
-import com.faltenreich.skeletonlayout.SkeletonLayout;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -33,12 +32,10 @@ import java.util.HashSet;
 import allen.town.focus_common.util.ImageUtils;
 import allen.town.focus_common.util.TopSnackbarUtil;
 import allen.town.focus_common.util.Util;
-import butterknife.BindView;
-import butterknife.ButterKnife;
-import butterknife.OnClick;
 import code.name.monkey.appthemehelper.ThemeStore;
 import code.name.monkey.appthemehelper.util.ATHUtil;
 import allen.town.podcast.R;
+import allen.town.podcast.databinding.ViewSeriesDetailInfoBinding;
 import allen.town.podcast.model.feed.Feed;
 import allen.town.podcast.model.feed.FeedFunding;
 import allen.town.podcast.util.AnimationsUtils;
@@ -53,74 +50,51 @@ public class SeriesDetailInfoView extends FrameLayout {
     private static final String TAG = "SeriesDetailInfoView";
     private int mCollapsedHeight;
 
-    @BindView(R.id.series_info_view_container)
-    public FrameLayout mContainer;
-    @BindView(R.id.content_placeholder)
-    public SkeletonLayout mContentPlaceholder;
+    private ViewSeriesDetailInfoBinding binding;
     private String mDescription;
     private String mDescriptionHtmlString;
-    @BindView(R.id.description)
-    public TextView mDescriptionView;
-
-    @BindView(R.id.txtvPodcastUrl)
-    public TextView mtxtvPodcastUrlView;
-
-    @BindView(R.id.txtvFeedUrl)
-    public TextView mtxtvFeedUrlView;
-
-    @BindView(R.id.lblSupport)
-    public TextView mtxtvlblSupportView;
-
-    @BindView(R.id.txtvFundingUrl)
-    public TextView mtxtvFundingUrlView;
-
     private boolean mEpisodesLoaded;
-    @BindView(R.id.fade_overlay)
-    public View mFadeOverlay;
-    @BindView(R.id.fade_overlay_container)
-    public View mFadeOverlayContainer;
     private boolean mIsAllDataLoaded;
     private boolean mIsChromeCustomTabsSupported;
     private boolean mIsCollapsed;
     private boolean mIsSubscribed;
     private boolean mIsTagsViewCollapsed;
     private boolean mInfoDataLoaded = false;
-    @BindView(R.id.podchaser_rating_and_links_container)
-    public LinearLayout mPodchaserRatingAndLinksContainer;
     public FragmentActivity mActivity;
     private int mScreenWidth;
     private boolean isLocalFeed = false;
 
-    @BindView(R.id.copy_feed_url_item)
-    public View mCopyFeedUrlIv;
-    @BindView(R.id.copy_podcast_url_item)
-    public View mCopyPodcastUrlIv;
-
-    @BindView(R.id.feed_url_l)
-    public View mFeedUrlL;
-    @BindView(R.id.podcast_url_l)
-    public View mPodcastUrlL;
-
     public SeriesDetailInfoView(@NonNull Context context) {
         super(context);
+        inflateContent();
     }
 
     public SeriesDetailInfoView(@NonNull Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
+        inflateContent();
     }
 
     public SeriesDetailInfoView(@NonNull Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
+        inflateContent();
     }
 
     public SeriesDetailInfoView(@NonNull Context context, @Nullable AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
+        inflateContent();
+    }
+
+    private void inflateContent() {
+        binding = ViewSeriesDetailInfoBinding.inflate(LayoutInflater.from(getContext()), this);
+        View.OnClickListener toggleListener = v -> toggleCollapseMode();
+        binding.descriptionContainer.setOnClickListener(toggleListener);
+        binding.description.setOnClickListener(toggleListener);
+        binding.fadeOverlayContainer.setOnClickListener(toggleListener);
     }
 
     @Override // android.view.View
     public void onFinishInflate() {
         super.onFinishInflate();
-        ButterKnife.bind(this, this);
         this.mCollapsedHeight = Util.dp2Px(getContext(), 144);
         afterViews();
     }
@@ -145,8 +119,8 @@ public class SeriesDetailInfoView extends FrameLayout {
     public void setData(Feed feed, FragmentActivity fragmentActivity) {
         mFeed = feed;
 
-            mContentPlaceholder.setVisibility(VISIBLE);
-            mContentPlaceholder.showSkeleton();
+            binding.contentPlaceholder.setVisibility(VISIBLE);
+            binding.contentPlaceholder.showSkeleton();
 
             this.mDescription = feed.getDescription();
             this.mIsSubscribed = feed.isSubscribed();
@@ -165,33 +139,33 @@ public class SeriesDetailInfoView extends FrameLayout {
             checkAllLoaded("setData2");
 
             if (TextUtils.isEmpty(feed.getLink()) || !Patterns.WEB_URL.matcher(feed.getLink()).matches()) {
-                mPodcastUrlL.setVisibility(GONE);
+                binding.podcastUrlL.setVisibility(GONE);
             }
 
             if (TextUtils.isEmpty(feed.getDownload_url()) || !Patterns.WEB_URL.matcher(feed.getDownload_url()).matches()) {
-                mFeedUrlL.setVisibility(GONE);
+                binding.feedUrlL.setVisibility(GONE);
             }
-            mtxtvPodcastUrlView.setText(feed.getLink());
-            mtxtvFeedUrlView.setText(feed.getDownload_url());
+            binding.txtvPodcastUrl.setText(feed.getLink());
+            binding.txtvFeedUrl.setText(feed.getDownload_url());
 
-            mCopyFeedUrlIv.setOnClickListener(new CopyListener(feed.getDownload_url()));
-            mCopyPodcastUrlIv.setOnClickListener(new CopyListener(feed.getLink()));
+            binding.copyFeedUrlItem.setOnClickListener(new CopyListener(feed.getDownload_url()));
+            binding.copyPodcastUrlItem.setOnClickListener(new CopyListener(feed.getLink()));
 
-            this.mtxtvFeedUrlView.setMovementMethod(MovementCheck.getInstance());
-            this.mtxtvFeedUrlView.setLinkTextColor(ThemeStore.accentColor(getContext()));
+            this.binding.txtvFeedUrl.setMovementMethod(MovementCheck.getInstance());
+            this.binding.txtvFeedUrl.setLinkTextColor(ThemeStore.accentColor(getContext()));
 
-            this.mtxtvPodcastUrlView.setMovementMethod(MovementCheck.getInstance());
-            this.mtxtvPodcastUrlView.setLinkTextColor(ThemeStore.accentColor(getContext()));
+            this.binding.txtvPodcastUrl.setMovementMethod(MovementCheck.getInstance());
+            this.binding.txtvPodcastUrl.setLinkTextColor(ThemeStore.accentColor(getContext()));
 
-            this.mtxtvFundingUrlView.setMovementMethod(MovementCheck.getInstance());
-            this.mtxtvFundingUrlView.setLinkTextColor(ThemeStore.accentColor(getContext()));
+            this.binding.txtvFundingUrl.setMovementMethod(MovementCheck.getInstance());
+            this.binding.txtvFundingUrl.setLinkTextColor(ThemeStore.accentColor(getContext()));
 
             if (feed.getPaymentLinks() == null || feed.getPaymentLinks().size() == 0) {
-                mtxtvlblSupportView.setVisibility(View.GONE);
-                mtxtvFundingUrlView.setVisibility(View.GONE);
+                binding.lblSupport.setVisibility(View.GONE);
+                binding.txtvFundingUrl.setVisibility(View.GONE);
             } else {
-                mtxtvlblSupportView.setVisibility(View.VISIBLE);
-                mtxtvFundingUrlView.setVisibility(View.VISIBLE);
+                binding.lblSupport.setVisibility(View.VISIBLE);
+                binding.txtvFundingUrl.setVisibility(View.VISIBLE);
                 ArrayList<FeedFunding> fundingList = feed.getPaymentLinks();
                 StringBuilder str = new StringBuilder();
                 HashSet<String> seen = new HashSet<String>();
@@ -207,7 +181,7 @@ public class SeriesDetailInfoView extends FrameLayout {
                     str.append("\n");
                 }
                 str = new StringBuilder(StringUtils.trim(str.toString()));
-                mtxtvFundingUrlView.setText(str.toString());
+                binding.txtvFundingUrl.setText(str.toString());
             }
 
 
@@ -217,27 +191,27 @@ public class SeriesDetailInfoView extends FrameLayout {
         boolean z = this.mInfoDataLoaded;
         boolean z4 = this.mEpisodesLoaded;
         if (z && z4) {
-            this.mContentPlaceholder.setVisibility(View.GONE);
-            if (!TextUtils.isEmpty(this.mDescriptionView.getText())) {
-                this.mDescriptionView.setVisibility(View.VISIBLE);
+            this.binding.contentPlaceholder.setVisibility(View.GONE);
+            if (!TextUtils.isEmpty(this.binding.description.getText())) {
+                this.binding.description.setVisibility(View.VISIBLE);
             }
-            this.mPodchaserRatingAndLinksContainer.setVisibility(View.VISIBLE);
-            if (this.mIsCollapsed && this.mFadeOverlayContainer.getVisibility() != View.VISIBLE) {
-                this.mFadeOverlayContainer.setVisibility(View.VISIBLE);
+            this.binding.podchaserRatingAndLinksContainer.setVisibility(View.VISIBLE);
+            if (this.mIsCollapsed && this.binding.fadeOverlayContainer.getVisibility() != View.VISIBLE) {
+                this.binding.fadeOverlayContainer.setVisibility(View.VISIBLE);
             }
             this.mIsAllDataLoaded = true;
         }
     }
 
     public void setDescription(boolean z) {
-        this.mDescriptionView.setMovementMethod(z ? MovementCheck.getInstance() : null);
-        this.mDescriptionView.setAutoLinkMask(z ? 1 : 0);
+        this.binding.description.setMovementMethod(z ? MovementCheck.getInstance() : null);
+        this.binding.description.setAutoLinkMask(z ? 1 : 0);
         if (!TextUtils.isEmpty(this.mDescriptionHtmlString)) {
-            this.mDescriptionView.setText(this.mDescriptionHtmlString);
-            this.mDescriptionView.setLinkTextColor(ThemeStore.accentColor(getContext()));
+            this.binding.description.setText(this.mDescriptionHtmlString);
+            this.binding.description.setLinkTextColor(ThemeStore.accentColor(getContext()));
             return;
         }
-        this.mDescriptionView.setVisibility(View.GONE);
+        this.binding.description.setVisibility(View.GONE);
     }
 
     public int getCollapsedHeight() {
@@ -252,12 +226,12 @@ public class SeriesDetailInfoView extends FrameLayout {
         if (!z) {
             return measuredHeight;
         }
-        this.mContainer.measure(View.MeasureSpec.makeMeasureSpec(this.mScreenWidth, MeasureSpec.EXACTLY), View.MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED));
-        return this.mContainer.getMeasuredHeight() > measuredHeight ? this.mContainer.getMeasuredHeight() : measuredHeight;
+        this.binding.seriesInfoViewContainer.measure(View.MeasureSpec.makeMeasureSpec(this.mScreenWidth, MeasureSpec.EXACTLY), View.MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED));
+        return this.binding.seriesInfoViewContainer.getMeasuredHeight() > measuredHeight ? this.binding.seriesInfoViewContainer.getMeasuredHeight() : measuredHeight;
     }
 
     public void clearDescriptionSelection() {
-        TextView textView = this.mDescriptionView;
+        TextView textView = this.binding.description;
         if (textView != null) {
             try {
                 textView.clearFocus();
@@ -271,14 +245,14 @@ public class SeriesDetailInfoView extends FrameLayout {
         if (this.mIsCollapsed) {
             ScaleAnimation scaleAnimation = new ScaleAnimation(1.0f, 1.0f, z ? 0.0f : 1.0f, z ? 1.0f : 0.0f, 1, 0.0f, 1, 1.0f);
             scaleAnimation.setDuration(i);
-            this.mFadeOverlayContainer.startAnimation(scaleAnimation);
+            this.binding.fadeOverlayContainer.startAnimation(scaleAnimation);
         }
     }
 
     private void afterViews() {
-        mFadeOverlay.setBackground(ImageUtils.getColoredDrawable(getContext(), R.drawable.gradient_white, ATHUtil.resolveColor(getContext(), R.attr.colorSurface)));
-        this.mDescriptionView.setVisibility(View.GONE);
-        mPodchaserRatingAndLinksContainer.setVisibility(View.GONE);
+        binding.fadeOverlay.setBackground(ImageUtils.getColoredDrawable(getContext(), R.drawable.gradient_white, ATHUtil.resolveColor(getContext(), R.attr.colorSurface)));
+        this.binding.description.setVisibility(View.GONE);
+        binding.podchaserRatingAndLinksContainer.setVisibility(View.GONE);
 
     }
 
@@ -288,11 +262,11 @@ public class SeriesDetailInfoView extends FrameLayout {
             if (z) {
                 int i3 = this.mScreenWidth;
                 if (i3 > 0) {
-                    this.mContainer.measure(View.MeasureSpec.makeMeasureSpec(i3, MeasureSpec.EXACTLY), View.MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED));
+                    this.binding.seriesInfoViewContainer.measure(View.MeasureSpec.makeMeasureSpec(i3, MeasureSpec.EXACTLY), View.MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED));
                 } else {
-                    this.mContainer.measure(0, 0);
+                    this.binding.seriesInfoViewContainer.measure(0, 0);
                 }
-                int measuredHeight = this.mContainer.getMeasuredHeight();
+                int measuredHeight = this.binding.seriesInfoViewContainer.getMeasuredHeight();
                 ValueAnimator ofInt = ValueAnimator.ofInt(this.mCollapsedHeight, measuredHeight);
                 ofInt.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() { // from class: fm.player.ui.customviews.SeriesDetailInfoView.5
                     @Override // android.animation.ValueAnimator.AnimatorUpdateListener
@@ -325,7 +299,7 @@ public class SeriesDetailInfoView extends FrameLayout {
                 ofInt.setInterpolator(new AccelerateDecelerateInterpolator());
                 ofInt.start();
             } else {
-                ValueAnimator ofInt2 = ValueAnimator.ofInt(this.mContainer.getMeasuredHeight(), this.mCollapsedHeight);
+                ValueAnimator ofInt2 = ValueAnimator.ofInt(this.binding.seriesInfoViewContainer.getMeasuredHeight(), this.mCollapsedHeight);
                 ofInt2.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() { // from class: fm.player.ui.customviews.SeriesDetailInfoView.7
                     @Override // android.animation.ValueAnimator.AnimatorUpdateListener
                     public void onAnimationUpdate(ValueAnimator valueAnimator) {
@@ -356,14 +330,14 @@ public class SeriesDetailInfoView extends FrameLayout {
                 ofInt2.start();
             }
             if (z) {
-                AnimationsUtils.fadeOut(this.mFadeOverlayContainer, 8, 250, 0);
+                AnimationsUtils.fadeOut(this.binding.fadeOverlayContainer, 8, 250, 0);
             } else {
-                AnimationsUtils.fadeIn(this.mFadeOverlayContainer, 250);
+                AnimationsUtils.fadeIn(this.binding.fadeOverlayContainer, 250);
             }
         } else {
             getLayoutParams().height = z ? -2 : this.mCollapsedHeight;
             requestLayout();
-            View view = this.mFadeOverlayContainer;
+            View view = this.binding.fadeOverlayContainer;
             if (!z && this.mIsAllDataLoaded) {
                 i = VISIBLE;
             }
@@ -374,7 +348,6 @@ public class SeriesDetailInfoView extends FrameLayout {
         this.mIsTagsViewCollapsed = !z;
     }
 
-    @OnClick({R.id.description_container, R.id.description, R.id.fade_overlay_container})
     public void toggleCollapseMode() {
         if (!this.mIsSubscribed || this.mIsCollapsed) {
             expandCollapseContent(this.mIsCollapsed, true);
