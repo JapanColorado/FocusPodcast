@@ -46,7 +46,7 @@ pixi run clean
 ./gradlew :app:connectedFdroidDebugAndroidTest   # Espresso/Robotium instrumentation tests (device required)
 ```
 
-JVM unit tests exist in `parser/feed`, `playback/base`, and `core` (`core/src/test`). Write new tests as plain JUnit4: the pinned Robolectric 4.5-alpha cannot load JDK 17 class files, so any `@RunWith(RobolectricTestRunner.class)` test fails with `IllegalArgumentException at ClassReader` under the required JDK. Android stubs in plain tests throw, so keep Android calls (e.g. `TextUtils`) out of the tested path or override them in a test subclass.
+JVM unit tests exist in `parser/feed`, `playback/base`, and `core` (`core/src/test`). Robolectric 4.12.2 works under JDK 17 but only emulates up to API 34, so every module with Robolectric tests has `src/test/resources/robolectric.properties` pinning `sdk=34`. Prefer plain JUnit4 for pure logic; use `@RunWith(RobolectricTestRunner.class)` when the code under test needs real Android classes (SQLite, `TextUtils`, resources).
 
 ## Module architecture
 

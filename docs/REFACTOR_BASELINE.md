@@ -15,7 +15,7 @@ because it is deleted outright.
 | Rx `subscribe(` with no error handler | ~11 | ~11 |
 | Build flavors | 3 | 3 |
 | Git submodules | 4 | 4 |
-| Unit test files | 15 | 15 |
+| Unit test files (passing tests) | 15 (51) | 15 (54) |
 
 Commands used:
 
