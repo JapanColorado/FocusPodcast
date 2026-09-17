@@ -43,10 +43,13 @@ import allen.town.podcast.core.util.playback.PlayableUtils;
 import allen.town.podcast.core.util.playback.PlaybackServiceStarter;
 import allen.town.podcast.core.widget.WidgetUpdater;
 import allen.town.podcast.event.PlayerErrorEvent;
+import allen.town.podcast.event.adskip.AdSegmentsChangedEvent;
+import allen.town.podcast.event.adskip.AdSkipUndoEvent;
 import allen.town.podcast.event.playback.BufferUpdateEvent;
 import allen.town.podcast.event.playback.PlaybackPositionEvent;
 import allen.town.podcast.event.playback.PlaybackServiceEvent;
 import allen.town.podcast.event.playback.SleepTimerUpdatedEvent;
+import allen.town.podcast.event.settings.AdSkipChangedEvent;
 import allen.town.podcast.event.settings.LoudnessChangedEvent;
 import allen.town.podcast.event.settings.MonoChangedEvent;
 import allen.town.podcast.event.settings.SkipIntroEndingChangedEvent;
@@ -156,6 +159,8 @@ public class PlaybackService extends MediaBrowserServiceCompat {
     final PlaybackServiceMediaSession mediaSessionHolder = new PlaybackServiceMediaSession(this);
     /** Applies the per-feed skip-intro / skip-ending preferences. */
     final PlaybackServiceAutoSkipper autoSkipper = new PlaybackServiceAutoSkipper(this);
+    /** Skips the stored ad segments of the episode being played. */
+    final PlaybackServiceAdSkipper adSkipper = new PlaybackServiceAdSkipper(this);
     /** Owns the headset / bluetooth / shutdown / skip broadcast receivers. */
     private final PlaybackServiceReceivers receivers = new PlaybackServiceReceivers(this);
     /** Answers the Android Auto media browser tree. */
@@ -717,6 +722,24 @@ public class PlaybackService extends MediaBrowserServiceCompat {
         }
     }
 
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    @SuppressWarnings("unused")
+    public void adSegmentsChanged(AdSegmentsChangedEvent event) {
+        adSkipper.onSegmentsChanged(event.getFeedItemId());
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    @SuppressWarnings("unused")
+    public void adSkipUndoRequested(AdSkipUndoEvent event) {
+        adSkipper.onUndo(event);
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    @SuppressWarnings("unused")
+    public void adSkipSettingChanged(AdSkipChangedEvent event) {
+        adSkipper.onAdSkipSettingChanged(event.getFeedId());
+    }
+
     public static MediaType getCurrentMediaType() {
         return currentMediaType;
     }
@@ -864,6 +887,7 @@ public class PlaybackService extends MediaBrowserServiceCompat {
                         notificationUpdater.updatePositionAndNotify(getCurrentPosition(), getCurrentPlaybackSpeed());
                     }
                     autoSkipper.skipEndingIfNecessary();
+                    adSkipper.skipIfNecessary();
                 }, error -> Log.e(TAG, "Position observer failed", error));
     }
 

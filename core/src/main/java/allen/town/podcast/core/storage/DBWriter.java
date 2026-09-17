@@ -41,8 +41,10 @@ import allen.town.podcast.event.FeedItemEvent;
 import allen.town.podcast.event.FeedListUpdateEvent;
 import allen.town.podcast.event.QueueEvent;
 import allen.town.podcast.event.UnreadItemsUpdateEvent;
+import allen.town.podcast.event.adskip.AdSegmentsChangedEvent;
 import allen.town.podcast.event.playback.PlaybackHistoryEvent;
 import allen.town.podcast.model.download.DownloadStatus;
+import allen.town.podcast.model.feed.AdSegment;
 import allen.town.podcast.model.feed.Feed;
 import allen.town.podcast.model.feed.FeedItem;
 import allen.town.podcast.model.feed.FeedMedia;
@@ -925,6 +927,73 @@ public class DBWriter {
             adapter.setFeedPreferences(preferences);
             adapter.close();
             EventBus.getDefault().post(new FeedListUpdateEvent(preferences.getFeedID()));
+        });
+    }
+
+    // ---------------------------------------------------------------------------------------
+    // Ad segments
+    // ---------------------------------------------------------------------------------------
+
+    /**
+     * Replaces the ad segments that one producer contributed for an episode. Segments from the
+     * other sources are left alone, so a re-run of the detector never discards manual marks.
+     *
+     * @param feedItemId the episode the segments belong to
+     * @param source     the producer whose segments are being replaced
+     * @param segments   the new segments; an empty list simply clears that source
+     */
+    public static Future<?> replaceAdSegments(final long feedItemId,
+                                              @NonNull final AdSegment.Source source,
+                                              @NonNull final List<AdSegment> segments) {
+        return dbExec.submit(() -> {
+            Db adapter = Db.getInstance();
+            adapter.open();
+            adapter.replaceAdSegments(feedItemId, source, segments);
+            adapter.close();
+            EventBus.getDefault().post(new AdSegmentsChangedEvent(feedItemId));
+        });
+    }
+
+    /**
+     * Stores a single ad segment, typically one the user marked by hand in the player.
+     */
+    public static Future<?> addAdSegment(@NonNull final AdSegment segment) {
+        return dbExec.submit(() -> {
+            Db adapter = Db.getInstance();
+            adapter.open();
+            adapter.insertAdSegment(segment);
+            adapter.close();
+            EventBus.getDefault().post(new AdSegmentsChangedEvent(segment.getFeedItemId()));
+        });
+    }
+
+    /**
+     * Switches one ad segment on or off. A disabled segment stays stored but is never skipped.
+     */
+    public static Future<?> setAdSegmentEnabled(final long id, final long feedItemId,
+                                                final boolean enabled) {
+        return dbExec.submit(() -> {
+            Db adapter = Db.getInstance();
+            adapter.open();
+            adapter.setAdSegmentEnabled(id, enabled);
+            adapter.close();
+            EventBus.getDefault().post(new AdSegmentsChangedEvent(feedItemId));
+        });
+    }
+
+    /**
+     * Removes one ad segment for good.
+     *
+     * @param id         the segment to delete
+     * @param feedItemId the episode it belonged to, needed for the change event
+     */
+    public static Future<?> deleteAdSegment(final long id, final long feedItemId) {
+        return dbExec.submit(() -> {
+            Db adapter = Db.getInstance();
+            adapter.open();
+            adapter.deleteAdSegment(id);
+            adapter.close();
+            EventBus.getDefault().post(new AdSegmentsChangedEvent(feedItemId));
         });
     }
 

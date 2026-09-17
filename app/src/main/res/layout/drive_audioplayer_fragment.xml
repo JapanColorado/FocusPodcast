@@ -100,7 +100,7 @@
         app:layout_constraintStart_toStartOf="parent">
 
 
-        <androidx.appcompat.widget.AppCompatSeekBar
+        <allen.town.podcast.view.AdMarkerSeekBar
             android:id="@+id/sbPosition"
             style="@style/Widget.MaterialComponents.LinearProgressIndicator"
             android:layout_width="match_parent"

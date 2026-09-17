@@ -23,6 +23,7 @@ import allen.town.podcast.core.util.comparator.DownloadStatusComparator;
 import allen.town.podcast.core.util.comparator.FeedItemPubdateComparator;
 import allen.town.podcast.core.util.comparator.PlaybackCompletionDateComparator;
 import allen.town.podcast.model.download.DownloadStatus;
+import allen.town.podcast.model.feed.AdSegment;
 import allen.town.podcast.model.feed.Chapter;
 import allen.town.podcast.model.feed.Feed;
 import allen.town.podcast.model.feed.FeedItem;
@@ -31,6 +32,7 @@ import allen.town.podcast.model.feed.FeedMedia;
 import allen.town.podcast.model.feed.FeedPreferences;
 import allen.town.podcast.storage.db.Db;
 import allen.town.podcast.storage.db.LongIntMap;
+import allen.town.podcast.storage.db.mapper.AdSegmentCursorMapper;
 import allen.town.podcast.storage.db.mapper.ChapterCursorMapper;
 import allen.town.podcast.storage.db.mapper.DownloadStatusCursorMapper;
 import allen.town.podcast.storage.db.mapper.FeedCursorMapper;
@@ -839,6 +841,27 @@ public final class DBReader {
                 chapters.add(ChapterCursorMapper.convert(cursor));
             }
             return chapters;
+        }
+    }
+
+    /**
+     * Loads the stored ad segments of one episode, earliest start first.
+     *
+     * @param feedItemId the id of the episode
+     * @return the segments; an empty list when the episode has none
+     */
+    @NonNull
+    public static List<AdSegment> loadAdSegmentsOfFeedItem(final long feedItemId) {
+        Db adapter = Db.getInstance();
+        adapter.open();
+        try (Cursor cursor = adapter.getAdSegmentsCursor(feedItemId)) {
+            List<AdSegment> segments = new ArrayList<>(cursor.getCount());
+            while (cursor.moveToNext()) {
+                segments.add(AdSegmentCursorMapper.convert(cursor));
+            }
+            return segments;
+        } finally {
+            adapter.close();
         }
     }
 

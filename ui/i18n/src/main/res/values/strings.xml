@@ -886,4 +886,39 @@
     <string name="custom_effect_applied">Custom effects applied</string>
     <string name="clear">clear</string>
 
+    <!-- Ad auto-skip -->
+    <string name="pref_ad_skip_category">Ad skipping</string>
+    <string name="pref_ad_skip_enabled_title">Skip ads automatically</string>
+    <string name="pref_ad_skip_enabled_sum">Analyses downloaded episodes for music beds, louder advertising voices and sponsor chapters, and jumps over what it finds. This is a heuristic: it can miss an ad or skip a little too much.</string>
+    <string name="pref_ad_skip_sensitivity_title">Detection sensitivity</string>
+    <string name="pref_ad_skip_sensitivity_sum">How sure the detector has to be before an ad is skipped: %1$s</string>
+    <string name="ad_skip_sensitivity_low">Low</string>
+    <string name="ad_skip_sensitivity_medium">Medium</string>
+    <string name="ad_skip_sensitivity_high">High</string>
+    <string name="pref_ad_skip_analyze_on_download_title">Analyse new downloads</string>
+    <string name="pref_ad_skip_analyze_on_download_sum">Look for ads as soon as an episode has finished downloading</string>
+    <string name="pref_ad_skip_show_snackbar_title">Show a message when an ad is skipped</string>
+    <string name="pref_ad_skip_show_snackbar_sum">The message offers an Undo action</string>
+    <string name="feed_ad_skip_title">Skip ads in this podcast</string>
+    <string name="feed_ad_skip_sum">Uses the global ad-skip settings</string>
+    <string name="mark_ad_start_label">Mark ad start</string>
+    <string name="mark_ad_end_label">Mark ad end</string>
+    <string name="ad_segments_label">Ad segments\u2026</string>
+    <string name="analyze_ads_label">Detect ads now</string>
+    <string name="ad_mark_start_set">Ad start marked at %1$s</string>
+    <string name="ad_mark_too_short">That range is shorter than two seconds, so nothing was saved</string>
+    <string name="ad_mark_saved">Ad segment saved</string>
+    <string name="ad_mark_start_discarded">The pending ad start was discarded</string>
+    <string name="analyze_ads_started">Looking for ads in this episode\u2026</string>
+    <string name="ad_skipped_snackbar">Skipped a %1$s ad</string>
+    <string name="ad_segments_title">Ad segments</string>
+    <string name="ad_segments_empty">No ad segments yet. Downloaded episodes are analysed automatically when ad skipping is on.</string>
+    <string name="ad_segment_range">%1$s \u2013 %2$s</string>
+    <string name="ad_segment_source_chapter">Chapter</string>
+    <string name="ad_segment_source_manual">Manual</string>
+    <string name="ad_segment_summary">%1$s \u00b7 %2$s</string>
+    <string name="ad_segment_source_detected_confidence">Detected %1$d%%</string>
+    <string name="ad_segment_delete_label">Delete this ad segment</string>
+    <string name="ad_segment_enabled_label">Skip this ad segment</string>
+
 </resources>

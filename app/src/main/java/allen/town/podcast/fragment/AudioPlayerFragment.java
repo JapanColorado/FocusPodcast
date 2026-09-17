@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.GradientDrawable;
+import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -17,10 +18,10 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.SeekBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.widget.AppCompatSeekBar;
 import androidx.appcompat.widget.Toolbar;
 import androidx.cardview.widget.CardView;
 import androidx.fragment.app.Fragment;
@@ -31,6 +32,7 @@ import androidx.viewpager2.adapter.FragmentStateAdapter;
 import androidx.viewpager2.widget.ViewPager2;
 
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
+import com.google.android.material.snackbar.Snackbar;
 import com.jetradarmobile.snowfall.SnowfallView;
 
 import org.greenrobot.eventbus.EventBus;
@@ -39,30 +41,39 @@ import org.greenrobot.eventbus.ThreadMode;
 
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
 import allen.town.podcast.common.extensions.ColorExtensionsUtils;
 import allen.town.podcast.common.util.MenuIconUtil;
+import allen.town.podcast.common.util.TopSnackbarUtil;
 import allen.town.podcast.common.util.Timber;
 import allen.town.podcast.R;
 import allen.town.podcast.activity.DriveModeActivity;
 import allen.town.podcast.activity.LockScreenActivity;
 import allen.town.podcast.activity.MainActivity;
+import allen.town.podcast.core.adskip.AdAnalysisWorker;
 import allen.town.podcast.core.feed.util.PlaybackSpeedUtils;
 import allen.town.podcast.core.playback.NowPlayingScreen;
 import allen.town.podcast.core.pref.Prefs;
 import allen.town.podcast.core.service.playback.PlaybackService;
+import allen.town.podcast.core.storage.DBReader;
+import allen.town.podcast.core.storage.DBWriter;
 import allen.town.podcast.core.util.ChapterUtils;
 import allen.town.podcast.core.util.Converter;
 import allen.town.podcast.core.util.IntentUtils;
 import allen.town.podcast.core.util.TimeSpeedConverter;
 import allen.town.podcast.core.util.playback.PlaybackController;
+import allen.town.podcast.dialog.AdSegmentsDialog;
 import allen.town.podcast.dialog.PlaySpeedDialog;
 import allen.town.podcast.dialog.PlaybackControlsDialog;
 import allen.town.podcast.dialog.SkipPrefDialog;
 import allen.town.podcast.dialog.SleepTimerDialog;
 import allen.town.podcast.event.CoverColorChangeEvent;
+import allen.town.podcast.event.adskip.AdSegmentsChangedEvent;
+import allen.town.podcast.event.adskip.AdSkipUndoEvent;
+import allen.town.podcast.event.adskip.AdSkippedEvent;
 import allen.town.podcast.event.FavoritesEvent;
 import allen.town.podcast.event.FeedItemEvent;
 import allen.town.podcast.event.PlayerErrorEvent;
@@ -73,11 +84,13 @@ import allen.town.podcast.event.playback.PlaybackServiceEvent;
 import allen.town.podcast.event.playback.SleepTimerUpdatedEvent;
 import allen.town.podcast.event.playback.SpeedChangedEvent;
 import allen.town.podcast.menuprocess.FeedItemMenuProcess;
+import allen.town.podcast.model.feed.AdSegment;
 import allen.town.podcast.model.feed.Chapter;
 import allen.town.podcast.model.feed.FeedItem;
 import allen.town.podcast.model.feed.FeedMedia;
 import allen.town.podcast.model.playback.Playable;
 import allen.town.podcast.playback.LibraryViewModel;
+import allen.town.podcast.view.AdMarkerSeekBar;
 import allen.town.podcast.view.DrawableGradient;
 import allen.town.podcast.view.PlayButton;
 import allen.town.podcast.theme.ThemeStore;
@@ -85,7 +98,9 @@ import allen.town.podcast.theme.util.ATHUtil;
 import allen.town.podcast.theme.util.ColorUtil;
 import allen.town.podcast.theme.util.MaterialValueHelper;
 import allen.town.podcast.theme.util.TintHelper;
+import io.reactivex.Completable;
 import io.reactivex.Maybe;
+import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
@@ -104,7 +119,7 @@ public class AudioPlayerFragment extends Fragment implements
     protected ViewPager2 pager;
     protected TextView txtvPosition;
     protected TextView txtvLength;
-    protected AppCompatSeekBar sbPosition;
+    protected AdMarkerSeekBar sbPosition;
     protected ImageButton butRev;
     protected TextView txtvRev;
     protected PlayButton butPlay;
@@ -116,8 +131,22 @@ public class AudioPlayerFragment extends Fragment implements
     protected CardView cardViewSeek;
     protected TextView txtvSeek;
 
+    /** No ad start is pending; the "mark ad start" menu item is the one on offer. */
+    private static final long NO_PENDING_AD_START = -1;
+    /** Anything shorter is a mis-tap rather than an ad, and is refused with a message. */
+    private static final long MIN_MANUAL_AD_LENGTH_MS = 2000;
+    private static final String KEY_PENDING_AD_START = "allen.town.podcast.pendingAdStartMs";
+
     protected PlaybackController controller;
     protected Disposable disposable;
+    /** Loads the ad segments of the episode currently shown; replaced on every media change. */
+    private Disposable adSegmentsDisposable;
+    /** Runs the chapter-only analysis a streamed episode can get. */
+    private Disposable adAnalysisDisposable;
+    /** The episode the seek bar is currently showing segments for, or 0 for none. */
+    private long adSegmentsItemId;
+    /** Where the user tapped "mark ad start", or {@link #NO_PENDING_AD_START}. */
+    private long pendingAdStartMs = NO_PENDING_AD_START;
     protected boolean showTimeLeft;
     protected boolean seekedToChapterStart = false;
     protected int currentChapterIndex = -1;
@@ -399,6 +428,7 @@ public class AudioPlayerFragment extends Fragment implements
         updatePlaybackSpeedButton(new SpeedChangedEvent(PlaybackSpeedUtils.getCurrentPlaybackSpeed(media)));
         setChapterDividers(media);
         setupOptionsMenu(media);
+        loadAdSegments(media);
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
@@ -501,6 +531,15 @@ public class AudioPlayerFragment extends Fragment implements
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (savedInstanceState != null) {
+            pendingAdStartMs = savedInstanceState.getLong(KEY_PENDING_AD_START, NO_PENDING_AD_START);
+        }
+    }
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putLong(KEY_PENDING_AD_START, pendingAdStartMs);
     }
 
     @Override
@@ -523,6 +562,14 @@ public class AudioPlayerFragment extends Fragment implements
         EventBus.getDefault().unregister(this);
         if (disposable != null) {
             disposable.dispose();
+        }
+        if (adSegmentsDisposable != null) {
+            adSegmentsDisposable.dispose();
+            adSegmentsDisposable = null;
+        }
+        if (adAnalysisDisposable != null) {
+            adAnalysisDisposable.dispose();
+            adAnalysisDisposable = null;
         }
     }
 
@@ -665,6 +712,13 @@ public class AudioPlayerFragment extends Fragment implements
             FeedItemMenuProcess.onPrepareMenu(toolbar.getMenu(), ((FeedMedia) media).getItem());
         }
 
+        toolbar.getMenu().findItem(R.id.ad_segments_item).setVisible(isFeedMedia);
+        toolbar.getMenu().findItem(R.id.analyze_ads_item).setVisible(isFeedMedia);
+        toolbar.getMenu().findItem(R.id.mark_ad_start_item)
+                .setVisible(isFeedMedia && pendingAdStartMs == NO_PENDING_AD_START);
+        toolbar.getMenu().findItem(R.id.mark_ad_end_item)
+                .setVisible(isFeedMedia && pendingAdStartMs != NO_PENDING_AD_START);
+
         toolbar.getMenu().findItem(R.id.set_sleeptimer_item).setVisible(!controller.sleepTimerActive());
         toolbar.getMenu().findItem(R.id.disable_sleeptimer_item).setVisible(controller.sleepTimerActive());
         toolbar.getMenu().findItem(R.id.driver_mode).setVisible(true);
@@ -711,8 +765,146 @@ public class AudioPlayerFragment extends Fragment implements
                 startActivity(intent);
             }
             return true;
+        } else if (itemId == R.id.mark_ad_start_item) {
+            pendingAdStartMs = controller.getPosition();
+            showShortMessage(getString(R.string.ad_mark_start_set,
+                    Converter.getDurationStringLong((int) pendingAdStartMs)));
+            setupOptionsMenu(media);
+            return true;
+        } else if (itemId == R.id.mark_ad_end_item) {
+            finishAdMark(media, feedItem);
+            return true;
+        } else if (itemId == R.id.ad_segments_item) {
+            if (feedItem != null) {
+                AdSegmentsDialog.newInstance(feedItem.getId())
+                        .show(getChildFragmentManager(), AdSegmentsDialog.TAG);
+            }
+            return true;
+        } else if (itemId == R.id.analyze_ads_item) {
+            analyzeAds(media, feedItem);
+            return true;
         }
         return false;
+    }
+
+    /**
+     * Closes a hand-marked ad segment. The two marks may be tapped in either order, so they are
+     * sorted here; a range under {@link #MIN_MANUAL_AD_LENGTH_MS} is treated as a mis-tap and
+     * dropped. Either way the pending mark is cleared and the menu swaps back.
+     */
+    private void finishAdMark(Playable media, @Nullable FeedItem feedItem) {
+        long start = pendingAdStartMs;
+        pendingAdStartMs = NO_PENDING_AD_START;
+        setupOptionsMenu(media);
+        if (start == NO_PENDING_AD_START || feedItem == null || controller == null) {
+            return;
+        }
+        long end = controller.getPosition();
+        long from = Math.min(start, end);
+        long to = Math.max(start, end);
+        if (to - from < MIN_MANUAL_AD_LENGTH_MS) {
+            showShortMessage(getString(R.string.ad_mark_too_short));
+            return;
+        }
+        DBWriter.addAdSegment(new AdSegment(feedItem.getId(), from, to, AdSegment.Source.MANUAL, 1f));
+        showShortMessage(getString(R.string.ad_mark_saved));
+    }
+
+    /**
+     * Runs detection on demand. A downloaded episode gets the full audio analysis through
+     * WorkManager; a streamed one can only be matched against its chapter titles, which is cheap
+     * but still touches the database, so it runs off the main thread.
+     */
+    private void analyzeAds(Playable media, @Nullable FeedItem feedItem) {
+        if (!(media instanceof FeedMedia) || feedItem == null) {
+            return;
+        }
+        FeedMedia feedMedia = (FeedMedia) media;
+        Context context = requireContext().getApplicationContext();
+        if (feedMedia.isDownloaded()) {
+            AdAnalysisWorker.enqueue(context, feedMedia.getId(), true);
+        } else {
+            if (adAnalysisDisposable != null) {
+                adAnalysisDisposable.dispose();
+            }
+            adAnalysisDisposable = Completable
+                    .fromAction(() -> AdAnalysisWorker.applyChapterSegments(feedItem))
+                    .subscribeOn(Schedulers.io())
+                    .subscribe(() -> { },
+                            error -> Log.e(TAG, "could not read the chapter ad segments", error));
+        }
+        showShortMessage(getString(R.string.analyze_ads_started));
+    }
+
+    private void showShortMessage(String message) {
+        TopSnackbarUtil.showSnack(getActivity(), message, Toast.LENGTH_SHORT);
+    }
+
+    /**
+     * Paints the ad segments of the episode onto the position bar. Nothing is drawn while ad
+     * skipping is switched off globally, so the bands never claim a skip that will not happen.
+     */
+    private void loadAdSegments(@Nullable Playable media) {
+        if (adSegmentsDisposable != null) {
+            adSegmentsDisposable.dispose();
+            adSegmentsDisposable = null;
+        }
+        if (sbPosition == null) {
+            return;
+        }
+        FeedItem item = (media instanceof FeedMedia) ? ((FeedMedia) media).getItem() : null;
+        if (item == null || !Prefs.isAdSkipEnabled()) {
+            adSegmentsItemId = item == null ? 0 : item.getId();
+            sbPosition.setAdSegments(Collections.emptyList(), 0);
+            return;
+        }
+        final long itemId = item.getId();
+        final long mediaDuration = media.getDuration();
+        adSegmentsItemId = itemId;
+        adSegmentsDisposable = Single.fromCallable(() -> DBReader.loadAdSegmentsOfFeedItem(itemId))
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(segments -> {
+                    if (sbPosition != null) {
+                        sbPosition.setAdSegments(segments, mediaDuration);
+                    }
+                }, error -> Log.e(TAG, "could not load the ad segments of item " + itemId, error));
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onAdSegmentsChanged(AdSegmentsChangedEvent event) {
+        if (controller == null || event.getFeedItemId() != adSegmentsItemId) {
+            return;
+        }
+        loadAdSegments(controller.getMedia());
+    }
+
+    /**
+     * Tells the user what the service just skipped and offers to take it back. The service does
+     * the seeking; this only posts the undo event so the same segment is not skipped again.
+     */
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onAdSkipped(AdSkippedEvent event) {
+        if (!Prefs.isAdSkipShowSnackbar() || !isAdded()) {
+            return;
+        }
+        String skipped = Converter.getDurationStringShort((int) event.getSkippedMs(), false);
+        String text = getString(R.string.ad_skipped_snackbar, skipped);
+        Snackbar snackbar;
+        if (getActivity() instanceof MainActivity) {
+            snackbar = ((MainActivity) getActivity())
+                    .showSnackbarAbovePlayer(text, Snackbar.LENGTH_LONG);
+        } else {
+            View root = getView();
+            if (root == null) {
+                return;
+            }
+            snackbar = Snackbar.make(root, text, Snackbar.LENGTH_LONG);
+            snackbar.show();
+        }
+        snackbar.setAction(getString(R.string.undo), v -> EventBus.getDefault().post(
+                new AdSkipUndoEvent(event.getFeedItemId(), event.getSegmentId(),
+                        event.getFromMs())));
     }
 
     protected void startOrStopSnow(boolean isSnowFalling) {

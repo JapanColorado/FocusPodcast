@@ -24,6 +24,7 @@ import java.util.Map;
 import java.util.Set;
 
 import allen.town.podcast.model.download.DownloadStatus;
+import allen.town.podcast.model.feed.AdSegment;
 import allen.town.podcast.model.feed.Feed;
 import allen.town.podcast.model.feed.FeedCounter;
 import allen.town.podcast.model.feed.FeedItem;
@@ -40,7 +41,8 @@ import allen.town.podcast.model.feed.SortOrder;
  * re-exports the column and table names that other modules refer to as {@code Db.KEY_*} and
  * {@code Db.TABLE_NAME_*}. The statements themselves live in the per-table helpers of this package
  * ({@link FeedDao}, {@link FeedItemDao}, {@link FeedMediaDao}, {@link QueueDao},
- * {@link FavoritesDao}, {@link DownloadLogDao}); every method below delegates to one of them,
+ * {@link FavoritesDao}, {@link DownloadLogDao}, {@link AdSegmentDao}); every method below delegates
+ * to one of them,
  * except the two writes that span several tables and therefore keep their transaction here.</p>
  */
 public class Db {
@@ -116,6 +118,12 @@ public class Db {
     public static final String KEY_FEED_TAGS = DbSchema.KEY_FEED_TAGS;
     public static final String KEY_EPISODE_NOTIFICATION = DbSchema.KEY_EPISODE_NOTIFICATION;
     public static final String KEY_FEED_PLAYBACK_SPEED = DbSchema.KEY_FEED_PLAYBACK_SPEED;
+    public static final String KEY_FEED_AD_SKIP = DbSchema.KEY_FEED_AD_SKIP;
+    public static final String KEY_AD_START_MS = DbSchema.KEY_AD_START_MS;
+    public static final String KEY_AD_END_MS = DbSchema.KEY_AD_END_MS;
+    public static final String KEY_AD_SOURCE = DbSchema.KEY_AD_SOURCE;
+    public static final String KEY_AD_CONFIDENCE = DbSchema.KEY_AD_CONFIDENCE;
+    public static final String KEY_AD_ENABLED = DbSchema.KEY_AD_ENABLED;
 
     // Table names
     public static final String TABLE_NAME_FEEDS = DbSchema.TABLE_NAME_FEEDS;
@@ -125,6 +133,7 @@ public class Db {
     public static final String TABLE_NAME_QUEUE = DbSchema.TABLE_NAME_QUEUE;
     public static final String TABLE_NAME_SIMPLECHAPTERS = DbSchema.TABLE_NAME_SIMPLECHAPTERS;
     public static final String TABLE_NAME_FAVORITES = DbSchema.TABLE_NAME_FAVORITES;
+    public static final String TABLE_NAME_AD_SEGMENTS = DbSchema.TABLE_NAME_AD_SEGMENTS;
 
     public static final String SELECT_KEY_ITEM_ID = DbSchema.SELECT_KEY_ITEM_ID;
     public static final String SELECT_KEY_MEDIA_ID = DbSchema.SELECT_KEY_MEDIA_ID;
@@ -140,6 +149,7 @@ public class Db {
     private final QueueDao queueDao;
     private final FavoritesDao favoritesDao;
     private final DownloadLogDao downloadLogDao;
+    private final AdSegmentDao adSegmentDao;
 
     public static void init(Context context) {
         if (context == null) {
@@ -164,7 +174,8 @@ public class Db {
         db = openDb();
         feedDao = new FeedDao(db);
         mediaDao = new FeedMediaDao(db);
-        itemDao = new FeedItemDao(db, feedDao, mediaDao);
+        adSegmentDao = new AdSegmentDao(db);
+        itemDao = new FeedItemDao(db, feedDao, mediaDao, adSegmentDao);
         queueDao = new QueueDao(db);
         favoritesDao = new FavoritesDao(db);
         downloadLogDao = new DownloadLogDao(db);
@@ -675,6 +686,41 @@ public class Db {
     }
 
     // ---------------------------------------------------------------------------------------
+    // Ad segments
+    // ---------------------------------------------------------------------------------------
+
+    /** All ad segments of one episode, earliest start first. */
+    public final Cursor getAdSegmentsCursor(final long feedItemId) {
+        return adSegmentDao.getAdSegmentsCursor(feedItemId);
+    }
+
+    /**
+     * Replaces the segments that {@code source} contributed for this episode, leaving segments from
+     * the other sources untouched.
+     */
+    public void replaceAdSegments(final long feedItemId, @NonNull final AdSegment.Source source,
+                                  @NonNull final List<AdSegment> segments) {
+        adSegmentDao.replaceAdSegments(feedItemId, source, segments);
+    }
+
+    /** Inserts one segment and returns its new row id. */
+    public long insertAdSegment(@NonNull final AdSegment segment) {
+        return adSegmentDao.insertAdSegment(segment);
+    }
+
+    public void setAdSegmentEnabled(final long id, final boolean enabled) {
+        adSegmentDao.setAdSegmentEnabled(id, enabled);
+    }
+
+    public void deleteAdSegment(final long id) {
+        adSegmentDao.deleteAdSegment(id);
+    }
+
+    public void deleteAdSegmentsOfItems(final long[] itemIds) {
+        adSegmentDao.deleteAdSegmentsOfItems(itemIds);
+    }
+
+    // ---------------------------------------------------------------------------------------
     // Download log
     // ---------------------------------------------------------------------------------------
 
@@ -748,6 +794,7 @@ public class Db {
             db.execSQL(DbSchema.CREATE_TABLE_QUEUE);
             db.execSQL(DbSchema.CREATE_TABLE_SIMPLECHAPTERS);
             db.execSQL(DbSchema.CREATE_TABLE_FAVORITES);
+            db.execSQL(DbSchema.CREATE_TABLE_AD_SEGMENTS);
             db.execSQL(DbSchema.CREATE_TABLE_FEEDS);
 
             db.execSQL(DbSchema.CREATE_INDEX_FEEDITEMS_PUBDATE);
@@ -756,6 +803,7 @@ public class Db {
             db.execSQL(DbSchema.CREATE_INDEX_SIMPLECHAPTERS_FEEDITEM);
             db.execSQL(DbSchema.CREATE_INDEX_QUEUE_FEEDITEM);
             db.execSQL(DbSchema.CREATE_INDEX_FEEDITEMS_FEED);
+            db.execSQL(DbSchema.CREATE_INDEX_AD_SEGMENTS_FEEDITEM);
         }
 
         @Override

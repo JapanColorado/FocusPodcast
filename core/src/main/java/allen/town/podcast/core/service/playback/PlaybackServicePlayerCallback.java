@@ -133,6 +133,7 @@ class PlaybackServicePlayerCallback implements PlaybackServiceMediaPlayer.PSMPCa
     @Override
     public void onMediaChanged(boolean reloadUI) {
         Log.d(TAG, "reloadUI callback reached");
+        service.adSkipper.onMediaChanged(service.getPlayable());
         if (reloadUI) {
             service.sendNotificationBroadcast(PlaybackService.NOTIFICATION_TYPE_RELOAD, 0);
         }
@@ -142,6 +143,7 @@ class PlaybackServicePlayerCallback implements PlaybackServiceMediaPlayer.PSMPCa
     @Override
     public void onPlaybackStart(@NonNull Playable playable, int position) {
         service.taskManager.startWidgetUpdater();
+        service.adSkipper.onMediaChanged(playable);
         if (position != PlaybackServiceMediaPlayer.INVALID_TIME) {
             playable.setPosition(position);
         } else {

@@ -13,6 +13,7 @@ import allen.town.podcast.dialog.EpisodeFilterDialog
 import allen.town.podcast.dialog.FeedSkipPreDialog
 import allen.town.podcast.dialog.TagEditDialog
 import allen.town.podcast.event.playback.TitleChangeEvent
+import allen.town.podcast.event.settings.AdSkipChangedEvent
 import allen.town.podcast.event.settings.SkipIntroEndingChangedEvent
 import allen.town.podcast.event.settings.SpeedPresetChangedEvent
 import allen.town.podcast.event.settings.VolumeAdaptionChangedEvent
@@ -169,6 +170,7 @@ class FeedSettingsFragment : Fragment() {
                     setupEpisodeFilterPreference()
                     setupPlaybackSpeedPreference()
                     setupFeedAutoSkipPreference()
+                    setupFeedAdSkipPreference()
                     setupEpisodeNotificationPreference()
                     setupTags()
                     updateAutoDeleteSummary()
@@ -213,6 +215,27 @@ class FeedSettingsFragment : Fragment() {
                             )
                         }
                     }.show()
+                    false
+                }
+        }
+
+        /**
+         * The per-podcast ad-skip switch. It only gates the global feature for this feed, so the
+         * summary points at the global settings rather than repeating them. Writing it posts an
+         * [AdSkipChangedEvent] so a playing episode of this feed re-evaluates immediately.
+         */
+        private fun setupFeedAdSkipPreference() {
+            val feedPreferences = this.feedPreferences ?: return
+            val feed = this.feed ?: return
+            val pref = requirePreference<ATESwitchPreference>(PREF_AD_SKIP)
+            pref.isChecked = feedPreferences.isAdSkipEnabled
+            pref.onPreferenceChangeListener =
+                Preference.OnPreferenceChangeListener { _: Preference?, newValue: Any ->
+                    val checked = newValue === java.lang.Boolean.TRUE
+                    feedPreferences.isAdSkipEnabled = checked
+                    DBWriter.setFeedPreferences(feedPreferences)
+                    pref.isChecked = checked
+                    EventBus.getDefault().post(AdSkipChangedEvent(feed.id))
                     false
                 }
         }
@@ -491,6 +514,7 @@ class FeedSettingsFragment : Fragment() {
             private val PREF_CATEGORY_AUTO_DOWNLOAD: CharSequence = "autoDownloadCategory"
             private const val PREF_FEED_PLAYBACK_SPEED = "feedPlaybackSpeed"
             private const val PREF_AUTO_SKIP = "feedAutoSkip"
+            private const val PREF_AD_SKIP = "feedAdSkip"
             private const val PREF_AUDIO_EFFECT = "feed_audio_effect_pref"
             private const val PREF_TAGS = "tags"
             private const val PREF_VOLUME_REDUCTION = "volumeReduction"

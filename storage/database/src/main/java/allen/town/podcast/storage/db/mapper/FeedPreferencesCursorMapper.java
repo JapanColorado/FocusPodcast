@@ -66,7 +66,13 @@ public abstract class FeedPreferencesCursorMapper {
         if (TextUtils.isEmpty(tagsString)) {
             tagsString = FeedPreferences.TAG_ROOT;
         }
-        return new FeedPreferences(feedId,
+        // Old cursors (and projections that predate the column) simply have no ad-skip column;
+        // getColumnIndex then returns -1 and the preference keeps its default of "enabled".
+        int indexAdSkip = cursor.getColumnIndex(Db.KEY_FEED_AD_SKIP);
+        boolean adSkipEnabled = indexAdSkip < 0 || cursor.isNull(indexAdSkip)
+                || cursor.getInt(indexAdSkip) > 0;
+
+        FeedPreferences preferences = new FeedPreferences(feedId,
                 autoDownload,
                 autoRefresh,
                 autoDeleteAction,
@@ -79,5 +85,7 @@ public abstract class FeedPreferencesCursorMapper {
                 feedAutoSkipEnding,
                 showNotification,
                 new HashSet<>(Arrays.asList(tagsString.split(FeedPreferences.TAG_SEPARATOR))),skipSilence,loudness,mono,isUseFeedEffect);
+        preferences.setAdSkipEnabled(adSkipEnabled);
+        return preferences;
     }
 }

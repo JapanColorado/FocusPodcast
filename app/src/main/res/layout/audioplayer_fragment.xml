@@ -116,7 +116,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/pager">
 
-        <androidx.appcompat.widget.AppCompatSeekBar
+        <allen.town.podcast.view.AdMarkerSeekBar
             android:id="@+id/sbPosition"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

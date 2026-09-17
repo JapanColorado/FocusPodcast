@@ -76,6 +76,12 @@ object Prefs {
     const val NOW_PLAYING_SCREEN_ID = "now_playing_screen_id"
     const val PREF_SMART_MARK_AS_PLAYED_SECS = "pref_smart_mark_as_played_secs"
 
+    // Ad auto-skip
+    const val PREF_AD_SKIP_ENABLED = "pref_ad_skip_enabled"
+    const val PREF_AD_SKIP_SENSITIVITY = "pref_ad_skip_sensitivity"
+    const val PREF_AD_SKIP_ANALYZE_ON_DOWNLOAD = "pref_ad_skip_analyze_on_download"
+    const val PREF_AD_SKIP_SHOW_SNACKBAR = "pref_ad_skip_show_snackbar"
+
     // Network
     const val PREF_UPDATE_INTERVAL = "pref_auto_refresh_interval"
     const val PREF_ENQUEUE_LOCATION = "pref_episode_location_in_playlist"
@@ -559,6 +565,46 @@ object Prefs {
     @JvmStatic
     val appBarMode: AppBarMode
         get() = UiPrefs.appBarMode
+
+    /** The master switch of the ad auto-skip feature. Off on a fresh install. */
+    @JvmStatic
+    var isAdSkipEnabled: Boolean
+        get() = AdSkipPrefs.isAdSkipEnabled
+        set(enabled) {
+            AdSkipPrefs.isAdSkipEnabled = enabled
+        }
+
+    /** "low", "medium" or "high"; see [AdSkipPrefs]. */
+    @JvmStatic
+    var adSkipSensitivity: String
+        get() = AdSkipPrefs.adSkipSensitivity
+        set(sensitivity) {
+            AdSkipPrefs.adSkipSensitivity = sensitivity
+        }
+
+    /**
+     * The confidence a detected segment needs before the player skips it. Chapter and manual
+     * segments are exact and ignore this threshold.
+     */
+    @JvmStatic
+    val adSkipMinConfidence: Float
+        get() = AdSkipPrefs.adSkipMinConfidence
+
+    /** Whether a finished download queues an ad analysis run for that episode. */
+    @JvmStatic
+    var isAdSkipAnalyzeOnDownload: Boolean
+        get() = AdSkipPrefs.isAdSkipAnalyzeOnDownload
+        set(analyze) {
+            AdSkipPrefs.isAdSkipAnalyzeOnDownload = analyze
+        }
+
+    /** Whether the app layer shows a snackbar with Undo after an ad was skipped. */
+    @JvmStatic
+    var isAdSkipShowSnackbar: Boolean
+        get() = AdSkipPrefs.isAdSkipShowSnackbar
+        set(show) {
+            AdSkipPrefs.isAdSkipShowSnackbar = show
+        }
 
     fun shouldShowColumnInLandscape(): Boolean = UiPrefs.shouldShowColumnInLandscape()
 

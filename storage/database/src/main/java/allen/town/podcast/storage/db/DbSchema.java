@@ -12,7 +12,7 @@ import static allen.town.podcast.model.feed.FeedPreferences.SPEED_USE_GLOBAL;
 final class DbSchema {
 
     public static final String DATABASE_NAME = "focusPodcastApp.db";
-    public static final int VERSION = 3;
+    public static final int VERSION = 4;
 
     /**
      * Maximum number of arguments for IN-operator.
@@ -85,6 +85,12 @@ final class DbSchema {
     public static final String KEY_FEED_TAGS = "tags";
     public static final String KEY_EPISODE_NOTIFICATION = "episode_notification";
     public static final String KEY_FEED_PLAYBACK_SPEED = "feed_playback_speed";
+    public static final String KEY_FEED_AD_SKIP = "feed_ad_skip";
+    public static final String KEY_AD_START_MS = "start_ms";
+    public static final String KEY_AD_END_MS = "end_ms";
+    public static final String KEY_AD_SOURCE = "source";
+    public static final String KEY_AD_CONFIDENCE = "confidence";
+    public static final String KEY_AD_ENABLED = "enabled";
 
     // Table names
     public static final String TABLE_NAME_FEEDS = "feeds";
@@ -94,6 +100,7 @@ final class DbSchema {
     public static final String TABLE_NAME_QUEUE = "playlist";
     public static final String TABLE_NAME_SIMPLECHAPTERS = "chapters";
     public static final String TABLE_NAME_FAVORITES = "favorites";
+    public static final String TABLE_NAME_AD_SEGMENTS = "ad_segments";
 
     // SQL Statements for creating new tables
     static final String TABLE_PRIMARY_KEY = KEY_ID
@@ -130,7 +137,8 @@ final class DbSchema {
             + KEY_FEED_VOLUME_ADAPTION + " INTEGER DEFAULT 0,"
             + KEY_FEED_TAGS + " TEXT,"
             + KEY_EPISODE_NOTIFICATION + " INTEGER DEFAULT 0,"
-            + KEY_FEED_SKIP_INTRO + " INTEGER DEFAULT 0)";
+            + KEY_FEED_SKIP_INTRO + " INTEGER DEFAULT 0,"
+            + KEY_FEED_AD_SKIP + " INTEGER DEFAULT 1)";
 
     static final String CREATE_TABLE_FEED_ITEMS = "CREATE TABLE "
             + TABLE_NAME_FEED_ITEMS + " (" + TABLE_PRIMARY_KEY
@@ -170,6 +178,17 @@ final class DbSchema {
             + " TEXT," + KEY_START + " INTEGER," + KEY_FEEDITEM + " INTEGER,"
             + KEY_IMAGE_URL + " TEXT," + KEY_LINK + " TEXT)";
 
+    /**
+     * One row per advertisement range of one episode. Written by the detector, the chapter
+     * scanner and the player's "mark as ad" action; read back whenever an episode starts.
+     */
+    static final String CREATE_TABLE_AD_SEGMENTS = "CREATE TABLE IF NOT EXISTS "
+            + TABLE_NAME_AD_SEGMENTS + " (" + TABLE_PRIMARY_KEY
+            + KEY_FEEDITEM + " INTEGER," + KEY_AD_START_MS + " INTEGER,"
+            + KEY_AD_END_MS + " INTEGER," + KEY_AD_SOURCE + " INTEGER,"
+            + KEY_AD_CONFIDENCE + " REAL,"
+            + KEY_AD_ENABLED + " INTEGER DEFAULT 1)";
+
     // SQL Statements for creating indexes
     static final String CREATE_INDEX_FEEDITEMS_FEED = "CREATE INDEX "
             + TABLE_NAME_FEED_ITEMS + "_" + KEY_FEED + " ON " + TABLE_NAME_FEED_ITEMS + " ("
@@ -193,6 +212,10 @@ final class DbSchema {
 
     static final String CREATE_INDEX_SIMPLECHAPTERS_FEEDITEM = "CREATE INDEX "
             + TABLE_NAME_SIMPLECHAPTERS + "_" + KEY_FEEDITEM + " ON " + TABLE_NAME_SIMPLECHAPTERS + " ("
+            + KEY_FEEDITEM + ")";
+
+    static final String CREATE_INDEX_AD_SEGMENTS_FEEDITEM = "CREATE INDEX IF NOT EXISTS "
+            + TABLE_NAME_AD_SEGMENTS + "_" + KEY_FEEDITEM + " ON " + TABLE_NAME_AD_SEGMENTS + " ("
             + KEY_FEEDITEM + ")";
 
     static final String CREATE_TABLE_FAVORITES = "CREATE TABLE "
@@ -241,7 +264,8 @@ final class DbSchema {
             TABLE_NAME_FEEDS + "." + KEY_EXCLUDE_FILTER,
             TABLE_NAME_FEEDS + "." + KEY_FEED_SKIP_INTRO,
             TABLE_NAME_FEEDS + "." + KEY_FEED_SKIP_ENDING,
-            TABLE_NAME_FEEDS + "." + KEY_EPISODE_NOTIFICATION
+            TABLE_NAME_FEEDS + "." + KEY_EPISODE_NOTIFICATION,
+            TABLE_NAME_FEEDS + "." + KEY_FEED_AD_SKIP
     };
 
     /**
@@ -254,7 +278,8 @@ final class DbSchema {
             TABLE_NAME_DOWNLOAD_LOG,
             TABLE_NAME_QUEUE,
             TABLE_NAME_SIMPLECHAPTERS,
-            TABLE_NAME_FAVORITES
+            TABLE_NAME_FAVORITES,
+            TABLE_NAME_AD_SEGMENTS
     };
 
     public static final String SELECT_KEY_ITEM_ID = "item_id";

@@ -81,6 +81,38 @@
 
 
     <item
+        android:id="@+id/mark_ad_start_item"
+        android:icon="@drawable/ic_skip_24dp"
+        custom:showAsAction="never"
+        android:title="@string/mark_ad_start_label"
+        android:visible="false">
+    </item>
+
+    <item
+        android:id="@+id/mark_ad_end_item"
+        android:icon="@drawable/ic_skip_24dp"
+        custom:showAsAction="never"
+        android:title="@string/mark_ad_end_label"
+        android:visible="false">
+    </item>
+
+    <item
+        android:id="@+id/ad_segments_item"
+        android:icon="@drawable/ic_sound_waves"
+        custom:showAsAction="never"
+        android:title="@string/ad_segments_label"
+        android:visible="false">
+    </item>
+
+    <item
+        android:id="@+id/analyze_ads_item"
+        android:icon="@drawable/ic_search"
+        custom:showAsAction="never"
+        android:title="@string/analyze_ads_label"
+        android:visible="false">
+    </item>
+
+    <item
         android:id="@+id/share_item"
         android:menuCategory="container"
         android:icon="@drawable/ic_share"
