@@ -1,8 +1,8 @@
 package allen.town.podcast.activity
 
-import allen.town.focus_common.activity.DialogActivity
-import allen.town.focus_common.adapter.BindableViewHolder
-import allen.town.focus_common.adapter.ReactiveListAdapter
+import allen.town.podcast.common.activity.DialogActivity
+import allen.town.podcast.common.adapter.BindableViewHolder
+import allen.town.podcast.common.adapter.ReactiveListAdapter
 import allen.town.podcast.R
 import allen.town.podcast.appshortcuts.SubscriptionActivityStarter
 import allen.town.podcast.core.storage.DBReader
@@ -22,7 +22,7 @@ import androidx.core.content.pm.ShortcutManagerCompat
 import androidx.core.graphics.drawable.IconCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import code.name.monkey.appthemehelper.util.scroll.ThemedFastScroller.create
+import allen.town.podcast.theme.util.scroll.ThemedFastScroller.create
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable

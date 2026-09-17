@@ -10,7 +10,7 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.EditText;
 
-import allen.town.focus_common.views.AccentMaterialDialog;
+import allen.town.podcast.common.views.AccentMaterialDialog;
 import allen.town.podcast.R;
 
 public class NumberPickerPreference extends Preference {

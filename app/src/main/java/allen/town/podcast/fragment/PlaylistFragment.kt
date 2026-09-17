@@ -1,10 +1,10 @@
 package allen.town.podcast.fragment
 
-import allen.town.focus_common.util.DoubleClickBackToContentTopListener
-import allen.town.focus_common.util.MenuIconUtil.showToolbarMenuIcon
-import allen.town.focus_common.util.TopSnackbarUtil.showSnack
-import allen.town.focus_common.views.AccentMaterialDialog
-import allen.town.focus_common.views.ItemOffsetDecoration
+import allen.town.podcast.common.util.DoubleClickBackToContentTopListener
+import allen.town.podcast.common.util.MenuIconUtil.showToolbarMenuIcon
+import allen.town.podcast.common.util.TopSnackbarUtil.showSnack
+import allen.town.podcast.common.views.AccentMaterialDialog
+import allen.town.podcast.common.views.ItemOffsetDecoration
 import allen.town.podcast.R
 import allen.town.podcast.activity.MainActivity
 import allen.town.podcast.adapter.MultiSelectAdapter
@@ -62,7 +62,7 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SimpleItemAnimator
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-import code.name.monkey.appthemehelper.util.scroll.ThemedFastScroller.create
+import allen.town.podcast.theme.util.scroll.ThemedFastScroller.create
 import com.beloo.widget.chipslayoutmanager.ChipsLayoutManager
 import com.faltenreich.skeletonlayout.Skeleton
 import com.faltenreich.skeletonlayout.applySkeleton

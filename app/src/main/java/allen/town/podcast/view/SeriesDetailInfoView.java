@@ -29,11 +29,11 @@ import org.apache.commons.lang3.StringUtils;
 import java.util.ArrayList;
 import java.util.HashSet;
 
-import allen.town.focus_common.util.ImageUtils;
-import allen.town.focus_common.util.TopSnackbarUtil;
-import allen.town.focus_common.util.Util;
-import code.name.monkey.appthemehelper.ThemeStore;
-import code.name.monkey.appthemehelper.util.ATHUtil;
+import allen.town.podcast.common.util.ImageUtils;
+import allen.town.podcast.common.util.TopSnackbarUtil;
+import allen.town.podcast.common.util.Util;
+import allen.town.podcast.theme.ThemeStore;
+import allen.town.podcast.theme.util.ATHUtil;
 import allen.town.podcast.R;
 import allen.town.podcast.databinding.ViewSeriesDetailInfoBinding;
 import allen.town.podcast.model.feed.Feed;

@@ -18,9 +18,9 @@ import android.view.View;
 import androidx.annotation.Nullable;
 import androidx.core.view.ViewCompat;
 
-import allen.town.focus_common.util.ImageUtils;
-import code.name.monkey.appthemehelper.ThemeStore;
-import code.name.monkey.appthemehelper.util.ColorUtil;
+import allen.town.podcast.common.util.ImageUtils;
+import allen.town.podcast.theme.ThemeStore;
+import allen.town.podcast.theme.util.ColorUtil;
 import allen.town.podcast.R;
 
 /* renamed from: fm.player.ui.customviews.SubscribeButton */

@@ -7,7 +7,7 @@
     android:layout_margin="16dp"
     android:background="?attr/selectableItemBackground">
 
-    <allen.town.focus_common.views.AccentRadioButton
+    <allen.town.podcast.common.views.AccentRadioButton
         android:id="@+id/radio_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -36,7 +36,7 @@
             android:layout_height="wrap_content"
             tools:text="2 GB" />
 
-        <allen.town.focus_common.views.AccentProgressBar
+        <allen.town.podcast.common.views.AccentProgressBar
             android:id="@+id/used_space"
             style="?android:attr/progressBarStyleHorizontal"
             android:layout_width="match_parent"

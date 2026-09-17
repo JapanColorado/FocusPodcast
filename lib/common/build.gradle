@@ -5,7 +5,7 @@ apply from: "../../common.gradle"
 
 android {
     defaultConfig {
-        namespace "allen.town.focus_common"
+        namespace "allen.town.podcast.common"
     }
 }
 

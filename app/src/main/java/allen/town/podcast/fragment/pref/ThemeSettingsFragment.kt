@@ -12,40 +12,39 @@
  * See the GNU General Public License for more details.
  *
  */
-package code.name.monkey.retromusic.fragments.settings
+package allen.town.podcast.fragment.pref
 
-import code.name.monkey.appthemehelper.constants.ThemeConstants.ACCENT_COLOR
-import code.name.monkey.appthemehelper.constants.ThemeConstants.BLACK_THEME
-import code.name.monkey.appthemehelper.constants.ThemeConstants.CUSTOM_LAUNCHER
-import code.name.monkey.appthemehelper.constants.ThemeConstants.DESATURATED_COLOR
-import code.name.monkey.appthemehelper.constants.ThemeConstants.GENERAL_THEME
-import code.name.monkey.appthemehelper.constants.ThemeConstants.MATERIAL_YOU
-import code.name.monkey.appthemehelper.constants.ThemeConstants.SHOULD_COLOR_APP_SHORTCUTS
-import code.name.monkey.appthemehelper.constants.ThemeConstants.WALLPAPER_ACCENT
-import allen.town.focus_common.theme.CustomLauncherIconMakerDialog
-import allen.town.focus_common.util.BasePreferenceUtil
-import allen.town.focus_common.util.PackageUtils
+import allen.town.podcast.theme.constants.ThemeConstants.ACCENT_COLOR
+import allen.town.podcast.theme.constants.ThemeConstants.BLACK_THEME
+import allen.town.podcast.theme.constants.ThemeConstants.CUSTOM_LAUNCHER
+import allen.town.podcast.theme.constants.ThemeConstants.DESATURATED_COLOR
+import allen.town.podcast.theme.constants.ThemeConstants.GENERAL_THEME
+import allen.town.podcast.theme.constants.ThemeConstants.MATERIAL_YOU
+import allen.town.podcast.theme.constants.ThemeConstants.SHOULD_COLOR_APP_SHORTCUTS
+import allen.town.podcast.theme.constants.ThemeConstants.WALLPAPER_ACCENT
+import allen.town.podcast.common.theme.CustomLauncherIconMakerDialog
+import allen.town.podcast.common.util.BasePreferenceUtil
+import allen.town.podcast.common.util.PackageUtils
 import android.annotation.SuppressLint
 import android.app.Application
 import android.os.Bundle
 import androidx.preference.Preference
 import androidx.preference.TwoStatePreference
-import code.name.monkey.appthemehelper.ACCENT_COLORS
-import code.name.monkey.appthemehelper.ACCENT_COLORS_SUB
-import code.name.monkey.appthemehelper.ThemeStore
-import allen.town.focus_common.common.prefs.supportv7.ATEColorPreference
-import allen.town.focus_common.common.prefs.supportv7.ATESwitchPreference
-import code.name.monkey.appthemehelper.util.ColorUtil
-import code.name.monkey.appthemehelper.util.VersionUtils
-import code.name.monkey.retromusic.appshortcuts.DynamicShortcutManager
-import code.name.monkey.retromusic.extensions.materialDialog
+import allen.town.podcast.theme.ACCENT_COLORS
+import allen.town.podcast.theme.ACCENT_COLORS_SUB
+import allen.town.podcast.theme.ThemeStore
+import allen.town.podcast.common.common.prefs.supportv7.ATEColorPreference
+import allen.town.podcast.common.common.prefs.supportv7.ATESwitchPreference
+import allen.town.podcast.theme.util.ColorUtil
+import allen.town.podcast.theme.util.VersionUtils
+import allen.town.podcast.theme.shortcut.DynamicShortcutManager
+import allen.town.podcast.common.extensions.materialDialog
 import com.afollestad.materialdialogs.color.colorChooser
 import com.google.android.material.color.DynamicColors
 import allen.town.podcast.MyApp
 import allen.town.podcast.R
 import allen.town.podcast.activity.SettingsActivity
 import allen.town.podcast.appshortcuts.ShortcutsDefaultList
-import allen.town.podcast.fragment.pref.AbsSettingsFragment
 
 /**
  * @author Hemanth S (h4h13).

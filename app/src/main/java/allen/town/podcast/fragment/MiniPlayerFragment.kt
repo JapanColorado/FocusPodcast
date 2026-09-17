@@ -1,6 +1,6 @@
 package allen.town.podcast.fragment
 
-import allen.town.focus_common.util.RetroUtil
+import allen.town.podcast.common.util.RetroUtil
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -10,10 +10,10 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.fragment.app.Fragment
-import allen.town.focus_common.extensions.accentBackgroundColor
-import allen.town.focus_common.extensions.accentColor
-import allen.town.focus_common.extensions.applyAccentColor
-import allen.town.focus_common.extensions.show
+import allen.town.podcast.common.extensions.accentBackgroundColor
+import allen.town.podcast.common.extensions.accentColor
+import allen.town.podcast.common.extensions.applyAccentColor
+import allen.town.podcast.common.extensions.show
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import com.google.android.material.bottomsheet.BottomSheetBehavior

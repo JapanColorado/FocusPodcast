@@ -8,7 +8,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.widget.AppCompatImageButton;
 import androidx.vectordrawable.graphics.drawable.AnimatedVectorDrawableCompat;
 
-import allen.town.focus_common.util.Timber;
+import allen.town.podcast.common.util.Timber;
 import allen.town.podcast.R;
 import allen.town.podcast.activity.LockScreenActivity;
 

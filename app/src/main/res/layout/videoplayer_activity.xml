@@ -14,7 +14,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center" />
 
-    <allen.town.focus_common.views.AccentProgressBar
+    <allen.town.podcast.common.views.AccentProgressBar
         android:id="@+id/progressBar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -144,7 +144,7 @@
                 android:textColor="@color/white"
                 android:textStyle="bold" />
 
-            <allen.town.focus_common.views.AccentSeekbar
+            <allen.town.podcast.common.views.AccentSeekbar
                 android:id="@+id/sbPosition"
                 android:layout_width="0px"
                 android:layout_height="wrap_content"

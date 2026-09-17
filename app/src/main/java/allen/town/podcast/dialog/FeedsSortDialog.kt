@@ -1,6 +1,6 @@
 package allen.town.podcast.dialog
 
-import allen.town.focus_common.views.AccentMaterialDialog
+import allen.town.podcast.common.views.AccentMaterialDialog
 import android.app.Dialog
 import allen.town.podcast.R
 import android.content.DialogInterface
@@ -16,7 +16,7 @@ import allen.town.podcast.core.pref.Prefs
 import allen.town.podcast.core.pref.Prefs.FEED_ORDER_COUNTER
 import allen.town.podcast.databinding.EditFeedSortDialogLayoutBinding
 import allen.town.podcast.event.UnreadItemsUpdateEvent
-import allen.town.focus_common.views.ItemOffsetDecoration
+import allen.town.podcast.common.views.ItemOffsetDecoration
 import org.greenrobot.eventbus.EventBus
 import java.util.*
 

@@ -22,7 +22,7 @@ import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import code.name.monkey.appthemehelper.ThemeStore;
+import allen.town.podcast.theme.ThemeStore;
 import allen.town.podcast.core.R;
 import allen.town.podcast.core.util.Converter;
 

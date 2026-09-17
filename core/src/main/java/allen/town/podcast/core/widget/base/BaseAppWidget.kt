@@ -28,7 +28,7 @@ import android.view.KeyEvent
 import android.view.View
 import android.widget.RemoteViews
 import androidx.core.content.ContextCompat
-import code.name.monkey.appthemehelper.util.VersionUtils
+import allen.town.podcast.theme.util.VersionUtils
 import allen.town.podcast.core.R
 import allen.town.podcast.core.widget.WidgetUpdater
 import allen.town.podcast.core.widget.WidgetUpdaterWorker

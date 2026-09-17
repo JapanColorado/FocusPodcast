@@ -19,7 +19,7 @@
         android:text="@string/gpodnetauth_finish_descr"
         android:textColor="?android:attr/textColorPrimary" />
 
-    <allen.town.focus_common.views.AccentMaterialButton
+    <allen.town.podcast.common.views.AccentMaterialButton
         style="@style/Widget.Material3.Button"
         android:id="@+id/butSyncNow"
         android:layout_width="match_parent"

@@ -1,6 +1,6 @@
 package allen.town.podcast.activity.main
 
-import allen.town.focus_common.util.Timber
+import allen.town.podcast.common.util.Timber
 import allen.town.podcast.R
 import allen.town.podcast.fragment.NavigationDrawerFragment
 import android.app.Activity

@@ -1,6 +1,6 @@
 package allen.town.podcast.fragment.pref
 
-import allen.town.focus_common.extensions.installLanguageAndRecreate
+import allen.town.podcast.common.extensions.installLanguageAndRecreate
 import allen.town.podcast.R
 import allen.town.podcast.activity.SettingsActivity
 import allen.town.podcast.core.pref.Prefs
@@ -12,7 +12,7 @@ import allen.town.podcast.event.PlayerStatusEvent
 import allen.town.podcast.event.UnreadItemsUpdateEvent
 import android.os.Bundle
 import androidx.preference.Preference
-import code.name.monkey.appthemehelper.constants.ThemeConstants.LANGUAGE_NAME
+import allen.town.podcast.theme.constants.ThemeConstants.LANGUAGE_NAME
 import org.greenrobot.eventbus.EventBus
 
 class UserInterfacePrefFragment : AbsSettingsFragment() {

@@ -22,7 +22,7 @@ import com.bumptech.glide.load.Options;
 import com.bumptech.glide.load.engine.Resource;
 import com.bumptech.glide.load.resource.transcode.ResourceTranscoder;
 
-import code.name.monkey.appthemehelper.util.RetroColorUtil;
+import allen.town.podcast.theme.util.RetroColorUtil;
 
 public class BitmapPaletteTranscoder implements ResourceTranscoder<Bitmap,  BitmapPaletteWrapper> {
 

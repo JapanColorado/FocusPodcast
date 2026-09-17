@@ -14,7 +14,7 @@ import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
 import android.util.Property;
 
-import allen.town.focus_common.util.Util;
+import allen.town.podcast.common.util.Util;
 
 /* renamed from: fm.player.ui.drawable.PlayPauseDrawable */
 /* loaded from: classes3.dex */

@@ -1,6 +1,6 @@
 package allen.town.podcast.fragment.feeditemlist
 
-import allen.town.focus_common.util.Timber
+import allen.town.podcast.common.util.Timber
 import allen.town.podcast.MyApp.Companion.runOnUiThread
 import allen.town.podcast.activity.RssSearchActivity.Companion.feedInFeedlist
 import allen.town.podcast.activity.RssSearchActivity.Companion.getFeedId

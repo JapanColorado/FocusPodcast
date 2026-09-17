@@ -17,8 +17,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import allen.town.focus_common.util.LanguagesHelper;
-import allen.town.focus_common.util.Util;
+import allen.town.podcast.common.util.LanguagesHelper;
+import allen.town.podcast.common.util.Util;
 import allen.town.podcast.R;
 import allen.town.podcast.databinding.ViewTagsSectionBinding;
 import allen.town.podcast.discovery.EnumItuneCategory;

@@ -1,6 +1,6 @@
 package allen.town.podcast.actionbuttons
 
-import allen.town.focus_common.util.TopSnackbarUtil.showSnack
+import allen.town.podcast.common.util.TopSnackbarUtil.showSnack
 import allen.town.podcast.model.feed.FeedItem
 import allen.town.podcast.R
 import allen.town.podcast.model.feed.FeedMedia

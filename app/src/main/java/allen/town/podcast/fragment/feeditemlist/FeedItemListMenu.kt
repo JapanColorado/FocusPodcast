@@ -1,6 +1,6 @@
 package allen.town.podcast.fragment.feeditemlist
 
-import allen.town.focus_common.util.TopSnackbarUtil.showSnack
+import allen.town.podcast.common.util.TopSnackbarUtil.showSnack
 import allen.town.podcast.R
 import allen.town.podcast.activity.MainActivity
 import allen.town.podcast.core.service.download.DownloadService

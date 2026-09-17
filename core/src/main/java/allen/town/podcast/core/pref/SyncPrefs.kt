@@ -1,11 +1,11 @@
 package allen.town.podcast.core.pref
 
-import allen.town.focus_common.extensions.getStringOrDefault
-import allen.town.focus_common.model.CategoryInfo
-import allen.town.focus_common.util.JsonHelper.parseStringList
-import allen.town.focus_common.util.JsonHelper.toJSONString
-import allen.town.focus_common.util.PodcastSearchPreferenceUtil
-import allen.town.focus_common.util.Timber
+import allen.town.podcast.common.extensions.getStringOrDefault
+import allen.town.podcast.common.model.CategoryInfo
+import allen.town.podcast.common.util.JsonHelper.parseStringList
+import allen.town.podcast.common.util.JsonHelper.toJSONString
+import allen.town.podcast.common.util.PodcastSearchPreferenceUtil
+import allen.town.podcast.common.util.Timber
 import allen.town.podcast.core.pref.PrefsStore.prefs
 import android.os.Build
 import com.google.gson.Gson

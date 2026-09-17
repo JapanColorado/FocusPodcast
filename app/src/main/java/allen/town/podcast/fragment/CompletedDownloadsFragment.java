@@ -24,7 +24,7 @@ import org.greenrobot.eventbus.ThreadMode;
 import java.util.ArrayList;
 import java.util.List;
 
-import allen.town.focus_common.util.DoubleClickBackToContentTopListener;
+import allen.town.podcast.common.util.DoubleClickBackToContentTopListener;
 import allen.town.podcast.R;
 import allen.town.podcast.activity.MainActivity;
 import allen.town.podcast.adapter.EpisodeItemListAdapter;
@@ -47,7 +47,7 @@ import allen.town.podcast.ui.common.PagedToolbarFragment;
 import allen.town.podcast.util.SkeletonRecyclerDelay;
 import allen.town.podcast.view.EmptyViewHandler;
 import allen.town.podcast.viewholder.EpisodeItemViewHolder;
-import code.name.monkey.appthemehelper.util.scroll.ThemedFastScroller;
+import allen.town.podcast.theme.util.scroll.ThemedFastScroller;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;

@@ -17,7 +17,7 @@ package allen.town.podcast.glide
 import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
 import android.widget.ImageView
-import allen.town.focus_common.extensions.colorControlNormal
+import allen.town.podcast.common.extensions.colorControlNormal
 import com.bumptech.glide.request.transition.Transition
 import allen.town.podcast.MyApp
 import allen.town.podcast.core.glide.palette.BitmapPaletteTarget

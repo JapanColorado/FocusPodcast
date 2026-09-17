@@ -14,7 +14,7 @@
  */
 package allen.town.podcast.core.widget.appwidgets
 
-import allen.town.focus_common.util.RetroUtil
+import allen.town.podcast.common.util.RetroUtil
 import android.app.PendingIntent
 import android.content.Context
 import android.graphics.Bitmap
@@ -22,8 +22,8 @@ import android.graphics.Color
 import android.graphics.drawable.Drawable
 import android.util.Log
 import android.widget.RemoteViews
-import code.name.monkey.appthemehelper.util.ImageUtil
-import code.name.monkey.appthemehelper.util.MaterialValueHelper
+import allen.town.podcast.theme.util.ImageUtil
+import allen.town.podcast.theme.util.MaterialValueHelper
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import com.bumptech.glide.request.target.CustomTarget

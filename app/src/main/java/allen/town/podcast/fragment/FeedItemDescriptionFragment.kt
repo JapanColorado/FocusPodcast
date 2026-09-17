@@ -18,7 +18,7 @@ import android.webkit.WebView
 import androidx.core.util.Consumer
 import androidx.core.widget.NestedScrollView
 import androidx.fragment.app.Fragment
-import code.name.monkey.appthemehelper.util.scroll.ThemedFastScroller.create
+import allen.town.podcast.theme.util.scroll.ThemedFastScroller.create
 import com.faltenreich.skeletonlayout.SkeletonLayout
 import io.reactivex.Maybe
 import io.reactivex.MaybeEmitter

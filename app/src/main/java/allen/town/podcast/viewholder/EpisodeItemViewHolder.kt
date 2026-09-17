@@ -1,7 +1,7 @@
 package allen.town.podcast.viewholder
 
-import allen.town.focus_common.extensions.accentColor
-import allen.town.focus_common.util.Timber
+import allen.town.podcast.common.extensions.accentColor
+import allen.town.podcast.common.util.Timber
 import allen.town.podcast.R
 import allen.town.podcast.actionbuttons.CancelDownloadActionButton
 import allen.town.podcast.activity.MainActivity

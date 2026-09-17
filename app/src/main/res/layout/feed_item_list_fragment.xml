@@ -58,7 +58,7 @@
                 android:layout_alignParentRight="true"
                 android:layout_centerVertical="true">
 
-                <allen.town.focus_common.views.AccentImageView
+                <allen.town.podcast.common.views.AccentImageView
                     android:id="@+id/action_search"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -67,7 +67,7 @@
                     android:padding="6dp"
                     android:src="@drawable/ic_search" />
 
-                <allen.town.focus_common.views.AccentImageView
+                <allen.town.podcast.common.views.AccentImageView
                     android:id="@+id/sort_items"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -77,7 +77,7 @@
                     android:padding="6dp"
                     android:src="@drawable/ic_sort" />
 
-                <allen.town.focus_common.views.AccentImageView
+                <allen.town.podcast.common.views.AccentImageView
                     android:id="@+id/filter_items"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"

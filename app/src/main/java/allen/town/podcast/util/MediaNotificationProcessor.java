@@ -38,8 +38,8 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 
-import code.name.monkey.appthemehelper.util.ATHUtil;
-import code.name.monkey.appthemehelper.util.ColorUtil;
+import allen.town.podcast.theme.util.ATHUtil;
+import allen.town.podcast.theme.util.ColorUtil;
 import allen.town.podcast.R;
 
 /** A class the processes media notifications and extracts the right text and background colors. */

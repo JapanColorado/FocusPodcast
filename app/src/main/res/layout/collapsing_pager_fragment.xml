@@ -25,7 +25,7 @@
             app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior"
             android:orientation="vertical">
 
-            <allen.town.focus_common.views.AccentTabLayout
+            <allen.town.podcast.common.views.AccentTabLayout
                 android:id="@+id/sliding_tabs"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

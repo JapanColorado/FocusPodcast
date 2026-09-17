@@ -9,7 +9,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.DialogFragment;
 
-import allen.town.focus_common.views.AccentMaterialDialog;
+import allen.town.podcast.common.views.AccentMaterialDialog;
 import allen.town.podcast.R;
 import allen.town.podcast.core.service.download.PodcastHttpClient;
 import allen.town.podcast.core.sync.SyncService;

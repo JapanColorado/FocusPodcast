@@ -10,9 +10,9 @@ import android.view.View
 import android.view.View.GONE
 import android.view.View.VISIBLE
 import androidx.core.content.ContextCompat
-import code.name.monkey.appthemehelper.util.ToolbarContentTintHelper
-import allen.town.focus_common.extensions.colorControlNormal
-import allen.town.focus_common.extensions.isColorLight
+import allen.town.podcast.theme.util.ToolbarContentTintHelper
+import allen.town.podcast.common.extensions.colorControlNormal
+import allen.town.podcast.common.extensions.isColorLight
 import com.bumptech.glide.Glide
 import allen.town.podcast.R
 import allen.town.podcast.core.glide.GlideApp

@@ -41,7 +41,7 @@
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
 
-    <allen.town.focus_common.views.AccentProgressBar
+    <allen.town.podcast.common.views.AccentProgressBar
         android:id="@+id/progLoading"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

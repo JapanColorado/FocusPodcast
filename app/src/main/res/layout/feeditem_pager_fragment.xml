@@ -25,7 +25,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
-    <allen.town.focus_common.views.AccentExtendFloatingActionButton
+    <allen.town.podcast.common.views.AccentExtendFloatingActionButton
         android:id="@+id/play_float_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

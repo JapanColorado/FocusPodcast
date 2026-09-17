@@ -103,7 +103,7 @@
                     tools:background="@android:color/holo_green_dark"
                     tools:text="author" />
 
-                <allen.town.focus_common.views.AccentImageView
+                <allen.town.podcast.common.views.AccentImageView
                     android:id="@+id/ivIsVideo"
                     android:visibility="gone"
                     tools:visibility="visible"

@@ -4,7 +4,7 @@ import android.text.TextUtils;
 import android.util.Log;
 import androidx.annotation.NonNull;
 
-import allen.town.focus_common.util.Timber;
+import allen.town.podcast.common.util.Timber;
 import allen.town.podcast.model.feed.Feed;
 import allen.town.podcast.model.feed.FeedItem;
 import allen.town.podcast.model.feed.FeedPreferences;

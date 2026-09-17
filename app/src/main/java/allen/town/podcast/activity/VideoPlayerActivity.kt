@@ -1,7 +1,7 @@
 package allen.town.podcast.activity
 
-import allen.town.focus_common.util.MenuIconUtil.showMenuIcon
-import allen.town.focus_common.util.Timber
+import allen.town.podcast.common.util.MenuIconUtil.showMenuIcon
+import allen.town.podcast.common.util.Timber
 import allen.town.podcast.R
 import allen.town.podcast.activity.MainActivity.Companion.getIntentToOpenFeedWithId
 import allen.town.podcast.core.pref.Prefs
@@ -28,7 +28,7 @@ import allen.town.podcast.model.feed.FeedItem
 import allen.town.podcast.model.feed.FeedMedia
 import allen.town.podcast.model.playback.Playable
 import allen.town.podcast.playback.base.PlayerStatus
-import allen.town.focus_common.activity.ToolbarBaseActivity
+import allen.town.podcast.common.activity.ToolbarBaseActivity
 import allen.town.podcast.ui.startintent.MainActivityStarter
 import android.annotation.SuppressLint
 import android.annotation.TargetApi

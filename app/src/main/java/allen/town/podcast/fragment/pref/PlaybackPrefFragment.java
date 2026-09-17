@@ -12,7 +12,7 @@ import androidx.preference.ListPreference;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceManager;
 
-import code.name.monkey.appthemehelper.util.VersionUtils;
+import allen.town.podcast.theme.util.VersionUtils;
 import allen.town.podcast.BuildConfig;
 import allen.town.podcast.MyApp;
 import allen.town.podcast.R;

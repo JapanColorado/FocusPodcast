@@ -11,7 +11,7 @@
     app:singleSelection="true">
 
 
-    <allen.town.focus_common.views.AccentMaterialOutlineBackgroundStatusButton
+    <allen.town.podcast.common.views.AccentMaterialOutlineBackgroundStatusButton
         android:id="@+id/filter_dialog_radioButton1"
         style="?attr/materialButtonOutlinedStyle"
         tools:text="it is a test button"
@@ -21,7 +21,7 @@
         android:layout_height="match_parent"
         android:checked="false" />
 
-    <allen.town.focus_common.views.AccentMaterialOutlineBackgroundStatusButton
+    <allen.town.podcast.common.views.AccentMaterialOutlineBackgroundStatusButton
         android:id="@+id/filter_dialog_radioButton2"
         style="?attr/materialButtonOutlinedStyle"
         tools:text="it is a test button,it is long,\n very long,long long 2"

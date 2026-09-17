@@ -1,8 +1,8 @@
 package allen.town.podcast.fragment
 
 import allen.town.podcast.core.view.TopAppBarLayout
-import allen.town.focus_common.util.TopSnackbarUtil
-import allen.town.focus_common.views.ItemCategoryDecoration
+import allen.town.podcast.common.util.TopSnackbarUtil
+import allen.town.podcast.common.views.ItemCategoryDecoration
 import allen.town.podcast.R
 import allen.town.podcast.activity.RssSearchActivity
 import allen.town.podcast.core.pref.Prefs.clearOnlinePodcastSearchHistory
@@ -31,7 +31,7 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
-import code.name.monkey.appthemehelper.util.EditTextUtil
+import allen.town.podcast.theme.util.EditTextUtil
 import com.beloo.widget.chipslayoutmanager.ChipsLayoutManager
 import com.google.android.material.chip.Chip
 import com.google.android.material.tabs.TabLayout

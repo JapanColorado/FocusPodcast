@@ -3,7 +3,7 @@ apply plugin: 'com.android.library'
 apply from: "../../common.gradle"
 android {
     defaultConfig {
-        namespace "com.bytehamster.lib.preferencesearch"
+        namespace "allen.town.podcast.searchpreference"
     }
 }
 dependencies {

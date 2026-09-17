@@ -4,7 +4,7 @@ plugins {
 apply from: "../../common.gradle"
 android {
     defaultConfig {
-        namespace "code.name.monkey.appthemehelper"
+        namespace "allen.town.podcast.theme"
     }
 }
 dependencies {

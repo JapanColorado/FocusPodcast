@@ -1,6 +1,6 @@
 package allen.town.podcast.discovery
 
-import allen.town.focus_common.util.Timber
+import allen.town.podcast.common.util.Timber
 import allen.town.podcast.core.pref.Prefs
 import io.reactivex.Single
 

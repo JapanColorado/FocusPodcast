@@ -1,6 +1,6 @@
 package allen.town.podcast.storage.db.mapper;
 
-import allen.town.focus_common.util.BaseDateUtils;
+import allen.town.podcast.common.util.BaseDateUtils;
 import allen.town.podcast.model.feed.FeedItemFilter;
 import allen.town.podcast.storage.db.Db;
 

@@ -21,7 +21,7 @@ import android.widget.Toast;
 import androidx.core.content.ContextCompat;
 import androidx.core.util.Consumer;
 
-import allen.town.focus_common.util.TopSnackbarUtil;
+import allen.town.podcast.common.util.TopSnackbarUtil;
 import allen.town.podcast.R;
 import allen.town.podcast.activity.MainActivity;
 import allen.town.podcast.core.util.menuhandler.MenuItemUtils;

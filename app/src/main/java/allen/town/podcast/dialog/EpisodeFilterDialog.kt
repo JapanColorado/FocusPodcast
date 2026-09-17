@@ -1,8 +1,8 @@
 package allen.town.podcast.dialog
 
-import allen.town.focus_common.util.Timber
-import allen.town.focus_common.views.AccentMaterialDialog
-import allen.town.focus_common.views.ItemOffsetDecoration
+import allen.town.podcast.common.util.Timber
+import allen.town.podcast.common.views.AccentMaterialDialog
+import allen.town.podcast.common.views.ItemOffsetDecoration
 import allen.town.podcast.R
 import allen.town.podcast.adapter.SimpleChipAdapter
 import allen.town.podcast.databinding.EpisodeFilterDialogBinding

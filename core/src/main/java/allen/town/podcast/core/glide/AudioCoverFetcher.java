@@ -14,7 +14,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-import allen.town.focus_common.util.Timber;
+import allen.town.podcast.common.util.Timber;
 
 // see https://github.com/bumptech/glide/issues/699
 class AudioCoverFetcher implements DataFetcher<InputStream> {

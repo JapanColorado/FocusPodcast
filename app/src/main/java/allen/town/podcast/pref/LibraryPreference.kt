@@ -14,11 +14,11 @@
 
 package allen.town.podcast.pref
 
-import allen.town.focus_common.R
+import allen.town.podcast.common.R
 import allen.town.podcast.adapter.CategoryInfoAdapter
-import allen.town.focus_common.databinding.PreferenceDialogLibraryCategoriesBinding
-import allen.town.focus_common.model.CategoryInfo
-import allen.town.focus_common.util.BasePreferenceUtil
+import allen.town.podcast.common.databinding.PreferenceDialogLibraryCategoriesBinding
+import allen.town.podcast.common.model.CategoryInfo
+import allen.town.podcast.common.util.BasePreferenceUtil
 import android.app.Dialog
 import android.content.Context
 import android.os.Bundle
@@ -27,9 +27,9 @@ import androidx.core.graphics.BlendModeColorFilterCompat
 import androidx.core.graphics.BlendModeCompat.SRC_IN
 import androidx.fragment.app.DialogFragment
 import androidx.recyclerview.widget.LinearLayoutManager
-import code.name.monkey.appthemehelper.ThemeStore
-import allen.town.focus_common.common.prefs.supportv7.ATEDialogPreference
-import code.name.monkey.retromusic.extensions.materialDialog
+import allen.town.podcast.theme.ThemeStore
+import allen.town.podcast.common.common.prefs.supportv7.ATEDialogPreference
+import allen.town.podcast.common.extensions.materialDialog
 
 
 class LibraryPreference @JvmOverloads constructor(

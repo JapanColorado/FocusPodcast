@@ -1,7 +1,7 @@
 package allen.town.podcast.core.pref
 
-import allen.town.focus_common.util.BasePreferenceUtil.materialYou
-import allen.town.focus_common.util.ThemeUtils.generalThemeValue
+import allen.town.podcast.common.util.BasePreferenceUtil.materialYou
+import allen.town.podcast.common.util.ThemeUtils.generalThemeValue
 import allen.town.podcast.core.R
 import allen.town.podcast.core.feed.SubscriptionsFilter
 import allen.town.podcast.core.playback.AlbumCoverStyle
@@ -15,7 +15,7 @@ import android.os.Build
 import android.text.TextUtils
 import androidx.annotation.StyleRes
 import androidx.core.app.NotificationCompat
-import code.name.monkey.retromusic.util.theme.ThemeMode
+import allen.town.podcast.common.theme.ThemeMode
 
 /**
  * Owns everything the user sees: the app theme and now-playing skin, the subscription list

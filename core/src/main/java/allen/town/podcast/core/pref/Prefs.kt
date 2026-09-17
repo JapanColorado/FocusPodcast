@@ -1,6 +1,6 @@
 package allen.town.podcast.core.pref
 
-import allen.town.focus_common.model.CategoryInfo
+import allen.town.podcast.common.model.CategoryInfo
 import allen.town.podcast.core.feed.SubscriptionsFilter
 import allen.town.podcast.core.playback.AlbumCoverStyle
 import allen.town.podcast.core.playback.NowPlayingScreen
@@ -13,7 +13,7 @@ import allen.town.podcast.model.playback.MediaType
 import android.content.Context
 import androidx.annotation.StyleRes
 import androidx.annotation.VisibleForTesting
-import code.name.monkey.appthemehelper.constants.ThemeConstants
+import allen.town.podcast.theme.constants.ThemeConstants
 import java.io.File
 
 /**

@@ -30,7 +30,7 @@ import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import allen.town.focus_common.views.AccentMaterialDialog;
+import allen.town.podcast.common.views.AccentMaterialDialog;
 import allen.town.podcast.R;
 import allen.town.podcast.core.sync.SynchronizationCredentials;
 import allen.town.podcast.core.service.download.PodcastHttpClient;

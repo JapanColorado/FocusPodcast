@@ -1,8 +1,8 @@
 package allen.town.podcast.core.view
 
-import allen.town.focus_common.databinding.CollapsingAppbarLayoutBinding
-import allen.town.focus_common.databinding.SimpleAppbarLayoutBinding
-import allen.town.focus_common.databinding.SimpleFixedAppbarLayoutBinding
+import allen.town.podcast.common.databinding.CollapsingAppbarLayoutBinding
+import allen.town.podcast.common.databinding.SimpleAppbarLayoutBinding
+import allen.town.podcast.common.databinding.SimpleFixedAppbarLayoutBinding
 import android.content.Context
 import android.content.res.Configuration
 import android.util.AttributeSet

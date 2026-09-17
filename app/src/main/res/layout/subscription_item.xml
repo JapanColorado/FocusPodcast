@@ -49,7 +49,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content">
 
-        <allen.town.focus_common.common.views.AccentCheckbox
+        <allen.town.podcast.common.common.views.AccentCheckbox
             android:id="@+id/selectCheckBox"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

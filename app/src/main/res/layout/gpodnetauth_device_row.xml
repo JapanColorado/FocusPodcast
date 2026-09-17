@@ -4,7 +4,7 @@
     android:layout_height="wrap_content"
     android:paddingTop="8dp">
 
-    <allen.town.focus_common.views.AccentMaterialOutlineStatusButton
+    <allen.town.podcast.common.views.AccentMaterialOutlineStatusButton
         android:id="@+id/selectDeviceButton"
         style="@style/Widget.Material3.Button.OutlinedButton"
         android:layout_width="match_parent"

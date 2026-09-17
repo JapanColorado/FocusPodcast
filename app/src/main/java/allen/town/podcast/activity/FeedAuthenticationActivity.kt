@@ -1,7 +1,7 @@
 package allen.town.podcast.activity
 
 import android.annotation.SuppressLint
-import allen.town.focus_common.activity.DialogActivity
+import allen.town.podcast.common.activity.DialogActivity
 import allen.town.podcast.R
 import allen.town.podcast.core.service.download.DownloadRequest
 import allen.town.podcast.core.service.download.DownloadService

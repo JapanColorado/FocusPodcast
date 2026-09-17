@@ -31,7 +31,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import allen.town.focus_common.util.TopSnackbarUtil;
+import allen.town.podcast.common.util.TopSnackbarUtil;
 import allen.town.podcast.core.R;
 import allen.town.podcast.core.pref.PlaybackPreferences;
 import allen.town.podcast.core.pref.Prefs;

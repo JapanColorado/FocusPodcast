@@ -1,9 +1,9 @@
 package allen.town.podcast.fragment
 
-import allen.town.focus_common.util.DoubleClickBackToContentTopListener
-import allen.town.focus_common.util.MenuIconUtil.showToolbarMenuIcon
-import allen.town.focus_common.util.StatusBarUtils.setPaddingStatusBarTop
-import allen.town.focus_common.util.Timber
+import allen.town.podcast.common.util.DoubleClickBackToContentTopListener
+import allen.town.podcast.common.util.MenuIconUtil.showToolbarMenuIcon
+import allen.town.podcast.common.util.StatusBarUtils.setPaddingStatusBarTop
+import allen.town.podcast.common.util.Timber
 import allen.town.podcast.R
 import allen.town.podcast.activity.MainActivity
 import allen.town.podcast.activity.MainActivity.Companion.onPanelCollapsed
@@ -42,7 +42,7 @@ import android.widget.AdapterView.OnItemClickListener
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
-import code.name.monkey.appthemehelper.util.scroll.ThemedFastScroller.create
+import allen.town.podcast.theme.util.scroll.ThemedFastScroller.create
 import com.faltenreich.skeletonlayout.Skeleton
 import com.faltenreich.skeletonlayout.applySkeleton
 import com.google.android.material.appbar.AppBarLayout

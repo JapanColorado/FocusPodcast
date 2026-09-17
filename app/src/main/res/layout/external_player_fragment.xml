@@ -64,7 +64,7 @@
                 tools:text="Episode author that is too long and will cause the text to wrap" />
         </LinearLayout>
 
-        <allen.town.focus_common.views.AccentImageView
+        <allen.town.podcast.common.views.AccentImageView
             android:src="@drawable/mini_player_skip_back"
             android:id="@+id/butRev"
             android:layout_gravity="center_vertical"
@@ -98,7 +98,7 @@
                 app:srcCompat="@drawable/ic_play_48dp"
                 tools:src="@drawable/ic_play_48dp" />
         </FrameLayout>
-        <allen.town.focus_common.views.AccentImageView
+        <allen.town.podcast.common.views.AccentImageView
             android:src="@drawable/mini_player_skip_forward"
             android:id="@+id/butFF"
             android:layout_gravity="center_vertical"
@@ -107,7 +107,7 @@
             android:padding="10dp"
             android:layout_width="38dp"
             android:layout_height="38dp"/>
-        <allen.town.focus_common.views.AccentImageView
+        <allen.town.podcast.common.views.AccentImageView
             android:padding="4dp"
             android:id="@+id/queue_iv"
             android:layout_width="40dp"

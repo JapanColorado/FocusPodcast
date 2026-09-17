@@ -14,11 +14,11 @@
  */
 package allen.town.podcast.activity
 
-import allen.town.focus_common.extensions.setEdgeToEdgeOrImmersive
+import allen.town.podcast.common.extensions.setEdgeToEdgeOrImmersive
 import android.graphics.Color
 import android.os.Bundle
 import androidx.lifecycle.ViewModelProvider
-import code.name.monkey.appthemehelper.ThemeStore
+import allen.town.podcast.theme.ThemeStore
 import allen.town.podcast.R
 import allen.town.podcast.core.glide.GlideApp
 import allen.town.podcast.databinding.ActivityDriveModeBinding

@@ -1,9 +1,9 @@
 package allen.town.podcast.activity
 
-import allen.town.focus_common.adapter.BindableViewHolder
-import allen.town.focus_common.adapter.ReactiveListAdapter
-import allen.town.focus_common.util.TopSnackbarUtil.showSnack
-import allen.town.focus_common.views.AccentMaterialDialog
+import allen.town.podcast.common.adapter.BindableViewHolder
+import allen.town.podcast.common.adapter.ReactiveListAdapter
+import allen.town.podcast.common.util.TopSnackbarUtil.showSnack
+import allen.town.podcast.common.views.AccentMaterialDialog
 import allen.town.podcast.R
 import allen.town.podcast.core.export.opml.OpmlElement
 import allen.town.podcast.core.export.opml.OpmlReader
@@ -35,7 +35,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.core.app.ActivityCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import code.name.monkey.appthemehelper.util.scroll.ThemedFastScroller.create
+import allen.town.podcast.theme.util.scroll.ThemedFastScroller.create
 import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers

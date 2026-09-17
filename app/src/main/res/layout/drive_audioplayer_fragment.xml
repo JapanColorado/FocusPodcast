@@ -8,7 +8,7 @@
     tools:background="@color/alpha54black"
     android:clickable="true"
     android:focusable="true">
-    <allen.town.focus_common.views.StatusBarView
+    <allen.town.podcast.common.views.StatusBarView
         android:id="@+id/status_bar"
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -198,7 +198,7 @@
                 app:srcCompat="@drawable/ic_play_48dp"
                 tools:srcCompat="@drawable/ic_play_48dp" />
 
-            <allen.town.focus_common.views.AccentProgressBar
+            <allen.town.podcast.common.views.AccentProgressBar
                 android:id="@+id/progLoading"
                 android:layout_width="132dp"
                 android:layout_height="132dp"

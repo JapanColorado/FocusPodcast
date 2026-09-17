@@ -1,7 +1,7 @@
 package allen.town.podcast.activity
 
-import allen.town.focus_common.util.Timber
-import allen.town.focus_common.util.TopSnackbarUtil.showSnack
+import allen.town.podcast.common.util.Timber
+import allen.town.podcast.common.util.TopSnackbarUtil.showSnack
 import allen.town.podcast.R
 import allen.town.podcast.storage.db.Db
 import android.content.Intent

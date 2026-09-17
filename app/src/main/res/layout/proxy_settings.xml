@@ -25,19 +25,19 @@
         android:layout_marginTop="8dp"
         android:text="@string/host_label"
         android:textColor="?android:attr/textColorSecondary" />
-    <allen.town.focus_common.views.AccentTextInputLayout
+    <allen.town.podcast.common.views.AccentTextInputLayout
         style="?attr/textInputOutlinedDenseStyle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:hintEnabled="true">
-    <allen.town.focus_common.views.CursorAccentTextInputEditText
+    <allen.town.podcast.common.views.CursorAccentTextInputEditText
         android:id="@+id/etHost"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:singleLine="true"
         android:inputType="textUri"
         android:hint="www.example.com" />
-    </allen.town.focus_common.views.AccentTextInputLayout>
+    </allen.town.podcast.common.views.AccentTextInputLayout>
 
     <com.google.android.material.textview.MaterialTextView
         android:id="@+id/txtvPort"
@@ -47,18 +47,18 @@
         android:text="@string/port_label"
         android:textColor="?android:attr/textColorSecondary" />
 
-    <allen.town.focus_common.views.AccentTextInputLayout
+    <allen.town.podcast.common.views.AccentTextInputLayout
         style="?attr/textInputOutlinedDenseStyle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:hintEnabled="true">
-    <allen.town.focus_common.views.CursorAccentTextInputEditText
+    <allen.town.podcast.common.views.CursorAccentTextInputEditText
         android:id="@+id/etPort"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="8080"
         android:inputType="number" />
-    </allen.town.focus_common.views.AccentTextInputLayout>
+    </allen.town.podcast.common.views.AccentTextInputLayout>
 
     <com.google.android.material.textview.MaterialTextView
         android:id="@+id/txtvUsername"
@@ -69,17 +69,17 @@
         android:text="@string/username_label"
         android:textColor="?android:attr/textColorSecondary" />
 
-    <allen.town.focus_common.views.AccentTextInputLayout
+    <allen.town.podcast.common.views.AccentTextInputLayout
         style="?attr/textInputOutlinedDenseStyle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:hintEnabled="true">
-    <allen.town.focus_common.views.CursorAccentTextInputEditText
+    <allen.town.podcast.common.views.CursorAccentTextInputEditText
         android:id="@+id/etUsername"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="@string/optional_hint" />
-    </allen.town.focus_common.views.AccentTextInputLayout>
+    </allen.town.podcast.common.views.AccentTextInputLayout>
 
     <com.google.android.material.textview.MaterialTextView
         android:id="@+id/txtvPassword"
@@ -89,18 +89,18 @@
         android:text="@string/password_label"
         android:textColor="?android:attr/textColorSecondary" />
 
-    <allen.town.focus_common.views.AccentTextInputLayout
+    <allen.town.podcast.common.views.AccentTextInputLayout
         style="?attr/textInputOutlinedDenseStyle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:hintEnabled="true">
-    <allen.town.focus_common.views.CursorAccentTextInputEditText
+    <allen.town.podcast.common.views.CursorAccentTextInputEditText
         android:id="@+id/etPassword"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="@string/optional_hint"
         android:inputType="textPassword" />
-    </allen.town.focus_common.views.AccentTextInputLayout>
+    </allen.town.podcast.common.views.AccentTextInputLayout>
 
     <com.joanzapata.iconify.widget.IconTextView
         android:id="@+id/txtvMessage"

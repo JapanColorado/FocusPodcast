@@ -13,10 +13,10 @@
  */
 package allen.town.podcast.adapter
 
-import allen.town.focus_common.databinding.PreferenceDialogLibraryCategoriesListitemBinding
-import allen.town.focus_common.model.CategoryInfo
-import allen.town.focus_common.util.SwipeAndDragHelper
-import allen.town.focus_common.util.TopSnackbarUtil
+import allen.town.podcast.common.databinding.PreferenceDialogLibraryCategoriesListitemBinding
+import allen.town.podcast.common.model.CategoryInfo
+import allen.town.podcast.common.util.SwipeAndDragHelper
+import allen.town.podcast.common.util.TopSnackbarUtil
 import allen.town.podcast.R
 import allen.town.podcast.core.pref.Prefs
 import allen.town.podcast.discovery.FyydPodcastSearcher

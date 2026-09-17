@@ -10,8 +10,8 @@ import androidx.appcompat.app.AlertDialog;
 
 import java.util.List;
 
-import allen.town.focus_common.util.TopSnackbarUtil;
-import allen.town.focus_common.views.AccentMaterialDialog;
+import allen.town.podcast.common.util.TopSnackbarUtil;
+import allen.town.podcast.common.views.AccentMaterialDialog;
 import allen.town.podcast.R;
 import allen.town.podcast.activity.SettingsActivity;
 import allen.town.podcast.core.pref.Prefs;

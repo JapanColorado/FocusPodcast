@@ -26,7 +26,7 @@ import allen.town.podcast.fragment.FavoriteEpisodesFragment;
 import allen.town.podcast.fragment.PlaylistFragment;
 import allen.town.podcast.model.feed.FeedItem;
 import allen.town.podcast.model.feed.FeedItemFilter;
-import allen.town.focus_common.util.ThemeUtils;
+import allen.town.podcast.common.util.ThemeUtils;
 import allen.town.podcast.viewholder.EpisodeItemViewHolder;
 import it.xabaras.android.recyclerview.swipedecorator.RecyclerViewSwipeDecorator;
 

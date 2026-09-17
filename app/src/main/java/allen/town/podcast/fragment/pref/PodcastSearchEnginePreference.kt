@@ -14,10 +14,10 @@
 
 package allen.town.podcast.fragment.pref
 
-import allen.town.focus_common.R
-import allen.town.focus_common.common.prefs.supportv7.ATEDialogPreference
-import allen.town.focus_common.databinding.PreferenceDialogLibraryCategoriesBinding
-import allen.town.focus_common.model.CategoryInfo
+import allen.town.podcast.common.R
+import allen.town.podcast.common.common.prefs.supportv7.ATEDialogPreference
+import allen.town.podcast.common.databinding.PreferenceDialogLibraryCategoriesBinding
+import allen.town.podcast.common.model.CategoryInfo
 import allen.town.podcast.adapter.PodcastSearchChooseAdapter
 import allen.town.podcast.core.pref.Prefs
 import android.app.Dialog
@@ -28,8 +28,8 @@ import androidx.core.graphics.BlendModeColorFilterCompat
 import androidx.core.graphics.BlendModeCompat.SRC_IN
 import androidx.fragment.app.DialogFragment
 import androidx.recyclerview.widget.LinearLayoutManager
-import code.name.monkey.appthemehelper.ThemeStore
-import code.name.monkey.retromusic.extensions.materialDialog
+import allen.town.podcast.theme.ThemeStore
+import allen.town.podcast.common.extensions.materialDialog
 
 
 class PodcastSearchEnginePreference @JvmOverloads constructor(

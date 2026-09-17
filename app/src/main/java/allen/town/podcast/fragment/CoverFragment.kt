@@ -1,6 +1,6 @@
 package allen.town.podcast.fragment
 
-import allen.town.focus_common.util.TopSnackbarUtil.showSnack
+import allen.town.podcast.common.util.TopSnackbarUtil.showSnack
 import allen.town.podcast.R
 import allen.town.podcast.activity.MainActivity.Companion.getIntentToOpenFeedWithId
 import allen.town.podcast.core.feed.util.ImageResourceUtils
@@ -46,9 +46,9 @@ import androidx.core.content.ContextCompat
 import androidx.core.graphics.BlendModeColorFilterCompat
 import androidx.core.graphics.BlendModeCompat
 import androidx.fragment.app.Fragment
-import code.name.monkey.appthemehelper.util.MaterialValueHelper.getPrimaryTextColor
-import allen.town.focus_common.extensions.accentColor
-import allen.town.focus_common.extensions.isColorLight
+import allen.town.podcast.theme.util.MaterialValueHelper.getPrimaryTextColor
+import allen.town.podcast.common.extensions.accentColor
+import allen.town.podcast.common.extensions.isColorLight
 import android.os.Build
 import com.bumptech.glide.Glide
 import com.bumptech.glide.RequestBuilder

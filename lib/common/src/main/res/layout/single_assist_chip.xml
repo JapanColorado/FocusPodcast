@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<allen.town.focus_common.views.AccentElevatedChip xmlns:android="http://schemas.android.com/apk/res/android"
+<allen.town.podcast.common.views.AccentElevatedChip xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/chip"
     style="@style/Widget.Material3.Chip.Assist.Elevated"

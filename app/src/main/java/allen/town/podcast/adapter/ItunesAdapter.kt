@@ -1,8 +1,8 @@
 package allen.town.podcast.adapter
 
-import allen.town.focus_common.util.ImageUtils.getColoredVectorDrawable
-import allen.town.focus_common.util.Timber
-import allen.town.focus_common.util.TopSnackbarUtil.showSnack
+import allen.town.podcast.common.util.ImageUtils.getColoredVectorDrawable
+import allen.town.podcast.common.util.Timber
+import allen.town.podcast.common.util.TopSnackbarUtil.showSnack
 import allen.town.podcast.R
 import allen.town.podcast.activity.MainActivity
 import allen.town.podcast.activity.RssSearchActivity
@@ -37,8 +37,8 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.FragmentActivity
 import androidx.recyclerview.widget.RecyclerView
-import code.name.monkey.appthemehelper.ThemeStore.Companion.accentColor
-import code.name.monkey.appthemehelper.util.ATHUtil.resolveColor
+import allen.town.podcast.theme.ThemeStore.Companion.accentColor
+import allen.town.podcast.theme.util.ATHUtil.resolveColor
 import com.airbnb.lottie.LottieAnimationView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy

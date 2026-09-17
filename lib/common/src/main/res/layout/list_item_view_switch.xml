@@ -67,7 +67,7 @@
                 tools:maxLines="@string/grid_size_1"
                 tools:text="@tools:sample/lorem/random" />
 
-            <allen.town.focus_common.views.BaselineGridTextView
+            <allen.town.podcast.common.views.BaselineGridTextView
                 android:id="@android:id/summary"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -80,7 +80,7 @@
                 tools:visibility="visible" />
         </LinearLayout>
 
-        <allen.town.focus_common.common.views.ATESwitch
+        <allen.town.podcast.common.common.views.ATESwitch
             android:id="@android:id/checkbox"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

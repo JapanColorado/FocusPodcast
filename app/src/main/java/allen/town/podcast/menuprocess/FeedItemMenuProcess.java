@@ -16,7 +16,7 @@ import com.google.android.material.snackbar.Snackbar;
 import java.util.ArrayList;
 import java.util.List;
 
-import allen.town.focus_common.util.TopSnackbarUtil;
+import allen.town.podcast.common.util.TopSnackbarUtil;
 import allen.town.podcast.R;
 import allen.town.podcast.activity.MainActivity;
 import allen.town.podcast.core.pref.PlaybackPreferences;

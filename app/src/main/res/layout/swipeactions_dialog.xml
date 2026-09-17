@@ -6,7 +6,7 @@
     android:orientation="vertical"
     android:padding="16dp">
 
-    <allen.town.focus_common.common.views.ATESwitch
+    <allen.town.podcast.common.common.views.ATESwitch
         android:id="@+id/enableSwitch"
         app:track="@drawable/switch_track"
         android:thumb="@drawable/switch_thumb"

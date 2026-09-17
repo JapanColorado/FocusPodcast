@@ -1,6 +1,6 @@
 package allen.town.podcast.config
 
-import allen.town.focus_common.model.CategoryInfo
+import allen.town.podcast.common.model.CategoryInfo
 import allen.town.podcast.discovery.FyydPodcastSearcher
 import allen.town.podcast.discovery.ItunesPodcastSearcher
 import allen.town.podcast.discovery.PodcastIndexPodcastSearcher

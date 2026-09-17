@@ -4,8 +4,8 @@ import android.annotation.TargetApi
 import android.content.Context
 import android.content.pm.ShortcutInfo
 import android.os.Build
-import code.name.monkey.appthemehelper.shortcut.AppShortcutIconGenerator
-import code.name.monkey.appthemehelper.shortcut.BaseShortcutType
+import allen.town.podcast.theme.shortcut.AppShortcutIconGenerator
+import allen.town.podcast.theme.shortcut.BaseShortcutType
 import allen.town.podcast.R
 import allen.town.podcast.activity.MainActivity
 import allen.town.podcast.activity.MainActivity.Companion.EXTRA_FRAGMENT_TAG

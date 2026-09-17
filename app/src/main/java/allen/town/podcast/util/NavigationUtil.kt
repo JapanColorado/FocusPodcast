@@ -13,7 +13,7 @@
  */
 package allen.town.podcast.util
 
-import allen.town.focus_common.util.TopSnackbarUtil
+import allen.town.podcast.common.util.TopSnackbarUtil
 import allen.town.podcast.core.R
 import android.app.Activity
 import android.content.ActivityNotFoundException

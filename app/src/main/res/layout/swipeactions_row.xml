@@ -34,7 +34,7 @@
             android:textSize="14sp"
             tools:text="@string/add_to_queue_label" />
 
-        <allen.town.focus_common.views.AccentMaterialTextButton
+        <allen.town.podcast.common.views.AccentMaterialTextButton
             android:id="@+id/changeButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

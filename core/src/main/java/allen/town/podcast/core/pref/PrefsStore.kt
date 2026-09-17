@@ -1,6 +1,6 @@
 package allen.town.podcast.core.pref
 
-import allen.town.focus_common.util.BasePreferenceUtil.instance
+import allen.town.podcast.common.util.BasePreferenceUtil.instance
 import android.app.Application
 import android.content.Context
 import android.content.SharedPreferences

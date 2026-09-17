@@ -26,9 +26,9 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
-import allen.town.focus_common.util.TopSnackbarUtil;
-import allen.town.focus_common.views.AccentMaterialDialog;
-import allen.town.focus_common.views.AccentProgressDialog;
+import allen.town.podcast.common.util.TopSnackbarUtil;
+import allen.town.podcast.common.views.AccentMaterialDialog;
+import allen.town.podcast.common.views.AccentProgressDialog;
 import allen.town.podcast.MyApp;
 import allen.town.podcast.R;
 import allen.town.podcast.activity.ImportOPMLActivity;

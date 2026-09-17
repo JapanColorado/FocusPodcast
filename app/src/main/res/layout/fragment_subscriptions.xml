@@ -30,7 +30,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
 
-                <allen.town.focus_common.views.GridRecyclerView
+                <allen.town.podcast.common.views.GridRecyclerView
                     android:id="@+id/subscriptions_grid"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
@@ -44,7 +44,7 @@
             </allen.town.podcast.view.MultiSwipeRefreshLayout>
         </LinearLayout>
 
-        <allen.town.focus_common.views.AccentFloatingActionButton
+        <allen.town.podcast.common.views.AccentFloatingActionButton
             android:id="@+id/subscriptions_add"
             style="@style/Widget.Material3.FloatingActionButton.Primary"
             android:layout_width="56dp"

@@ -3,10 +3,10 @@
 package allen.town.podcast.playback
 
 import androidx.appcompat.app.AppCompatActivity
-import allen.town.focus_common.extensions.isColorLight
-import allen.town.focus_common.extensions.setLightNavigationBar
-import allen.town.focus_common.extensions.setLightStatusBar
-import allen.town.focus_common.extensions.setNavigationBarColor
+import allen.town.podcast.common.extensions.isColorLight
+import allen.town.podcast.common.extensions.setLightNavigationBar
+import allen.town.podcast.common.extensions.setLightStatusBar
+import allen.town.podcast.common.extensions.setNavigationBarColor
 import allen.town.podcast.core.playback.NowPlayingScreen
 import allen.town.podcast.core.pref.Prefs
 import allen.town.podcast.fragment.*

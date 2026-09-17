@@ -22,7 +22,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
-import allen.town.focus_common.util.Timber;
+import allen.town.podcast.common.util.Timber;
 import allen.town.podcast.core.R;
 import allen.town.podcast.core.event.DownloadLogEvent;
 import allen.town.podcast.core.feed.FeedEvent;

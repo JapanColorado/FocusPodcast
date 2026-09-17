@@ -1,6 +1,6 @@
 package allen.town.podcast.activity
 
-import allen.town.focus_common.views.AccentMaterialDialog
+import allen.town.podcast.common.views.AccentMaterialDialog
 import allen.town.podcast.R
 import allen.town.podcast.databinding.SettingsActivityBinding
 import allen.town.podcast.fragment.pref.*
@@ -11,10 +11,10 @@ import android.provider.Settings
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import androidx.preference.PreferenceFragmentCompat
-import allen.town.focus_common.extensions.applyToolbar
-import code.name.monkey.retromusic.fragments.settings.ThemeSettingsFragment
-import com.bytehamster.lib.preferencesearch.SearchPreferenceResult
-import com.bytehamster.lib.preferencesearch.SearchPreferenceResultListener
+import allen.town.podcast.common.extensions.applyToolbar
+import allen.town.podcast.fragment.pref.ThemeSettingsFragment
+import allen.town.podcast.searchpreference.SearchPreferenceResult
+import allen.town.podcast.searchpreference.SearchPreferenceResultListener
 
 /**
  * PreferenceActivity for API 11+. In order to change the behavior of the preference UI, see

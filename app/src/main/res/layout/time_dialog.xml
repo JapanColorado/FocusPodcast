@@ -32,7 +32,7 @@
 
             </LinearLayout>
 
-            <allen.town.focus_common.views.AccentMaterialButton
+            <allen.town.podcast.common.views.AccentMaterialButton
                 android:id="@+id/setSleeptimerButton"
                 style="@style/Widget.Material3.Button"
                 android:layout_width="match_parent"
@@ -59,7 +59,7 @@
                 android:textColor="?android:attr/textColorPrimary"
                 android:textSize="32sp" />
 
-            <allen.town.focus_common.views.AccentMaterialButton
+            <allen.town.podcast.common.views.AccentMaterialButton
                 android:id="@+id/disableSleeptimerButton"
                 style="@style/Widget.Material3.Button"
                 android:layout_width="match_parent"
@@ -72,7 +72,7 @@
                 android:gravity="center_vertical"
                 android:orientation="horizontal">
 
-                <allen.town.focus_common.views.AccentMaterialOutlineStatusButton
+                <allen.town.podcast.common.views.AccentMaterialOutlineStatusButton
                     android:id="@+id/extendSleepFiveMinutesButton"
                     style="@style/Widget.Material3.Button.OutlinedButton"
                     android:layout_width="0dp"
@@ -84,7 +84,7 @@
                     android:paddingVertical="4dp"
                     tools:text="+5 min" />
 
-                <allen.town.focus_common.views.AccentMaterialOutlineStatusButton
+                <allen.town.podcast.common.views.AccentMaterialOutlineStatusButton
                     android:id="@+id/extendSleepTenMinutesButton"
                     style="@style/Widget.Material3.Button.OutlinedButton"
                     android:layout_width="0dp"
@@ -96,7 +96,7 @@
                     android:paddingVertical="4dp"
                     tools:text="+10 min" />
 
-                <allen.town.focus_common.views.AccentMaterialOutlineStatusButton
+                <allen.town.podcast.common.views.AccentMaterialOutlineStatusButton
                     android:id="@+id/extendSleepTwentyMinutesButton"
                     style="@style/Widget.Material3.Button.OutlinedButton"
                     android:layout_width="0dp"
@@ -130,13 +130,13 @@
                 android:layout_height="wrap_content"
                 android:orientation="horizontal">
 
-                <allen.town.focus_common.views.AccentImageView
+                <allen.town.podcast.common.views.AccentImageView
                     style="@style/Widget.Material3.Button.IconButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:src="@drawable/ic_shake" />
 
-                <allen.town.focus_common.common.views.ATESwitch
+                <allen.town.podcast.common.common.views.ATESwitch
                     android:id="@+id/cbShakeToReset"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -150,13 +150,13 @@
                 android:layout_height="wrap_content"
                 android:orientation="horizontal">
 
-                <allen.town.focus_common.views.AccentImageView
+                <allen.town.podcast.common.views.AccentImageView
                     style="@style/Widget.Material3.Button.IconButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:src="@drawable/ic_round_vibration_24" />
 
-                <allen.town.focus_common.common.views.ATESwitch
+                <allen.town.podcast.common.common.views.ATESwitch
                     android:id="@+id/cbVibrate"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -170,13 +170,13 @@
                 android:layout_height="wrap_content"
                 android:orientation="horizontal">
 
-                <allen.town.focus_common.views.AccentImageView
+                <allen.town.podcast.common.views.AccentImageView
                     style="@style/Widget.Material3.Button.IconButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:src="@drawable/ic_auto" />
 
-                <allen.town.focus_common.common.views.ATESwitch
+                <allen.town.podcast.common.common.views.ATESwitch
                     android:id="@+id/chAutoEnable"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"

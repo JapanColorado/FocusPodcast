@@ -1,9 +1,9 @@
 package allen.town.podcast.dialog
 
-import allen.town.focus_common.util.Timber
-import allen.town.focus_common.util.TopSnackbarUtil.showSnack
-import allen.town.focus_common.views.AccentMaterialDialog
-import allen.town.focus_common.views.ItemOffsetDecoration
+import allen.town.podcast.common.util.Timber
+import allen.town.podcast.common.util.TopSnackbarUtil.showSnack
+import allen.town.podcast.common.views.AccentMaterialDialog
+import allen.town.podcast.common.views.ItemOffsetDecoration
 import allen.town.podcast.R
 import allen.town.podcast.core.pref.SleepTimerPreferences
 import allen.town.podcast.core.service.playback.PlaybackService

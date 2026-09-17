@@ -7,7 +7,7 @@ import android.view.View;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.SwitchCompat;
 
-import allen.town.focus_common.views.AccentMaterialDialog;
+import allen.town.podcast.common.views.AccentMaterialDialog;
 import allen.town.podcast.R;
 
 public class PreferenceSwitchDialog {

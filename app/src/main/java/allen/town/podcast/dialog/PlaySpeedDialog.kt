@@ -1,7 +1,7 @@
 package allen.town.podcast.dialog
 
-import allen.town.focus_common.util.TopSnackbarUtil.showSnack
-import allen.town.focus_common.views.ItemOffsetDecoration
+import allen.town.podcast.common.util.TopSnackbarUtil.showSnack
+import allen.town.podcast.common.views.ItemOffsetDecoration
 import allen.town.podcast.R
 import allen.town.podcast.core.pref.Prefs
 import allen.town.podcast.core.util.playback.PlaybackController

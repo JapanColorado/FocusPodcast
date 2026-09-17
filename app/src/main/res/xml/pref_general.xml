@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:search="http://schemas.android.com/apk/com.bytehamster.lib.preferencesearch"
+    xmlns:search="http://schemas.android.com/apk/allen.town.podcast.searchpreference"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <allen.town.podcast.fragment.pref.PodcastSearchEnginePreference
@@ -10,10 +10,10 @@
         android:summary="@string/pref_podcast_search_engine_sum"
         android:title="@string/pref_podcast_search_engine_title" />
 
-    <allen.town.focus_common.common.prefs.supportv7.ATEPreferenceCategory
+    <allen.town.podcast.common.common.prefs.supportv7.ATEPreferenceCategory
         android:layout="@layout/preference_category_title"
         android:title="@string/notification_pref_fragment">
-        <allen.town.focus_common.common.prefs.supportv7.ATESwitchPreference
+        <allen.town.podcast.common.common.prefs.supportv7.ATESwitchPreference
             android:layout="@layout/list_item_view_switch"
             android:defaultValue="false"
             android:enabled="true"
@@ -21,23 +21,23 @@
             android:summary="@string/pref_expandNotify_sum"
             android:title="@string/pref_expandNotify_title"
             search:ignore="true" />
-        <allen.town.focus_common.common.prefs.supportv7.ATESwitchPreference
+        <allen.town.podcast.common.common.prefs.supportv7.ATESwitchPreference
             android:layout="@layout/list_item_view_switch"
             android:defaultValue="true"
             android:enabled="true"
             android:key="pref_persist_notification"
             android:summary="@string/pref_persistNotify_sum"
             android:title="@string/pref_persistNotify_title" />
-        <allen.town.focus_common.common.prefs.supportv7.ATEPreference
+        <allen.town.podcast.common.common.prefs.supportv7.ATEPreference
             android:layout="@layout/list_item_view_no_title"
             android:key="pref_compact_noti_buttons"
             android:summary="@string/pref_compact_notification_buttons_sum"
             android:title="@string/pref_compact_notification_buttons_title" />
-    </allen.town.focus_common.common.prefs.supportv7.ATEPreferenceCategory>
-    <allen.town.focus_common.common.prefs.supportv7.ATEPreferenceCategory
+    </allen.town.podcast.common.common.prefs.supportv7.ATEPreferenceCategory>
+    <allen.town.podcast.common.common.prefs.supportv7.ATEPreferenceCategory
         android:layout="@layout/preference_category_title"
         android:title="@string/behavior">
-        <allen.town.focus_common.common.prefs.supportv7.ATEListPreference
+        <allen.town.podcast.common.common.prefs.supportv7.ATEListPreference
             android:layout="@layout/list_item_view"
             android:entryValues="@array/back_button_behavior_values"
             android:entries="@array/back_button_behavior_options"
@@ -46,11 +46,11 @@
             android:title="@string/pref_back_button_behavior_title"
             android:summary="@string/pref_back_button_behavior_sum"
             android:defaultValue="default" />
-        <allen.town.focus_common.common.prefs.supportv7.ATEPreference
+        <allen.town.podcast.common.common.prefs.supportv7.ATEPreference
             android:layout="@layout/list_item_view_no_title"
             android:key="pref_swipe"
             app:icon="@drawable/ic_swipe"
             android:summary="@string/swipeactions_summary"
             android:title="@string/swipeactions_label" />
-    </allen.town.focus_common.common.prefs.supportv7.ATEPreferenceCategory>
+    </allen.town.podcast.common.common.prefs.supportv7.ATEPreferenceCategory>
 </PreferenceScreen>

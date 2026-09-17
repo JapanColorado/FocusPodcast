@@ -50,7 +50,7 @@
         tools:maxLines="1"
         tools:text="@tools:sample/lorem/random" />
 
-    <allen.town.focus_common.views.BaselineGridTextView
+    <allen.town.podcast.common.views.BaselineGridTextView
         android:id="@android:id/summary"
         android:layout_width="0dp"
         android:layout_height="wrap_content"

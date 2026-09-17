@@ -26,10 +26,10 @@ import android.os.Bundle
 import android.view.WindowManager
 import androidx.core.content.getSystemService
 import androidx.lifecycle.ViewModelProvider
-import code.name.monkey.appthemehelper.util.VersionUtils
-import allen.town.focus_common.extensions.setEdgeToEdgeOrImmersive
-import allen.town.focus_common.extensions.setStatusBarColor
-import allen.town.focus_common.extensions.setTaskDescriptionColorAuto
+import allen.town.podcast.theme.util.VersionUtils
+import allen.town.podcast.common.extensions.setEdgeToEdgeOrImmersive
+import allen.town.podcast.common.extensions.setStatusBarColor
+import allen.town.podcast.common.extensions.setTaskDescriptionColorAuto
 import com.r0adkll.slidr.Slidr
 import com.r0adkll.slidr.model.SlidrConfig
 import com.r0adkll.slidr.model.SlidrListener

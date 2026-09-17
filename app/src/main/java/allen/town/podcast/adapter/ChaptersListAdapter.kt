@@ -8,7 +8,7 @@ import allen.town.podcast.model.feed.Chapter
 import allen.town.podcast.model.feed.EmbeddedChapterImage
 import allen.town.podcast.model.playback.Playable
 import allen.town.podcast.ui.common.CircularProgressBar
-import allen.town.focus_common.util.ThemeUtils.getColorFromAttr
+import allen.town.podcast.common.util.ThemeUtils.getColorFromAttr
 import android.content.Context
 import android.text.TextUtils
 import android.view.LayoutInflater

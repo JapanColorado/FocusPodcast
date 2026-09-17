@@ -1,18 +1,18 @@
 package allen.town.podcast.activity
 
-import allen.town.focus_common.extensions.*
-import allen.town.focus_common.util.BasePreferenceUtil
-import allen.town.focus_common.util.LanguageContextWrapper
+import allen.town.podcast.common.extensions.*
+import allen.town.podcast.common.util.BasePreferenceUtil
+import allen.town.podcast.common.util.LanguageContextWrapper
 import android.content.Context
 import android.content.res.Resources
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.os.ConfigurationCompat
-import code.name.monkey.appthemehelper.util.VersionUtils
-import code.name.monkey.retromusic.util.theme.ThemeManager
+import allen.town.podcast.theme.util.VersionUtils
+import allen.town.podcast.common.theme.ThemeManager
 import allen.town.podcast.R
 import allen.town.podcast.core.pref.Prefs
-import allen.town.focus_common.activity.ToolbarBaseActivity
+import allen.town.podcast.common.activity.ToolbarBaseActivity
 import java.util.*
 
 abstract class SimpleToolbarActivity : ToolbarBaseActivity() {

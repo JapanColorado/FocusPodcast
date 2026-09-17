@@ -4,7 +4,7 @@ import android.os.Bundle;
 
 import java.util.Locale;
 
-import allen.town.focus_common.ui.customtabs.BrowserLauncher;
+import allen.town.podcast.common.ui.customtabs.BrowserLauncher;
 import allen.town.podcast.R;
 import allen.town.podcast.activity.SettingsActivity;
 

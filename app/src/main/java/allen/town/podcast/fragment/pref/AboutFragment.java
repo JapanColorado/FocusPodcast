@@ -13,10 +13,10 @@ import androidx.appcompat.app.AppCompatDialogFragment;
 import java.util.Arrays;
 import java.util.List;
 
-import allen.town.focus_common.util.Intents;
-import allen.town.focus_common.util.PackageUtils;
-import allen.town.focus_common.views.AccentMaterialDialog;
-import code.name.monkey.appthemehelper.ThemeStore;
+import allen.town.podcast.common.util.Intents;
+import allen.town.podcast.common.util.PackageUtils;
+import allen.town.podcast.common.views.AccentMaterialDialog;
+import allen.town.podcast.theme.ThemeStore;
 import allen.town.podcast.BuildConfig;
 import allen.town.podcast.R;
 import allen.town.podcast.core.util.IntentUtils;

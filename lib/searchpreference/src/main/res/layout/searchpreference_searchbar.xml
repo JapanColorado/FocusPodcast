@@ -32,7 +32,7 @@
             app:srcCompat="@drawable/searchpreference_ic_search"
             app:tint="?colorControlNormal" />
 
-        <allen.town.focus_common.views.CursorAccentEditText
+        <allen.town.podcast.common.views.CursorAccentEditText
             android:id="@+id/search"
             android:layout_width="0dip"
             android:layout_height="wrap_content"

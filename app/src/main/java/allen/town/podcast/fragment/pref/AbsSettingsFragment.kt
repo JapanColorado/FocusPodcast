@@ -14,8 +14,8 @@
  */
 package allen.town.podcast.fragment.pref
 
-import allen.town.focus_common.activity.ToolbarBaseActivity
-import allen.town.focus_common.common.prefs.supportv7.ATEPreferenceFragmentCompat
+import allen.town.podcast.common.activity.ToolbarBaseActivity
+import allen.town.podcast.common.common.prefs.supportv7.ATEPreferenceFragmentCompat
 import allen.town.podcast.pref.LibraryPreference
 import allen.town.podcast.pref.LibraryPreferenceDialog
 import allen.town.podcast.pref.NowPlayingScreenPreference

@@ -1,8 +1,8 @@
 package allen.town.podcast
 
-import allen.town.focus_common.BaseApplication
-import allen.town.focus_common.util.BasePreferenceUtil
-import allen.town.focus_common.util.PodcastSearchPreferenceUtil
+import allen.town.podcast.common.BaseApplication
+import allen.town.podcast.common.util.BasePreferenceUtil
+import allen.town.podcast.common.util.PodcastSearchPreferenceUtil
 import allen.town.podcast.activity.SplashActivity
 import allen.town.podcast.appshortcuts.ShortcutsDefaultList
 import allen.town.podcast.config.CategoriesDefaultList
@@ -16,9 +16,9 @@ import android.os.Handler
 import android.os.Looper
 import android.os.StrictMode
 import android.os.StrictMode.VmPolicy
-import code.name.monkey.appthemehelper.ThemeStore
-import code.name.monkey.appthemehelper.util.VersionUtils
-import code.name.monkey.retromusic.appshortcuts.DynamicShortcutManager
+import allen.town.podcast.theme.ThemeStore
+import allen.town.podcast.theme.util.VersionUtils
+import allen.town.podcast.theme.shortcut.DynamicShortcutManager
 import com.joanzapata.iconify.Iconify
 import com.joanzapata.iconify.fonts.FontAwesomeModule
 import com.joanzapata.iconify.fonts.MaterialModule

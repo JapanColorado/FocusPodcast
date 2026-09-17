@@ -1,6 +1,6 @@
 package allen.town.podcast.activity.main
 
-import allen.town.focus_common.util.BasePreferenceUtil.materialYou
+import allen.town.podcast.common.util.BasePreferenceUtil.materialYou
 import allen.town.podcast.R
 import allen.town.podcast.activity.MainActivity
 import allen.town.podcast.fragment.AudioPlayerFragment
@@ -12,7 +12,7 @@ import android.view.ViewGroup.MarginLayoutParams
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.FragmentContainerView
 import androidx.lifecycle.ViewModelProvider
-import code.name.monkey.appthemehelper.ThemeStore.Companion.accentColor
+import allen.town.podcast.theme.ThemeStore.Companion.accentColor
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetBehavior.BottomSheetCallback
 import com.google.android.material.snackbar.Snackbar

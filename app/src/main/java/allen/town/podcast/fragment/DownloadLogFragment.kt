@@ -1,6 +1,6 @@
 package allen.town.podcast.fragment
 
-import allen.town.focus_common.util.DoubleClickBackToContentTopListener.IBackToContentTopView
+import allen.town.podcast.common.util.DoubleClickBackToContentTopListener.IBackToContentTopView
 import allen.town.podcast.R
 import allen.town.podcast.activity.MainActivity
 import allen.town.podcast.adapter.DownloadLogAdapter
@@ -21,7 +21,7 @@ import android.util.Log
 import android.view.*
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.RecyclerView
-import code.name.monkey.appthemehelper.util.scroll.ThemedFastScroller.create
+import allen.town.podcast.theme.util.scroll.ThemedFastScroller.create
 import com.faltenreich.skeletonlayout.Skeleton
 import com.faltenreich.skeletonlayout.applySkeleton
 import io.reactivex.Observable

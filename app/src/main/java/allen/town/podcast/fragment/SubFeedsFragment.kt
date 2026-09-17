@@ -1,9 +1,9 @@
 package allen.town.podcast.fragment
 
 import allen.town.podcast.core.view.TopAppBarLayout
-import allen.town.focus_common.util.DoubleClickBackToContentTopListener
-import allen.town.focus_common.util.MenuIconUtil.showToolbarMenuIcon
-import allen.town.focus_common.util.Timber
+import allen.town.podcast.common.util.DoubleClickBackToContentTopListener
+import allen.town.podcast.common.util.MenuIconUtil.showToolbarMenuIcon
+import allen.town.podcast.common.util.Timber
 import allen.town.podcast.R
 import allen.town.podcast.activity.MainActivity
 import allen.town.podcast.adapter.MultiSelectAdapter

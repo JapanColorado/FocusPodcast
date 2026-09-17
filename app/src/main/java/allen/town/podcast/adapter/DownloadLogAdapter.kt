@@ -1,8 +1,8 @@
 package allen.town.podcast.adapter
 
 import android.annotation.SuppressLint
-import allen.town.focus_common.util.ImageUtils.getColoredVectorDrawable
-import allen.town.focus_common.util.TopSnackbarUtil.showSnack
+import allen.town.podcast.common.util.ImageUtils.getColoredVectorDrawable
+import allen.town.podcast.common.util.TopSnackbarUtil.showSnack
 import allen.town.podcast.R
 import allen.town.podcast.core.service.download.DownloadRequestCreator
 import allen.town.podcast.core.service.download.DownloadService
@@ -27,7 +27,7 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
-import code.name.monkey.appthemehelper.ThemeStore.Companion.accentColor
+import allen.town.podcast.theme.ThemeStore.Companion.accentColor
 
 /**
  * Displays a list of DownloadStatus entries.

@@ -1,6 +1,6 @@
 package allen.town.podcast.adapter
 
-import allen.town.focus_common.util.MenuIconUtil.showContextMenuIcon
+import allen.town.podcast.common.util.MenuIconUtil.showContextMenuIcon
 import allen.town.podcast.R
 import allen.town.podcast.activity.MainActivity
 import allen.town.podcast.adapter.SubFeedsAdapter.SubscriptionViewHolder
@@ -23,7 +23,7 @@ import androidx.appcompat.content.res.AppCompatResources
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.ItemDecoration
-import code.name.monkey.appthemehelper.ThemeStore.Companion.accentColor
+import allen.town.podcast.theme.ThemeStore.Companion.accentColor
 import jp.shts.android.library.TriangleLabelView
 import java.lang.ref.WeakReference
 import java.text.NumberFormat

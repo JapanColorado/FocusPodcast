@@ -3,10 +3,10 @@ package allen.town.podcast.fragment
 import android.graphics.PorterDuff
 import android.os.Bundle
 import android.view.View
-import code.name.monkey.appthemehelper.ThemeStore.Companion.accentColor
-import code.name.monkey.appthemehelper.util.TintHelper
-import allen.town.focus_common.extensions.applyColor
-import allen.town.focus_common.extensions.ripAlpha
+import allen.town.podcast.theme.ThemeStore.Companion.accentColor
+import allen.town.podcast.theme.util.TintHelper
+import allen.town.podcast.common.extensions.applyColor
+import allen.town.podcast.common.extensions.ripAlpha
 import allen.town.podcast.core.pref.Prefs
 import allen.town.podcast.event.CoverColorChangeEvent
 

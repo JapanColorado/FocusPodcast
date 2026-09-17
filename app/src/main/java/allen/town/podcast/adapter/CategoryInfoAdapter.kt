@@ -13,11 +13,11 @@
  */
 package allen.town.podcast.adapter
 
-import allen.town.focus_common.databinding.PreferenceDialogLibraryCategoriesListitemBinding
-import allen.town.focus_common.model.CategoryInfo
-import allen.town.focus_common.util.BasePreferenceUtil
-import allen.town.focus_common.util.SwipeAndDragHelper
-import allen.town.focus_common.util.TopSnackbarUtil
+import allen.town.podcast.common.databinding.PreferenceDialogLibraryCategoriesListitemBinding
+import allen.town.podcast.common.model.CategoryInfo
+import allen.town.podcast.common.util.BasePreferenceUtil
+import allen.town.podcast.common.util.SwipeAndDragHelper
+import allen.town.podcast.common.util.TopSnackbarUtil
 import allen.town.podcast.R
 import allen.town.podcast.fragment.*
 import android.annotation.SuppressLint
@@ -89,7 +89,7 @@ class CategoryInfoAdapter : RecyclerView.Adapter<CategoryInfoAdapter.ViewHolder>
             } else {
                 TopSnackbarUtil.showSnack(
                     holder.itemView.context,
-                    allen.town.focus_common.R.string.you_have_to_select_at_least_one_category,
+                    allen.town.podcast.common.R.string.you_have_to_select_at_least_one_category,
                     Toast.LENGTH_SHORT
                 )
             }

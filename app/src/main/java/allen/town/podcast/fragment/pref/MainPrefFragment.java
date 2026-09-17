@@ -5,11 +5,11 @@ import android.os.Bundle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.preference.Preference;
 
-import com.bytehamster.lib.preferencesearch.SearchConfiguration;
-import com.bytehamster.lib.preferencesearch.SearchPreference;
+import allen.town.podcast.searchpreference.SearchConfiguration;
+import allen.town.podcast.searchpreference.SearchPreference;
 
-import allen.town.focus_common.util.Constants;
-import allen.town.focus_common.util.LogUtils;
+import allen.town.podcast.common.util.Constants;
+import allen.town.podcast.common.util.LogUtils;
 import allen.town.podcast.BuildConfig;
 import allen.town.podcast.R;
 import allen.town.podcast.activity.SettingsActivity;

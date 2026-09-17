@@ -5,12 +5,12 @@ import android.graphics.Color
 import android.graphics.PorterDuff
 import android.os.Bundle
 import android.view.View
-import code.name.monkey.appthemehelper.util.ColorUtil
-import code.name.monkey.appthemehelper.util.TintHelper
-import code.name.monkey.appthemehelper.util.ToolbarContentTintHelper
-import allen.town.focus_common.extensions.applyColor
-import allen.town.focus_common.extensions.colorControlNormal
-import allen.town.focus_common.extensions.isColorLight
+import allen.town.podcast.theme.util.ColorUtil
+import allen.town.podcast.theme.util.TintHelper
+import allen.town.podcast.theme.util.ToolbarContentTintHelper
+import allen.town.podcast.common.extensions.applyColor
+import allen.town.podcast.common.extensions.colorControlNormal
+import allen.town.podcast.common.extensions.isColorLight
 import allen.town.podcast.event.CoverColorChangeEvent
 
 /**

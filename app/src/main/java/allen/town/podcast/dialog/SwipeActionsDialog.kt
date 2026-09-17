@@ -1,6 +1,6 @@
 package allen.town.podcast.dialog
 
-import allen.town.focus_common.views.AccentMaterialDialog
+import allen.town.podcast.common.views.AccentMaterialDialog
 import allen.town.podcast.R
 import allen.town.podcast.databinding.*
 import allen.town.podcast.fragment.EpisodesFragment
@@ -8,7 +8,7 @@ import allen.town.podcast.fragment.FeedItemlistFragment
 import allen.town.podcast.fragment.PlaylistFragment
 import allen.town.podcast.fragment.swipeactions.SwipeAction
 import allen.town.podcast.fragment.swipeactions.SwipeActions
-import allen.town.focus_common.util.ThemeUtils.getColorFromAttr
+import allen.town.podcast.common.util.ThemeUtils.getColorFromAttr
 import android.content.Context
 import android.content.DialogInterface
 import android.graphics.PorterDuff

@@ -1,17 +1,17 @@
 package allen.town.podcast.activity
 
 import android.annotation.SuppressLint
-import allen.town.focus_common.extensions.notificationRequestCode
-import allen.town.focus_common.extensions.requestNotificationPermission
-import allen.town.focus_common.extensions.setLightNavigationBarAuto
-import allen.town.focus_common.extensions.setLightStatusBarAuto
-import allen.town.focus_common.extensions.setNavigationBarColor
-import allen.town.focus_common.extensions.surfaceColor
-import allen.town.focus_common.util.BasePreferenceUtil.libraryCategory
-import allen.town.focus_common.util.RetroUtil
-import allen.town.focus_common.util.Timber
-import allen.town.focus_common.util.TopSnackbarUtil.showSnack
-import allen.town.focus_common.views.AccentMaterialDialog
+import allen.town.podcast.common.extensions.notificationRequestCode
+import allen.town.podcast.common.extensions.requestNotificationPermission
+import allen.town.podcast.common.extensions.setLightNavigationBarAuto
+import allen.town.podcast.common.extensions.setLightStatusBarAuto
+import allen.town.podcast.common.extensions.setNavigationBarColor
+import allen.town.podcast.common.extensions.surfaceColor
+import allen.town.podcast.common.util.BasePreferenceUtil.libraryCategory
+import allen.town.podcast.common.util.RetroUtil
+import allen.town.podcast.common.util.Timber
+import allen.town.podcast.common.util.TopSnackbarUtil.showSnack
+import allen.town.podcast.common.views.AccentMaterialDialog
 import allen.town.podcast.BuildConfig
 import allen.town.podcast.R
 import allen.town.podcast.activity.main.MainFragmentNavigator
@@ -53,7 +53,7 @@ import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
 import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.RecyclerView.RecycledViewPool
-import code.name.monkey.appthemehelper.constants.ThemeConstants
+import allen.town.podcast.theme.constants.ThemeConstants
 import com.bumptech.glide.Glide
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.snackbar.Snackbar

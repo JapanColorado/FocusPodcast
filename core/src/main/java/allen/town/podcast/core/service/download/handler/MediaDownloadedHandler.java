@@ -12,7 +12,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.concurrent.ExecutionException;
 
-import allen.town.focus_common.util.Timber;
+import allen.town.podcast.common.util.Timber;
 import allen.town.podcast.event.UnreadItemsUpdateEvent;
 import allen.town.podcast.core.service.download.DownloadRequest;
 import allen.town.podcast.model.download.DownloadStatus;

@@ -5,7 +5,7 @@ import android.content.DialogInterface
 import android.view.View
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
-import code.name.monkey.appthemehelper.ThemeStore.Companion.accentColor
+import allen.town.podcast.theme.ThemeStore.Companion.accentColor
 import allen.town.podcast.model.feed.FeedItem
 import allen.town.podcast.R
 import allen.town.podcast.model.feed.FeedMedia

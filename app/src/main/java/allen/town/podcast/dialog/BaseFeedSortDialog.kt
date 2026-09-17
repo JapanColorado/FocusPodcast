@@ -1,7 +1,7 @@
 package allen.town.podcast.dialog
 
-import allen.town.focus_common.views.AccentMaterialDialog
-import allen.town.focus_common.views.ItemOffsetDecoration
+import allen.town.podcast.common.views.AccentMaterialDialog
+import allen.town.podcast.common.views.ItemOffsetDecoration
 import allen.town.podcast.R
 import allen.town.podcast.model.feed.SortOrder
 import allen.town.podcast.model.feed.SortOrder.ASC_INDEX

@@ -15,8 +15,8 @@ import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.RequestOptions;
 import com.bumptech.glide.request.target.Target;
 
-import allen.town.focus_common.util.ImageUtils;
-import allen.town.focus_common.util.ShortCutUtils;
+import allen.town.podcast.common.util.ImageUtils;
+import allen.town.podcast.common.util.ShortCutUtils;
 import allen.town.podcast.R;
 import allen.town.podcast.activity.MainActivity;
 import allen.town.podcast.model.feed.Feed;

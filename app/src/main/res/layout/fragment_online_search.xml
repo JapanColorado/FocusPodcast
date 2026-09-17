@@ -26,7 +26,7 @@
         android:visibility="gone"
         android:text="@string/search_status_no_results" />
 
-    <allen.town.focus_common.views.AccentProgressBar
+    <allen.town.podcast.common.views.AccentProgressBar
         android:id="@+id/progressBar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -50,7 +50,7 @@
         tools:text="Error message"
         tools:visibility="visible" />
 
-    <allen.town.focus_common.views.AccentMaterialButton
+    <allen.town.podcast.common.views.AccentMaterialButton
         android:id="@+id/butRetry"
         style="@style/Widget.Material3.Button"
         android:layout_width="wrap_content"

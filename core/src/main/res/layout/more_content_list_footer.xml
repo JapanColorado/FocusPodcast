@@ -18,7 +18,7 @@
         android:contentDescription="@string/load_next_page_label"
         app:srcCompat="@drawable/ic_load_more" />
 
-    <allen.town.focus_common.views.AccentProgressBar
+    <allen.town.podcast.common.views.AccentProgressBar
         android:id="@+id/progBar"
         android:layout_width="16dp"
         android:layout_height="16dp"

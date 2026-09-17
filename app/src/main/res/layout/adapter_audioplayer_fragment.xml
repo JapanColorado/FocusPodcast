@@ -222,7 +222,7 @@
                         app:srcCompat="@drawable/ic_play_48dp"
                         tools:srcCompat="@drawable/ic_play_48dp" />
 
-                    <allen.town.focus_common.views.AccentProgressBar
+                    <allen.town.podcast.common.views.AccentProgressBar
                         android:id="@+id/progLoading"
                         android:layout_width="@dimen/audioplayer_playercontrols_length_big"
                         android:layout_height="@dimen/audioplayer_playercontrols_length_big"

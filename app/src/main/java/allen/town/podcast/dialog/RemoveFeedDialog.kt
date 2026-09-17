@@ -1,7 +1,7 @@
 package allen.town.podcast.dialog
 
 import android.annotation.SuppressLint
-import allen.town.focus_common.util.TopSnackbarUtil.showSnack
+import allen.town.podcast.common.util.TopSnackbarUtil.showSnack
 import allen.town.podcast.R
 import allen.town.podcast.core.dialog.ConfirmationDialog
 import allen.town.podcast.core.storage.DBWriter

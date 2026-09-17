@@ -28,7 +28,7 @@ import org.greenrobot.eventbus.ThreadMode;
 import java.util.ArrayList;
 import java.util.List;
 
-import allen.town.focus_common.util.Timber;
+import allen.town.podcast.common.util.Timber;
 import allen.town.podcast.R;
 import allen.town.podcast.adapter.ItunesAdapter;
 import allen.town.podcast.core.storage.DBReader;

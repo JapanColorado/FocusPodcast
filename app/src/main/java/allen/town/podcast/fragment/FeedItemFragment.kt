@@ -1,8 +1,8 @@
 package allen.town.podcast.fragment
 
-import allen.town.focus_common.extensions.accentColor
-import allen.town.focus_common.extensions.tint
-import allen.town.focus_common.util.TopSnackbarUtil.showSnack
+import allen.town.podcast.common.extensions.accentColor
+import allen.town.podcast.common.extensions.tint
+import allen.town.podcast.common.util.TopSnackbarUtil.showSnack
 import allen.town.podcast.R
 import allen.town.podcast.actionbuttons.*
 import allen.town.podcast.activity.MainActivity
@@ -41,8 +41,8 @@ import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.core.util.Consumer
 import androidx.fragment.app.Fragment
-import code.name.monkey.appthemehelper.util.VersionUtils.hasMarshmallow
-import code.name.monkey.appthemehelper.util.scroll.ThemedFastScroller
+import allen.town.podcast.theme.util.VersionUtils.hasMarshmallow
+import allen.town.podcast.theme.util.scroll.ThemedFastScroller
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton

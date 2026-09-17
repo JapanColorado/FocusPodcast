@@ -1,9 +1,9 @@
 package allen.town.podcast.fragment
 
 import allen.town.podcast.core.view.TopAppBarLayout
-import allen.town.focus_common.util.DoubleClickBackToContentTopListener
-import allen.town.focus_common.util.MenuIconUtil.showToolbarMenuIcon
-import allen.town.focus_common.util.TopSnackbarUtil.showSnack
+import allen.town.podcast.common.util.DoubleClickBackToContentTopListener
+import allen.town.podcast.common.util.MenuIconUtil.showToolbarMenuIcon
+import allen.town.podcast.common.util.TopSnackbarUtil.showSnack
 import allen.town.podcast.BuildConfig
 import allen.town.podcast.R
 import allen.town.podcast.activity.MainActivity
@@ -48,7 +48,7 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SimpleItemAnimator
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-import code.name.monkey.appthemehelper.util.scroll.ThemedFastScroller.create
+import allen.town.podcast.theme.util.scroll.ThemedFastScroller.create
 import com.faltenreich.skeletonlayout.Skeleton
 import com.faltenreich.skeletonlayout.applySkeleton
 import io.reactivex.Observable

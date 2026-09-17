@@ -1,7 +1,7 @@
 package allen.town.podcast.adapter
 
-import allen.town.focus_common.util.BasePreferenceUtil.libraryCategory
-import allen.town.focus_common.views.AccentMaterialDialog
+import allen.town.podcast.common.util.BasePreferenceUtil.libraryCategory
+import allen.town.podcast.common.views.AccentMaterialDialog
 import allen.town.podcast.R
 import allen.town.podcast.activity.SettingsActivity
 import allen.town.podcast.core.glide.ApGlideSettings
@@ -26,9 +26,9 @@ import androidx.core.graphics.BlendModeColorFilterCompat
 import androidx.core.graphics.BlendModeCompat
 import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.RecyclerView
-import code.name.monkey.appthemehelper.ThemeStore.Companion.accentColor
-import code.name.monkey.appthemehelper.ThemeStore.Companion.textColorPrimary
-import code.name.monkey.appthemehelper.constants.ThemeConstants
+import allen.town.podcast.theme.ThemeStore.Companion.accentColor
+import allen.town.podcast.theme.ThemeStore.Companion.textColorPrimary
+import allen.town.podcast.theme.constants.ThemeConstants
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.CenterCrop
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners

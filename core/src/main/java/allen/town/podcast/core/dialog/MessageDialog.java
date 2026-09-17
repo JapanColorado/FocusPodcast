@@ -5,7 +5,7 @@ import android.content.DialogInterface;
 
 import androidx.appcompat.app.AlertDialog;
 
-import allen.town.focus_common.views.AccentMaterialDialog;
+import allen.town.podcast.common.views.AccentMaterialDialog;
 import allen.town.podcast.core.R;
 
 /**

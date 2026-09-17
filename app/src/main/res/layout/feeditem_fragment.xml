@@ -66,7 +66,7 @@
                     android:gravity="center_vertical"
                     android:orientation="horizontal">
 
-                    <allen.town.focus_common.views.AccentTextView
+                    <allen.town.podcast.common.views.AccentTextView
                         android:id="@+id/txtvPodcast"
                         style="@style/FocusPodcast.TextView.ListItemSecondaryTitle"
                         android:layout_width="wrap_content"
@@ -77,7 +77,7 @@
                         tools:background="@android:color/holo_green_dark"
                         tools:text="Podcast title , long text title , yes ,i am a long title long ong than you can see" />
 
-                    <allen.town.focus_common.views.AccentImageView
+                    <allen.town.podcast.common.views.AccentImageView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:clickable="false"

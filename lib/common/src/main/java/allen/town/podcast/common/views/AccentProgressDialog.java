@@ -1,0 +1,93 @@
+package allen.town.podcast.common.views;
+
+import android.app.ProgressDialog;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffColorFilter;
+import android.graphics.drawable.Drawable;
+import android.view.View;
+import android.widget.ProgressBar;
+
+import allen.town.podcast.common.util.Timber;
+import allen.town.podcast.theme.ThemeStore;
+
+
+public class AccentProgressDialog {
+
+    public static ProgressDialog show(Context context, CharSequence content) {
+        return show(context, "", content, false);
+    }
+
+    public static ProgressDialog show(Context context, CharSequence charSequence, CharSequence charSequence2) {
+        return show(context, charSequence, charSequence2, false);
+    }
+
+    public static ProgressDialog show(Context context, CharSequence charSequence, CharSequence charSequence2, boolean z) {
+        return show(context, charSequence, charSequence2, z, false, null);
+    }
+
+    public static ProgressDialog show(Context context, CharSequence charSequence, CharSequence charSequence2, boolean z, boolean z2) {
+        return show(context, charSequence, charSequence2, z, z2, null);
+    }
+
+    public static ProgressDialog show(Context context, CharSequence charSequence, CharSequence charSequence2, boolean z, boolean z2, DialogInterface.OnCancelListener onCancelListener) {
+        ProgressDialog progressDialog = new ProgressDialog(context);
+        progressDialog.setTitle(charSequence);
+        progressDialog.setMessage(charSequence2);
+        progressDialog.setIndeterminate(z);
+        progressDialog.setCancelable(z2);
+        progressDialog.setOnCancelListener(onCancelListener);
+        progressDialog.show();
+        // init() only has an effect after show()
+        init(progressDialog);
+        return progressDialog;
+    }
+
+    public static ProgressDialog instance(Context context, CharSequence charSequence, CharSequence charSequence2, boolean z, boolean z2, DialogInterface.OnCancelListener onCancelListener) {
+        ProgressDialog progressDialog = new ProgressDialogImpl(context);
+        progressDialog.setTitle(charSequence);
+        progressDialog.setMessage(charSequence2);
+        progressDialog.setIndeterminate(z);
+        progressDialog.setCancelable(z2);
+        progressDialog.setOnCancelListener(onCancelListener);
+        return progressDialog;
+    }
+
+    static class ProgressDialogImpl extends ProgressDialog{
+
+        public ProgressDialogImpl(Context context) {
+            super(context);
+        }
+
+        public ProgressDialogImpl(Context context, int theme) {
+            super(context, theme);
+        }
+
+        @Override
+        public void show() {
+            super.show();
+            init(this);
+        }
+
+    }
+
+    private static void init(final ProgressDialog progressDialog) {
+        try {
+            // android.R.id.progress is the id ProgressDialog gives its ProgressBar in
+            // both its spinner and its horizontal layout, so no reflection is needed.
+            View progressView = progressDialog.findViewById(android.R.id.progress);
+            if (progressView instanceof ProgressBar) {
+                Drawable drawable = ((ProgressBar) progressView).getIndeterminateDrawable();
+                if (drawable != null) {
+                    drawable.setColorFilter(new PorterDuffColorFilter(
+                            ThemeStore.accentColor(progressDialog.getContext()), PorterDuff.Mode.SRC_ATOP));
+                }
+            }
+        } catch (Exception e) {
+            // Purely cosmetic: without the tint the dialog shows the platform's default spinner
+            // color, so there is nothing worth failing the dialog over.
+            Timber.w(e, "could not tint the progress dialog");
+        }
+    }
+}

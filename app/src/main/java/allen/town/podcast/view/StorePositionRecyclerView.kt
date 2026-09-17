@@ -3,7 +3,7 @@ package allen.town.podcast.view
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.LinearLayoutManager
 import allen.town.podcast.R
-import allen.town.focus_common.util.Timber
+import allen.town.podcast.common.util.Timber
 import android.content.Context
 import android.content.res.Configuration
 import android.util.AttributeSet

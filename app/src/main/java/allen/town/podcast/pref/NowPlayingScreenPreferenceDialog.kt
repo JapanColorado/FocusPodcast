@@ -14,10 +14,10 @@
 
 package allen.town.podcast.pref
 
-import allen.town.focus_common.common.prefs.supportv7.ATEDialogPreference
-import allen.town.focus_common.extensions.colorControlNormal
-import allen.town.focus_common.extensions.hide
-import allen.town.focus_common.util.Util
+import allen.town.podcast.common.common.prefs.supportv7.ATEDialogPreference
+import allen.town.podcast.common.extensions.colorControlNormal
+import allen.town.podcast.common.extensions.hide
+import allen.town.podcast.common.util.Util
 import allen.town.podcast.R
 import allen.town.podcast.core.playback.NowPlayingScreen
 import allen.town.podcast.core.pref.Prefs
@@ -34,7 +34,7 @@ import androidx.core.graphics.BlendModeCompat.SRC_IN
 import androidx.fragment.app.DialogFragment
 import androidx.viewpager.widget.PagerAdapter
 import androidx.viewpager.widget.ViewPager
-import code.name.monkey.retromusic.extensions.*
+import allen.town.podcast.common.extensions.*
 import com.bumptech.glide.Glide
 
 class NowPlayingScreenPreference @JvmOverloads constructor(

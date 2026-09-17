@@ -1,6 +1,6 @@
 package allen.town.podcast.discovery
 
-import allen.town.focus_common.util.Timber
+import allen.town.podcast.common.util.Timber
 import allen.town.podcast.MyApp.Companion.instance
 import allen.town.podcast.core.util.DateFormatter
 import allen.town.podcast.parser.feed.util.ItunesEpisodesDateUtils

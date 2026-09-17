@@ -5,7 +5,7 @@ import android.util.Log;
 
 import androidx.core.app.ServiceCompat;
 
-import allen.town.focus_common.util.Timber;
+import allen.town.podcast.common.util.Timber;
 
 class PlaybackServiceStateManager {
     private final PlaybackService playbackService;

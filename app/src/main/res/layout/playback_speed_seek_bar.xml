@@ -21,7 +21,7 @@
         android:contentDescription="@string/decrease_speed"
         android:background="?attr/selectableItemBackgroundBorderless" />
 
-    <allen.town.focus_common.views.AccentAlphaSlider
+    <allen.town.podcast.common.views.AccentAlphaSlider
         android:id="@+id/playback_speed"
         android:layout_width="0dp"
         android:layout_height="wrap_content"

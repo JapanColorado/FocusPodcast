@@ -9,7 +9,7 @@
         android:orientation="vertical">
 
         <!-- colorSurface may be overridden, so adding this background actually looks wrong -->
-        <allen.town.focus_common.views.AccentTabLayout
+        <allen.town.podcast.common.views.AccentTabLayout
             android:id="@+id/sliding_tabs"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

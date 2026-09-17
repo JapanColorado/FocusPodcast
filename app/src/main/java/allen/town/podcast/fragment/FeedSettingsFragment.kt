@@ -1,7 +1,7 @@
 package allen.town.podcast.fragment
 
-import allen.town.focus_common.common.prefs.supportv7.ATESwitchPreference
-import allen.town.focus_common.views.AccentMaterialDialog
+import allen.town.podcast.common.common.prefs.supportv7.ATESwitchPreference
+import allen.town.podcast.common.views.AccentMaterialDialog
 import allen.town.podcast.R
 import allen.town.podcast.core.pref.Prefs.isEnableAutodownload
 import allen.town.podcast.core.storage.DBReader

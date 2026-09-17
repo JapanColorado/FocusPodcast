@@ -1,6 +1,6 @@
 package allen.town.podcast.discovery
 
-import allen.town.focus_common.util.Timber
+import allen.town.podcast.common.util.Timber
 import allen.town.podcast.BuildConfig
 import allen.town.podcast.core.ClientConfig
 import allen.town.podcast.core.service.download.PodcastHttpClient

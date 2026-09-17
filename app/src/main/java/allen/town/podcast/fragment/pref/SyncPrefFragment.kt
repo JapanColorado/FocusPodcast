@@ -1,7 +1,7 @@
 package allen.town.podcast.fragment.pref
 
-import allen.town.focus_common.util.TopSnackbarUtil.showSnack
-import allen.town.focus_common.views.AccentMaterialDialog
+import allen.town.podcast.common.util.TopSnackbarUtil.showSnack
+import allen.town.podcast.common.views.AccentMaterialDialog
 import allen.town.podcast.R
 import allen.town.podcast.activity.SettingsActivity
 import allen.town.podcast.core.sync.SyncService
@@ -24,7 +24,7 @@ import androidx.core.graphics.BlendModeColorFilterCompat
 import androidx.core.graphics.BlendModeCompat
 import androidx.core.text.HtmlCompat
 import androidx.preference.Preference
-import code.name.monkey.appthemehelper.ThemeStore.Companion.accentColor
+import allen.town.podcast.theme.ThemeStore.Companion.accentColor
 import java.util.Locale
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe

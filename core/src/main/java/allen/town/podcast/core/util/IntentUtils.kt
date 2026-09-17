@@ -1,6 +1,6 @@
 package allen.town.podcast.core.util
 
-import allen.town.focus_common.ui.customtabs.BrowserLauncher
+import allen.town.podcast.common.ui.customtabs.BrowserLauncher
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.Context

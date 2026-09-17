@@ -8,7 +8,7 @@ import androidx.preference.Preference;
 
 import org.greenrobot.eventbus.EventBus;
 
-import allen.town.focus_common.common.prefs.supportv7.ATESwitchPreference;
+import allen.town.podcast.common.common.prefs.supportv7.ATESwitchPreference;
 import allen.town.podcast.MyApp;
 import allen.town.podcast.R;
 import allen.town.podcast.core.pref.Prefs;

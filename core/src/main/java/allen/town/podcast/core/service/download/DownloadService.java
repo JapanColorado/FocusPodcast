@@ -20,7 +20,7 @@ import androidx.core.app.ServiceCompat;
 import androidx.core.content.ContextCompat;
 
 
-import allen.town.focus_common.util.Timber;
+import allen.town.podcast.common.util.Timber;
 import allen.town.podcast.core.BuildConfig;
 import allen.town.podcast.core.R;
 import org.greenrobot.eventbus.EventBus;

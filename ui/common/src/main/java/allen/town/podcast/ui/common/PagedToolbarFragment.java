@@ -7,7 +7,7 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import androidx.viewpager2.widget.ViewPager2;
 
-import allen.town.focus_common.util.DoubleClickBackToContentTopListener;
+import allen.town.podcast.common.util.DoubleClickBackToContentTopListener;
 
 /**
  * Fragment with a ViewPager where the displayed items influence the top toolbar's menu.

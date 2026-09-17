@@ -32,7 +32,7 @@
         android:layout_height="@dimen/list_pref_guideline_begin"
         android:layout_centerVertical="true">
 
-        <allen.town.focus_common.views.SettingsImageView
+        <allen.town.podcast.common.views.SettingsImageView
             android:id="@android:id/icon"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -61,7 +61,7 @@
             tools:maxLines="@string/grid_size_1"
             tools:text="@tools:sample/lorem/random" />
 
-        <allen.town.focus_common.views.BaselineGridTextView
+        <allen.town.podcast.common.views.BaselineGridTextView
             android:id="@android:id/summary"
             android:layout_width="match_parent"
             android:layout_height="match_parent"

@@ -11,7 +11,7 @@ import androidx.core.content.ContextCompat;
 import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.appbar.CollapsingToolbarLayout;
 
-import allen.town.focus_common.extensions.ActivityThemeExtensionsUtils;
+import allen.town.podcast.common.extensions.ActivityThemeExtensionsUtils;
 import allen.town.podcast.R;
 import allen.town.podcast.activity.MainActivity;
 

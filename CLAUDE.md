@@ -62,7 +62,7 @@ Dependency direction (top depends on bottom):
 - **parser/feed** (RSS/Atom), **parser/media** (ID3/Vorbis chapters), **net/ssl**, **net/sync/model** + **net/sync/gpoddernet**
 - **event** — EventBus payload classes only. **model** — POJOs (`Feed`, `FeedItem`, `FeedMedia`, ...).
 - **ui/common** (shared views), **ui/app-start-intent** (typed Intent builders so lower modules can launch app Activities without depending on `app`), **ui/i18n** and **ui/png-icons** (resources only).
-- **lib/common** (`allen.town.focus_common.*` — base Activity/Application, dialogs, utils), **lib/theme** (`code.name.monkey.appthemehelper.*`), **lib/searchpreference** (`com.bytehamster.lib.preferencesearch.*`). These were git submodules until Phase 1; they are now ordinary in-tree modules and may be edited freely.
+- **lib/common** (`allen.town.podcast.common.*` — base Activity/Application, dialogs, utils), **lib/theme** (`allen.town.podcast.theme.*`), **lib/searchpreference** (`allen.town.podcast.searchpreference.*`). These were git submodules until Phase 1; they are now ordinary in-tree modules and may be edited freely. Their packages were renamed out of their upstream namespaces into `allen.town.podcast.common.*`, `allen.town.podcast.theme.*` and `allen.town.podcast.searchpreference.*` (the handful of files that still declared a RetroMusic package were folded into the package matching their own directory), so every class in the build now lives under `allen.town.podcast.*` and upstream AppThemeHelper / RetroMusic / SearchPreference sources no longer apply as drop-in patches.
 
 ### How the layers talk to each other
 

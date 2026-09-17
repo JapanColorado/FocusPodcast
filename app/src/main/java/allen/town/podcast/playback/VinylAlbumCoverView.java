@@ -13,8 +13,8 @@ import android.os.Looper;
 import android.util.AttributeSet;
 import android.view.View;
 
-import allen.town.focus_common.util.ImageUtils;
-import allen.town.focus_common.util.RetroUtil;
+import allen.town.podcast.common.util.ImageUtils;
+import allen.town.podcast.common.util.RetroUtil;
 import allen.town.podcast.R;
 
 

@@ -41,7 +41,7 @@ import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
 
 import com.google.android.exoplayer2.upstream.HttpDataSource;
 
-import allen.town.focus_common.util.Timber;
+import allen.town.podcast.common.util.Timber;
 import allen.town.podcast.core.ClientConfig;
 import allen.town.podcast.core.R;
 import allen.town.podcast.core.pref.Prefs;

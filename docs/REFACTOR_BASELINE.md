@@ -1,14 +1,14 @@
 # Refactor baseline
 
 Counts taken on 2026-09-16 at commit 6c8252a, before the fdroid-only refactor.
-Each phase updates the "now" column. Submodule figures cover focus-common,
+The "Now" column is the state at the end of the refactor on 2026-09-17. Submodule figures cover focus-common,
 focus-theme and searchpreference (vendored as `lib/*` in Phase 1); the
 focus-purchase submodule (128k lines of vendored Alipay SDK) is excluded
 because it is deleted outright.
 
 | Metric | Baseline | Now |
 |---|---:|---:|
-| First-party source lines (java + kt) | 71,121 | 65,483 |
+| First-party source lines (java + kt) | 71,121 | 70,500 |
 | Kotlin `!!` assertions (app, core, lib) | 1,865 | 0 |
 | `printStackTrace()` calls | 135 | 0 |
 | Chinese (CJK) lines outside translation resources | 626 | 0 |
@@ -16,6 +16,9 @@ because it is deleted outright.
 | Build flavors | 3 | 1 |
 | Git submodules | 4 | 0 |
 | Unit test files (passing tests) | 10 (58) | 16 (162) |
+| Largest source file (lines) | 1,989 (PlaybackService) | 1,129 (PlayPauseProgressButton) |
+| Vendored library packages outside `allen.town.podcast.*` | 3 | 0 |
+| Release APK size | 12.3 MB | 11.3 MB |
 | detekt findings (`pixi run detekt`) | 202 | 0 |
 
 The detekt figure is the count on the first run of the gate, immediately after the config

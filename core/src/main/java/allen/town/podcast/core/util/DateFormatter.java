@@ -10,7 +10,7 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.Locale;
 
-import allen.town.focus_common.util.EntityDateUtils;
+import allen.town.podcast.common.util.EntityDateUtils;
 import allen.town.podcast.core.R;
 
 /**

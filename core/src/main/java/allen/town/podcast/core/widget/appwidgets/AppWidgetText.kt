@@ -14,13 +14,13 @@
  */
 package allen.town.podcast.core.widget.appwidgets
 
-import allen.town.focus_common.util.RetroUtil
+import allen.town.podcast.common.util.RetroUtil
 import android.app.PendingIntent
 import android.content.Context
 import android.graphics.Bitmap
 import android.widget.RemoteViews
 import androidx.core.content.ContextCompat
-import code.name.monkey.appthemehelper.util.ImageUtil
+import allen.town.podcast.theme.util.ImageUtil
 import allen.town.podcast.core.R
 import allen.town.podcast.core.widget.WidgetUpdater
 import allen.town.podcast.core.widget.base.BaseAppWidget
