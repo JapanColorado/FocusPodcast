@@ -16,6 +16,7 @@ import allen.town.podcast.event.CoverColorChangeEvent
 class ColorAudioPlayerFragment : AudioPlayerFragment(false) {
     override fun coverColorUpdate(event: CoverColorChangeEvent) {
         super.coverColorUpdate(event)
+        gradientBackgroundEnabled = false
         colorGradientBackground.visibility = GONE
         colorBackground.visibility = VISIBLE
         colorBackground.setBackgroundColor(event.color.backgroundColor)

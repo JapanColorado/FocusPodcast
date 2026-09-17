@@ -31,6 +31,7 @@ open class BlurAudioPlayerFragment : AudioPlayerFragment(false) {
         lastPlaybackControlsColor = if(event.color.backgroundColor.isColorLight) colorControlNormal() else  Color.WHITE
         lastDisabledPlaybackControlsColor = if(event.color.backgroundColor.isColorLight) colorControlNormal()
         else ContextCompat.getColor(requireContext(), R.color.md_grey_200)
+        gradientBackgroundEnabled = false
         colorGradientBackground.visibility = GONE
         colorBackground.visibility = VISIBLE
         updateBlur(event.bitmap)

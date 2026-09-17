@@ -63,7 +63,6 @@ constructor() : Fragment() {
     ): View {
         // Inflate the layout for this fragment
         val root: View = inflater.inflate(R.layout.collapsing_pager_fragment, container, false)
-        setupToolbar(root.findViewById<TopAppBarLayout>(R.id.appBarLayout).toolbar)
         viewPager = root.findViewById(R.id.viewpager)
         viewPager.setOffscreenPageLimit(2)
         viewPager.setAdapter(PagerAdapter(this))
@@ -91,6 +90,9 @@ constructor() : Fragment() {
         searchHistoryAdapter = SearchHistoryAdapter()
         searchHistoryAdapter.setHasStableIds(true)
         recyclerView.setAdapter(searchHistoryAdapter)
+        // Expanding the SearchView fires onQueryTextChange synchronously, which calls
+        // showSearchLayout(), so the toolbar must be set up after the views and adapter exist.
+        setupToolbar(root.findViewById<TopAppBarLayout>(R.id.appBarLayout).toolbar)
         showSearchLayout(false)
         clearHistoryIv.setOnClickListener(object : View.OnClickListener {
             public override fun onClick(v: View) {
@@ -187,7 +189,9 @@ constructor() : Fragment() {
     private fun showSearchLayout(show: Boolean) {
         suggestionLayout?.visibility = if (show) View.GONE else View.VISIBLE
         tabViewPagerLayout?.visibility = if (show) View.VISIBLE else View.INVISIBLE
-        searchHistoryAdapter.notifyDataSetChanged()
+        if (::searchHistoryAdapter.isInitialized) {
+            searchHistoryAdapter.notifyDataSetChanged()
+        }
     }
 
     private fun search(query: String) {

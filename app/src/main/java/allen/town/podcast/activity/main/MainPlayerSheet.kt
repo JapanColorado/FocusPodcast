@@ -64,6 +64,7 @@ internal class MainPlayerSheet(
             if (slideOffset == 0.0f) { //STATE_COLLAPSED
                 audioPlayer.scrollToPage(AudioPlayerFragment.POS_COVER)
             }
+            audioPlayer.setGradientBackgroundVisible(slideOffset > 0.0f)
             val condensedSlideOffset = Math.max(0.0f, Math.min(0.2f, slideOffset - 0.2f)) / 0.2f
             audioPlayer.externalPlayerHolder.alpha = 1 - condensedSlideOffset
             audioPlayer.externalPlayerHolder.visibility =

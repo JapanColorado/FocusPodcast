@@ -129,6 +129,20 @@ public class AudioPlayerFragment extends Fragment implements
     protected ImageView driveCloseIv;
     protected NowPlayingScreen nowPlayingScreen;
     protected View colorGradientBackground;
+    /** Player styles that draw their own background set this to false and hide the gradient for good. */
+    protected boolean gradientBackgroundEnabled = true;
+
+    /**
+     * The palette gradient spans the whole sheet, so while the sheet is collapsed its top edge
+     * would show below the mini player, in the navigation-bar inset. Only show it while the
+     * sheet is (partly) expanded.
+     */
+    public void setGradientBackgroundVisible(boolean visible) {
+        if (colorGradientBackground == null || !gradientBackgroundEnabled) {
+            return;
+        }
+        colorGradientBackground.setVisibility(visible ? View.VISIBLE : View.INVISIBLE);
+    }
     protected ImageView playPauseButton;
     protected ImageView swipeUpIv;
     protected TextView swipeUpTipTv;

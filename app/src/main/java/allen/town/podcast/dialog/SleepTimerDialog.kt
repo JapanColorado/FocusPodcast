@@ -168,7 +168,12 @@ class SleepTimerDialog : DialogFragment() {
         }
 
         override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-            holder.chip.text = spinnerContent[position] + getString(R.string.time_minutes)
+            val minutes = spinnerContent[position].toIntOrNull()
+            holder.chip.text = if (minutes != null) {
+                resources.getQuantityString(R.plurals.time_minutes_quantified, minutes, minutes)
+            } else {
+                "${spinnerContent[position]} ${getString(R.string.time_minutes)}"
+            }
             holder.chip.isChecked = selectedIndex == position
             holder.chip.isCheckedIconVisible = holder.chip.isChecked
             holder.chip.setOnClickListener {
