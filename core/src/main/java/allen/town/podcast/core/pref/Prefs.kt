@@ -1,59 +1,33 @@
 package allen.town.podcast.core.pref
 
 import allen.town.focus_common.model.CategoryInfo
-import allen.town.focus_common.util.BasePreferenceUtil.instance
-import allen.town.focus_common.util.BasePreferenceUtil.materialYou
-import allen.town.focus_common.util.JsonHelper.parseStringList
-import allen.town.focus_common.util.JsonHelper.toJSONString
-import allen.town.focus_common.util.PodcastSearchPreferenceUtil
-import allen.town.focus_common.util.Timber
-import allen.town.podcast.core.R
 import allen.town.podcast.core.feed.SubscriptionsFilter
 import allen.town.podcast.core.playback.AlbumCoverStyle
 import allen.town.podcast.core.playback.NowPlayingScreen
-import allen.town.podcast.core.storage.*
-import allen.town.podcast.core.util.download.AutoUpdateManager
+import allen.town.podcast.core.storage.EpisodeCleanupAlgorithm
 import allen.town.podcast.core.view.TopAppBarLayout.AppBarMode
 import allen.town.podcast.model.download.ProxyConfig
 import allen.town.podcast.model.feed.FeedCounter
 import allen.town.podcast.model.feed.SortOrder
 import allen.town.podcast.model.playback.MediaType
-import allen.town.focus_common.util.ThemeUtils.generalThemeValue
-import android.app.Application
 import android.content.Context
-import android.content.SharedPreferences
-import android.os.Build
-import android.text.TextUtils
-import android.util.Log
-import android.view.KeyEvent
 import androidx.annotation.StyleRes
 import androidx.annotation.VisibleForTesting
-import androidx.core.app.NotificationCompat
-import androidx.preference.PreferenceManager
 import code.name.monkey.appthemehelper.constants.ThemeConstants
-import allen.town.focus_common.extensions.getStringOrDefault
-import code.name.monkey.retromusic.util.theme.ThemeMode
-import com.google.gson.Gson
-import com.google.gson.JsonSyntaxException
-import com.google.gson.reflect.TypeToken
-import org.json.JSONArray
-import org.json.JSONException
 import java.io.File
-import java.io.IOException
-import java.net.Proxy
-import java.text.DecimalFormat
-import java.text.DecimalFormatSymbols
-import java.util.*
-import java.util.concurrent.TimeUnit
 
 /**
  * Provides access to preferences set by the user in the settings screen. A
  * private instance of this class must first be instantiated via
  * init() or otherwise every public method will throw an Exception
  * when called.
+ *
+ * This object is the single entry point callers use; the implementation is split by topic into
+ * [UiPrefs], [PlaybackPrefs], [DownloadPrefs], [NetworkPrefs] and [SyncPrefs], all reading the
+ * shared state in [PrefsStore]. Every member below is a one-line delegation, so the preference
+ * keys and defaults for one topic live together in exactly one file.
  */
 object Prefs {
-    private const val TAG = "Prefs"
 
     // User Interface
     const val PREF_THEME = ThemeConstants.GENERAL_THEME //theme key
@@ -61,17 +35,14 @@ object Prefs {
 
     //drive
     const val PREF_QUEUE_KEEP_SORTED = "pref_queue_keep_sorted"
-    
+
     //app start page
     const val PREF_HOME_PAGE = "pref_homepage"
     const val PREF_DRAWER_FEED_ORDER = "pref_feed_order"
     const val PREF_EXPANDED_NOTIFICATION = "pref_expand_notification"
-    private const val PREF_PERSISTENT_NOTIFICATION = "pref_persist_notification"
     const val PREF_SHOW_TIME_LEFT = "pref_show_left_time" //show remaining time
     const val PREF_COMPACT_NOTIFICATION_BUTTONS = "pref_compact_noti_buttons"
     const val PREF_LOCKSCREEN_BACKGROUND = "pref_lock_screen_backgound"
-    private const val PREF_DRAWER_FEED_COUNTER = "pref_feed_counts"
-    private const val PREF_SHOW_DOWNLOAD_REPORT = "pref_show_download_sync_failed"
     const val PREF_COLUMN_IN_LANDSCAPE = "prefColumnDisplayInLandscape"
     const val PREF_BACK_BUTTON_BEHAVIOR = "pref_backbutton_behavior"
     const val PREF_USE_EPISODE_COVER = "pref_use_episode_cover" //use episode cover
@@ -79,15 +50,11 @@ object Prefs {
     const val PREF_FILTER_FEED = "prefSubscriptionsFilter"
     const val PREF_SUBSCRIPTION_TITLE = "pref_show_sub_title"
     const val APPBAR_MODE = "appbar_mode"
-    private const val PREF_SHOW_AUTO_DOWNLOAD_REPORT = "pref_show_auto_downlod_result"
-
 
     //playlist sort order
     const val PREF_QUEUE_KEEP_SORTED_ORDER = "pref_playlist_keep_order"
 
-
     // Other
-    private const val PREF_DATA_FOLDER = "prefDataFolder"
     const val PREF_DELETE_REMOVES_FROM_QUEUE = "prefDeleteRemovesFromQueue"
     const val PREF_USAGE_COUNTING_DATE = "prefUsageCounting"
     const val PREF_ONLINE_PODCAST_SEARCH_HISTORY = "pref_online_podcast_search_history"
@@ -98,1140 +65,504 @@ object Prefs {
     const val NEW_BLUR_AMOUNT = "new_blur_amount"
     const val PREF_UNPAUSE_ON_HEADSET_RECONNECT = "pref_play_when_headset_reconnect"
     const val PREF_HARDWARE_FORWARD_BUTTON = "pref_hardware_forward_button"
-    private const val PREF_UNPAUSE_ON_BLUETOOTH_RECONNECT = "pref_play_when_bluetooth_reconnect"
     const val PREF_FOLLOW_QUEUE = "pref_follow_playlist"
     const val PREF_SKIP_KEEPS_EPISODE = "pref_keep_episode_when_skip"
-    private const val PREF_FAVORITE_KEEPS_EPISODE = "pref_keeps_favorite_episodes"
-    private const val PREF_PLAYBACK_SPEED_ARRAY = "pref_playback_speed_list"
-    private const val PREF_RESUME_AFTER_CALL = "pref_replay_after_call"
-    private const val PREF_AUTO_DELETE = "pref_auto_delete"
     const val PREF_STREAM_OVER_DOWNLOAD = "pref_allow_stream_over_download"
     const val PREF_HARDWARE_PREVIOUS_BUTTON = "pref_hardware_previous_button"
     const val PREF_PAUSE_PLAYBACK_FOR_FOCUS_LOSS = "pref_pause_when_loss_focus"
     const val PREF_SNOWFALL = "pre_show_snow_fall"
-    private const val PREF_TIME_RESPECTS_SPEED = "pref_respects_playbacktime_for_speed"
     const val PREF_TOGGLE_ADD_CONTROLS = "toggle_add_controls"
     const val PREF_ADAPTIVE_COLOR_APP = "pref_adaptive_color_app"
     const val NOW_PLAYING_SCREEN_ID = "now_playing_screen_id"
     const val PREF_SMART_MARK_AS_PLAYED_SECS = "pref_smart_mark_as_played_secs"
 
     // Network
-    private const val PREF_ENQUEUE_DOWNLOADED = "pref_add_to_playlist_when_download"
     const val PREF_UPDATE_INTERVAL = "pref_auto_refresh_interval"
-    private const val PREF_MOBILE_UPDATE = "pref_mobile_update_types"
     const val PREF_ENQUEUE_LOCATION = "pref_episode_location_in_playlist"
     const val PREF_PARALLEL_DOWNLOADS = "pref_parallel_downloads"
     const val PREF_EPISODE_CACHE_SIZE = "pref_episodes_cache_size"
     const val PREF_ENABLE_AUTODL = "pref_auto_download_enable"
     const val PREF_ENABLE_AUTODL_ON_BATTERY = "pref_auto_download_enable_on_battery"
     const val PREF_EPISODE_CLEANUP = "pref_episodes_clean_up"
-    private const val PREF_PROXY_HOST = "pref_proxy_host"
-    private const val PREF_PROXY_PORT = "pref_proxy_port"
-    private const val PREF_PROXY_TYPE = "pref_proxy_type"
-    private const val PREF_PROXY_USER = "pref_proxy_username"
-    private const val PREF_PROXY_PASSWORD = "pref_proxy_pass"
-    private const val PREF_REFRESH_ON_START = "pref_refresh_on_start"
 
     // Services
     public const val PREF_GPODNET_NOTIFICATIONS = "pref_show_gpod_notifications"
 
-
-    //loudness enhancement
-    private const val PREF_AUDIO_LOUDNESS = "pref_audio_loudness"
     const val EPISODE_CLEANUP_QUEUE = -1
     const val EPISODE_CLEANUP_NULL = -2
     const val EPISODE_CLEANUP_EXCEPT_FAVORITE = -3
     const val EPISODE_CLEANUP_DEFAULT = 0
-    
 
     //global audio playback speed
-    private const val PREF_PLAYBACK_SPEED = "pref_globa_playback_speed"
-    private const val PREF_VIDEO_PLAYBACK_SPEED = "pref_global_video_playback_speed"
     const val PREF_PLAYBACK_SKIP_SILENCE = "pref_global_skip_silence"
-    private const val PREF_FAST_FORWARD_SECS = "pref_global_fast_forward_secs"
-    private const val PREF_REWIND_SECS = "pref_global_rewind_secs"
-
-    //lock the playlist
-    private const val PREF_QUEUE_LOCKED = "pref_queue_Locked"
-
-    // Experimental
-    private const val PREF_STEREO_TO_MONO = "pref_stereo_to_mono"
-
 
     // Constants
-    private const val NOTIFICATION_BUTTON_REWIND = 0
-    private const val NOTIFICATION_BUTTON_FAST_FORWARD = 1
-    private const val NOTIFICATION_BUTTON_SKIP = 2
-    private const val EPISODE_CACHE_SIZE_UNLIMITED = -1
     const val FEED_ORDER_COUNTER = 0
     const val FEED_ORDER_ALPHABETICAL = 1
     const val ORDER_ASC = "asc"
     const val ORDER_DESC = "desc"
-    /**
-     * Typed as [Application] rather than [Context] on purpose: this field lives for the whole
-     * process, so only the application instance may be stored here. Anything shorter-lived (an
-     * Activity, a Service) would be leaked.
-     */
-    private var applicationContext: Application? = null
-    private var sharedPrefs: SharedPreferences? = null
-    private var themePrefs: SharedPreferences? = null
 
-    private const val NOT_INITIALIZED =
-        "Prefs.init() must be called (via ClientConfig.initialize) before any preference is used"
-
-    private val context: Application
-        get() = applicationContext ?: error(NOT_INITIALIZED)
-
-    private val prefs: SharedPreferences
-        get() = sharedPrefs ?: error(NOT_INITIALIZED)
-
-    /**
-     * Sets up the Prefs class.
-     */
+    /** Sets up the Prefs class. Must run before any preference below is touched. */
     @JvmStatic
-    fun init(context: Context) {
-        Log.d(TAG, "init")
-        applicationContext = context.applicationContext as Application
-        sharedPrefs = PreferenceManager.getDefaultSharedPreferences(context)
-        themePrefs = instance(context)
-        createNoMediaFile()
-    }
+    fun init(context: Context) = PrefsStore.init(context)
 
-    /**
-     * Drops the process-wide state so that a unit test can assert the uninitialised behaviour.
-     * Robolectric reuses one class loader for every test class with the same configuration, so
-     * without this hook the "not initialised" branch would only ever be reachable in whichever
-     * test happened to run first.
-     */
+    /** Drops the process-wide state so a unit test can assert the uninitialised behaviour. */
     @VisibleForTesting(otherwise = VisibleForTesting.NONE)
     @JvmStatic
-    fun resetForTests() {
-        applicationContext = null
-        sharedPrefs = null
-        themePrefs = null
-    }
+    fun resetForTests() = PrefsStore.resetForTests()
 
-    /** Reads a string preference that always has a non-null default. */
-    private fun getString(key: String, defaultValue: String): String =
-        prefs.getString(key, defaultValue) ?: defaultValue
-
-    /**
-     * Returns the current theme.
-     *
-     * @return R.style.Theme_FocusPodcast_Light or R.style.Theme_FocusPodcast_Dark
-     */
     @get:StyleRes
     @JvmStatic
     val theme: Int
-        get() = if (materialYou) {
-            if (generalThemeValue(context) === ThemeMode.BLACK) R.style.Theme_FocusPodcast_MD3_Base_Black else R.style.Theme_FocusPodcast_MD3_Base
-        } else {
-            val themeMode = generalThemeValue(
-                context
-            )
-            if (themeMode === ThemeMode.LIGHT) {
-                R.style.Theme_FocusPodcast_Light
-            } else if (themeMode === ThemeMode.DARK) {
-                R.style.Theme_FocusPodcast_Dark
-            } else if (themeMode === ThemeMode.BLACK) {
-                R.style.Theme_FocusPodcast_TrueBlack
-            } else {
-                R.style.Theme_FocusPodcast_Light
-            }
-        }
+        get() = UiPrefs.theme
 
     @JvmStatic
     var compactNotificationButtons: List<Int>
-        get() {
-            val buttons = TextUtils.split(
-                prefs.getString(
-                    PREF_COMPACT_NOTIFICATION_BUTTONS,
-                    NOTIFICATION_BUTTON_REWIND.toString() + "," + NOTIFICATION_BUTTON_FAST_FORWARD
-                ),
-                ","
-            )
-            val notificationButtons: MutableList<Int> = ArrayList()
-            for (button in buttons) {
-                notificationButtons.add(button.toInt())
-            }
-            return notificationButtons
-        }
+        get() = UiPrefs.compactNotificationButtons
         set(items) {
-            val str = TextUtils.join(",", items)
-            prefs.edit()
-                .putString(PREF_COMPACT_NOTIFICATION_BUTTONS, str)
-                .apply()
+            UiPrefs.compactNotificationButtons = items
         }
 
-    /**
-     * Helper function to return whether the specified button should be shown on compact
-     * notifications.
-     *
-     * @param buttonId Either NOTIFICATION_BUTTON_REWIND, NOTIFICATION_BUTTON_FAST_FORWARD or
-     * NOTIFICATION_BUTTON_SKIP.
-     * @return `true` if button should be shown, `false`  otherwise
-     */
-    private fun showButtonOnCompactNotification(buttonId: Int): Boolean {
-        return compactNotificationButtons.contains(buttonId)
-    }
     @JvmStatic
-    fun showRewindOnCompactNotification(): Boolean {
-        return showButtonOnCompactNotification(NOTIFICATION_BUTTON_REWIND)
-    }
+    fun showRewindOnCompactNotification(): Boolean = UiPrefs.showRewindOnCompactNotification()
+
     @JvmStatic
-    fun showFastForwardOnCompactNotification(): Boolean {
-        return showButtonOnCompactNotification(NOTIFICATION_BUTTON_FAST_FORWARD)
-    }
+    fun showFastForwardOnCompactNotification(): Boolean =
+        UiPrefs.showFastForwardOnCompactNotification()
+
     @JvmStatic
-    fun showSkipOnCompactNotification(): Boolean {
-        return showButtonOnCompactNotification(NOTIFICATION_BUTTON_SKIP)
-    }
+    fun showSkipOnCompactNotification(): Boolean = UiPrefs.showSkipOnCompactNotification()
+
     @JvmStatic
     val feedOrder: Int
-        get() {
-            return getString(PREF_DRAWER_FEED_ORDER, "" + FEED_ORDER_COUNTER).toInt()
-        }
+        get() = UiPrefs.feedOrder
+
     @JvmStatic
-    fun setFeedOrder(selected: String?) {
-        prefs.edit()
-            .putString(PREF_DRAWER_FEED_ORDER, selected)
-            .apply()
-    }
+    fun setFeedOrder(selected: String?) = UiPrefs.setFeedOrder(selected)
 
     @JvmStatic
     var feedOrderMethod: String
-        get() = getString(PREF_DRAWER_FEED_ORDER_METHOD, ORDER_ASC)
+        get() = UiPrefs.feedOrderMethod
         set(selected) {
-            prefs.edit()
-                .putString(PREF_DRAWER_FEED_ORDER_METHOD, selected)
-                .apply()
+            UiPrefs.feedOrderMethod = selected
         }
 
     @JvmStatic
     val feedCounterSetting: FeedCounter
-        get() {
-            val value = getString(
-                PREF_DRAWER_FEED_COUNTER,
-                "" + FeedCounter.SHOW_NEW_UNPLAYED_SUM.id
-            )
-            return FeedCounter.fromOrdinal(value.toInt())
-        }
+        get() = UiPrefs.feedCounterSetting
 
-    /**
-     * @return `true` if episodes should use their own cover, `false`  otherwise
-     */
     @JvmStatic
     val useEpisodeCoverSetting: Boolean
-        get() = prefs.getBoolean(PREF_USE_EPISODE_COVER, true)
+        get() = UiPrefs.useEpisodeCoverSetting
 
     @JvmStatic
     val showEpisodeCoverInFeed: Boolean
-        get() = prefs.getBoolean(PREF_SHOW_EPISODE_COVER_IN_FEED, true)
+        get() = UiPrefs.showEpisodeCoverInFeed
 
-
-    /**
-     * @return `true` if we should show remaining time or the duration
-     */
     @JvmStatic
-    fun shouldShowRemainingTime(): Boolean {
-        return prefs.getBoolean(PREF_SHOW_TIME_LEFT, false)
-    }
+    fun shouldShowRemainingTime(): Boolean = UiPrefs.shouldShowRemainingTime()
 
-    /**
-     * Whether to show the most recently opened page: "1" is the first item, "0" is the most recent one.
-     * @return
-     */
     @JvmStatic
-    fun shouldShowLastPageOfHome(): Boolean {
-        return prefs.getString(PREF_HOME_PAGE, "0") == "0"
-    }
+    fun shouldShowLastPageOfHome(): Boolean = UiPrefs.shouldShowLastPageOfHome()
 
-    /**
-     * Sets the preference for whether we show the remain time, if not show the duration. This will
-     * send out events so the current playing screen, queue and the episode list would refresh
-     *
-     * @return `true` if we should show remaining time or the duration
-     */
     @JvmStatic
-    fun setShowRemainTimeSetting(showRemain: Boolean?) {
-        prefs.edit()
-            .putBoolean(
-                PREF_SHOW_TIME_LEFT,
-                checkNotNull(showRemain) { "showRemain must not be null" }
-            )
-            .apply()
-    }
+    fun setShowRemainTimeSetting(showRemain: Boolean?) = UiPrefs.setShowRemainTimeSetting(showRemain)
 
-    /**
-     * Returns notification priority.
-     *
-     * @return NotificationCompat.PRIORITY_MAX or NotificationCompat.PRIORITY_DEFAULT
-     */
     @JvmStatic
     val notifyPriority: Int
-        get() = if (prefs.getBoolean(PREF_EXPANDED_NOTIFICATION, false)) {
-            NotificationCompat.PRIORITY_MAX
-        } else {
-            NotificationCompat.PRIORITY_DEFAULT
-        }
+        get() = UiPrefs.notifyPriority
 
-    /**
-     * Returns true if notifications are persistent
-     *
-     * @return `true` if notifications are persistent, `false`  otherwise
-     */
     @JvmStatic
     val isPersistNotify: Boolean
-        get() = prefs.getBoolean(PREF_PERSISTENT_NOTIFICATION, true)
+        get() = UiPrefs.isPersistNotify
 
-    /**
-     * Returns true if the lockscreen background should be set to the current episode's image
-     *
-     * @return `true` if the lockscreen background should be set, `false`  otherwise
-     */
     @JvmStatic
-    fun setLockscreenBackground(): Boolean {
-        return prefs.getBoolean(PREF_LOCKSCREEN_BACKGROUND, true)
-    }
+    fun setLockscreenBackground(): Boolean = UiPrefs.setLockscreenBackground()
 
-    /**
-     * Returns true if download reports are shown
-     *
-     * @return `true` if download reports are shown, `false`  otherwise
-     */
     @JvmStatic
-    fun showDownloadReport(): Boolean {
-        return if (Build.VERSION.SDK_INT >= 26) {
-            true // System handles notification preferences
-        } else prefs.getBoolean(
-            PREF_SHOW_DOWNLOAD_REPORT,
-            true
-        )
-    }
+    fun showDownloadReport(): Boolean = UiPrefs.showDownloadReport()
 
-    /**
-     * Used for migration of the preference to system notification channels.
-     */
     @JvmStatic
     val showDownloadReportRaw: Boolean
-        get() = prefs.getBoolean(PREF_SHOW_DOWNLOAD_REPORT, true)
+        get() = UiPrefs.showDownloadReportRaw
 
     @JvmStatic
-    fun showAutoDownloadReport(): Boolean {
-        return if (Build.VERSION.SDK_INT >= 26) {
-            true // System handles notification preferences
-        } else prefs.getBoolean(PREF_SHOW_AUTO_DOWNLOAD_REPORT, false)
-    }
+    fun showAutoDownloadReport(): Boolean = UiPrefs.showAutoDownloadReport()
 
-    /**
-     * Used for migration of the preference to system notification channels.
-     */
     @JvmStatic
     val showAutoDownloadReportRaw: Boolean
-        get() = prefs.getBoolean(PREF_SHOW_AUTO_DOWNLOAD_REPORT, false)
+        get() = UiPrefs.showAutoDownloadReportRaw
 
     @JvmStatic
-    fun enqueueDownloadedEpisodes(): Boolean {
-        return prefs.getBoolean(PREF_ENQUEUE_DOWNLOADED, true)
-    }
+    fun enqueueDownloadedEpisodes(): Boolean = DownloadPrefs.enqueueDownloadedEpisodes()
 
     @VisibleForTesting
     @JvmStatic
-    fun setEnqueueDownloadedEpisodes(enqueueDownloadedEpisodes: Boolean) {
-        prefs.edit()
-            .putBoolean(PREF_ENQUEUE_DOWNLOADED, enqueueDownloadedEpisodes)
-            .apply()
-    }
+    fun setEnqueueDownloadedEpisodes(enqueueDownloadedEpisodes: Boolean) =
+        DownloadPrefs.setEnqueueDownloadedEpisodes(enqueueDownloadedEpisodes)
 
-    // should never happen but just in case
     @JvmStatic
     var enqueueLocation: EnqueueLocation
-        get() {
-            val valStr = getString(PREF_ENQUEUE_LOCATION, EnqueueLocation.BACK.name)
-            return try {
-                EnqueueLocation.valueOf(valStr)
-            } catch (t: IllegalArgumentException) {
-                // should never happen but just in case
-                Log.e(TAG, "getEnqueueLocation: invalid value '$valStr' Use default.", t)
-                EnqueueLocation.BACK
-            }
-        }
+        get() = DownloadPrefs.enqueueLocation
         set(location) {
-            prefs.edit()
-                .putString(PREF_ENQUEUE_LOCATION, location.name)
-                .apply()
+            DownloadPrefs.enqueueLocation = location
         }
+
     @JvmStatic
     val isPauseOnHeadsetDisconnect: Boolean
-        get() = prefs.getBoolean(PREF_PAUSE_ON_HEADSET_DISCONNECT, true)
+        get() = PlaybackPrefs.isPauseOnHeadsetDisconnect
+
     @JvmStatic
     val isUnpauseOnHeadsetReconnect: Boolean
-        get() = prefs.getBoolean(PREF_UNPAUSE_ON_HEADSET_RECONNECT, true)
+        get() = PlaybackPrefs.isUnpauseOnHeadsetReconnect
+
     @JvmStatic
     val isUnpauseOnBluetoothReconnect: Boolean
-        get() = prefs.getBoolean(PREF_UNPAUSE_ON_BLUETOOTH_RECONNECT, false)
+        get() = PlaybackPrefs.isUnpauseOnBluetoothReconnect
+
     @JvmStatic
     val hardwareForwardButton: Int
-        get() = getString(
-            PREF_HARDWARE_FORWARD_BUTTON,
-            KeyEvent.KEYCODE_MEDIA_FAST_FORWARD.toString()
-        ).toInt()
+        get() = PlaybackPrefs.hardwareForwardButton
+
     @JvmStatic
     val hardwarePreviousButton: Int
-        get() = getString(
-            PREF_HARDWARE_PREVIOUS_BUTTON,
-            KeyEvent.KEYCODE_MEDIA_REWIND.toString()
-        ).toInt()
+        get() = PlaybackPrefs.hardwarePreviousButton
 
-    /**
-     * Set to true to enable Continuous Playback
-     */
     @set:VisibleForTesting
     @JvmStatic
     var isFollowQueue: Boolean
-        get() = prefs.getBoolean(PREF_FOLLOW_QUEUE, true)
+        get() = PlaybackPrefs.isFollowQueue
         set(value) {
-            prefs.edit().putBoolean(PREF_FOLLOW_QUEUE, value).apply()
+            PlaybackPrefs.isFollowQueue = value
         }
+
     @JvmStatic
-    fun shouldSkipKeepEpisode(): Boolean {
-        return prefs.getBoolean(PREF_SKIP_KEEPS_EPISODE, true)
-    }
+    fun shouldSkipKeepEpisode(): Boolean = PlaybackPrefs.shouldSkipKeepEpisode()
+
     @JvmStatic
-    fun shouldFavoriteKeepEpisode(): Boolean {
-        return prefs.getBoolean(PREF_FAVORITE_KEEPS_EPISODE, true)
-    }
+    fun shouldFavoriteKeepEpisode(): Boolean = PlaybackPrefs.shouldFavoriteKeepEpisode()
 
     @JvmStatic
     val isAutoDelete: Boolean
-        get() = prefs.getBoolean(PREF_AUTO_DELETE, false)
+        get() = DownloadPrefs.isAutoDelete
+
     @JvmStatic
     val smartMarkAsPlayedSecs: Int
-        get() = getString(PREF_SMART_MARK_AS_PLAYED_SECS, "30").toInt()
-    @JvmStatic
-    fun shouldDeleteRemoveFromQueue(): Boolean {
-        return prefs.getBoolean(PREF_DELETE_REMOVES_FROM_QUEUE, false)
-    }
-    @JvmStatic
-    fun getPlaybackSpeed(mediaType: MediaType?): Float {
-        return if (mediaType == MediaType.VIDEO) {
-            videoPlaybackSpeed
-        } else {
-            audioPlaybackSpeed
-        }
-    }
+        get() = PlaybackPrefs.smartMarkAsPlayedSecs
 
-    private const val PODCAST_SEARCH_ENGINE_LIST = "podcast_search_engine_list"
+    @JvmStatic
+    fun shouldDeleteRemoveFromQueue(): Boolean = DownloadPrefs.shouldDeleteRemoveFromQueue()
+
+    @JvmStatic
+    fun getPlaybackSpeed(mediaType: MediaType?): Float = PlaybackPrefs.getPlaybackSpeed(mediaType)
+
     @JvmStatic
     var podcastSearchEngineList: List<CategoryInfo>
-        get() {
-            val gson = Gson()
-            val collectionType = object : TypeToken<List<CategoryInfo>>() {}.type
-
-            val data = prefs.getStringOrDefault(PODCAST_SEARCH_ENGINE_LIST, gson.toJson(
-                PodcastSearchPreferenceUtil.defaultSearchEngine, collectionType))
-            return try {
-                Gson().fromJson(data, collectionType)
-            } catch (e: JsonSyntaxException) {
-                Timber.e(e,"podcastSearchEngineList")
-                return PodcastSearchPreferenceUtil.defaultSearchEngine.orEmpty()
-            }
-        }
+        get() = SyncPrefs.podcastSearchEngineList
         set(value) {
-            val collectionType = object : TypeToken<List<CategoryInfo>>() {}.type
-            prefs.edit()
-                .putString(PODCAST_SEARCH_ENGINE_LIST, Gson().toJson(value, collectionType))
-                .apply()
+            SyncPrefs.podcastSearchEngineList = value
         }
 
-    /**
-     * Returns the global audio playback speed.
-     * @return
-     */
-    @JvmStatic
-    private val audioPlaybackSpeed: Float
-        get() = try {
-            getString(PREF_PLAYBACK_SPEED, "1.00").toFloat()
-        } catch (e: NumberFormatException) {
-            Log.e(TAG, Log.getStackTraceString(e))
-            setPlaybackSpeed(1.0f)
-            1.0f
-        }
-
-    /**
-     * Returns the global video playback speed.
-     * @return
-     */
     @JvmStatic
     var videoPlaybackSpeed: Float
-        get() = try {
-            getString(PREF_VIDEO_PLAYBACK_SPEED, "1.00").toFloat()
-        } catch (e: NumberFormatException) {
-            Log.e(TAG, Log.getStackTraceString(e))
-            videoPlaybackSpeed = 1.0f
-            1.0f
-        }
+        get() = PlaybackPrefs.videoPlaybackSpeed
         set(speed) {
-            prefs.edit()
-                .putString(PREF_VIDEO_PLAYBACK_SPEED, speed.toString())
-                .apply()
+            PlaybackPrefs.videoPlaybackSpeed = speed
         }
+
     @JvmStatic
     var isSkipSilence: Boolean
-        get() = prefs.getBoolean(PREF_PLAYBACK_SKIP_SILENCE, false)
+        get() = PlaybackPrefs.isSkipSilence
         set(skipSilence) {
-            prefs.edit()
-                .putBoolean(PREF_PLAYBACK_SKIP_SILENCE, skipSilence)
-                .apply()
+            PlaybackPrefs.isSkipSilence = skipSilence
         }
+
     @JvmStatic
     var playbackSpeedArray: List<Float>
-        get() = readPlaybackSpeedArray(prefs.getString(PREF_PLAYBACK_SPEED_ARRAY, null))
+        get() = PlaybackPrefs.playbackSpeedArray
         set(speeds) {
-            val format = DecimalFormatSymbols(Locale.US)
-            format.decimalSeparator = '.'
-            val speedFormat = DecimalFormat("0.0", format)
-            val jsonArray = JSONArray()
-            for (speed in speeds) {
-                jsonArray.put(speedFormat.format(speed.toDouble()))
-            }
-            prefs.edit()
-                .putString(PREF_PLAYBACK_SPEED_ARRAY, jsonArray.toString())
-                .apply()
+            PlaybackPrefs.playbackSpeedArray = speeds
         }
+
     @JvmStatic
-    fun shouldPauseForFocusLoss(): Boolean {
-        return prefs.getBoolean(PREF_PAUSE_PLAYBACK_FOR_FOCUS_LOSS, true)
-    }
-    /*
-     * Returns update interval in milliseconds; value 0 means that auto update is disabled
-     * or feeds are updated at a certain time of day
-     */// when updating with an interval, we assume the user wants
-    // to update *now* and then every 'hours' interval thereafter.
-    /**
-     * Sets the update interval value.
-     */
+    fun shouldPauseForFocusLoss(): Boolean = PlaybackPrefs.shouldPauseForFocusLoss()
+
     @JvmStatic
     var updateInterval: Long
-        get() {
-            val updateInterval = getString(PREF_UPDATE_INTERVAL, "0")
-            return if (!updateInterval.contains(":")) {
-                readUpdateInterval(updateInterval)
-            } else {
-                0
-            }
-        }
+        get() = NetworkPrefs.updateInterval
         set(hours) {
-            prefs.edit()
-                .putString(PREF_UPDATE_INTERVAL, hours.toString())
-                .apply()
-            // when updating with an interval, we assume the user wants
-            // to update *now* and then every 'hours' interval thereafter.
-            AutoUpdateManager.restartUpdateAlarm(context)
+            NetworkPrefs.updateInterval = hours
         }
+
     @JvmStatic
     val updateTimeOfDay: IntArray
-        get() {
-            val datetime = getString(PREF_UPDATE_INTERVAL, "")
-            return if (datetime.length >= 3 && datetime.contains(":")) {
-                val parts = datetime.split(":".toRegex()).toTypedArray()
-                val hourOfDay = parts[0].toInt()
-                val minute = parts[1].toInt()
-                intArrayOf(hourOfDay, minute)
-            } else {
-                IntArray(0)
-            }
-        }
-    @JvmStatic
-    /**
-     * True when automatic feed refresh is off. Uses the same default as [updateInterval]
-     * so a pristine install reports "disabled"; a time-of-day schedule ("HH:mm") is not disabled.
-     */
-    val isAutoUpdateDisabled: Boolean
-        get() = getString(PREF_UPDATE_INTERVAL, "0") == "0"
+        get() = NetworkPrefs.updateTimeOfDay
 
-    private fun isAllowMobileFor(type: String): Boolean {
-        val defaultValue = HashSet<String>()
-        defaultValue.add("images")
-        val allowed = prefs.getStringSet(PREF_MOBILE_UPDATE, defaultValue) ?: defaultValue
-        return allowed.contains(type)
-    }
+    @JvmStatic
+    val isAutoUpdateDisabled: Boolean
+        get() = NetworkPrefs.isAutoUpdateDisabled
 
     @JvmStatic
     var isAllowMobileFeedRefresh: Boolean
-        get() = isAllowMobileFor("feed_refresh")
+        get() = NetworkPrefs.isAllowMobileFeedRefresh
         set(allow) {
-            setAllowMobileFor("feed_refresh", allow)
+            NetworkPrefs.isAllowMobileFeedRefresh = allow
         }
 
     @JvmStatic
     var isAllowMobileEpisodeDownload: Boolean
-        get() = isAllowMobileFor("episode_download")
+        get() = NetworkPrefs.isAllowMobileEpisodeDownload
         set(allow) {
-            setAllowMobileFor("episode_download", allow)
+            NetworkPrefs.isAllowMobileEpisodeDownload = allow
         }
 
     @JvmStatic
     var isAllowMobileAutoDownload: Boolean
-        get() = isAllowMobileFor("auto_download")
+        get() = NetworkPrefs.isAllowMobileAutoDownload
         set(allow) {
-            setAllowMobileFor("auto_download", allow)
+            NetworkPrefs.isAllowMobileAutoDownload = allow
         }
 
     @JvmStatic
     var isAllowMobileStreaming: Boolean
-        get() = isAllowMobileFor("streaming")
+        get() = NetworkPrefs.isAllowMobileStreaming
         set(allow) {
-            setAllowMobileFor("streaming", allow)
+            NetworkPrefs.isAllowMobileStreaming = allow
         }
 
     @JvmStatic
     var isAllowMobileImages: Boolean
-        get() = isAllowMobileFor("images")
+        get() = NetworkPrefs.isAllowMobileImages
         set(allow) {
-            setAllowMobileFor("images", allow)
+            NetworkPrefs.isAllowMobileImages = allow
         }
-
-    private fun setAllowMobileFor(type: String, allow: Boolean) {
-        val defaultValue = HashSet<String>()
-        defaultValue.add("images")
-        val getValueStringSet = prefs.getStringSet(PREF_MOBILE_UPDATE, defaultValue) ?: defaultValue
-        val allowed: MutableSet<String> = HashSet(getValueStringSet)
-        if (allow) {
-            allowed.add(type)
-        } else {
-            allowed.remove(type)
-        }
-        prefs.edit().putStringSet(PREF_MOBILE_UPDATE, allowed).apply()
-        if (type == "feed_refresh") {
-            // the periodic worker bakes UNMETERED vs CONNECTED into its constraints
-            AutoUpdateManager.restartUpdateAlarm(context)
-        }
-    }
 
     @JvmStatic
     val parallelDownloads: Int
-        get() = getString(PREF_PARALLEL_DOWNLOADS, "4").toInt()
+        get() = DownloadPrefs.parallelDownloads
+
     @JvmStatic
     val episodeCacheSizeUnlimited: Int
-        get() = context.resources.getInteger(R.integer.episode_cache_size_unlimited)
+        get() = DownloadPrefs.episodeCacheSizeUnlimited
 
-    /**
-     * Returns the capacity of the episode cache. This method will return the
-     * negative integer EPISODE_CACHE_SIZE_UNLIMITED if the cache size is set to
-     * 'unlimited'.
-     */
     @JvmStatic
     val episodeCacheSize: Int
-        get() = readEpisodeCacheSizeInternal(getString(PREF_EPISODE_CACHE_SIZE, "20"))
+        get() = DownloadPrefs.episodeCacheSize
 
     @set:VisibleForTesting
     @JvmStatic
     var isEnableAutodownload: Boolean
-        get() = prefs.getBoolean(PREF_ENABLE_AUTODL, false)
+        get() = DownloadPrefs.isEnableAutodownload
         set(enabled) {
-            prefs.edit().putBoolean(PREF_ENABLE_AUTODL, enabled).apply()
+            DownloadPrefs.isEnableAutodownload = enabled
         }
+
     @JvmStatic
     val isEnableAutodownloadOnBattery: Boolean
-        get() = prefs.getBoolean(PREF_ENABLE_AUTODL_ON_BATTERY, true)
+        get() = DownloadPrefs.isEnableAutodownloadOnBattery
 
     @JvmStatic
     var fastForwardSecs: Int
-        get() = prefs.getInt(PREF_FAST_FORWARD_SECS, 30)
+        get() = PlaybackPrefs.fastForwardSecs
         set(secs) {
-            prefs.edit()
-                .putInt(PREF_FAST_FORWARD_SECS, secs)
-                .apply()
+            PlaybackPrefs.fastForwardSecs = secs
         }
+
     @JvmStatic
     var rewindSecs: Int
-        get() = prefs.getInt(PREF_REWIND_SECS, 10)
+        get() = PlaybackPrefs.rewindSecs
         set(secs) {
-            prefs.edit()
-                .putInt(PREF_REWIND_SECS, secs)
-                .apply()
+            PlaybackPrefs.rewindSecs = secs
         }
 
     @JvmStatic
     var proxyConfig: ProxyConfig
-        get() {
-            val type =
-                Proxy.Type.valueOf(getString(PREF_PROXY_TYPE, Proxy.Type.DIRECT.name))
-            val host = prefs.getString(PREF_PROXY_HOST, null)
-            val port = prefs.getInt(PREF_PROXY_PORT, 0)
-            val username = prefs.getString(PREF_PROXY_USER, null)
-            val password = prefs.getString(PREF_PROXY_PASSWORD, null)
-            return ProxyConfig(type, host, port, username, password)
-        }
+        get() = NetworkPrefs.proxyConfig
         set(config) {
-            val editor = prefs.edit()
-            editor.putString(PREF_PROXY_TYPE, config.type.name)
-            if (TextUtils.isEmpty(config.host)) {
-                editor.remove(PREF_PROXY_HOST)
-            } else {
-                editor.putString(PREF_PROXY_HOST, config.host)
-            }
-            if (config.port <= 0 || config.port > 65535) {
-                editor.remove(PREF_PROXY_PORT)
-            } else {
-                editor.putInt(PREF_PROXY_PORT, config.port)
-            }
-            if (TextUtils.isEmpty(config.username)) {
-                editor.remove(PREF_PROXY_USER)
-            } else {
-                editor.putString(PREF_PROXY_USER, config.username)
-            }
-            if (TextUtils.isEmpty(config.password)) {
-                editor.remove(PREF_PROXY_PASSWORD)
-            } else {
-                editor.putString(PREF_PROXY_PASSWORD, config.password)
-            }
-            editor.apply()
+            NetworkPrefs.proxyConfig = config
         }
 
     @JvmStatic
-    fun shouldResumeAfterCall(): Boolean {
-        return prefs.getBoolean(PREF_RESUME_AFTER_CALL, true)
-    }
+    fun shouldResumeAfterCall(): Boolean = PlaybackPrefs.shouldResumeAfterCall()
 
     @JvmStatic
-    fun showSnowFall(): Boolean {
-        return prefs.getBoolean(PREF_SNOWFALL, false)
-    }
+    fun showSnowFall(): Boolean = UiPrefs.showSnowFall()
 
     @JvmStatic
-    fun showExtraMiniButtons(): Boolean {
-        return prefs.getBoolean(PREF_TOGGLE_ADD_CONTROLS, false)
-    }
+    fun showExtraMiniButtons(): Boolean = UiPrefs.showExtraMiniButtons()
 
     @JvmStatic
     val isAdapterColor: Boolean
-        get() = prefs.getBoolean(PREF_ADAPTIVE_COLOR_APP, true)
+        get() = UiPrefs.isAdapterColor
 
-    // Also set a cover theme for that now playing
     @JvmStatic
     var nowPlayingScreen: NowPlayingScreen
-        get() {
-            val id = prefs.getInt(NOW_PLAYING_SCREEN_ID, 0)
-            for (nowPlayingScreen in NowPlayingScreen.values()) {
-                if (nowPlayingScreen.id == id) {
-                    return nowPlayingScreen
-                }
-            }
-            return NowPlayingScreen.Normal
-        }
+        get() = UiPrefs.nowPlayingScreen
         set(nowPlayingScreen) {
-            prefs.edit()
-                .putInt(NOW_PLAYING_SCREEN_ID, nowPlayingScreen.id)
-                .apply()
-            // Also set a cover theme for that now playing
-            albumCoverStyle = nowPlayingScreen.defaultCoverTheme
+            UiPrefs.nowPlayingScreen = nowPlayingScreen
         }
 
     @JvmStatic
-    var ALBUM_COVER_STYLE = "album_cover_style_id"
+    var ALBUM_COVER_STYLE: String
+        get() = UiPrefs.ALBUM_COVER_STYLE
+        set(value) {
+            UiPrefs.ALBUM_COVER_STYLE = value
+        }
+
     @JvmStatic
     var albumCoverStyle: AlbumCoverStyle?
-        get() {
-            val id = prefs.getInt(ALBUM_COVER_STYLE, 0)
-            for (albumCoverStyle in AlbumCoverStyle.values()) {
-                if (albumCoverStyle.id == id) {
-                    return albumCoverStyle
-                }
-            }
-            return AlbumCoverStyle.Normal
-        }
+        get() = UiPrefs.albumCoverStyle
         set(albumCoverStyle) {
-            val style = checkNotNull(albumCoverStyle) { "albumCoverStyle must not be null" }
-            prefs.edit()
-                .putInt(ALBUM_COVER_STYLE, style.id)
-                .apply()
+            UiPrefs.albumCoverStyle = albumCoverStyle
         }
+
     @JvmStatic
     val blurAmount: Int
-        get() = prefs.getInt(NEW_BLUR_AMOUNT, 12)
+        get() = UiPrefs.blurAmount
 
-    /**
-     * Whether the playlist is locked.
-     * @return
-     */
     @JvmStatic
     var isPlaylistLocked: Boolean
-        get() = prefs.getBoolean(PREF_QUEUE_LOCKED, false)
+        get() = PlaybackPrefs.isPlaylistLocked
         set(locked) {
-            prefs.edit()
-                .putBoolean(PREF_QUEUE_LOCKED, locked)
-                .apply()
+            PlaybackPrefs.isPlaylistLocked = locked
         }
 
     @JvmStatic
-    fun setPlaybackSpeed(speed: Float) {
-        prefs.edit()
-            .putString(PREF_PLAYBACK_SPEED, speed.toString())
-            .apply()
-    }
-
-    private const val LAST_CHECKED_APP_VERSION = "last_checked_app_version"
-    private const val LAST_CHECKED_NOTIFY_VERSION = "last_checked_notify_version"
+    fun setPlaybackSpeed(speed: Float) = PlaybackPrefs.setPlaybackSpeed(speed)
 
     @JvmStatic
     var versionCode: Int
-        get() = prefs.getInt(LAST_CHECKED_APP_VERSION, 0)
+        get() = SyncPrefs.versionCode
         set(versionCode) {
-            prefs.edit().putInt(LAST_CHECKED_APP_VERSION, versionCode).apply()
+            SyncPrefs.versionCode = versionCode
         }
 
     @JvmStatic
     var notifyVersionCode: Int
-        get() = prefs.getInt(LAST_CHECKED_NOTIFY_VERSION, 0)
+        get() = SyncPrefs.notifyVersionCode
         set(versionCode) {
-            prefs.edit().putInt(LAST_CHECKED_NOTIFY_VERSION, versionCode).apply()
+            SyncPrefs.notifyVersionCode = versionCode
         }
 
-    /**
-     * Checks whether the user has already dismissed the update for this version.
-     *
-     * @param newVersion
-     * @return
-     */
     @JvmStatic
-    fun lastVersionChecked(newVersion: Int): Boolean {
-        return versionCode == newVersion
-    }
+    fun lastVersionChecked(newVersion: Int): Boolean = SyncPrefs.lastVersionChecked(newVersion)
 
     @JvmStatic
-    fun lastNotifyVersionChecked(newVersion: Int): Boolean {
-        return notifyVersionCode == newVersion
-    }
-
-
-    /**
-     * Sets the update interval value.
-     */
-    @JvmStatic
-    fun setUpdateTimeOfDay(hourOfDay: Int, minute: Int) {
-        prefs.edit()
-            .putString(PREF_UPDATE_INTERVAL, "$hourOfDay:$minute")
-            .apply()
-        AutoUpdateManager.restartUpdateAlarm(context)
-    }
+    fun lastNotifyVersionChecked(newVersion: Int): Boolean =
+        SyncPrefs.lastNotifyVersionChecked(newVersion)
 
     @JvmStatic
-    fun disableAutoUpdate(context: Context?) {
-        prefs.edit()
-            .putString(PREF_UPDATE_INTERVAL, "0")
-            .apply()
-        AutoUpdateManager.disableAutoUpdate(context)
-    }
+    fun setUpdateTimeOfDay(hourOfDay: Int, minute: Int) =
+        NetworkPrefs.setUpdateTimeOfDay(hourOfDay, minute)
 
     @JvmStatic
-    fun gpodnetNotificationsEnabled(): Boolean {
-        return if (Build.VERSION.SDK_INT >= 26) {
-            true // System handles notification preferences
-        } else prefs.getBoolean(PREF_GPODNET_NOTIFICATIONS, true)
-    }
+    fun disableAutoUpdate(context: Context?) = NetworkPrefs.disableAutoUpdate(context)
 
-    /**
-     * Used for migration of the preference to system notification channels.
-     */
+    @JvmStatic
+    fun gpodnetNotificationsEnabled(): Boolean = SyncPrefs.gpodnetNotificationsEnabled()
+
     @JvmStatic
     val gpodnetNotificationsEnabledRaw: Boolean
-        get() = prefs.getBoolean(PREF_GPODNET_NOTIFICATIONS, true)
+        get() = SyncPrefs.gpodnetNotificationsEnabledRaw
 
     @JvmStatic
-    fun setGpodnetNotificationsEnabled() {
-        prefs.edit()
-            .putBoolean(PREF_GPODNET_NOTIFICATIONS, true)
-            .apply()
-    }
-
-    private fun readUpdateInterval(valueFromPrefs: String): Long {
-        val hours = valueFromPrefs.toInt()
-        return TimeUnit.HOURS.toMillis(hours.toLong())
-    }
-
-    private fun readEpisodeCacheSizeInternal(valueFromPrefs: String): Int {
-        return if (valueFromPrefs == context.getString(R.string.pref_episode_cache_unlimited)) {
-            EPISODE_CACHE_SIZE_UNLIMITED
-        } else {
-            valueFromPrefs.toInt()
-        }
-    }
-
-    private fun readPlaybackSpeedArray(valueFromPrefs: String?): List<Float> {
-        if (valueFromPrefs != null) {
-            try {
-                val jsonArray = JSONArray(valueFromPrefs)
-                val selectedSpeeds: MutableList<Float> = ArrayList()
-                for (i in 0 until jsonArray.length()) {
-                    selectedSpeeds.add(jsonArray.getDouble(i).toFloat())
-                }
-                return selectedSpeeds
-            } catch (e: JSONException) {
-                // Falls through to the default speed list below; a corrupt preference value
-                // should not stop the player from starting.
-                Log.e(TAG, "Could not read playback speeds from the stored JSON array", e)
-            }
-        }
-        // If this preference hasn't been set yet, return the default options
-        return Arrays.asList(0.8f, 1.0f, 1.2f, 1.5f, 2.0f)
-    }
+    fun setGpodnetNotificationsEnabled() = SyncPrefs.setGpodnetNotificationsEnabled()
 
     @JvmStatic
-    fun useExoplayer(): Boolean {
-        return true
-    }
+    fun useExoplayer(): Boolean = PlaybackPrefs.useExoplayer()
 
     @JvmStatic
-    fun stereoToMono(): Boolean {
-        return prefs.getBoolean(PREF_STEREO_TO_MONO, false)
-    }
+    fun stereoToMono(): Boolean = PlaybackPrefs.stereoToMono()
 
     @JvmStatic
-    fun stereoToMono(enable: Boolean) {
-        prefs.edit()
-            .putBoolean(PREF_STEREO_TO_MONO, enable)
-            .apply()
-    }
+    fun stereoToMono(enable: Boolean) = PlaybackPrefs.stereoToMono(enable)
 
     @JvmStatic
-    fun audioLoudness(): Boolean {
-        return prefs.getBoolean(PREF_AUDIO_LOUDNESS, false)
-    }
+    fun audioLoudness(): Boolean = PlaybackPrefs.audioLoudness()
 
     @JvmStatic
-    fun setAudioLoudness(enable: Boolean) {
-        prefs.edit()
-            .putBoolean(PREF_AUDIO_LOUDNESS, enable)
-            .apply()
-    }
+    fun setAudioLoudness(enable: Boolean) = PlaybackPrefs.setAudioLoudness(enable)
 
     @JvmStatic
     val episodeCleanupAlgorithm: EpisodeCleanupAlgorithm
-        get() {
-            if (!isEnableAutodownload) {
-                return APNullCleanupAlgorithm()
-            }
-            val cleanupValue = episodeCleanupValue
-            return if (cleanupValue == EPISODE_CLEANUP_EXCEPT_FAVORITE) {
-                ExceptFavoriteCleanupAlgorithm()
-            } else if (cleanupValue == EPISODE_CLEANUP_QUEUE) {
-                APQueueCleanupAlgorithm()
-            } else if (cleanupValue == EPISODE_CLEANUP_NULL) {
-                APNullCleanupAlgorithm()
-            } else {
-                APCleanupAlgorithm(cleanupValue)
-            }
-        }
+        get() = DownloadPrefs.episodeCleanupAlgorithm
+
     @JvmStatic
     var episodeCleanupValue: Int
-        get() = getString(PREF_EPISODE_CLEANUP, "" + EPISODE_CLEANUP_NULL)
-            .toInt()
+        get() = DownloadPrefs.episodeCleanupValue
         set(episodeCleanupValue) {
-            prefs.edit()
-                .putString(PREF_EPISODE_CLEANUP, Integer.toString(episodeCleanupValue))
-                .apply()
+            DownloadPrefs.episodeCleanupValue = episodeCleanupValue
         }
-
-    /**
-     * Returns the folder where the app stores all of its data. This method returns the standard
-     * data folder if the user has not set one.
-     * @param type The name of the folder inside the data folder. May be null when accessing the root of the data folder.
-     * @return The requested data folder, or null if the folder could not be created.
-     */
-    @JvmStatic
-    fun getDataFolder(type: String?): File? {
-        var dataFolder = getTypeDir(prefs.getString(PREF_DATA_FOLDER, null), type)
-        if (dataFolder == null || !dataFolder.canWrite()) {
-            dataFolder = context.getExternalFilesDir(type)
-        }
-        if (dataFolder == null || !dataFolder.canWrite()) {
-            dataFolder = getTypeDir(context.filesDir.absolutePath, type)
-        }
-        return dataFolder
-    }
-
-    private fun getTypeDir(baseDirPath: String?, type: String?): File? {
-        if (baseDirPath == null) {
-            return null
-        }
-        val baseDir = File(baseDirPath)
-        val typeDir = if (type == null) baseDir else File(baseDir, type)
-        if (!typeDir.exists()) {
-            if (!baseDir.canWrite()) {
-                Log.e(TAG, "Base dir is not writable " + baseDir.absolutePath)
-                return null
-            }
-            if (!typeDir.mkdirs()) {
-                Log.e(TAG, "Could not create type dir " + typeDir.absolutePath)
-                return null
-            }
-        }
-        return typeDir
-    }
 
     @JvmStatic
-    fun setDataFolder(dir: String) {
-        Log.d(TAG, "set storage folder $dir")
-        prefs.edit()
-            .putString(PREF_DATA_FOLDER, dir)
-            .apply()
-    }
+    fun getDataFolder(type: String?): File? = DownloadPrefs.getDataFolder(type)
 
-    /**
-     * Create a .nomedia file to prevent scanning by the media scanner.
-     */
-    private fun createNoMediaFile() {
-        val f = File(context.getExternalFilesDir(null), ".nomedia")
-        if (!f.exists()) {
-            try {
-                f.createNewFile()
-            } catch (e: IOException) {
-                // Safe to ignore: without .nomedia the media scanner may index downloaded
-                // episodes, which is cosmetic and not worth failing the data folder setup for.
-                Log.e(TAG, "Could not create .nomedia file in " + f.parent, e)
-            }
-            Log.d(TAG, ".nomedia file created")
-        }
-    }
+    @JvmStatic
+    fun setDataFolder(dir: String) = DownloadPrefs.setDataFolder(dir)
 
-    /**
-     *
-     * @return true if auto update is set to a specific time
-     * false if auto update is set to interval
-     */
     @JvmStatic
     val isAutoUpdateTimeOfDay: Boolean
-        get() = updateTimeOfDay.size == 2
+        get() = NetworkPrefs.isAutoUpdateTimeOfDay
 
     @JvmStatic
     val backButtonBehavior: BackButtonBehavior
-        get() = when (prefs.getString(PREF_BACK_BUTTON_BEHAVIOR, "default")) {
-            "drawer" -> BackButtonBehavior.OPEN_DRAWER
-            "doubletap" -> BackButtonBehavior.DOUBLE_TAP
-            "prompt" -> BackButtonBehavior.SHOW_PROMPT
-            "default" -> BackButtonBehavior.DEFAULT
-            else -> BackButtonBehavior.DEFAULT
-        }
+        get() = UiPrefs.backButtonBehavior
 
     @JvmStatic
-    fun timeRespectsSpeed(): Boolean {
-        return prefs.getBoolean(PREF_TIME_RESPECTS_SPEED, false)
-    }
+    fun timeRespectsSpeed(): Boolean = PlaybackPrefs.timeRespectsSpeed()
 
     @JvmStatic
     var isStreamOverDownload: Boolean
-        get() = true
+        get() = DownloadPrefs.isStreamOverDownload
         set(stream) {
-            prefs.edit().putBoolean(PREF_STREAM_OVER_DOWNLOAD, stream).apply()
+            DownloadPrefs.isStreamOverDownload = stream
         }
-    /**
-     * Returns if the queue is in keep sorted mode.
-     *
-     * @see .getQueueKeepSortedOrder
-     */
-    /**
-     * Enables/disables the keep sorted mode of the queue.
-     *
-     * @see .setQueueKeepSortedOrder
-     */
+
     @JvmStatic
     var isPlaylistKeepSorted: Boolean
-        get() = prefs.getBoolean(PREF_QUEUE_KEEP_SORTED, false)
+        get() = PlaybackPrefs.isPlaylistKeepSorted
         set(keepSorted) {
-            prefs.edit()
-                .putBoolean(PREF_QUEUE_KEEP_SORTED, keepSorted)
-                .apply()
+            PlaybackPrefs.isPlaylistKeepSorted = keepSorted
         }
-    /**
-     * Returns the sort order for the queue keep sorted mode.
-     * Note: This value is stored independently from the keep sorted state.
-     *
-     * @see .isQueueKeepSorted
-     */
-    /**
-     * Sets the sort order for the queue keep sorted mode.
-     *
-     * @see .setQueueKeepSorted
-     */
+
     @JvmStatic
     var queueKeepSortedOrder: SortOrder?
-        get() {
-            val sortOrderStr = prefs.getString(PREF_QUEUE_KEEP_SORTED_ORDER, "use-default")
-            return SortOrder.parseWithDefault(sortOrderStr, SortOrder.DATE_NEW_OLD)
-        }
+        get() = PlaybackPrefs.queueKeepSortedOrder
         set(sortOrder) {
-            if (sortOrder == null) {
-                return
-            }
-            prefs.edit()
-                .putString(PREF_QUEUE_KEEP_SORTED_ORDER, sortOrder.name)
-                .apply()
+            PlaybackPrefs.queueKeepSortedOrder = sortOrder
         }
 
     @JvmStatic
     var subscriptionsFilter: SubscriptionsFilter
-        get() {
-            val value = prefs.getString(PREF_FILTER_FEED, "")
-            return SubscriptionsFilter(value)
-        }
+        get() = UiPrefs.subscriptionsFilter
         set(value) {
-            prefs.edit()
-                .putString(PREF_FILTER_FEED, value.serialize())
-                .apply()
+            UiPrefs.subscriptionsFilter = value
         }
 
     @JvmStatic
-    fun shouldShowSubscriptionTitle(): Boolean {
-        return prefs.getBoolean(PREF_SUBSCRIPTION_TITLE, false)
-    }
+    fun shouldShowSubscriptionTitle(): Boolean = UiPrefs.shouldShowSubscriptionTitle()
 
     @JvmStatic
     var onlinePodcastSearchHistory: List<String?>
-        get() = parseStringList(prefs.getString(PREF_ONLINE_PODCAST_SEARCH_HISTORY, ""))
+        get() = SyncPrefs.onlinePodcastSearchHistory
         set(keywords) {
-            prefs.edit()
-                .putString(PREF_ONLINE_PODCAST_SEARCH_HISTORY, toJSONString(keywords))
-                .apply()
+            SyncPrefs.onlinePodcastSearchHistory = keywords
         }
 
     @JvmStatic
-    fun clearOnlinePodcastSearchHistory() {
-        prefs.edit()
-            .putString(PREF_ONLINE_PODCAST_SEARCH_HISTORY, "")
-            .apply()
-    }
+    fun clearOnlinePodcastSearchHistory() = SyncPrefs.clearOnlinePodcastSearchHistory()
 
     @JvmStatic
     val isFullLockScreen: Boolean
-        get() = prefs.getBoolean(PREF_FULL_LOCK_SCREEN, false)
+        get() = UiPrefs.isFullLockScreen
 
     @JvmStatic
     val appBarMode: AppBarMode
-        get() {
-            val value = prefs.getString(APPBAR_MODE, "1")
-            return if (value == "0") {
-                AppBarMode.COLLAPSING
-            } else if (value == "2") {
-                AppBarMode.FIXED
-            } else {
-                AppBarMode.SIMPLE
-            }
-        }
+        get() = UiPrefs.appBarMode
 
-    /**
-     * Whether to show two columns in landscape orientation.
-     * @return
-     */
-    fun shouldShowColumnInLandscape(): Boolean {
-        return prefs.getBoolean(PREF_COLUMN_IN_LANDSCAPE, true)
-    }
+    fun shouldShowColumnInLandscape(): Boolean = UiPrefs.shouldShowColumnInLandscape()
 
-    fun shouldSyncOnStart(): Boolean {
-        return prefs.getBoolean(PREF_REFRESH_ON_START, true)
-    }
-
+    fun shouldSyncOnStart(): Boolean = NetworkPrefs.shouldSyncOnStart()
 
     enum class EnqueueLocation {
         BACK, FRONT, AFTER_CURRENTLY_PLAYING

@@ -1,364 +1,145 @@
 package allen.town.podcast.storage.db;
 
-import static allen.town.podcast.model.feed.FeedPreferences.SPEED_USE_GLOBAL;
-import static allen.town.podcast.model.feed.SortOrder.toCodeString;
-
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.DatabaseErrorHandler;
-import android.database.DatabaseUtils;
 import android.database.DefaultDatabaseErrorHandler;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteDatabase.CursorFactory;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.text.TextUtils;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.VisibleForTesting;
 
-
 import org.apache.commons.io.FileUtils;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
 import allen.town.podcast.model.download.DownloadStatus;
-import allen.town.podcast.model.feed.Chapter;
 import allen.town.podcast.model.feed.Feed;
 import allen.town.podcast.model.feed.FeedCounter;
-import allen.town.podcast.model.feed.FeedFunding;
 import allen.town.podcast.model.feed.FeedItem;
 import allen.town.podcast.model.feed.FeedItemFilter;
 import allen.town.podcast.model.feed.FeedMedia;
 import allen.town.podcast.model.feed.FeedPreferences;
 import allen.town.podcast.model.feed.SortOrder;
-import allen.town.podcast.storage.db.mapper.FeedItemFilterQuery;
 
 /**
- * Implements methods for accessing the database
+ * Implements methods for accessing the database.
+ *
+ * <p>This class is the single entry point callers use. It owns the process-wide singleton, opens the
+ * writable {@link SQLiteDatabase} through its {@link SQLiteOpenHelper}, handles corruption, and
+ * re-exports the column and table names that other modules refer to as {@code Db.KEY_*} and
+ * {@code Db.TABLE_NAME_*}. The statements themselves live in the per-table helpers of this package
+ * ({@link FeedDao}, {@link FeedItemDao}, {@link FeedMediaDao}, {@link QueueDao},
+ * {@link FavoritesDao}, {@link DownloadLogDao}); every method below delegates to one of them,
+ * except the two writes that span several tables and therefore keep their transaction here.</p>
  */
 public class Db {
 
     private static final String TAG = "Db";
-    public static final String DATABASE_NAME = "focusPodcastApp.db";
-    public static final int VERSION = 3;
 
-    /**
-     * Maximum number of arguments for IN-operator.
-     */
-    private static final int IN_OPERATOR_MAXIMUM = 800;
+    public static final String DATABASE_NAME = DbSchema.DATABASE_NAME;
+    public static final int VERSION = DbSchema.VERSION;
 
     // Key-constants
-    public static final String KEY_TITLE = "title";
-    public static final String KEY_ID = "id";
-    public static final String KEY_FILE_URL = "file_path";
-    public static final String KEY_CUSTOM_TITLE = "custom_title";
-    public static final String KEY_LINK = "link";
-    public static final String KEY_POSITION = "position";
-    public static final String KEY_DOWNLOAD_URL = "rss_url";
-    public static final String KEY_PUBDATE = "pub_date";
-    public static final String KEY_READ = "read";
-    public static final String KEY_DESCRIPTION = "description";
-    public static final String KEY_SIZE = "file_size";
-    public static final String KEY_IMAGE_URL = "image_url";
-    public static final String KEY_FEED = "feed";
-    public static final String KEY_DURATION = "duration";
-    public static final String KEY_MEDIA = "media";
-    public static final String KEY_DOWNLOADED = "is_downloaded";
-    public static final String KEY_MIME_TYPE = "mime_type";
-    public static final String KEY_FEEDFILE = "feed_file";
-    public static final String KEY_REASON = "reason";
-    public static final String KEY_SUCCESSFUL = "is_successful";
-    public static final String KEY_LASTUPDATE = "last_update";
-    public static final String KEY_COMPLETION_DATE = "completion_date";
-    public static final String KEY_FEEDITEM = "feeditem";
-    public static final String KEY_PAYMENT_LINK = "payment_link";
-    public static final String KEY_FEEDFILETYPE = "feedfile_type";
-    public static final String KEY_LANGUAGE = "language";
-    public static final String KEY_AUTHOR = "author";
-    public static final String KEY_HAS_CHAPTERS = "has_chapters";
-    public static final String KEY_START = "start";
-    public static final String KEY_TYPE = "type";
-    public static final String KEY_PLAYBACK_COMPLETION_DATE = "playback_completion_date";
-    public static final String KEY_ITEM_IDENTIFIER = "item_identifier";
-    public static final String KEY_DOWNLOADSTATUS_TITLE = "title";
-    public static final String KEY_FEED_IDENTIFIER = "feed_identifier";
-    public static final String KEY_REASON_DETAILED = "reason_detail";
-    public static final String KEY_SKIP_SILENCE_ENABLED = "skip_silence";
-    public static final String KEY_AUTO_DOWNLOAD_ATTEMPTS = "auto_download";
-    public static final String KEY_AUTO_DOWNLOAD_ENABLED = "auto_download"; // Both tables use the same key
-    public static final String KEY_IS_SUBSCRIBED = "is_subscribed";
-    public static final String KEY_ITUNES_FEED_ID = "itunes_feed_id";
-    public static final String KEY_USE_FEED_EFFECT = "use_feed_effect";
-    public static final String KEY_LOUDNESS_ENABLED = "loudness";
-    public static final String KEY_MONO_ENABLED = "mono";
-    public static final String KEY_PLAYED_DURATION = "played_duration";
-    public static final String KEY_KEEP_UPDATED = "keep_updated";
-    public static final String KEY_USERNAME = "username";
-    public static final String KEY_FEED_VOLUME_ADAPTION = "feed_volume_adaption";
-    public static final String KEY_AUTO_DELETE_ACTION = "auto_delete_action";
-    public static final String KEY_MINIMAL_DURATION_FILTER = "minimal_duration_filter";
-    public static final String KEY_IS_PAGED = "is_paged";
-    public static final String KEY_NEXT_PAGE_LINK = "next_page_link";
-    public static final String KEY_HIDE = "hide";
-    public static final String KEY_PASSWORD = "password";
-    public static final String KEY_LAST_UPDATE_FAILED = "last_update_failed";
-    public static final String KEY_HAS_EMBEDDED_PICTURE = "has_embedded_picture";
-    public static final String KEY_LAST_PLAYED_TIME = "last_played_time";
-    public static final String KEY_SORT_ORDER = "sort_order";
-    public static final String KEY_EXCLUDE_FILTER = "exclude_filter";
-    public static final String KEY_PODCASTINDEX_CHAPTER_URL = "podcastindex_chapter_url";
-    public static final String KEY_INCLUDE_FILTER = "include_filter";
-    public static final String KEY_FEED_SKIP_INTRO = "feed_skip_intro";
-    public static final String KEY_FEED_SKIP_ENDING = "feed_skip_ending";
-    public static final String KEY_FEED_TAGS = "tags";
-    public static final String KEY_EPISODE_NOTIFICATION = "episode_notification";
-    public static final String KEY_FEED_PLAYBACK_SPEED = "feed_playback_speed";
+    public static final String KEY_TITLE = DbSchema.KEY_TITLE;
+    public static final String KEY_ID = DbSchema.KEY_ID;
+    public static final String KEY_FILE_URL = DbSchema.KEY_FILE_URL;
+    public static final String KEY_CUSTOM_TITLE = DbSchema.KEY_CUSTOM_TITLE;
+    public static final String KEY_LINK = DbSchema.KEY_LINK;
+    public static final String KEY_POSITION = DbSchema.KEY_POSITION;
+    public static final String KEY_DOWNLOAD_URL = DbSchema.KEY_DOWNLOAD_URL;
+    public static final String KEY_PUBDATE = DbSchema.KEY_PUBDATE;
+    public static final String KEY_READ = DbSchema.KEY_READ;
+    public static final String KEY_DESCRIPTION = DbSchema.KEY_DESCRIPTION;
+    public static final String KEY_SIZE = DbSchema.KEY_SIZE;
+    public static final String KEY_IMAGE_URL = DbSchema.KEY_IMAGE_URL;
+    public static final String KEY_FEED = DbSchema.KEY_FEED;
+    public static final String KEY_DURATION = DbSchema.KEY_DURATION;
+    public static final String KEY_MEDIA = DbSchema.KEY_MEDIA;
+    public static final String KEY_DOWNLOADED = DbSchema.KEY_DOWNLOADED;
+    public static final String KEY_MIME_TYPE = DbSchema.KEY_MIME_TYPE;
+    public static final String KEY_FEEDFILE = DbSchema.KEY_FEEDFILE;
+    public static final String KEY_REASON = DbSchema.KEY_REASON;
+    public static final String KEY_SUCCESSFUL = DbSchema.KEY_SUCCESSFUL;
+    public static final String KEY_LASTUPDATE = DbSchema.KEY_LASTUPDATE;
+    public static final String KEY_COMPLETION_DATE = DbSchema.KEY_COMPLETION_DATE;
+    public static final String KEY_FEEDITEM = DbSchema.KEY_FEEDITEM;
+    public static final String KEY_PAYMENT_LINK = DbSchema.KEY_PAYMENT_LINK;
+    public static final String KEY_FEEDFILETYPE = DbSchema.KEY_FEEDFILETYPE;
+    public static final String KEY_LANGUAGE = DbSchema.KEY_LANGUAGE;
+    public static final String KEY_AUTHOR = DbSchema.KEY_AUTHOR;
+    public static final String KEY_HAS_CHAPTERS = DbSchema.KEY_HAS_CHAPTERS;
+    public static final String KEY_START = DbSchema.KEY_START;
+    public static final String KEY_TYPE = DbSchema.KEY_TYPE;
+    public static final String KEY_PLAYBACK_COMPLETION_DATE = DbSchema.KEY_PLAYBACK_COMPLETION_DATE;
+    public static final String KEY_ITEM_IDENTIFIER = DbSchema.KEY_ITEM_IDENTIFIER;
+    public static final String KEY_DOWNLOADSTATUS_TITLE = DbSchema.KEY_DOWNLOADSTATUS_TITLE;
+    public static final String KEY_FEED_IDENTIFIER = DbSchema.KEY_FEED_IDENTIFIER;
+    public static final String KEY_REASON_DETAILED = DbSchema.KEY_REASON_DETAILED;
+    public static final String KEY_SKIP_SILENCE_ENABLED = DbSchema.KEY_SKIP_SILENCE_ENABLED;
+    public static final String KEY_AUTO_DOWNLOAD_ATTEMPTS = DbSchema.KEY_AUTO_DOWNLOAD_ATTEMPTS;
+    public static final String KEY_AUTO_DOWNLOAD_ENABLED = DbSchema.KEY_AUTO_DOWNLOAD_ENABLED;
+    public static final String KEY_IS_SUBSCRIBED = DbSchema.KEY_IS_SUBSCRIBED;
+    public static final String KEY_ITUNES_FEED_ID = DbSchema.KEY_ITUNES_FEED_ID;
+    public static final String KEY_USE_FEED_EFFECT = DbSchema.KEY_USE_FEED_EFFECT;
+    public static final String KEY_LOUDNESS_ENABLED = DbSchema.KEY_LOUDNESS_ENABLED;
+    public static final String KEY_MONO_ENABLED = DbSchema.KEY_MONO_ENABLED;
+    public static final String KEY_PLAYED_DURATION = DbSchema.KEY_PLAYED_DURATION;
+    public static final String KEY_KEEP_UPDATED = DbSchema.KEY_KEEP_UPDATED;
+    public static final String KEY_USERNAME = DbSchema.KEY_USERNAME;
+    public static final String KEY_FEED_VOLUME_ADAPTION = DbSchema.KEY_FEED_VOLUME_ADAPTION;
+    public static final String KEY_AUTO_DELETE_ACTION = DbSchema.KEY_AUTO_DELETE_ACTION;
+    public static final String KEY_MINIMAL_DURATION_FILTER = DbSchema.KEY_MINIMAL_DURATION_FILTER;
+    public static final String KEY_IS_PAGED = DbSchema.KEY_IS_PAGED;
+    public static final String KEY_NEXT_PAGE_LINK = DbSchema.KEY_NEXT_PAGE_LINK;
+    public static final String KEY_HIDE = DbSchema.KEY_HIDE;
+    public static final String KEY_PASSWORD = DbSchema.KEY_PASSWORD;
+    public static final String KEY_LAST_UPDATE_FAILED = DbSchema.KEY_LAST_UPDATE_FAILED;
+    public static final String KEY_HAS_EMBEDDED_PICTURE = DbSchema.KEY_HAS_EMBEDDED_PICTURE;
+    public static final String KEY_LAST_PLAYED_TIME = DbSchema.KEY_LAST_PLAYED_TIME;
+    public static final String KEY_SORT_ORDER = DbSchema.KEY_SORT_ORDER;
+    public static final String KEY_EXCLUDE_FILTER = DbSchema.KEY_EXCLUDE_FILTER;
+    public static final String KEY_PODCASTINDEX_CHAPTER_URL = DbSchema.KEY_PODCASTINDEX_CHAPTER_URL;
+    public static final String KEY_INCLUDE_FILTER = DbSchema.KEY_INCLUDE_FILTER;
+    public static final String KEY_FEED_SKIP_INTRO = DbSchema.KEY_FEED_SKIP_INTRO;
+    public static final String KEY_FEED_SKIP_ENDING = DbSchema.KEY_FEED_SKIP_ENDING;
+    public static final String KEY_FEED_TAGS = DbSchema.KEY_FEED_TAGS;
+    public static final String KEY_EPISODE_NOTIFICATION = DbSchema.KEY_EPISODE_NOTIFICATION;
+    public static final String KEY_FEED_PLAYBACK_SPEED = DbSchema.KEY_FEED_PLAYBACK_SPEED;
 
     // Table names
-    public static final String TABLE_NAME_FEEDS = "feeds";
-    public static final String TABLE_NAME_FEED_ITEMS = "episodes";
-    public static final String TABLE_NAME_FEED_MEDIA = "medias";
-    public static final String TABLE_NAME_DOWNLOAD_LOG = "download_log";
-    public static final String TABLE_NAME_QUEUE = "playlist";
-    public static final String TABLE_NAME_SIMPLECHAPTERS = "chapters";
-    public static final String TABLE_NAME_FAVORITES = "favorites";
+    public static final String TABLE_NAME_FEEDS = DbSchema.TABLE_NAME_FEEDS;
+    public static final String TABLE_NAME_FEED_ITEMS = DbSchema.TABLE_NAME_FEED_ITEMS;
+    public static final String TABLE_NAME_FEED_MEDIA = DbSchema.TABLE_NAME_FEED_MEDIA;
+    public static final String TABLE_NAME_DOWNLOAD_LOG = DbSchema.TABLE_NAME_DOWNLOAD_LOG;
+    public static final String TABLE_NAME_QUEUE = DbSchema.TABLE_NAME_QUEUE;
+    public static final String TABLE_NAME_SIMPLECHAPTERS = DbSchema.TABLE_NAME_SIMPLECHAPTERS;
+    public static final String TABLE_NAME_FAVORITES = DbSchema.TABLE_NAME_FAVORITES;
 
-    // SQL Statements for creating new tables
-    private static final String TABLE_PRIMARY_KEY = KEY_ID
-            + " INTEGER PRIMARY KEY AUTOINCREMENT ,";
-
-    private static final String CREATE_TABLE_FEEDS = "CREATE TABLE "
-            + TABLE_NAME_FEEDS + " (" + TABLE_PRIMARY_KEY + KEY_TITLE
-            + " TEXT," + KEY_CUSTOM_TITLE + " TEXT," + KEY_FILE_URL + " TEXT," + KEY_DOWNLOAD_URL + " TEXT,"
-            + KEY_LINK + " TEXT,"
-            + KEY_DESCRIPTION + " TEXT," + KEY_PAYMENT_LINK + " TEXT,"
-            + KEY_LASTUPDATE + " TEXT," + KEY_LANGUAGE + " TEXT," + KEY_AUTHOR
-            + " TEXT," + KEY_IMAGE_URL + " TEXT," + KEY_TYPE + " TEXT,"
-            + KEY_SKIP_SILENCE_ENABLED + " INTEGER DEFAULT 0,"
-            + KEY_IS_SUBSCRIBED + " INTEGER DEFAULT 0,"
-            + KEY_FEED_IDENTIFIER + " TEXT," + KEY_AUTO_DOWNLOAD_ENABLED + " INTEGER DEFAULT 1,"
-            + KEY_USE_FEED_EFFECT + " INTEGER DEFAULT 0,"
-            + KEY_LOUDNESS_ENABLED + " INTEGER DEFAULT 0,"
-            + KEY_ITUNES_FEED_ID + " TEXT,"
-            + KEY_USERNAME + " TEXT,"
-            + KEY_MONO_ENABLED + " INTEGER DEFAULT 0,"
-            + KEY_INCLUDE_FILTER + " TEXT DEFAULT '',"
-            + KEY_EXCLUDE_FILTER + " TEXT DEFAULT '',"
-            + KEY_PASSWORD + " TEXT,"
-            + KEY_KEEP_UPDATED + " INTEGER DEFAULT 1,"
-            + KEY_SORT_ORDER + " TEXT,"
-            + KEY_HIDE + " TEXT,"
-            + KEY_IS_PAGED + " INTEGER DEFAULT 0,"
-            + KEY_MINIMAL_DURATION_FILTER + " INTEGER DEFAULT -1,"
-            + KEY_NEXT_PAGE_LINK + " TEXT,"
-            + KEY_LAST_UPDATE_FAILED + " INTEGER DEFAULT 0,"
-            + KEY_FEED_PLAYBACK_SPEED + " REAL DEFAULT " + SPEED_USE_GLOBAL + ","
-            + KEY_AUTO_DELETE_ACTION + " INTEGER DEFAULT 0,"
-            + KEY_FEED_SKIP_ENDING + " INTEGER DEFAULT 0,"
-            + KEY_FEED_VOLUME_ADAPTION + " INTEGER DEFAULT 0,"
-            + KEY_FEED_TAGS + " TEXT,"
-            + KEY_EPISODE_NOTIFICATION + " INTEGER DEFAULT 0,"
-            + KEY_FEED_SKIP_INTRO + " INTEGER DEFAULT 0)";
-
-    private static final String CREATE_TABLE_FEED_ITEMS = "CREATE TABLE "
-            + TABLE_NAME_FEED_ITEMS + " (" + TABLE_PRIMARY_KEY
-            + KEY_READ + " INTEGER," + KEY_LINK + " TEXT,"
-            + KEY_TITLE + " TEXT," + KEY_PUBDATE + " INTEGER,"
-            + KEY_MEDIA + " INTEGER," + KEY_FEED + " INTEGER,"
-            + KEY_DESCRIPTION + " TEXT," + KEY_PAYMENT_LINK + " TEXT,"
-            + KEY_AUTO_DOWNLOAD_ATTEMPTS + " INTEGER,"
-            + KEY_IMAGE_URL + " TEXT,"
-            + KEY_HAS_CHAPTERS + " INTEGER," + KEY_ITEM_IDENTIFIER + " TEXT,"
-            + KEY_PODCASTINDEX_CHAPTER_URL + " TEXT)";
-
-    private static final String CREATE_TABLE_FEED_MEDIA = "CREATE TABLE "
-            + TABLE_NAME_FEED_MEDIA + " (" + TABLE_PRIMARY_KEY + KEY_DURATION
-            + " INTEGER," + KEY_FILE_URL + " TEXT," + KEY_DOWNLOAD_URL
-            + " TEXT," + KEY_DOWNLOADED + " INTEGER," + KEY_POSITION
-            + " INTEGER," + KEY_SIZE + " INTEGER," + KEY_MIME_TYPE + " TEXT,"
-            + KEY_FEEDITEM + " INTEGER,"
-            + KEY_PLAYBACK_COMPLETION_DATE + " INTEGER,"
-            + KEY_HAS_EMBEDDED_PICTURE + " INTEGER,"
-            + KEY_LAST_PLAYED_TIME + " INTEGER,"
-            + KEY_PLAYED_DURATION + " INTEGER" + ")";
-
-    private static final String CREATE_TABLE_DOWNLOAD_LOG = "CREATE TABLE "
-            + TABLE_NAME_DOWNLOAD_LOG + " (" + TABLE_PRIMARY_KEY + KEY_FEEDFILE
-            + " INTEGER," + KEY_FEEDFILETYPE + " INTEGER," + KEY_REASON
-            + " INTEGER," + KEY_SUCCESSFUL + " INTEGER," + KEY_COMPLETION_DATE
-            + " INTEGER," + KEY_DOWNLOADSTATUS_TITLE + " TEXT,"
-            + KEY_REASON_DETAILED + " TEXT)";
-
-    private static final String CREATE_TABLE_QUEUE = "CREATE TABLE "
-            + TABLE_NAME_QUEUE + "(" + KEY_ID + " INTEGER PRIMARY KEY,"
-            + KEY_FEEDITEM + " INTEGER," + KEY_FEED + " INTEGER)";
-
-    private static final String CREATE_TABLE_SIMPLECHAPTERS = "CREATE TABLE "
-            + TABLE_NAME_SIMPLECHAPTERS + " (" + TABLE_PRIMARY_KEY + KEY_TITLE
-            + " TEXT," + KEY_START + " INTEGER," + KEY_FEEDITEM + " INTEGER,"
-            + KEY_IMAGE_URL + " TEXT," + KEY_LINK + " TEXT)";
-
-    // SQL Statements for creating indexes
-    static final String CREATE_INDEX_FEEDITEMS_FEED = "CREATE INDEX "
-            + TABLE_NAME_FEED_ITEMS + "_" + KEY_FEED + " ON " + TABLE_NAME_FEED_ITEMS + " ("
-            + KEY_FEED + ")";
-
-    static final String CREATE_INDEX_FEEDITEMS_PUBDATE = "CREATE INDEX "
-            + TABLE_NAME_FEED_ITEMS + "_" + KEY_PUBDATE + " ON " + TABLE_NAME_FEED_ITEMS + " ("
-            + KEY_PUBDATE + ")";
-
-    static final String CREATE_INDEX_FEEDITEMS_READ = "CREATE INDEX "
-            + TABLE_NAME_FEED_ITEMS + "_" + KEY_READ + " ON " + TABLE_NAME_FEED_ITEMS + " ("
-            + KEY_READ + ")";
-
-    static final String CREATE_INDEX_QUEUE_FEEDITEM = "CREATE INDEX "
-            + TABLE_NAME_QUEUE + "_" + KEY_FEEDITEM + " ON " + TABLE_NAME_QUEUE + " ("
-            + KEY_FEEDITEM + ")";
-
-    static final String CREATE_INDEX_FEEDMEDIA_FEEDITEM = "CREATE INDEX "
-            + TABLE_NAME_FEED_MEDIA + "_" + KEY_FEEDITEM + " ON " + TABLE_NAME_FEED_MEDIA + " ("
-            + KEY_FEEDITEM + ")";
-
-    static final String CREATE_INDEX_SIMPLECHAPTERS_FEEDITEM = "CREATE INDEX "
-            + TABLE_NAME_SIMPLECHAPTERS + "_" + KEY_FEEDITEM + " ON " + TABLE_NAME_SIMPLECHAPTERS + " ("
-            + KEY_FEEDITEM + ")";
-
-    static final String CREATE_TABLE_FAVORITES = "CREATE TABLE "
-            + TABLE_NAME_FAVORITES + "(" + KEY_ID + " INTEGER PRIMARY KEY,"
-            + KEY_FEEDITEM + " INTEGER," + KEY_FEED + " INTEGER)";
-
-    /**
-     * Select all columns from the feed-table
-     */
-    private static final String[] FEED_SEL_STD = {
-            TABLE_NAME_FEEDS + "." + KEY_TITLE,
-            TABLE_NAME_FEEDS + "." + KEY_CUSTOM_TITLE,
-            TABLE_NAME_FEEDS + "." + KEY_FILE_URL,
-            TABLE_NAME_FEEDS + "." + KEY_LANGUAGE,
-            TABLE_NAME_FEEDS + "." + KEY_LINK,
-            TABLE_NAME_FEEDS + "." + KEY_DOWNLOAD_URL,
-            TABLE_NAME_FEEDS + "." + KEY_PAYMENT_LINK,
-            TABLE_NAME_FEEDS + "." + KEY_ID,
-            TABLE_NAME_FEEDS + "." + KEY_AUTO_DOWNLOAD_ENABLED,
-            TABLE_NAME_FEEDS + "." + KEY_DESCRIPTION,
-            TABLE_NAME_FEEDS + "." + KEY_LASTUPDATE,
-            TABLE_NAME_FEEDS + "." + KEY_TYPE,
-            TABLE_NAME_FEEDS + "." + KEY_AUTHOR,
-            TABLE_NAME_FEEDS + "." + KEY_IMAGE_URL,
-            TABLE_NAME_FEEDS + "." + KEY_SKIP_SILENCE_ENABLED,
-            TABLE_NAME_FEEDS + "." + KEY_USE_FEED_EFFECT,
-            TABLE_NAME_FEEDS + "." + KEY_IS_SUBSCRIBED,
-            TABLE_NAME_FEEDS + "." + KEY_IS_PAGED,
-            TABLE_NAME_FEEDS + "." + KEY_LOUDNESS_ENABLED,
-            TABLE_NAME_FEEDS + "." + KEY_FEED_IDENTIFIER,
-            TABLE_NAME_FEEDS + "." + KEY_KEEP_UPDATED,
-            TABLE_NAME_FEEDS + "." + KEY_ITUNES_FEED_ID,
-            TABLE_NAME_FEEDS + "." + KEY_NEXT_PAGE_LINK,
-            TABLE_NAME_FEEDS + "." + KEY_MONO_ENABLED,
-            TABLE_NAME_FEEDS + "." + KEY_PASSWORD,
-            TABLE_NAME_FEEDS + "." + KEY_HIDE,
-            TABLE_NAME_FEEDS + "." + KEY_SORT_ORDER,
-            TABLE_NAME_FEEDS + "." + KEY_LAST_UPDATE_FAILED,
-            TABLE_NAME_FEEDS + "." + KEY_AUTO_DELETE_ACTION,
-            TABLE_NAME_FEEDS + "." + KEY_INCLUDE_FILTER,
-            TABLE_NAME_FEEDS + "." + KEY_FEED_VOLUME_ADAPTION,
-            TABLE_NAME_FEEDS + "." + KEY_USERNAME,
-            TABLE_NAME_FEEDS + "." + KEY_MINIMAL_DURATION_FILTER,
-            TABLE_NAME_FEEDS + "." + KEY_FEED_PLAYBACK_SPEED,
-            TABLE_NAME_FEEDS + "." + KEY_FEED_TAGS,
-            TABLE_NAME_FEEDS + "." + KEY_EXCLUDE_FILTER,
-            TABLE_NAME_FEEDS + "." + KEY_FEED_SKIP_INTRO,
-            TABLE_NAME_FEEDS + "." + KEY_FEED_SKIP_ENDING,
-            TABLE_NAME_FEEDS + "." + KEY_EPISODE_NOTIFICATION
-    };
-
-    /**
-     * All the tables in the database
-     */
-    private static final String[] ALL_TABLES = {
-            TABLE_NAME_FEEDS,
-            TABLE_NAME_FEED_ITEMS,
-            TABLE_NAME_FEED_MEDIA,
-            TABLE_NAME_DOWNLOAD_LOG,
-            TABLE_NAME_QUEUE,
-            TABLE_NAME_SIMPLECHAPTERS,
-            TABLE_NAME_FAVORITES
-    };
-
-    public static final String SELECT_KEY_ITEM_ID = "item_id";
-    public static final String SELECT_KEY_MEDIA_ID = "media_id";
-
-    private static final String KEYS_FEED_ITEM_WITHOUT_DESCRIPTION =
-            TABLE_NAME_FEED_ITEMS + "." + KEY_ID + " AS " + SELECT_KEY_ITEM_ID + ", "
-                    + TABLE_NAME_FEED_ITEMS + "." + KEY_MEDIA + ", "
-                    + TABLE_NAME_FEED_ITEMS + "." + KEY_TITLE + ", "
-                    + TABLE_NAME_FEED_ITEMS + "." + KEY_PUBDATE + ", "
-                    + TABLE_NAME_FEED_ITEMS + "." + KEY_LINK + ", "
-                    + TABLE_NAME_FEED_ITEMS + "." + KEY_PAYMENT_LINK + ", "
-                    + TABLE_NAME_FEED_ITEMS + "." + KEY_FEED + ", "
-                    + TABLE_NAME_FEED_ITEMS + "." + KEY_ITEM_IDENTIFIER + ", "
-                    + TABLE_NAME_FEED_ITEMS + "." + KEY_HAS_CHAPTERS + ", "
-                    + TABLE_NAME_FEED_ITEMS + "." + KEY_READ + ", "
-                    + TABLE_NAME_FEED_ITEMS + "." + KEY_AUTO_DOWNLOAD_ATTEMPTS + ", "
-                    + TABLE_NAME_FEED_ITEMS + "." + KEY_IMAGE_URL + ", "
-            + TABLE_NAME_FEED_ITEMS + "." + KEY_PODCASTINDEX_CHAPTER_URL;
-
-    private static final String KEYS_FEED_MEDIA =
-            TABLE_NAME_FEED_MEDIA + "." + KEY_ID + " AS " + SELECT_KEY_MEDIA_ID + ", "
-            + TABLE_NAME_FEED_MEDIA + "." + KEY_FILE_URL + ", "
-                    + TABLE_NAME_FEED_MEDIA + "." + KEY_DOWNLOAD_URL + ", "
-                    + TABLE_NAME_FEED_MEDIA + "." + KEY_DOWNLOADED + ", "
-                    + TABLE_NAME_FEED_MEDIA + "." + KEY_DURATION + ", "
-                    + TABLE_NAME_FEED_MEDIA + "." + KEY_POSITION + ", "
-            + TABLE_NAME_FEED_MEDIA + "." + KEY_MIME_TYPE + ", "
-                    + TABLE_NAME_FEED_MEDIA + "." + KEY_PLAYBACK_COMPLETION_DATE + ", "
-                    + TABLE_NAME_FEED_MEDIA + "." + KEY_SIZE + ", "
-            + TABLE_NAME_FEED_MEDIA + "." + KEY_PLAYED_DURATION + ", "
-                    + TABLE_NAME_FEED_MEDIA + "." + KEY_FEEDITEM + ", "
-                    + TABLE_NAME_FEED_MEDIA + "." + KEY_HAS_EMBEDDED_PICTURE + ", "
-            + TABLE_NAME_FEED_MEDIA + "." + KEY_LAST_PLAYED_TIME;
-
-    private static final String JOIN_FEED_ITEM_AND_MEDIA = " LEFT JOIN " + TABLE_NAME_FEED_MEDIA
-            + " ON " + TABLE_NAME_FEED_ITEMS + "." + KEY_ID + "=" + TABLE_NAME_FEED_MEDIA + "." + KEY_FEEDITEM + " ";
-
-    private static final String SELECT_FEED_ITEMS_AND_MEDIA_WITH_DESCRIPTION =
-            "SELECT " + KEYS_FEED_ITEM_WITHOUT_DESCRIPTION + ", " + KEYS_FEED_MEDIA + ", "
-                    + TABLE_NAME_FEED_ITEMS + "." + KEY_DESCRIPTION
-            + " FROM " + TABLE_NAME_FEED_ITEMS
-            + JOIN_FEED_ITEM_AND_MEDIA;
-    private static final String SELECT_FEED_ITEMS_AND_MEDIA =
-            "SELECT " + KEYS_FEED_ITEM_WITHOUT_DESCRIPTION + ", " + KEYS_FEED_MEDIA
-            + " FROM " + TABLE_NAME_FEED_ITEMS
-            + JOIN_FEED_ITEM_AND_MEDIA;
-
-    private static final String JOIN_FEED_ITEM_AND_MEDIA_AND_DOWNLOADLOG = " LEFT JOIN " + TABLE_NAME_DOWNLOAD_LOG
-            + " ON " + TABLE_NAME_DOWNLOAD_LOG + "." + KEY_FEEDFILE  + "=" + TABLE_NAME_FEED_MEDIA + "." + KEY_ID + " LEFT JOIN " + TABLE_NAME_FEED_MEDIA
-            + " ON " + TABLE_NAME_FEED_ITEMS + "." + KEY_ID + "=" + TABLE_NAME_FEED_MEDIA + "." + KEY_FEEDITEM + " ";
-
-    private static final String JOIN_FEED_ITEM_AND_FEED = " LEFT JOIN " + TABLE_NAME_FEEDS
-            + " ON " + TABLE_NAME_FEEDS + "." + KEY_ID + " = " + TABLE_NAME_FEED_ITEMS + "." + KEY_FEED + " ";
-
-    private static final String SELECT_FEED_ITEMS_AND_MEDIA_AND_DOWNLOADLOG =
-            "SELECT " + TABLE_NAME_FEED_MEDIA + "." + KEY_FEEDITEM
-                    + " FROM " + TABLE_NAME_FEED_ITEMS
-                    + JOIN_FEED_ITEM_AND_MEDIA;
-
+    public static final String SELECT_KEY_ITEM_ID = DbSchema.SELECT_KEY_ITEM_ID;
+    public static final String SELECT_KEY_MEDIA_ID = DbSchema.SELECT_KEY_MEDIA_ID;
     private static Context context;
     private static Db instance;
 
     private final SQLiteDatabase db;
     private final DbHelper dbHelper;
+
+    private final FeedDao feedDao;
+    private final FeedMediaDao mediaDao;
+    private final FeedItemDao itemDao;
+    private final QueueDao queueDao;
+    private final FavoritesDao favoritesDao;
+    private final DownloadLogDao downloadLogDao;
 
     public static void init(Context context) {
         if (context == null) {
@@ -381,9 +162,15 @@ public class Db {
     private Db() {
         dbHelper = new DbHelper(Db.context, DATABASE_NAME, null);
         db = openDb();
+        feedDao = new FeedDao(db);
+        mediaDao = new FeedMediaDao(db);
+        itemDao = new FeedItemDao(db, feedDao, mediaDao);
+        queueDao = new QueueDao(db);
+        favoritesDao = new FavoritesDao(db);
+        downloadLogDao = new DownloadLogDao(db);
     }
 
-    public SQLiteDatabase getDb(){
+    public SQLiteDatabase getDb() {
         return db;
     }
 
@@ -430,9 +217,7 @@ public class Db {
         Db adapter = getInstance();
         adapter.open();
         try {
-            for (String tableName : ALL_TABLES) {
-                adapter.db.delete(tableName, "1", null);
-            }
+            adapter.feedDao.deleteAllTables();
             return true;
         } finally {
             adapter.close();
@@ -440,207 +225,26 @@ public class Db {
     }
 
     /**
-     * Inserts or updates a feed entry
-     *
-     * @return the id of the entry
-     */
-    private long setFeed(Feed feed) {
-        ContentValues values = new ContentValues();
-        values.put(KEY_TITLE, feed.getFeedTitle());
-        values.put(KEY_LINK, feed.getLink());
-        values.put(KEY_DESCRIPTION, feed.getDescription());
-        values.put(KEY_IS_SUBSCRIBED, feed.isSubscribed());
-        values.put(KEY_ITUNES_FEED_ID,feed.getItunesId());
-        values.put(KEY_PAYMENT_LINK, FeedFunding.getPaymentLinksAsString(feed.getPaymentLinks()));
-        values.put(KEY_AUTHOR, feed.getAuthor());
-        values.put(KEY_LANGUAGE, feed.getLanguage());
-        values.put(KEY_IMAGE_URL, feed.getImageUrl());
-
-        values.put(KEY_FILE_URL, feed.getFile_url());
-        values.put(KEY_DOWNLOAD_URL, feed.getDownload_url());
-        values.put(KEY_LASTUPDATE, feed.getLastUpdate());
-        values.put(KEY_TYPE, feed.getType());
-        values.put(KEY_FEED_IDENTIFIER, feed.getFeedIdentifier());
-
-        values.put(KEY_IS_PAGED, feed.isPaged());
-        values.put(KEY_NEXT_PAGE_LINK, feed.getNextPageLink());
-        if (feed.getItemFilter() != null && feed.getItemFilter().getValues().length > 0) {
-            values.put(KEY_HIDE, TextUtils.join(",", feed.getItemFilter().getValues()));
-        } else {
-            values.put(KEY_HIDE, "");
-        }
-        values.put(KEY_SORT_ORDER, toCodeString(feed.getSortOrder()));
-        values.put(KEY_LAST_UPDATE_FAILED, feed.hasLastUpdateFailed());
-        if (feed.getId() == 0) {
-            // Create new entry
-            Log.d(this.toString(), "insert new feed into db");
-            feed.setId(db.insert(TABLE_NAME_FEEDS, null, values));
-        } else {
-            Log.d(this.toString(), "update existing feed in db");
-            db.update(TABLE_NAME_FEEDS, values, KEY_ID + "=?",
-                    new String[]{String.valueOf(feed.getId())});
-        }
-        return feed.getId();
-    }
-
-    public void setFeedPreferences(FeedPreferences prefs) {
-        if (prefs.getFeedID() == 0) {
-            throw new IllegalArgumentException("Feed ID of preference must not be null");
-        }
-        ContentValues values = new ContentValues();
-        values.put(KEY_AUTO_DOWNLOAD_ENABLED, prefs.getAutoDownload());
-        values.put(KEY_SKIP_SILENCE_ENABLED, prefs.isSkipSilence());
-        values.put(KEY_USE_FEED_EFFECT, prefs.isUseFeedEffect());
-        values.put(KEY_LOUDNESS_ENABLED, prefs.isLoudness());
-        values.put(KEY_MONO_ENABLED, prefs.isMono());
-        values.put(KEY_KEEP_UPDATED, prefs.getKeepUpdated());
-        values.put(KEY_AUTO_DELETE_ACTION, prefs.getAutoDeleteAction().ordinal());
-        values.put(KEY_FEED_VOLUME_ADAPTION, prefs.getVolumeAdaptionSetting().toInteger());
-        values.put(KEY_USERNAME, prefs.getUsername());
-        values.put(KEY_PASSWORD, prefs.getPassword());
-        values.put(KEY_INCLUDE_FILTER, prefs.getFilter().getIncludeFilterRaw());
-        values.put(KEY_EXCLUDE_FILTER, prefs.getFilter().getExcludeFilterRaw());
-        values.put(KEY_MINIMAL_DURATION_FILTER, prefs.getFilter().getMinimalDurationFilter());
-        values.put(KEY_FEED_PLAYBACK_SPEED, prefs.getFeedPlaybackSpeed());
-        values.put(KEY_FEED_TAGS, prefs.getTagsAsString());
-        values.put(KEY_FEED_SKIP_INTRO, prefs.getFeedSkipIntro());
-        values.put(KEY_FEED_SKIP_ENDING, prefs.getFeedSkipEnding());
-        values.put(KEY_EPISODE_NOTIFICATION, prefs.getShowEpisodeNotification());
-        db.update(TABLE_NAME_FEEDS, values, KEY_ID + "=?", new String[]{String.valueOf(prefs.getFeedID())});
-    }
-
-    public void setFeedItemFilter(long feedId, Set<String> filterValues) {
-        String valuesList = TextUtils.join(",", filterValues);
-        Log.d(TAG, String.format(Locale.US,
-                "setFeedItemFilter() called with: feedId = [%d], filterValues = [%s]", feedId, valuesList));
-        ContentValues values = new ContentValues();
-        values.put(KEY_HIDE, valuesList);
-        db.update(TABLE_NAME_FEEDS, values, KEY_ID + "=?", new String[]{String.valueOf(feedId)});
-    }
-
-    public void setFeedItemSortOrder(long feedId, @Nullable SortOrder sortOrder) {
-        ContentValues values = new ContentValues();
-        values.put(KEY_SORT_ORDER, toCodeString(sortOrder));
-        db.update(TABLE_NAME_FEEDS, values, KEY_ID + "=?", new String[]{String.valueOf(feedId)});
-    }
-
-    /**
-     * Inserts or updates a media entry
-     *
-     * @return the id of the entry
-     */
-    public long setMedia(FeedMedia media) {
-        ContentValues values = new ContentValues();
-        values.put(KEY_DURATION, media.getDuration());
-        values.put(KEY_POSITION, media.getPosition());
-        values.put(KEY_SIZE, media.getSize());
-        values.put(KEY_MIME_TYPE, media.getMime_type());
-        values.put(KEY_DOWNLOAD_URL, media.getDownload_url());
-        values.put(KEY_DOWNLOADED, media.isDownloaded());
-        values.put(KEY_FILE_URL, media.getFile_url());
-        values.put(KEY_HAS_EMBEDDED_PICTURE, media.hasEmbeddedPicture());
-        values.put(KEY_LAST_PLAYED_TIME, media.getLastPlayedTime());
-
-        if (media.getPlaybackCompletionDate() != null) {
-            values.put(KEY_PLAYBACK_COMPLETION_DATE, media.getPlaybackCompletionDate().getTime());
-        } else {
-            values.put(KEY_PLAYBACK_COMPLETION_DATE, 0);
-        }
-        if (media.getItem() != null) {
-            values.put(KEY_FEEDITEM, media.getItem().getId());
-        }
-        if (media.getId() == 0) {
-            media.setId(db.insert(TABLE_NAME_FEED_MEDIA, null, values));
-        } else {
-            db.update(TABLE_NAME_FEED_MEDIA, values, KEY_ID + "=?",
-                    new String[]{String.valueOf(media.getId())});
-        }
-        return media.getId();
-    }
-
-    /**
-     * Saves only the download-related columns (downloaded flag, file url, embedded picture)
-     * so that a stale in-memory snapshot cannot clobber playback position etc.
-     */
-    public void setFeedMediaDownloadState(FeedMedia media) {
-        if (media.getId() != 0) {
-            ContentValues values = new ContentValues();
-            values.put(KEY_DOWNLOADED, media.isDownloaded());
-            values.put(KEY_FILE_URL, media.getFile_url());
-            values.put(KEY_HAS_EMBEDDED_PICTURE, media.hasEmbeddedPicture());
-            db.update(TABLE_NAME_FEED_MEDIA, values, KEY_ID + "=?",
-                    new String[]{String.valueOf(media.getId())});
-        } else {
-            Log.e(TAG, "setFeedMediaDownloadState: ID of media was 0");
-        }
-    }
-
-    public void setFeedMediaPlaybackInformation(FeedMedia media) {
-        if (media.getId() != 0) {
-            ContentValues values = new ContentValues();
-            values.put(KEY_POSITION, media.getPosition());
-            values.put(KEY_DURATION, media.getDuration());
-            values.put(KEY_PLAYED_DURATION, media.getPlayedDuration());
-            values.put(KEY_LAST_PLAYED_TIME, media.getLastPlayedTime());
-            db.update(TABLE_NAME_FEED_MEDIA, values, KEY_ID + "=?",
-                    new String[]{String.valueOf(media.getId())});
-        } else {
-            Log.e(TAG, "setFeedMediaPlaybackInformation: ID of media was 0");
-        }
-    }
-
-    public void setFeedMediaPlaybackCompletionDate(FeedMedia media) {
-        if (media.getId() != 0) {
-            ContentValues values = new ContentValues();
-            values.put(KEY_PLAYBACK_COMPLETION_DATE, media.getPlaybackCompletionDate().getTime());
-            values.put(KEY_PLAYED_DURATION, media.getPlayedDuration());
-            db.update(TABLE_NAME_FEED_MEDIA, values, KEY_ID + "=?",
-                    new String[]{String.valueOf(media.getId())});
-        } else {
-            Log.e(TAG, "setFeedMediaPlaybackCompletionDate: ID of media was 0");
-        }
-    }
-
-    /**
-     * Resets the playback duration of all podcasts to 0.
-     */
-    public void resetAllMediaPlayedDuration() {
-        try {
-            db.beginTransactionNonExclusive();
-            ContentValues values = new ContentValues();
-            values.put(KEY_PLAYED_DURATION, 0);
-            db.update(TABLE_NAME_FEED_MEDIA, values, null, new String[0]);
-            db.setTransactionSuccessful();
-        } catch (SQLException e) {
-            // Log and continue: setTransactionSuccessful() was never reached, so the finally
-            // below rolls the whole statement back. The caller's in-memory model is unchanged
-            // and the next write of the same data retries it.
-            Log.e(TAG, "resetAllMediaPlayedDuration failed, transaction rolled back", e);
-        } finally {
-            db.endTransaction();
-        }
-    }
-
-    /**
      * Insert all FeedItems of a feed and the feed object itself in a single
-     * transaction
+     * transaction. Spans the feeds, episodes, medias and chapters tables, so the transaction is
+     * held here rather than in one of the per-table helpers.
      */
     public void setCompleteFeed(Feed... feeds) {
         try {
             db.beginTransactionNonExclusive();
             for (Feed feed : feeds) {
-                setFeed(feed);
+                feedDao.setFeed(feed);
                 if (feed.getItems() != null) {
                     for (FeedItem item : feed.getItems()) {
                         // fromRefresh: the item objects were read before the (possibly long)
                         // parse+merge, so only feed-derived columns may be written for rows
                         // that already exist; otherwise played state, playback position and
                         // downloaded flag changed in the meantime would be reverted.
-                        updateOrInsertFeedItem(item, false, true);
+                        itemDao.updateOrInsertFeedItem(item, false, true);
                     }
                 }
                 if (feed.getPreferences() != null) {
-                    setFeedPreferences(feed.getPreferences());
+                    feedDao.setFeedPreferences(feed.getPreferences());
                 }
             }
             db.setTransactionSuccessful();
@@ -655,433 +259,17 @@ public class Db {
     }
 
     /**
-     * Updates the download URL of a Feed.
-     */
-    public void setFeedDownloadUrl(String original, String updated) {
-        ContentValues values = new ContentValues();
-        values.put(KEY_DOWNLOAD_URL, updated);
-        db.update(TABLE_NAME_FEEDS, values, KEY_DOWNLOAD_URL + "=?", new String[]{original});
-    }
-
-    public void storeFeedItemlist(List<FeedItem> items) {
-        try {
-            db.beginTransactionNonExclusive();
-            for (FeedItem item : items) {
-                updateOrInsertFeedItem(item, true);
-            }
-            db.setTransactionSuccessful();
-        } catch (SQLException e) {
-            // Log and continue: setTransactionSuccessful() was never reached, so the finally
-            // below rolls the whole statement back. The caller's in-memory model is unchanged
-            // and the next write of the same data retries it.
-            Log.e(TAG, "storeFeedItemlist failed, transaction rolled back", e);
-        } finally {
-            db.endTransaction();
-        }
-    }
-
-    public long setSingleFeedItem(FeedItem item) {
-        long result = 0;
-        try {
-            db.beginTransactionNonExclusive();
-            result = updateOrInsertFeedItem(item, true);
-            db.setTransactionSuccessful();
-        } catch (SQLException e) {
-            // Log and continue: setTransactionSuccessful() was never reached, so the finally
-            // below rolls the whole statement back. The caller's in-memory model is unchanged
-            // and the next write of the same data retries it.
-            Log.e(TAG, "setSingleFeedItem failed, transaction rolled back", e);
-        } finally {
-            db.endTransaction();
-        }
-        return result;
-    }
-
-    /**
-     * Unlike setSingleFeedItem(FeedItem item), this does not update the feed.
-     * @param item
-     * @return
-     */
-    public long setSingleFeedItemExcludeFeed(FeedItem item) {
-        long result = 0;
-        try {
-            db.beginTransactionNonExclusive();
-            result = updateOrInsertFeedItem(item, false);
-            db.setTransactionSuccessful();
-        } catch (SQLException e) {
-            // Log and continue: setTransactionSuccessful() was never reached, so the finally
-            // below rolls the whole statement back. The caller's in-memory model is unchanged
-            // and the next write of the same data retries it.
-            Log.e(TAG, "setSingleFeedItemExcludeFeed failed, transaction rolled back", e);
-        } finally {
-            db.endTransaction();
-        }
-        return result;
-    }
-
-    /**
-     * Inserts or updates a feeditem entry
-     *
-     * @param item     The FeedItem
-     * @param saveFeed true if the Feed of the item should also be saved. This should be set to
-     *                 false if the method is executed on a list of FeedItems of the same Feed.
-     * @return the id of the entry
-     */
-    private long updateOrInsertFeedItem(FeedItem item, boolean saveFeed) {
-        return updateOrInsertFeedItem(item, saveFeed, false);
-    }
-
-    /**
-     * @param fromRefresh true if the item comes from a feed refresh merge. For rows that already
-     *                    exist only feed-derived columns are written then: the read state is
-     *                    written only when the merge marked the item NEW, and the media row
-     *                    keeps its position/downloaded/file columns.
-     */
-    private long updateOrInsertFeedItem(FeedItem item, boolean saveFeed, boolean fromRefresh) {
-        final boolean existingRefreshRow = fromRefresh && item.getId() != 0;
-        if (item.getId() == 0 && item.getPubDate() == null) {
-            Log.e(TAG, "Newly saved item has no pubDate. Using current date as pubDate");
-            item.setPubDate(new Date());
-        }
-
-        ContentValues values = new ContentValues();
-        values.put(KEY_TITLE, item.getTitle());
-        values.put(KEY_LINK, item.getLink());
-        if (item.getDescription() != null) {
-            values.put(KEY_DESCRIPTION, item.getDescription());
-        }
-        values.put(KEY_PUBDATE, item.getPubDate().getTime());
-        values.put(KEY_PAYMENT_LINK, item.getPaymentLink());
-        if (saveFeed && item.getFeed() != null) {
-            setFeed(item.getFeed());
-        }
-        values.put(KEY_FEED, item.getFeed().getId());
-        if (item.isNew()) {
-            values.put(KEY_READ, FeedItem.NEW);
-        } else if (!existingRefreshRow) {
-            values.put(KEY_READ, item.isPlayed() ? FeedItem.PLAYED : FeedItem.UNPLAYED);
-        }
-        values.put(KEY_HAS_CHAPTERS, item.getChapters() != null || item.hasChapters());
-        values.put(KEY_ITEM_IDENTIFIER, item.getItemIdentifier());
-        if (!existingRefreshRow) {
-            values.put(KEY_AUTO_DOWNLOAD_ATTEMPTS, item.getAutoDownloadAttemptsAndTime());
-        }
-        values.put(KEY_IMAGE_URL, item.getImageUrl());
-        values.put(KEY_PODCASTINDEX_CHAPTER_URL, item.getPodcastIndexChapterUrl());
-
-        if (item.getId() == 0) {
-            item.setId(db.insert(TABLE_NAME_FEED_ITEMS, null, values));
-        } else {
-            db.update(TABLE_NAME_FEED_ITEMS, values, KEY_ID + "=?",
-                    new String[]{String.valueOf(item.getId())});
-        }
-        if (item.getMedia() != null) {
-            if (fromRefresh && item.getMedia().getId() != 0) {
-                setMediaFeedData(item.getMedia());
-            } else {
-                setMedia(item.getMedia());
-            }
-        }
-        if (item.getChapters() != null) {
-            setChapters(item);
-        }
-        return item.getId();
-    }
-
-    /**
-     * Updates only the columns of a media row that come from the feed itself.
-     */
-    private void setMediaFeedData(FeedMedia media) {
-        ContentValues values = new ContentValues();
-        values.put(KEY_SIZE, media.getSize());
-        values.put(KEY_MIME_TYPE, media.getMime_type());
-        values.put(KEY_DOWNLOAD_URL, media.getDownload_url());
-        if (media.getDuration() > 0) {
-            values.put(KEY_DURATION, media.getDuration());
-        }
-        if (media.getItem() != null) {
-            values.put(KEY_FEEDITEM, media.getItem().getId());
-        }
-        db.update(TABLE_NAME_FEED_MEDIA, values, KEY_ID + "=?",
-                new String[]{String.valueOf(media.getId())});
-    }
-
-    public void setFeedItemRead(int played, long itemId, long mediaId,
-                                boolean resetMediaPosition) {
-        try {
-            db.beginTransactionNonExclusive();
-            ContentValues values = new ContentValues();
-
-            values.put(KEY_READ, played);
-            db.update(TABLE_NAME_FEED_ITEMS, values, KEY_ID + "=?", new String[]{String.valueOf(itemId)});
-
-            if (resetMediaPosition) {
-                values.clear();
-                values.put(KEY_POSITION, 0);
-                db.update(TABLE_NAME_FEED_MEDIA, values, KEY_ID + "=?", new String[]{String.valueOf(mediaId)});
-            }
-
-            db.setTransactionSuccessful();
-        } catch (SQLException e) {
-            // Log and continue: setTransactionSuccessful() was never reached, so the finally
-            // below rolls the whole statement back. The caller's in-memory model is unchanged
-            // and the next write of the same data retries it.
-            Log.e(TAG, "setFeedItemRead failed, transaction rolled back", e);
-        } finally {
-            db.endTransaction();
-        }
-    }
-
-    /**
-     * Sets the 'read' attribute of the item.
-     *
-     * @param read    must be one of FeedItem.PLAYED, FeedItem.NEW, FeedItem.UNPLAYED
-     * @param itemIds items to change the value of
-     */
-    public void setFeedItemRead(int read, long... itemIds) {
-        try {
-            db.beginTransactionNonExclusive();
-            ContentValues values = new ContentValues();
-            for (long id : itemIds) {
-                values.clear();
-                values.put(KEY_READ, read);
-                db.update(TABLE_NAME_FEED_ITEMS, values, KEY_ID + "=?", new String[]{String.valueOf(id)});
-            }
-            db.setTransactionSuccessful();
-        } catch (SQLException e) {
-            // Log and continue: setTransactionSuccessful() was never reached, so the finally
-            // below rolls the whole statement back. The caller's in-memory model is unchanged
-            // and the next write of the same data retries it.
-            Log.e(TAG, "setFeedItemRead failed, transaction rolled back", e);
-        } finally {
-            db.endTransaction();
-        }
-    }
-
-    private void setChapters(FeedItem item) {
-        ContentValues values = new ContentValues();
-        for (Chapter chapter : item.getChapters()) {
-            values.put(KEY_TITLE, chapter.getTitle());
-            values.put(KEY_START, chapter.getStart());
-            values.put(KEY_FEEDITEM, item.getId());
-            values.put(KEY_LINK, chapter.getLink());
-            values.put(KEY_IMAGE_URL, chapter.getImageUrl());
-            if (chapter.getId() == 0) {
-                chapter.setId(db.insert(TABLE_NAME_SIMPLECHAPTERS, null, values));
-            } else {
-                db.update(TABLE_NAME_SIMPLECHAPTERS, values, KEY_ID + "=?",
-                        new String[]{String.valueOf(chapter.getId())});
-            }
-        }
-    }
-
-    public void setFeedLastUpdateFailed(long feedId, boolean failed) {
-        final String sql = "UPDATE " + TABLE_NAME_FEEDS
-                + " SET " + KEY_LAST_UPDATE_FAILED + "=" + (failed ? "1" : "0")
-                + " WHERE " + KEY_ID + "=" + feedId;
-        db.execSQL(sql);
-    }
-
-    public void setFeedCustomTitle(long feedId, String customTitle) {
-        ContentValues values = new ContentValues();
-        values.put(KEY_CUSTOM_TITLE, customTitle);
-        db.update(TABLE_NAME_FEEDS, values, KEY_ID + "=?", new String[]{String.valueOf(feedId)});
-    }
-
-    public void subscribeFeed(long feedId) {
-        ContentValues values = new ContentValues();
-        values.put(KEY_IS_SUBSCRIBED, true);
-        db.update(TABLE_NAME_FEEDS, values, KEY_ID + "=?", new String[]{String.valueOf(feedId)});
-    }
-
-    public void setFeedItunesId(long feedId, String itunesId) {
-        ContentValues values = new ContentValues();
-        values.put(KEY_ITUNES_FEED_ID, itunesId);
-        db.update(TABLE_NAME_FEEDS, values, KEY_ID + "=?", new String[]{String.valueOf(feedId)});
-    }
-
-    public final Cursor getSubscribedFeedsCountCursor() {
-        return db.query(TABLE_NAME_FEEDS, new String[]{"count(*)"}, KEY_IS_SUBSCRIBED + "=?", new String[]{"1"}, null, null,
-                KEY_TITLE + " COLLATE NOCASE ASC");
-    }
-
-    /**
-     * Inserts or updates a download status.
-     */
-    public long setDownloadStatus(DownloadStatus status) {
-        if(status.getFeedfileId() == 0){
-//            feedId=0 means the feed was not subscribed at the time, recording the sync state is not what the user wants
-            Log.d(TAG,"ignore feed id =0 download status " + status.getTitle());
-            return 0;
-        }
-        if(status.isSuccessful()){
-            // On success, drop the record: the user only cares about downloads that are running or failed
-            db.delete(TABLE_NAME_DOWNLOAD_LOG, KEY_ID + "=?",
-                    new String[]{String.valueOf(status.getId())});
-            return status.getId();
-        }
-        if (status.getReason() == allen.town.podcast.model.download.DownloadError.ERROR_PARSER_EXCEPTION_DUPLICATE
-                && status.getId() == 0) {
-            // A duplicate-episode warning is re-reported on every refresh for as long as the
-            // podcast host keeps the duplicate in the feed. Keep a single row per episode and
-            // let it move to the top instead of accumulating one entry per refresh.
-            db.delete(TABLE_NAME_DOWNLOAD_LOG,
-                    KEY_FEEDFILE + "=? AND " + KEY_FEEDFILETYPE + "=? AND " + KEY_REASON + "=? AND " + KEY_DOWNLOADSTATUS_TITLE + "=?",
-                    new String[]{String.valueOf(status.getFeedfileId()), String.valueOf(status.getFeedfileType()),
-                            String.valueOf(status.getReason().getCode()), String.valueOf(status.getTitle())});
-        }
-        ContentValues values = new ContentValues();
-        values.put(KEY_FEEDFILE, status.getFeedfileId());
-        values.put(KEY_FEEDFILETYPE, status.getFeedfileType());
-        values.put(KEY_REASON, status.getReason().getCode());
-        values.put(KEY_SUCCESSFUL, status.isSuccessful());
-        values.put(KEY_COMPLETION_DATE, status.getCompletionDate().getTime());
-        values.put(KEY_REASON_DETAILED, status.getReasonDetailed());
-        values.put(KEY_DOWNLOADSTATUS_TITLE, status.getTitle());
-        if (status.getId() == 0) {
-            status.setId(db.insert(TABLE_NAME_DOWNLOAD_LOG, null, values));
-        } else {
-            db.update(TABLE_NAME_DOWNLOAD_LOG, values, KEY_ID + "=?",
-                    new String[]{String.valueOf(status.getId())});
-        }
-        return status.getId();
-    }
-
-    public void setFavorites(List<FeedItem> favorites) {
-        ContentValues values = new ContentValues();
-        try {
-            db.beginTransactionNonExclusive();
-            db.delete(TABLE_NAME_FAVORITES, null, null);
-            for (int i = 0; i < favorites.size(); i++) {
-                FeedItem item = favorites.get(i);
-                values.put(KEY_ID, i);
-                values.put(KEY_FEEDITEM, item.getId());
-                values.put(KEY_FEED, item.getFeed().getId());
-                db.insertWithOnConflict(TABLE_NAME_FAVORITES, null, values, SQLiteDatabase.CONFLICT_REPLACE);
-            }
-            db.setTransactionSuccessful();
-        } catch (SQLException e) {
-            // Log and continue: setTransactionSuccessful() was never reached, so the finally
-            // below rolls the whole statement back. The caller's in-memory model is unchanged
-            // and the next write of the same data retries it.
-            Log.e(TAG, "setFavorites failed, transaction rolled back", e);
-        } finally {
-            db.endTransaction();
-        }
-    }
-
-    /**
-     * Adds the item to favorites
-     */
-    public void addFavoriteItem(FeedItem item) {
-        // don't add an item that's already there...
-        if (isItemInFavorites(item)) {
-            Log.d(TAG, "item already in favorites");
-            return;
-        }
-        ContentValues values = new ContentValues();
-        values.put(KEY_FEEDITEM, item.getId());
-        values.put(KEY_FEED, item.getFeedId());
-        db.insert(TABLE_NAME_FAVORITES, null, values);
-    }
-
-    public void removeFavoriteItem(FeedItem item) {
-        String deleteClause = String.format("DELETE FROM %s WHERE %s=%s AND %s=%s",
-                TABLE_NAME_FAVORITES,
-                KEY_FEEDITEM, item.getId(),
-                KEY_FEED, item.getFeedId());
-        db.execSQL(deleteClause);
-    }
-
-    private boolean isItemInFavorites(FeedItem item) {
-        String query = String.format(Locale.US, "SELECT %s from %s WHERE %s=%d",
-                KEY_ID, TABLE_NAME_FAVORITES, KEY_FEEDITEM, item.getId());
-        Cursor c = db.rawQuery(query, null);
-        int count = c.getCount();
-        c.close();
-        return count > 0;
-    }
-
-    public void setQueue(List<FeedItem> queue) {
-        ContentValues values = new ContentValues();
-        try {
-            db.beginTransactionNonExclusive();
-            db.delete(TABLE_NAME_QUEUE, null, null);
-            for (int i = 0; i < queue.size(); i++) {
-                FeedItem item = queue.get(i);
-                values.put(KEY_ID, i);
-                values.put(KEY_FEEDITEM, item.getId());
-                values.put(KEY_FEED, item.getFeed().getId());
-                db.insertWithOnConflict(TABLE_NAME_QUEUE, null, values, SQLiteDatabase.CONFLICT_REPLACE);
-            }
-            db.setTransactionSuccessful();
-        } catch (SQLException e) {
-            // Log and continue: setTransactionSuccessful() was never reached, so the finally
-            // below rolls the whole statement back. The caller's in-memory model is unchanged
-            // and the next write of the same data retries it.
-            Log.e(TAG, "setQueue failed, transaction rolled back", e);
-        } finally {
-            db.endTransaction();
-        }
-    }
-
-    public void clearQueue() {
-        db.delete(TABLE_NAME_QUEUE, null, null);
-    }
-
-    /**
-     * Remove the listed items and their FeedMedia entries.
-     */
-    public void removeFeedItems(@NonNull List<FeedItem> items) {
-        try {
-            StringBuilder mediaIds = new StringBuilder();
-            StringBuilder itemIds = new StringBuilder();
-            for (FeedItem item : items) {
-                if (item.getMedia() != null) {
-                    if (mediaIds.length() != 0) {
-                        mediaIds.append(",");
-                    }
-                    mediaIds.append(item.getMedia().getId());
-                }
-                if (itemIds.length() != 0) {
-                    itemIds.append(",");
-                }
-                itemIds.append(item.getId());
-            }
-
-            db.beginTransactionNonExclusive();
-            db.delete(TABLE_NAME_SIMPLECHAPTERS, KEY_FEEDITEM + " IN (" + itemIds + ")", null);
-            db.delete(TABLE_NAME_DOWNLOAD_LOG, KEY_FEEDFILETYPE + "=" + FeedMedia.FEEDFILETYPE_FEEDMEDIA
-                            + " AND " + KEY_FEEDFILE + " IN (" + mediaIds + ")", null);
-            db.delete(TABLE_NAME_FEED_MEDIA, KEY_ID + " IN (" + mediaIds + ")", null);
-            db.delete(TABLE_NAME_FEED_ITEMS, KEY_ID + " IN (" + itemIds + ")", null);
-            db.setTransactionSuccessful();
-        } catch (SQLException e) {
-            // Log and continue: setTransactionSuccessful() was never reached, so the finally
-            // below rolls the whole statement back. The caller's in-memory model is unchanged
-            // and the next write of the same data retries it.
-            Log.e(TAG, "removeFeedItems failed, transaction rolled back", e);
-        } finally {
-            db.endTransaction();
-        }
-    }
-
-    /**
      * Remove a feed with all its FeedItems and Media entries. Better not to call this directly,
-     * because the items of the feed may not have been queried at all.
+     * because the items of the feed may not have been queried at all. Spans several tables, so the
+     * transaction is held here rather than in one of the per-table helpers.
      */
     public void removeFeed(Feed feed) {
         try {
             db.beginTransactionNonExclusive();
             if (feed.getItems() != null) {
-                removeFeedItems(feed.getItems());
+                itemDao.removeFeedItems(feed.getItems());
             }
-            // delete download log entries for feed
-            db.delete(TABLE_NAME_DOWNLOAD_LOG, KEY_FEEDFILE + "=? AND " + KEY_FEEDFILETYPE + "=?",
-                    new String[]{String.valueOf(feed.getId()), String.valueOf(Feed.FEEDFILETYPE_FEED)});
-
-            db.delete(TABLE_NAME_FEEDS, KEY_ID + "=?",
-                    new String[]{String.valueOf(feed.getId())});
+            feedDao.deleteFeedRow(feed);
             db.setTransactionSuccessful();
         } catch (SQLException e) {
             // Log and continue: setTransactionSuccessful() was never reached, so the finally
@@ -1093,45 +281,72 @@ public class Db {
         }
     }
 
-    public void clearPlaybackHistory() {
-        ContentValues values = new ContentValues();
-        values.put(KEY_PLAYBACK_COMPLETION_DATE, 0);
-        db.update(TABLE_NAME_FEED_MEDIA, values, null, null);
+    /**
+     * Insert raw data to the database.
+     * Call method only for unit tests.
+     */
+    @VisibleForTesting(otherwise = VisibleForTesting.NONE)
+    public void insertTestData(@NonNull String table, @NonNull ContentValues values) {
+        db.insert(table, null, values);
+    }
+
+    // ---------------------------------------------------------------------------------------
+    // Feeds
+    // ---------------------------------------------------------------------------------------
+
+    public void setFeedPreferences(FeedPreferences prefs) {
+        feedDao.setFeedPreferences(prefs);
+    }
+
+    public void setFeedItemFilter(long feedId, Set<String> filterValues) {
+        feedDao.setFeedItemFilter(feedId, filterValues);
+    }
+
+    public void setFeedItemSortOrder(long feedId, @Nullable SortOrder sortOrder) {
+        feedDao.setFeedItemSortOrder(feedId, sortOrder);
+    }
+
+    /**
+     * Updates the download URL of a Feed.
+     */
+    public void setFeedDownloadUrl(String original, String updated) {
+        feedDao.setFeedDownloadUrl(original, updated);
+    }
+
+    public void setFeedLastUpdateFailed(long feedId, boolean failed) {
+        feedDao.setFeedLastUpdateFailed(feedId, failed);
+    }
+
+    public void setFeedCustomTitle(long feedId, String customTitle) {
+        feedDao.setFeedCustomTitle(feedId, customTitle);
+    }
+
+    public void subscribeFeed(long feedId) {
+        feedDao.subscribeFeed(feedId);
+    }
+
+    public void setFeedItunesId(long feedId, String itunesId) {
+        feedDao.setFeedItunesId(feedId, itunesId);
+    }
+
+    public final Cursor getSubscribedFeedsCountCursor() {
+        return feedDao.getSubscribedFeedsCountCursor();
     }
 
     /**
      * Deletes feeds that are not subscribed and have no items in the playlist or the favorites.
      * Do not use this, the wrapped removeFeed is more appropriate.
-     * @return
      */
     public void removeFeedsNotSubAndNotInPlaylistAndFav() {
-        db.execSQL("delete from " + TABLE_NAME_FEEDS
-                        + " where " + KEY_ID + " in ("
-                        + " select " + KEY_ID + " from " + TABLE_NAME_FEEDS + " where " + KEY_IS_SUBSCRIBED + " =? AND "
-                        + KEY_ID + " not in (" + " select " + KEY_FEED + " from " + TABLE_NAME_FAVORITES + ") AND "
-                        + KEY_ID + " not in (" + " select " + KEY_FEED + " from " + TABLE_NAME_QUEUE + "))"
-                , new String[]{"0"});
+        feedDao.removeFeedsNotSubAndNotInPlaylistAndFav();
     }
 
     /**
      * Returns the feeds that are not subscribed and have no items in the playlist, the favorites
      * or the playback history.
-     * @return
      */
     public Cursor getFeedsNotSubAndNotInPlaylistAndFavCursor() {
-        return db.rawQuery("select " + KEY_ID + " from " + TABLE_NAME_FEEDS + " where " + KEY_IS_SUBSCRIBED + " =? AND "
-                        + KEY_ID + " not in (" + " select " + KEY_FEED + " from " + TABLE_NAME_FAVORITES + ") AND "
-                        + KEY_ID + " not in (" + " select " + KEY_FEED + " from " + TABLE_NAME_QUEUE + ") AND "
-                        + KEY_ID + " not in (" + " select " + KEY_FEED + " from " + TABLE_NAME_FEED_ITEMS
-                        + " inner join (select " + KEY_FEEDITEM + " from " + TABLE_NAME_FEED_MEDIA + " where "
-                        + KEY_PLAYBACK_COMPLETION_DATE + " >0 ) m "
-                        + " on m." + KEY_FEEDITEM + " = " + TABLE_NAME_FEED_ITEMS + "." + KEY_ID + " group by " + KEY_FEED
-                        + ") "
-                , new String[]{"0"});
-    }
-
-    public void clearDownloadLog() {
-        db.delete(TABLE_NAME_DOWNLOAD_LOG, null, null);
+        return feedDao.getFeedsNotSubAndNotInPlaylistAndFavCursor();
     }
 
     /**
@@ -1140,8 +355,7 @@ public class Db {
      * @return The cursor of the query
      */
     public final Cursor getSubscribedFeedsCursor() {
-        return db.query(TABLE_NAME_FEEDS, FEED_SEL_STD, KEY_IS_SUBSCRIBED + "=?", new String[]{"1"}, null, null,
-                KEY_TITLE + " COLLATE NOCASE ASC");
+        return feedDao.getSubscribedFeedsCursor();
     }
 
     /**
@@ -1150,103 +364,95 @@ public class Db {
      * @return The cursor of the query
      */
     public final Cursor getAllFeedsCursor() {
-        return db.query(TABLE_NAME_FEEDS, FEED_SEL_STD, null, null, null, null,
-                KEY_TITLE + " COLLATE NOCASE ASC");
+        return feedDao.getAllFeedsCursor();
     }
 
     public final Cursor getFeedCursorDownloadUrls() {
-        return db.query(TABLE_NAME_FEEDS, new String[]{KEY_ID, KEY_DOWNLOAD_URL}, null, null, null, null, null);
+        return feedDao.getFeedCursorDownloadUrls();
     }
 
     /**
      * Returns the download URLs of the subscribed feeds.
-     * @return
      */
     public final Cursor getSubFeedCursorDownloadUrls() {
-        return db.query(TABLE_NAME_FEEDS, new String[]{KEY_ID, KEY_DOWNLOAD_URL}, KEY_IS_SUBSCRIBED+" =?", new String[]{"1"}, null, null, null);
+        return feedDao.getSubFeedCursorDownloadUrls();
+    }
+
+    public final Cursor getFeedCursor(final long id) {
+        return feedDao.getFeedCursor(id);
+    }
+
+    public final Cursor getFeedCursorByFeedUrl(final String url) {
+        return feedDao.getFeedCursorByFeedUrl(url);
+    }
+
+    public final Cursor getFeedCursorByItunesFeedId(final String itunesId) {
+        return feedDao.getFeedCursorByItunesFeedId(itunesId);
+    }
+
+    public Cursor getImageAuthenticationCursor(final String imageUrl) {
+        return feedDao.getImageAuthenticationCursor(imageUrl);
+    }
+
+    public final LongIntMap getFeedCounters(FeedCounter setting, long... feedIds) {
+        return feedDao.getFeedCounters(setting, feedIds);
+    }
+
+    public final LongIntMap getPlayedEpisodesCounters(long... feedIds) {
+        return feedDao.getPlayedEpisodesCounters(feedIds);
+    }
+
+    public final Map<Long, Long> getMostRecentItemDates() {
+        return feedDao.getMostRecentItemDates();
     }
 
     /**
-     * Returns a cursor with all FeedItems of a Feed. Uses FEEDITEM_SEL_FI_SMALL
+     * Searches for the given query in various values of all feeds.
      *
-     * @param feed The feed you want to get the FeedItems from.
-     * @return The cursor of the query
+     * @return A cursor with all search results in SEL_FI_EXTRA selection.
      */
-    public final Cursor getItemsOfFeedCursor(final Feed feed, FeedItemFilter filter) {
-        String filterQuery = FeedItemFilterQuery.generateFrom(filter);
-        String whereClauseAnd = "".equals(filterQuery) ? "" : " AND " + filterQuery;
-        final String query = SELECT_FEED_ITEMS_AND_MEDIA
-                + " WHERE " + TABLE_NAME_FEED_ITEMS + "." + KEY_FEED + "=" + feed.getId()
-                + whereClauseAnd;
-        return db.rawQuery(query, null);
+    public Cursor searchFeeds(String searchQuery) {
+        return feedDao.searchFeeds(searchQuery);
+    }
+
+    // ---------------------------------------------------------------------------------------
+    // Feed items
+    // ---------------------------------------------------------------------------------------
+
+    public void storeFeedItemlist(List<FeedItem> items) {
+        itemDao.storeFeedItemlist(items);
+    }
+
+    public long setSingleFeedItem(FeedItem item) {
+        return itemDao.setSingleFeedItem(item);
     }
 
     /**
-     * Return the description and content_encoded of item
+     * Unlike setSingleFeedItem(FeedItem item), this does not update the feed.
      */
-    public final Cursor getDescriptionOfItem(final FeedItem item) {
-        final String query = "SELECT " + KEY_DESCRIPTION
-                + " FROM " + TABLE_NAME_FEED_ITEMS
-                + " WHERE " + KEY_ID + "=" + item.getId();
-        return db.rawQuery(query, null);
+    public long setSingleFeedItemExcludeFeed(FeedItem item) {
+        return itemDao.setSingleFeedItemExcludeFeed(item);
     }
 
-    public final Cursor getSimpleChaptersOfFeedItemCursor(final FeedItem item) {
-        return db.query(TABLE_NAME_SIMPLECHAPTERS, null, KEY_FEEDITEM
-                        + "=?", new String[]{String.valueOf(item.getId())}, null,
-                null, null
-        );
-    }
-
-    public final Cursor getDownloadLog(final int feedFileType, final long feedFileId) {
-        final String query = "SELECT * FROM " + TABLE_NAME_DOWNLOAD_LOG +
-                " WHERE " + KEY_FEEDFILE + "=" + feedFileId + " AND " + KEY_FEEDFILETYPE + "=" + feedFileType
-                + " ORDER BY " + KEY_ID + " DESC";
-        return db.rawQuery(query, null);
-    }
-
-    public final Cursor getDownloadLogCursor(final int limit) {
-        return db.query(TABLE_NAME_DOWNLOAD_LOG, null, null, null, null,
-                null, KEY_COMPLETION_DATE + " DESC LIMIT " + limit);
+    public void setFeedItemRead(int played, long itemId, long mediaId, boolean resetMediaPosition) {
+        itemDao.setFeedItemRead(played, itemId, mediaId, resetMediaPosition);
     }
 
     /**
-     * Returns a cursor which contains all feed items in the queue. The returned
-     * cursor uses the FEEDITEM_SEL_FI_SMALL selection.
-     * cursor uses the FEEDITEM_SEL_FI_SMALL selection.
+     * Sets the 'read' attribute of the item.
+     *
+     * @param read    must be one of FeedItem.PLAYED, FeedItem.NEW, FeedItem.UNPLAYED
+     * @param itemIds items to change the value of
      */
-    public final Cursor getQueueCursor() {
-        final String query = SELECT_FEED_ITEMS_AND_MEDIA
-                + " INNER JOIN " + TABLE_NAME_QUEUE
-                + " ON " + SELECT_KEY_ITEM_ID + " = " + TABLE_NAME_QUEUE + "." + KEY_FEEDITEM
-                + " ORDER BY " + TABLE_NAME_QUEUE + "." + KEY_ID;
-        return db.rawQuery(query, null);
+    public void setFeedItemRead(int read, long... itemIds) {
+        itemDao.setFeedItemRead(read, itemIds);
     }
 
-    public Cursor getQueueIDCursor() {
-        return db.query(TABLE_NAME_QUEUE, new String[]{KEY_FEEDITEM}, null, null, null, null, KEY_ID + " ASC", null);
-    }
-
-    public Cursor getNextInQueue(final FeedItem item) {
-        final String query = SELECT_FEED_ITEMS_AND_MEDIA
-                + "INNER JOIN " + TABLE_NAME_QUEUE
-                + " ON " + SELECT_KEY_ITEM_ID + " = " + TABLE_NAME_QUEUE + "." + KEY_FEEDITEM
-                + " WHERE " + TABLE_NAME_QUEUE + "." + KEY_ID + " > (SELECT " + TABLE_NAME_QUEUE + "." + KEY_ID
-                + " FROM " + TABLE_NAME_QUEUE + " WHERE " + TABLE_NAME_QUEUE + "." + KEY_FEEDITEM + " = "
-                + item.getId()
-                + ")"
-                + " ORDER BY " + TABLE_NAME_QUEUE + "." + KEY_ID
-                + " LIMIT 1";
-        return db.rawQuery(query, null);
-    }
-
-    public final Cursor getFavoritesCursor(int offset, int limit) {
-        final String query = SELECT_FEED_ITEMS_AND_MEDIA
-                + " INNER JOIN " + TABLE_NAME_FAVORITES
-                + " ON " + SELECT_KEY_ITEM_ID + " = " + TABLE_NAME_FAVORITES + "." + KEY_FEEDITEM
-                + " ORDER BY " + TABLE_NAME_FEED_ITEMS + "." + KEY_PUBDATE + " DESC"
-                + " LIMIT " + offset + ", " + limit;
-        return db.rawQuery(query, null);
+    /**
+     * Remove the listed items and their FeedMedia entries.
+     */
+    public void removeFeedItems(@NonNull List<FeedItem> items) {
+        itemDao.removeFeedItems(items);
     }
 
     public void setFeedItems(int state) {
@@ -1262,15 +468,28 @@ public class Db {
     }
 
     public void setFeedItems(int oldState, int newState, long feedId) {
-        String sql = "UPDATE " + TABLE_NAME_FEED_ITEMS + " SET " + KEY_READ + "=" + newState;
-        if (feedId > 0) {
-            sql += " WHERE " + KEY_FEED + "=" + feedId;
-        }
-        if (FeedItem.NEW <= oldState && oldState <= FeedItem.PLAYED) {
-            sql += feedId > 0 ? " AND " : " WHERE ";
-            sql += KEY_READ + "=" + oldState;
-        }
-        db.execSQL(sql);
+        itemDao.setFeedItems(oldState, newState, feedId);
+    }
+
+    /**
+     * Returns a cursor with all FeedItems of a Feed. Uses FEEDITEM_SEL_FI_SMALL
+     *
+     * @param feed The feed you want to get the FeedItems from.
+     * @return The cursor of the query
+     */
+    public final Cursor getItemsOfFeedCursor(final Feed feed, FeedItemFilter filter) {
+        return itemDao.getItemsOfFeedCursor(feed, filter);
+    }
+
+    /**
+     * Return the description and content_encoded of item
+     */
+    public final Cursor getDescriptionOfItem(final FeedItem item) {
+        return itemDao.getDescriptionOfItem(item);
+    }
+
+    public final Cursor getSimpleChaptersOfFeedItemCursor(final FeedItem item) {
+        return itemDao.getSimpleChaptersOfFeedItemCursor(item);
     }
 
     /**
@@ -1279,307 +498,46 @@ public class Db {
      * The returned cursor uses the FEEDITEM_SEL_FI_SMALL selection.
      */
     public final Cursor getNewItemsCursor(int offset, int limit) {
-        final String query = SELECT_FEED_ITEMS_AND_MEDIA
-                + " INNER JOIN " + TABLE_NAME_FEEDS
-                + " ON " + TABLE_NAME_FEED_ITEMS + "." + KEY_FEED + "=" + TABLE_NAME_FEEDS + "." + KEY_ID
-                + " WHERE " + TABLE_NAME_FEED_ITEMS + "." + KEY_READ + "=" + FeedItem.NEW
-                    + " AND " + TABLE_NAME_FEEDS + "." + KEY_KEEP_UPDATED + " > 0"
-                + " ORDER BY " + TABLE_NAME_FEED_ITEMS + "." + KEY_PUBDATE + " DESC"
-                + " LIMIT " + offset + ", " + limit;
-        return db.rawQuery(query, null);
+        return itemDao.getNewItemsCursor(offset, limit);
     }
 
     public final Cursor getRecentlyPublishedItemsCursor(int offset, int limit, FeedItemFilter filter) {
-        // Filter out the episodes of feeds that are not actually subscribed
-        String filterQuery = FeedItemFilterQuery.generateFrom(filter);
-        String whereClause = "".equals(filterQuery) ? " WHERE " + TABLE_NAME_FEEDS + "." + KEY_IS_SUBSCRIBED + "=1"
-                : " WHERE " + filterQuery +" AND " + TABLE_NAME_FEEDS + "." + KEY_IS_SUBSCRIBED + "=1";
-        final String query = SELECT_FEED_ITEMS_AND_MEDIA + JOIN_FEED_ITEM_AND_FEED + whereClause
-                + " ORDER BY " + KEY_PUBDATE + " DESC LIMIT " + offset + ", " + limit;
-        return db.rawQuery(query, null);
+        return itemDao.getRecentlyPublishedItemsCursor(offset, limit, filter);
     }
 
     public final Cursor getTotalEpisodeCountCursor(FeedItemFilter filter) {
-        String filterQuery = FeedItemFilterQuery.generateFrom(filter);
-        String whereClause = "".equals(filterQuery) ? "" : " WHERE " + filterQuery;
-        final String query = "SELECT count(" + TABLE_NAME_FEED_ITEMS + "." + KEY_ID + ") FROM " + TABLE_NAME_FEED_ITEMS
-                + JOIN_FEED_ITEM_AND_MEDIA + JOIN_FEED_ITEM_AND_FEED + whereClause + " AND " + TABLE_NAME_FEEDS + "." + KEY_IS_SUBSCRIBED + "=1";
-        return db.rawQuery(query, null);
+        return itemDao.getTotalEpisodeCountCursor(filter);
     }
 
     public Cursor getDownloadedItemsCursor() {
-        final String query = SELECT_FEED_ITEMS_AND_MEDIA
-                + "WHERE " + TABLE_NAME_FEED_MEDIA + "." + KEY_DOWNLOADED + " > 0";
-        return db.rawQuery(query, null);
+        return itemDao.getDownloadedItemsCursor();
     }
 
     public Cursor getPlayedItemsCursor() {
-        final String query = SELECT_FEED_ITEMS_AND_MEDIA
-                + "WHERE " + TABLE_NAME_FEED_ITEMS + "." + KEY_READ + "=" + FeedItem.PLAYED;
-        return db.rawQuery(query, null);
-    }
-
-    /**
-     * Returns a cursor which contains feed media objects with a playback
-     * completion date in ascending order.
-     * @param offset The row to start at.
-     * @param limit The maximum row count of the returned cursor. Must be an
-     *              integer >= 0.
-     * @throws IllegalArgumentException if limit < 0
-     */
-    public final Cursor getCompletedMediaCursor(int offset, int limit) {
-        if (limit < 0) {
-            throw new IllegalArgumentException("Limit must be >= 0");
-        }
-
-        return db.query(TABLE_NAME_FEED_MEDIA, null,
-                KEY_PLAYBACK_COMPLETION_DATE + " > 0", null, null,
-                null, String.format(Locale.US, "%s DESC LIMIT %d, %d", KEY_PLAYBACK_COMPLETION_DATE, offset, limit));
-    }
-
-    public final long getCompletedMediaLength() {
-        return DatabaseUtils.queryNumEntries(db, TABLE_NAME_FEED_MEDIA, KEY_PLAYBACK_COMPLETION_DATE + "> 0");
-    }
-
-    public final Cursor getSingleFeedMediaCursor(long id) {
-        final String query = "SELECT " + KEYS_FEED_MEDIA + " FROM " + TABLE_NAME_FEED_MEDIA
-                + " WHERE " + KEY_ID + "=" + id;
-        return db.rawQuery(query, null);
-    }
-
-    public final Cursor getFeedCursor(final long id) {
-        return db.query(TABLE_NAME_FEEDS, FEED_SEL_STD, KEY_ID + "=" + id, null,
-                null, null, null);
-    }
-
-    public final Cursor getFeedCursorByFeedUrl(final String url) {
-        return db.query(TABLE_NAME_FEEDS, FEED_SEL_STD, KEY_DOWNLOAD_URL + "=?", new String[]{url},
-                null, null, null);
-    }
-
-    public final Cursor getFeedCursorByItunesFeedId(final String itunesId) {
-        return db.query(TABLE_NAME_FEEDS, FEED_SEL_STD, KEY_ITUNES_FEED_ID + "=?", new String[]{itunesId},
-                null, null, null);
+        return itemDao.getPlayedItemsCursor();
     }
 
     public final Cursor getFeedItemCursor(final String id) {
-        return getFeedItemCursor(new String[]{id});
+        return itemDao.getFeedItemCursor(id);
     }
 
     /**
      * Returns all feed items of unsubscribed feeds.
-     * @return
      */
     public final Cursor getUnsubFeedItemsCursor() {
-        final String query = SELECT_FEED_ITEMS_AND_MEDIA
-                + " INNER JOIN " + "(select * from "+TABLE_NAME_FEEDS +" where " + KEY_IS_SUBSCRIBED +" = 0 ) feeds "
-                + " ON feeds." + KEY_ID + " = " + TABLE_NAME_FEED_ITEMS + "." + KEY_FEED
-                + " LEFT JOIN " + TABLE_NAME_QUEUE + " ON "
-                + TABLE_NAME_FEED_ITEMS + "." + KEY_ID + " = " + TABLE_NAME_QUEUE + "." + KEY_FEEDITEM + " "
-                + " LEFT JOIN " + TABLE_NAME_FAVORITES + " ON "
-                + TABLE_NAME_FEED_ITEMS + "." + KEY_ID + " = " + TABLE_NAME_FAVORITES + "." + KEY_FEEDITEM + " "
-                + " WHERE " + TABLE_NAME_FAVORITES + "." + KEY_FEEDITEM + " is null "
-                + " AND " + TABLE_NAME_QUEUE + "." + KEY_FEEDITEM + " is null ";
-        return db.rawQuery(query, null);
+        return itemDao.getUnsubFeedItemsCursor();
     }
 
     public final Cursor getFeedItemCursor(final String[] ids) {
-        if (ids.length > IN_OPERATOR_MAXIMUM) {
-            throw new IllegalArgumentException("number of IDs must not be larger than " + IN_OPERATOR_MAXIMUM);
-        }
-        final String query = SELECT_FEED_ITEMS_AND_MEDIA
-                + " WHERE " + SELECT_KEY_ITEM_ID + " IN (" + TextUtils.join(",", ids) + ")";
-        return db.rawQuery(query, null);
+        return itemDao.getFeedItemCursor(ids);
     }
 
     public final Cursor getFeedItemCursor(final String guid, final String episodeUrl) {
-        String escapedEpisodeUrl = DatabaseUtils.sqlEscapeString(episodeUrl);
-        String whereClauseCondition = TABLE_NAME_FEED_MEDIA + "." + KEY_DOWNLOAD_URL + "=" + escapedEpisodeUrl;
-
-        if (guid != null) {
-            String escapedGuid = DatabaseUtils.sqlEscapeString(guid);
-            whereClauseCondition = TABLE_NAME_FEED_ITEMS + "." + KEY_ITEM_IDENTIFIER + "=" + escapedGuid;
-        }
-
-        final String query = SELECT_FEED_ITEMS_AND_MEDIA
-                + " INNER JOIN " + TABLE_NAME_FEEDS
-                + " ON " + TABLE_NAME_FEED_ITEMS + "." + KEY_FEED + "=" + TABLE_NAME_FEEDS + "." + KEY_ID
-                + " WHERE " + whereClauseCondition;
-        return db.rawQuery(query, null);
-    }
-
-    public Cursor getImageAuthenticationCursor(final String imageUrl) {
-        String downloadUrl = DatabaseUtils.sqlEscapeString(imageUrl);
-        final String query = ""
-                + "SELECT " + KEY_USERNAME + "," + KEY_PASSWORD + " FROM " + TABLE_NAME_FEED_ITEMS
-                + " INNER JOIN " + TABLE_NAME_FEEDS
-                + " ON " + TABLE_NAME_FEED_ITEMS + "." + KEY_FEED + " = " + TABLE_NAME_FEEDS + "." + KEY_ID
-                + " WHERE " + TABLE_NAME_FEED_ITEMS + "." + KEY_IMAGE_URL + "=" + downloadUrl
-                + " UNION SELECT " + KEY_USERNAME + "," + KEY_PASSWORD + " FROM " + TABLE_NAME_FEEDS
-                + " WHERE " + TABLE_NAME_FEEDS + "." + KEY_IMAGE_URL + "=" + downloadUrl;
-        return db.rawQuery(query, null);
-    }
-
-    public final Cursor getMonthlyStatisticsCursor() {
-        final String query = "SELECT SUM(" + KEY_PLAYED_DURATION + ") AS total_duration"
-                + ", strftime('%m', datetime(" + KEY_LAST_PLAYED_TIME + "/1000, 'unixepoch')) AS month"
-                + ", strftime('%Y', datetime(" + KEY_LAST_PLAYED_TIME + "/1000, 'unixepoch')) AS year"
-                + " FROM " + TABLE_NAME_FEED_MEDIA
-                + " WHERE " + KEY_LAST_PLAYED_TIME + " > 0 AND " + KEY_PLAYED_DURATION + " > 0"
-                + " GROUP BY year, month"
-                + " ORDER BY year, month";
-        return db.rawQuery(query, null);
-    }
-
-    public int getQueueSize() {
-        final String query = String.format("SELECT COUNT(%s) FROM %s", KEY_ID, TABLE_NAME_QUEUE);
-        Cursor c = db.rawQuery(query, null);
-        int result = 0;
-        if (c.moveToFirst()) {
-            result = c.getInt(0);
-        }
-        c.close();
-        return result;
+        return itemDao.getFeedItemCursor(guid, episodeUrl);
     }
 
     public final int getNumberOfNewItems() {
-        Object[] args = new String[]{
-                TABLE_NAME_FEED_ITEMS + "." + KEY_ID,
-                TABLE_NAME_FEED_ITEMS,
-                TABLE_NAME_FEEDS,
-                TABLE_NAME_FEED_ITEMS + "." + KEY_FEED + "=" + TABLE_NAME_FEEDS + "." + KEY_ID,
-                TABLE_NAME_FEED_ITEMS + "." + KEY_READ + "=" + FeedItem.NEW
-                        + " AND " + TABLE_NAME_FEEDS + "." + KEY_KEEP_UPDATED + " > 0"
-        };
-        final String query = String.format("SELECT COUNT(%s) FROM %s INNER JOIN %s ON %s WHERE %s", args);
-        Cursor c = db.rawQuery(query, null);
-        int result = 0;
-        if (c.moveToFirst()) {
-            result = c.getInt(0);
-        }
-        c.close();
-        return result;
-    }
-
-    public final LongIntMap getFeedCounters(FeedCounter setting, long... feedIds) {
-        String whereRead;
-        switch (setting) {
-            case SHOW_NEW_UNPLAYED_SUM:
-                whereRead = "(" + KEY_READ + "=" + FeedItem.NEW +
-                        " OR " + KEY_READ + "=" + FeedItem.UNPLAYED + ")";
-                break;
-            case SHOW_NEW:
-                whereRead = KEY_READ + "=" + FeedItem.NEW;
-                break;
-            case SHOW_UNPLAYED:
-                whereRead = KEY_READ + "=" + FeedItem.UNPLAYED;
-                break;
-            case SHOW_DOWNLOADED:
-                whereRead = KEY_DOWNLOADED + "=1";
-                break;
-            case SHOW_DOWNLOADED_UNPLAYED:
-                whereRead = "(" + KEY_READ + "=" + FeedItem.NEW
-                        + " OR " + KEY_READ + "=" + FeedItem.UNPLAYED + ")"
-                        + " AND " + KEY_DOWNLOADED + "=1";
-                break;
-            case SHOW_NONE:
-                // deliberate fall-through
-            default: // NONE
-                return new LongIntMap(0);
-        }
-        return conditionalFeedCounterRead(whereRead, feedIds);
-    }
-
-    private LongIntMap conditionalFeedCounterRead(String whereRead, long... feedIds) {
-        String limitFeeds = "";
-        if (feedIds.length > 0) {
-            // work around TextUtils.join wanting only boxed items
-            // and StringUtils.join() causing NoSuchMethodErrors on MIUI
-            StringBuilder builder = new StringBuilder();
-            for (long id : feedIds) {
-                builder.append(id);
-                builder.append(',');
-            }
-            // there's an extra ',', get rid of it
-            builder.deleteCharAt(builder.length() - 1);
-            limitFeeds = KEY_FEED + " IN (" + builder.toString() + ") AND ";
-        }
-
-        final String query = "SELECT " + KEY_FEED + ", COUNT(" + TABLE_NAME_FEED_ITEMS + "." + KEY_ID + ") AS count "
-                + " FROM " + TABLE_NAME_FEED_ITEMS
-                + " LEFT JOIN " + TABLE_NAME_FEED_MEDIA + " ON "
-                + TABLE_NAME_FEED_ITEMS + "." + KEY_ID + "=" + TABLE_NAME_FEED_MEDIA + "." + KEY_FEEDITEM
-                + JOIN_FEED_ITEM_AND_FEED
-                + " WHERE " + limitFeeds + " "
-                + whereRead
-                + " AND " + TABLE_NAME_FEEDS + "." + KEY_IS_SUBSCRIBED + "=1"
-                + " GROUP BY " + KEY_FEED;
-
-        Cursor c = db.rawQuery(query, null);
-        LongIntMap result = new LongIntMap(c.getCount());
-        if (c.moveToFirst()) {
-            do {
-                long feedId = c.getLong(0);
-                int count = c.getInt(1);
-                result.put(feedId, count);
-            } while (c.moveToNext());
-        }
-        c.close();
-        return result;
-    }
-
-    public final LongIntMap getPlayedEpisodesCounters(long... feedIds) {
-        String whereRead = KEY_READ + "=" + FeedItem.PLAYED;
-        return conditionalFeedCounterRead(whereRead, feedIds);
-    }
-
-    public final Map<Long, Long> getMostRecentItemDates() {
-        final String query = "SELECT " + KEY_FEED + ","
-                + " MAX(" + TABLE_NAME_FEED_ITEMS + "." + KEY_PUBDATE + ") AS most_recent_pubdate"
-                + " FROM " + TABLE_NAME_FEED_ITEMS
-                + " GROUP BY " + KEY_FEED;
-
-        Cursor c = db.rawQuery(query, null);
-        Map<Long, Long> result = new HashMap<>();
-        if (c.moveToFirst()) {
-            do {
-                long feedId = c.getLong(0);
-                long date = c.getLong(1);
-                result.put(feedId, date);
-            } while (c.moveToNext());
-        }
-        c.close();
-        return result;
-    }
-
-    public final int getNumberOfDownloadedEpisodes() {
-        final String query = "SELECT COUNT(DISTINCT " + KEY_ID + ") AS count FROM " + TABLE_NAME_FEED_MEDIA +
-                " WHERE " + KEY_DOWNLOADED + " > 0";
-
-        Cursor c = db.rawQuery(query, null);
-        int result = 0;
-        if (c.moveToFirst()) {
-            result = c.getInt(0);
-        }
-        c.close();
-        return result;
-    }
-
-    /**
-     * Uses DatabaseUtils to escape a search query and removes ' at the
-     * beginning and the end of the string returned by the escape method.
-     */
-    private String[] prepareSearchQuery(String query) {
-        String[] queryWords = query.split("\\s+");
-        for (int i = 0; i < queryWords.length; ++i) {
-            StringBuilder builder = new StringBuilder();
-            DatabaseUtils.appendEscapedSQLString(builder, queryWords[i]);
-            builder.deleteCharAt(0);
-            builder.deleteCharAt(builder.length() - 1);
-            queryWords[i] = builder.toString();
-        }
-
-        return queryWords;
+        return itemDao.getNumberOfNewItems();
     }
 
     /**
@@ -1589,86 +547,160 @@ public class Db {
      * @return A cursor with all search results in SEL_FI_EXTRA selection.
      */
     public Cursor searchItems(long feedID, String searchQuery) {
-        String[] queryWords = prepareSearchQuery(searchQuery);
-
-        String queryFeedId;
-        if (feedID != 0) {
-            // search items in specific feed
-            queryFeedId = KEY_FEED + " = " + feedID;
-        } else {
-            // search through all items
-            queryFeedId = "1 = 1";
-        }
-        StringBuilder descriptionStr = new StringBuilder();
-
-        String queryStart = SELECT_FEED_ITEMS_AND_MEDIA_WITH_DESCRIPTION
-                + " WHERE " + queryFeedId + " AND (";
-        StringBuilder sb = new StringBuilder(queryStart);
-
-        for (int i = 0; i < queryWords.length; i++) {
-            descriptionStr = descriptionStr
-                    .append(KEY_DESCRIPTION + " LIKE '%").append(queryWords[i])
-                    .append("%' OR ");
-            sb.append("(")
-                    .append(descriptionStr)
-                    .append(KEY_TITLE).append(" LIKE '%").append(queryWords[i])
-                    .append("%') ");
-
-            if (i != queryWords.length - 1) {
-                sb.append("AND ");
-            }
-        }
-
-        sb.append(") ORDER BY " + KEY_PUBDATE + " DESC LIMIT 300");
-
-        return db.rawQuery(sb.toString(), null);
+        return itemDao.searchItems(feedID, searchQuery);
     }
 
+    // ---------------------------------------------------------------------------------------
+    // Feed media
+    // ---------------------------------------------------------------------------------------
+
     /**
-     * Searches for the given query in various values of all feeds.
+     * Inserts or updates a media entry
      *
-     * @return A cursor with all search results in SEL_FI_EXTRA selection.
+     * @return the id of the entry
      */
-    public Cursor searchFeeds(String searchQuery) {
-        String[] queryWords = prepareSearchQuery(searchQuery);
-
-        String queryStart = "SELECT * FROM " + TABLE_NAME_FEEDS + " WHERE ";
-        StringBuilder sb = new StringBuilder(queryStart);
-
-        for (int i = 0; i < queryWords.length; i++) {
-            sb
-                    .append("(")
-                    .append(KEY_TITLE).append(" LIKE '%").append(queryWords[i])
-                    .append("%' OR ")
-                    .append(KEY_CUSTOM_TITLE).append(" LIKE '%").append(queryWords[i])
-                    .append("%' OR ")
-                    .append(KEY_AUTHOR).append(" LIKE '%").append(queryWords[i])
-                    .append("%' OR ")
-                    .append(KEY_DESCRIPTION).append(" LIKE '%").append(queryWords[i])
-                    .append("%') ");
-
-            if (i != queryWords.length - 1) {
-                sb.append("AND ");
-            }
-        }
-        sb.append(" AND " + KEY_IS_SUBSCRIBED + " =1 ");
-        sb.append("ORDER BY " + KEY_TITLE + " ASC LIMIT 300");
-
-        return db.rawQuery(sb.toString(), null);
+    public long setMedia(FeedMedia media) {
+        return mediaDao.setMedia(media);
     }
 
     /**
-     * Insert raw data to the database.
-     * Call method only for unit tests.
+     * Saves only the download-related columns (downloaded flag, file url, embedded picture)
+     * so that a stale in-memory snapshot cannot clobber playback position etc.
      */
-    @VisibleForTesting(otherwise = VisibleForTesting.NONE)
-    public void insertTestData(@NonNull String table, @NonNull ContentValues values) {
-        db.insert(table, null, values);
+    public void setFeedMediaDownloadState(FeedMedia media) {
+        mediaDao.setFeedMediaDownloadState(media);
+    }
+
+    public void setFeedMediaPlaybackInformation(FeedMedia media) {
+        mediaDao.setFeedMediaPlaybackInformation(media);
+    }
+
+    public void setFeedMediaPlaybackCompletionDate(FeedMedia media) {
+        mediaDao.setFeedMediaPlaybackCompletionDate(media);
+    }
+
+    /**
+     * Resets the playback duration of all podcasts to 0.
+     */
+    public void resetAllMediaPlayedDuration() {
+        mediaDao.resetAllMediaPlayedDuration();
+    }
+
+    public void clearPlaybackHistory() {
+        mediaDao.clearPlaybackHistory();
+    }
+
+    /**
+     * Returns a cursor which contains feed media objects with a playback
+     * completion date in ascending order.
+     *
+     * @param offset The row to start at.
+     * @param limit  The maximum row count of the returned cursor. Must be an
+     *               integer >= 0.
+     * @throws IllegalArgumentException if limit < 0
+     */
+    public final Cursor getCompletedMediaCursor(int offset, int limit) {
+        return mediaDao.getCompletedMediaCursor(offset, limit);
+    }
+
+    public final long getCompletedMediaLength() {
+        return mediaDao.getCompletedMediaLength();
+    }
+
+    public final Cursor getSingleFeedMediaCursor(long id) {
+        return mediaDao.getSingleFeedMediaCursor(id);
+    }
+
+    public final Cursor getMonthlyStatisticsCursor() {
+        return mediaDao.getMonthlyStatisticsCursor();
+    }
+
+    public final int getNumberOfDownloadedEpisodes() {
+        return mediaDao.getNumberOfDownloadedEpisodes();
+    }
+
+    // ---------------------------------------------------------------------------------------
+    // Queue
+    // ---------------------------------------------------------------------------------------
+
+    public void setQueue(List<FeedItem> queue) {
+        queueDao.setQueue(queue);
+    }
+
+    public void clearQueue() {
+        queueDao.clearQueue();
+    }
+
+    /**
+     * Returns a cursor which contains all feed items in the queue. The returned
+     * cursor uses the FEEDITEM_SEL_FI_SMALL selection.
+     */
+    public final Cursor getQueueCursor() {
+        return queueDao.getQueueCursor();
+    }
+
+    public Cursor getQueueIDCursor() {
+        return queueDao.getQueueIDCursor();
+    }
+
+    public Cursor getNextInQueue(final FeedItem item) {
+        return queueDao.getNextInQueue(item);
+    }
+
+    public int getQueueSize() {
+        return queueDao.getQueueSize();
+    }
+
+    // ---------------------------------------------------------------------------------------
+    // Favorites
+    // ---------------------------------------------------------------------------------------
+
+    public void setFavorites(List<FeedItem> favorites) {
+        favoritesDao.setFavorites(favorites);
+    }
+
+    /**
+     * Adds the item to favorites
+     */
+    public void addFavoriteItem(FeedItem item) {
+        favoritesDao.addFavoriteItem(item);
+    }
+
+    public void removeFavoriteItem(FeedItem item) {
+        favoritesDao.removeFavoriteItem(item);
+    }
+
+    public final Cursor getFavoritesCursor(int offset, int limit) {
+        return favoritesDao.getFavoritesCursor(offset, limit);
+    }
+
+    // ---------------------------------------------------------------------------------------
+    // Download log
+    // ---------------------------------------------------------------------------------------
+
+    /**
+     * Inserts or updates a download status.
+     */
+    public long setDownloadStatus(DownloadStatus status) {
+        return downloadLogDao.setDownloadStatus(status);
+    }
+
+    public void clearDownloadLog() {
+        downloadLogDao.clearDownloadLog();
+    }
+
+    public final Cursor getDownloadLog(final int feedFileType, final long feedFileId) {
+        return downloadLogDao.getDownloadLog(feedFileType, feedFileId);
+    }
+
+    public final Cursor getDownloadLogCursor(final int limit) {
+        return downloadLogDao.getDownloadLogCursor(limit);
     }
 
     public final Cursor getFeedIdFromDownloadLogCursor(final int limit) {
-        return db.rawQuery(SELECT_FEED_ITEMS_AND_MEDIA_AND_DOWNLOADLOG, null);
+        return downloadLogDao.getFeedIdFromDownloadLogCursor(limit);
     }
+
     /**
      * Called when a database corruption happens.
      */
@@ -1704,26 +736,26 @@ public class Db {
          * @param name    Name of the database
          * @param factory to use for creating cursor objects
          */
-        public DbHelper(final Context context, final String name, final CursorFactory factory) {
+        DbHelper(final Context context, final String name, final CursorFactory factory) {
             super(context, name, factory, VERSION, new PodDbErrorHandler());
         }
 
         @Override
         public void onCreate(final SQLiteDatabase db) {
-            db.execSQL(CREATE_TABLE_FEED_ITEMS);
-            db.execSQL(CREATE_TABLE_FEED_MEDIA);
-            db.execSQL(CREATE_TABLE_DOWNLOAD_LOG);
-            db.execSQL(CREATE_TABLE_QUEUE);
-            db.execSQL(CREATE_TABLE_SIMPLECHAPTERS);
-            db.execSQL(CREATE_TABLE_FAVORITES);
-            db.execSQL(CREATE_TABLE_FEEDS);
+            db.execSQL(DbSchema.CREATE_TABLE_FEED_ITEMS);
+            db.execSQL(DbSchema.CREATE_TABLE_FEED_MEDIA);
+            db.execSQL(DbSchema.CREATE_TABLE_DOWNLOAD_LOG);
+            db.execSQL(DbSchema.CREATE_TABLE_QUEUE);
+            db.execSQL(DbSchema.CREATE_TABLE_SIMPLECHAPTERS);
+            db.execSQL(DbSchema.CREATE_TABLE_FAVORITES);
+            db.execSQL(DbSchema.CREATE_TABLE_FEEDS);
 
-            db.execSQL(CREATE_INDEX_FEEDITEMS_PUBDATE);
-            db.execSQL(CREATE_INDEX_FEEDITEMS_READ);
-            db.execSQL(CREATE_INDEX_FEEDMEDIA_FEEDITEM);
-            db.execSQL(CREATE_INDEX_SIMPLECHAPTERS_FEEDITEM);
-            db.execSQL(CREATE_INDEX_QUEUE_FEEDITEM);
-            db.execSQL(CREATE_INDEX_FEEDITEMS_FEED);
+            db.execSQL(DbSchema.CREATE_INDEX_FEEDITEMS_PUBDATE);
+            db.execSQL(DbSchema.CREATE_INDEX_FEEDITEMS_READ);
+            db.execSQL(DbSchema.CREATE_INDEX_FEEDMEDIA_FEEDITEM);
+            db.execSQL(DbSchema.CREATE_INDEX_SIMPLECHAPTERS_FEEDITEM);
+            db.execSQL(DbSchema.CREATE_INDEX_QUEUE_FEEDITEM);
+            db.execSQL(DbSchema.CREATE_INDEX_FEEDITEMS_FEED);
         }
 
         @Override

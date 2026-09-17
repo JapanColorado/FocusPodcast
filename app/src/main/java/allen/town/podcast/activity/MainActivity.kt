@@ -8,81 +8,58 @@ import allen.town.focus_common.extensions.setLightStatusBarAuto
 import allen.town.focus_common.extensions.setNavigationBarColor
 import allen.town.focus_common.extensions.surfaceColor
 import allen.town.focus_common.util.BasePreferenceUtil.libraryCategory
-import allen.town.focus_common.util.BasePreferenceUtil.materialYou
 import allen.town.focus_common.util.RetroUtil
 import allen.town.focus_common.util.Timber
 import allen.town.focus_common.util.TopSnackbarUtil.showSnack
 import allen.town.focus_common.views.AccentMaterialDialog
 import allen.town.podcast.BuildConfig
 import allen.town.podcast.R
+import allen.town.podcast.activity.main.MainFragmentNavigator
+import allen.town.podcast.activity.main.MainHardwareKeys
+import allen.town.podcast.activity.main.MainIntentHandler
+import allen.town.podcast.activity.main.MainNavDrawer
+import allen.town.podcast.activity.main.MainPlayerSheet
 import allen.town.podcast.core.pref.Prefs
 import allen.town.podcast.core.pref.Prefs.BackButtonBehavior
-import allen.town.podcast.core.receiver.MediaButtonReceiver
-import allen.town.podcast.core.service.playback.PlaybackService
 import allen.town.podcast.core.storage.DBTasks
 import allen.town.podcast.core.util.StorageUtils
 import allen.town.podcast.core.util.download.AutoUpdateManager
 import allen.town.podcast.event.MessageEvent
 import allen.town.podcast.fragment.AudioPlayerFragment
 import allen.town.podcast.fragment.DiscoverFragment
-import allen.town.podcast.fragment.DownloadPagerFragment
-import allen.town.podcast.fragment.EpisodesFragment
-import allen.town.podcast.fragment.FavoriteEpisodesFragment
 import allen.town.podcast.fragment.FeedItemlistFragment
-import allen.town.podcast.fragment.LocalSearchFragment
 import allen.town.podcast.fragment.NavigationDrawerFragment
 import allen.town.podcast.fragment.NavigationDrawerFragment.Companion.getLastNavFragment
-import allen.town.podcast.fragment.NavigationDrawerFragment.Companion.saveLastNavFragment
-import allen.town.podcast.fragment.PlaybackHistoryFragment
 import allen.town.podcast.fragment.PlaylistFragment
-import allen.town.podcast.fragment.SubFeedsFragment
 import allen.town.podcast.fragment.TransitionEffect
 import allen.town.podcast.model.feed.Feed
-import allen.town.podcast.playback.LibraryViewModel
 import allen.town.podcast.playback.getSelectedAudioPlayerFragment
-import allen.town.podcast.playback.onPaletteColorChanged
 import allen.town.podcast.pref.PreferenceUpgrader
-import allen.town.podcast.ui.startintent.MainActivityStarter
-import android.app.Activity
 import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
 import android.content.SharedPreferences
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener
 import android.content.res.Configuration
-import android.graphics.Color
-import android.media.AudioManager
-import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.util.DisplayMetrics
 import android.util.Log
 import android.view.KeyEvent
 import android.view.MenuItem
 import android.view.View
-import android.view.ViewGroup.MarginLayoutParams
-import android.widget.EditText
 import android.widget.Toast
-import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
-import androidx.core.content.ContextCompat
-import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentContainerView
-import androidx.lifecycle.ViewModelProvider
 import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.RecyclerView.RecycledViewPool
-import code.name.monkey.appthemehelper.ThemeStore.Companion.accentColor
 import code.name.monkey.appthemehelper.constants.ThemeConstants
 import com.bumptech.glide.Glide
 import com.google.android.material.bottomsheet.BottomSheetBehavior
-import com.google.android.material.bottomsheet.BottomSheetBehavior.BottomSheetCallback
 import com.google.android.material.snackbar.Snackbar
 import io.reactivex.Completable
 import io.reactivex.schedulers.Schedulers
 import org.apache.commons.lang3.ArrayUtils
-import org.apache.commons.lang3.Validate
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
@@ -90,16 +67,24 @@ import org.greenrobot.eventbus.ThreadMode
 
 /**
  * The activity that is shown when the user launches the app.
+ *
+ * The heavy lifting lives in four collaborators created in [onCreate]: [MainNavDrawer] (drawer +
+ * per-fragment toolbar toggle), [MainFragmentNavigator] (top-level and child fragment
+ * transactions), [MainPlayerSheet] (mini/full player bottom sheet, palette colour, anchored
+ * snackbars) and [MainIntentHandler] (launch intents and deep links). The activity keeps the
+ * lifecycle callbacks, the EventBus subscriber and the hardware-key handling, and forwards its
+ * public API to the collaborators.
  */
 class MainActivity : SimpleToolbarActivity(), OnSharedPreferenceChangeListener {
-    private var drawerLayout: DrawerLayout? = null
+    private lateinit var navDrawerController: MainNavDrawer
+    private lateinit var fragmentNavigator: MainFragmentNavigator
+    private lateinit var playerSheet: MainPlayerSheet
+    private lateinit var intentHandler: MainIntentHandler
+    private val hardwareKeys = MainHardwareKeys(this)
 
-    /** Kept so the delayed nav-drawer attach can be cancelled when the activity goes away. */
-    private var attachNavDrawer: Runnable? = null
-    private var drawerToggle: ActionBarDrawerToggle? = null
-    private lateinit var navDrawer: View
-    lateinit var bottomSheet: BottomSheetBehavior<View>
-        private set
+    val bottomSheet: BottomSheetBehavior<View>
+        get() = playerSheet.bottomSheet
+
     private var lastBackButtonPressTime: Long = 0
     val recycledViewPool = RecycledViewPool()
 
@@ -126,9 +111,12 @@ class MainActivity : SimpleToolbarActivity(), OnSharedPreferenceChangeListener {
         recycledViewPool.setMaxRecycledViews(R.id.view_type_episode_item, 25)
         PreferenceManager.getDefaultSharedPreferences(this)
             .registerOnSharedPreferenceChangeListener(this)
-        drawerLayout = findViewById(R.id.drawer_layout)
-        navDrawer = findViewById(R.id.navDrawerFragment)
-        setNavDrawerSize()
+        navDrawerController = MainNavDrawer(this) { fragmentNavigator.openPendingFragment() }
+        fragmentNavigator = MainFragmentNavigator(
+            this,
+            { navDrawerController.isDrawerOpen },
+            { navDrawerController.closeDrawerNow() }
+        )
         Timber.d("app version %s , %s", BuildConfig.VERSION_NAME, BuildConfig.VERSION_CODE)
         Timber.d("Android: " + Build.VERSION.RELEASE + " " + Build.MANUFACTURER + " " + Build.MODEL)
         val fm = supportFragmentManager
@@ -170,31 +158,13 @@ class MainActivity : SimpleToolbarActivity(), OnSharedPreferenceChangeListener {
         )
         transaction.commit()
 
-
-        //load this fragment with a delay so the UI shows first; too short a delay makes the subscription screen animation skip or stutter
-        attachNavDrawer = Runnable {
-            Timber.v("post nav inti on ui thread")
-            fm.beginTransaction().replace(
-                R.id.navDrawerFragment,
-                NavigationDrawerFragment(),
-                NavigationDrawerFragment.TAG
-            ).commitAllowingStateLoss()
-            Timber.v("nav inti finished")
-        }
-        navDrawer.postDelayed(attachNavDrawer, 1000)
-
-
+        navDrawerController.scheduleAttach()
 
         checkFirstLaunch()
         PreferenceUpgrader.checkUpgrades(this)
-        this.bottomSheet = BottomSheetBehavior.from(findViewById<View>(R.id.audioplayerFragment))
-        bottomSheet.setPeekHeight(resources.getDimension(R.dimen.external_player_height).toInt())
-        bottomSheet.setHideable(false)
-        bottomSheet.setBottomSheetCallback(bottomSheetCallback)
-        libraryViewModel = ViewModelProvider(this).get(
-            LibraryViewModel::class.java
-        )
-        updateColor()
+        playerSheet = MainPlayerSheet(this, navDrawerController.navDrawerView)
+        intentHandler = MainIntentHandler(this, fragmentNavigator, playerSheet)
+        playerSheet.observePaletteColor()
 
         if (Prefs.shouldSyncOnStart()) {
             AutoUpdateManager.runImmediate(this)
@@ -232,128 +202,13 @@ class MainActivity : SimpleToolbarActivity(), OnSharedPreferenceChangeListener {
         outState.putInt(KEY_GENERATED_VIEW_ID, View.generateViewId())
     }
 
-    private lateinit var libraryViewModel: LibraryViewModel
-
-    /**
-     * Album cover color changed
-     */
-    private fun onPaletteColorChanged() {
-        if (bottomSheet.state == BottomSheetBehavior.STATE_EXPANDED) {
-            this.onPaletteColorChanged(paletteColor)
-        }
-    }
-
-    private var paletteColor = Color.WHITE
-    private fun updateColor() {
-        libraryViewModel.paletteColor.observe(this) { color: Int ->
-            paletteColor = color
-            onPaletteColorChanged()
-        }
-    }
-
-    private val bottomSheetCallback: BottomSheetCallback = object : BottomSheetCallback() {
-        /**
-         * Called when the state changes
-         * @param view
-         * @param state
-         */
-        override fun onStateChanged(view: View, state: Int) {
-            if (state == BottomSheetBehavior.STATE_COLLAPSED) {
-                onSlide(view, 0.0f)
-                onPanelCollapsed(this@MainActivity)
-            } else if (state == BottomSheetBehavior.STATE_EXPANDED) {
-                onSlide(view, 1.0f)
-                onPaletteColorChanged()
-            }
-        }
-
-        /**
-         * Called while sliding
-         * @param view
-         * @param slideOffset
-         */
-        override fun onSlide(view: View, slideOffset: Float) {
-            val audioPlayer = supportFragmentManager
-                .findFragmentByTag(AudioPlayerFragment.TAG) as AudioPlayerFragment? ?: return
-            if (slideOffset == 0.0f) { //STATE_COLLAPSED
-                audioPlayer.scrollToPage(AudioPlayerFragment.POS_COVER)
-            }
-            val condensedSlideOffset = Math.max(0.0f, Math.min(0.2f, slideOffset - 0.2f)) / 0.2f
-            audioPlayer.externalPlayerHolder.alpha = 1 - condensedSlideOffset
-            audioPlayer.externalPlayerHolder.visibility =
-                if (condensedSlideOffset > 0.99f) View.GONE else View.VISIBLE
-        }
-    }
-
     /**
      * Every fragment has its own toolbar; this wraps the setup
      * @param toolbar
      * @param displayUpArrow
      */
     fun setupToolbarToggle(toolbar: Toolbar, displayUpArrow: Boolean) {
-        val drawerLayout = this.drawerLayout
-        if (drawerLayout != null) { // Tablet layout does not have a drawer
-            drawerToggle?.let { drawerLayout.removeDrawerListener(it) }
-            val toggle = DrawerCloseToggle(
-                this, drawerLayout, toolbar,
-                R.string.drawer_open, R.string.drawer_close
-            )
-            drawerToggle = toggle
-            drawerLayout.addDrawerListener(toggle)
-            toggle.syncState()
-            //in the original logic, true meant the system handled the menu event
-//            toggle.isDrawerIndicatorEnabled = !displayUpArrow
-            toggle.isDrawerIndicatorEnabled = false
-            toolbar.setNavigationIcon(if (displayUpArrow) R.drawable.ic_keyboard_backspace_black else R.drawable.ic_homepage)
-            toggle.toolbarNavigationClickListener =
-                View.OnClickListener { v: View? ->
-                    if (displayUpArrow) supportFragmentManager.popBackStack() else drawerLayout.openDrawer(
-                        navDrawer
-                    )
-                }
-        } else if (!displayUpArrow) {
-            toolbar.navigationIcon = null
-        } else {
-            toolbar.setNavigationIcon(R.drawable.ic_keyboard_backspace_black)
-            toolbar.setNavigationOnClickListener { v: View? -> supportFragmentManager.popBackStack() }
-        }
-    }
-
-    internal inner class DrawerCloseToggle : ActionBarDrawerToggle {
-        constructor(
-            activity: Activity?,
-            drawerLayout: DrawerLayout?,
-            openDrawerContentDescRes: Int,
-            closeDrawerContentDescRes: Int
-        ) : super(activity, drawerLayout, openDrawerContentDescRes, closeDrawerContentDescRes) {
-        }
-
-        constructor(
-            activity: Activity?,
-            drawerLayout: DrawerLayout?,
-            toolbar: Toolbar?,
-            openDrawerContentDescRes: Int,
-            closeDrawerContentDescRes: Int
-        ) : super(
-            activity,
-            drawerLayout,
-            toolbar,
-            openDrawerContentDescRes,
-            closeDrawerContentDescRes
-        ) {
-        }
-
-        override fun onDrawerClosed(drawerView: View) {
-            super.onDrawerClosed(drawerView)
-            val pendingFragment = needtoOpenFragmentLater
-            val closeCallback = drawerCloseCallback
-            if (pendingFragment != null) {
-                loadFragmentInner(pendingFragment)
-            } else if (closeCallback != null) {
-                closeCallback()
-                drawerCloseCallback = null
-            }
-        }
+        navDrawerController.setupToolbarToggle(toolbar, displayUpArrow)
     }
 
     private fun checkFirstLaunch() {
@@ -372,28 +227,10 @@ class MainActivity : SimpleToolbarActivity(), OnSharedPreferenceChangeListener {
     }
 
     val isDrawerOpen: Boolean
-        get() = drawerLayout?.isDrawerOpen(navDrawer) == true
-
+        get() = navDrawerController.isDrawerOpen
 
     fun setPlayerVisible(visible: Boolean) {
-        if (visible) {
-            //the first argument is unused but must not be null, so anything is passed
-            bottomSheetCallback.onStateChanged(navDrawer, bottomSheet.state) // Update toolbar visibility
-        } else {
-            bottomSheet.setState(BottomSheetBehavior.STATE_COLLAPSED)
-        }
-
-        val mainView = findViewById<FragmentContainerView>(R.id.main_view)
-        val params = mainView.layoutParams as MarginLayoutParams
-        params.setMargins(
-            0,
-            0,
-            0,
-            if (visible) resources.getDimension(R.dimen.external_player_height).toInt() else 0
-        )
-        mainView.layoutParams = params
-        findViewById<View>(R.id.audioplayerFragment).visibility =
-            if (visible) View.VISIBLE else View.GONE
+        playerSheet.setPlayerVisible(visible)
     }
 
     /**
@@ -402,31 +239,7 @@ class MainActivity : SimpleToolbarActivity(), OnSharedPreferenceChangeListener {
      * @param args
      */
     fun loadFragment(tag: String?, args: Bundle?) {
-        var tag = tag
-        var args = args
-        Log.d(TAG, "loadFragment -> tag: $tag args: $args")
-        val fragment: Fragment
-        when (tag) {
-            PlaylistFragment.TAG -> fragment = PlaylistFragment()
-            EpisodesFragment.TAG -> fragment = EpisodesFragment()
-            DownloadPagerFragment.TAG -> fragment = DownloadPagerFragment()
-            PlaybackHistoryFragment.TAG -> fragment = PlaybackHistoryFragment()
-            DiscoverFragment.TAG -> fragment = DiscoverFragment()
-            SubFeedsFragment.TAG -> fragment =
-                SubFeedsFragment()
-            FavoriteEpisodesFragment.TAG -> fragment = FavoriteEpisodesFragment()
-            else -> {
-                // default to the queue
-                fragment = PlaylistFragment()
-                tag = PlaylistFragment.TAG
-                args = null
-            }
-        }
-        if (args != null) {
-            fragment.arguments = args
-        }
-        saveLastNavFragment(this, tag)
-        loadFragment(fragment)
+        fragmentNavigator.loadFragment(tag, args)
     }
 
     /**
@@ -435,47 +248,7 @@ class MainActivity : SimpleToolbarActivity(), OnSharedPreferenceChangeListener {
      * @param args
      */
     fun loadFeedFragmentById(feedId: Long, args: Bundle?) {
-        val fragment: Fragment = FeedItemlistFragment.newInstance(feedId)
-        if (args != null) {
-            fragment.arguments = args
-        }
-        saveLastNavFragment(this, feedId.toString())
-        loadFragment(fragment)
-    }
-
-    private var needtoOpenFragmentLater: Fragment? = null
-    private fun loadFragment(fragment: Fragment) {
-        if (isDrawerOpen) {
-            needtoOpenFragmentLater = fragment
-            drawerLayout?.closeDrawer(navDrawer)
-        } else {
-            loadFragmentInner(fragment)
-        }
-    }
-
-    private fun loadFragmentInner(fragment: Fragment) {
-        val fragmentManager = supportFragmentManager
-        // clear back stack
-        for (i in 0 until fragmentManager.backStackEntryCount) {
-            fragmentManager.popBackStack()
-        }
-        val t = fragmentManager.beginTransaction()
-        //without this animation, tapping a feed flickers
-        t.setCustomAnimations(
-            R.anim.retro_fragment_open_enter,
-            R.anim.retro_fragment_open_exit,
-            R.anim.retro_fragment_close_enter,
-            R.anim.retro_fragment_close_exit
-        ).replace(R.id.main_view, fragment, MAIN_FRAGMENT_TAG)
-        fragmentManager.popBackStack()
-        // TODO: we have to allow state loss here
-        // since this function can get called from an AsyncTask which
-        // could be finishing after our app has already committed state
-        // and is about to get shutdown.  What we *should* do is
-        // not commit anything in an AsyncTask, but that's a bigger
-        // change than we want now.
-        t.commitAllowingStateLoss()
-        needtoOpenFragmentLater = null
+        fragmentNavigator.loadFeedFragmentById(feedId, args)
     }
 
     /**
@@ -488,83 +261,28 @@ class MainActivity : SimpleToolbarActivity(), OnSharedPreferenceChangeListener {
         fragment: Fragment,
         transition: TransitionEffect? = TransitionEffect.FADE_AND_SCALE
     ) {
-        Validate.notNull(fragment)
-        val transaction = supportFragmentManager.beginTransaction()
-        when (transition) {
-            TransitionEffect.FADE -> transaction.setCustomAnimations(
-                R.anim.fade_in,
-                R.anim.fade_out
-            )
-            TransitionEffect.SLIDE -> transaction.setCustomAnimations(
-                R.anim.slide_right_in,
-                R.anim.slide_left_out,
-                R.anim.slide_left_in,
-                R.anim.slide_right_out
-            )
-            TransitionEffect.FADE_AND_SCALE -> transaction.setCustomAnimations(
-                R.anim.retro_fragment_open_enter,
-                R.anim.retro_fragment_open_exit,
-                R.anim.retro_fragment_close_enter,
-                R.anim.retro_fragment_close_exit
-            )
-            else -> transaction.setCustomAnimations(
-                R.anim.fade_in,
-                R.anim.fade_out
-            )
-        }
-        supportFragmentManager.findFragmentByTag(MAIN_FRAGMENT_TAG)?.let { transaction.hide(it) }
-        transaction
-            .add(R.id.main_view, fragment, MAIN_FRAGMENT_TAG)
-            .addToBackStack(null)
-            .commit()
-
-        /*if (drawerLayout != null) { // Tablet layout does not have a drawer
-            drawerLayout.closeDrawer(navDrawer);
-        }*/
+        fragmentNavigator.loadChildFragment(fragment, transition)
     }
 
     override fun onPostCreate(savedInstanceState: Bundle?) {
         super.onPostCreate(savedInstanceState)
-        // Tablet layout does not have a drawer
-        drawerToggle?.syncState()
+        navDrawerController.onPostCreate()
     }
 
     override fun onConfigurationChanged(newConfig: Configuration) {
         super.onConfigurationChanged(newConfig)
-        // Tablet layout does not have a drawer
-        drawerToggle?.onConfigurationChanged(newConfig)
-        setNavDrawerSize()
+        navDrawerController.onConfigurationChanged(newConfig)
     }
-
-    /**
-     * Set the drawer width
-     */
-    private fun setNavDrawerSize() {
-        val screenPercent = resources.getInteger(R.integer.nav_drawer_screen_size_percent) * 0.01f
-        val width = (screenWidth * screenPercent).toInt()
-        val maxWidth = resources.getDimension(R.dimen.nav_drawer_max_screen_size).toInt()
-        navDrawer.layoutParams.width = Math.min(width, maxWidth)
-    }
-
-    private val screenWidth: Int
-        private get() {
-            val displayMetrics = DisplayMetrics()
-            windowManager.defaultDisplay.getMetrics(displayMetrics)
-            return displayMetrics.widthPixels
-        }
 
     override fun onRestoreInstanceState(savedInstanceState: Bundle) {
         super.onRestoreInstanceState(savedInstanceState)
-        if (bottomSheet.state == BottomSheetBehavior.STATE_EXPANDED) {
-            //re-open
-            bottomSheetCallback.onSlide(navDrawer, 1.0f)
-        }
+        playerSheet.onRestoreInstanceState()
     }
 
     override fun onResume() {
         super.onResume()
         StorageUtils.checkStorageAvailability(this)
-        handleNavIntent()
+        intentHandler.handleNavIntent()
     }
 
     override fun onStop() {
@@ -575,9 +293,7 @@ class MainActivity : SimpleToolbarActivity(), OnSharedPreferenceChangeListener {
     override fun onDestroy() {
         Timber.d("onDestroy")
         super.onDestroy()
-        attachNavDrawer?.let { navDrawer.removeCallbacks(it) }
-        attachNavDrawer = null
-        drawerToggle?.let { drawerLayout?.removeDrawerListener(it) }
+        navDrawerController.onDestroy()
         EventBus.getDefault().unregister(this)
         PreferenceManager.getDefaultSharedPreferences(this)
             .unregisterOnSharedPreferenceChangeListener(this)
@@ -593,7 +309,7 @@ class MainActivity : SimpleToolbarActivity(), OnSharedPreferenceChangeListener {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return if (drawerToggle?.onOptionsItemSelected(item) == true) { // Tablet layout does not have a drawer
+        return if (navDrawerController.onOptionsItemSelected(item)) { // Tablet layout does not have a drawer
             true
         } else if (item.itemId == android.R.id.home) {
             if (supportFragmentManager.backStackEntryCount > 0) {
@@ -605,24 +321,19 @@ class MainActivity : SimpleToolbarActivity(), OnSharedPreferenceChangeListener {
         }
     }
 
-    var drawerCloseCallback: (() -> Unit)? = null
+    var drawerCloseCallback: (() -> Unit)?
+        get() = navDrawerController.drawerCloseCallback
+        set(value) {
+            navDrawerController.drawerCloseCallback = value
+        }
 
     fun closeDrawer(callback: (() -> Unit)?) {
-        if (isDrawerOpen) {
-            callback?.run {
-                drawerCloseCallback = this
-            }
-            drawerLayout?.closeDrawer(navDrawer)
-        } else {
-            callback?.run {
-                callback()
-            }
-        }
+        navDrawerController.closeDrawer(callback)
     }
 
     override fun onBackPressed() {
         if (isDrawerOpen) {
-            drawerLayout?.closeDrawer(navDrawer)
+            navDrawerController.closeDrawerNow()
         } else if (bottomSheet.state == BottomSheetBehavior.STATE_EXPANDED) {
             bottomSheet.setState(BottomSheetBehavior.STATE_COLLAPSED)
         } else if (supportFragmentManager.backStackEntryCount != 0) {
@@ -630,7 +341,7 @@ class MainActivity : SimpleToolbarActivity(), OnSharedPreferenceChangeListener {
         } else {
             when (Prefs.backButtonBehavior) {
                 // Tablet layout does not have drawer
-                BackButtonBehavior.OPEN_DRAWER -> drawerLayout?.openDrawer(navDrawer)
+                BackButtonBehavior.OPEN_DRAWER -> navDrawerController.openDrawer()
                 BackButtonBehavior.SHOW_PROMPT -> AccentMaterialDialog(
                     this,
                     R.style.MaterialAlertDialogTheme
@@ -661,43 +372,10 @@ class MainActivity : SimpleToolbarActivity(), OnSharedPreferenceChangeListener {
         }
     }
 
-    private fun handleNavIntent() {
-        val intent = intent
-        if (intent.hasExtra(EXTRA_FEED_ID) || intent.hasExtra(EXTRA_FRAGMENT_TAG)
-            || intent.hasExtra(EXTRA_FEED)
-        ) {
-            Log.d(TAG, "handle NavIntent()")
-            val tag = intent.getStringExtra(EXTRA_FRAGMENT_TAG)
-            val args = intent.getBundleExtra(EXTRA_FRAGMENT_ARGS)
-
-            val feedId = intent.getLongExtra(EXTRA_FEED_ID, 0)
-            val feed = intent.getParcelableExtra<Feed>(EXTRA_FEED)
-            if (tag != null) {
-                loadFragment(tag, args)
-            } else if (feedId > 0) {
-                if (intent.getBooleanExtra(EXTRA_STARTED_FROM_SEARCH, false)) {
-                    loadChildFragment(FeedItemlistFragment.newInstance(feedId))
-                } else {
-                    loadFeedFragmentById(feedId, args)
-                }
-            } else if (feed != null) {
-                loadChildFragment(FeedItemlistFragment.newInstance(feed))
-            }
-            bottomSheet.setState(BottomSheetBehavior.STATE_COLLAPSED)
-        } else if (intent.getBooleanExtra(MainActivityStarter.EXTRA_OPEN_PLAYER, false)) {
-            bottomSheet.state = BottomSheetBehavior.STATE_EXPANDED
-            bottomSheetCallback.onSlide(navDrawer, 1.0f)
-        } else if (Intent.ACTION_VIEW == intent.action) {
-            handleDeeplink(intent.data)
-        }
-        // to avoid handling the intent twice when the configuration changes
-        setIntent(Intent(this@MainActivity, MainActivity::class.java))
-    }
-
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         setIntent(intent)
-        handleNavIntent()
+        intentHandler.handleNavIntent()
     }
 
     /**
@@ -707,21 +385,7 @@ class MainActivity : SimpleToolbarActivity(), OnSharedPreferenceChangeListener {
      * @return
      */
     fun showSnackbarAbovePlayer(text: CharSequence?, duration: Int): Snackbar {
-        val message = text ?: ""
-        val s: Snackbar
-        if (bottomSheet.state == BottomSheetBehavior.STATE_COLLAPSED) {
-            s = Snackbar.make(findViewById(R.id.main_view), message, duration)
-            if (findViewById<View>(R.id.audioplayerFragment).visibility == View.VISIBLE) {
-                s.anchorView = findViewById(R.id.audioplayerFragment)
-            }
-        } else {
-            s = Snackbar.make(findViewById(android.R.id.content), message, duration)
-        }
-        if (!materialYou) {
-            s.setActionTextColor(accentColor(this))
-        }
-        s.show()
-        return s
+        return playerSheet.showSnackbarAbovePlayer(text, duration)
     }
 
     fun showSnackbarAbovePlayer(text: Int, duration: Int): Snackbar {
@@ -729,90 +393,10 @@ class MainActivity : SimpleToolbarActivity(), OnSharedPreferenceChangeListener {
     }
 
     /**
-     * Handles the deep link incoming via App Actions.
-     * Performs an in-app search or opens the relevant feature of the app
-     * depending on the query.
-     *
-     * @param uri incoming deep link
-     */
-    private fun handleDeeplink(uri: Uri?) {
-        if (uri == null || uri.path == null) {
-            return
-        }
-        Log.d(TAG, "handle deeplink -> $uri")
-        when (uri.path) {
-            "/deeplink/search" -> {
-                val query = uri.getQueryParameter("query") ?: return
-                loadChildFragment(LocalSearchFragment.newInstance(query))
-            }
-            "/deeplink/main" -> {
-                val feature = uri.getQueryParameter("page") ?: return
-                when (feature) {
-                    "downloads" -> loadFragment(DownloadPagerFragment.TAG, null)
-                    "history" -> loadFragment(PlaybackHistoryFragment.TAG, null)
-                    "episodes" -> loadFragment(EpisodesFragment.TAG, null)
-                    "playlist" -> loadFragment(PlaylistFragment.TAG, null)
-                    "subscriptions" -> loadFragment(SubFeedsFragment.TAG, null)
-                    "favorite" -> loadFragment(FavoriteEpisodesFragment.TAG, null)
-                    else -> {
-                        showSnack(
-                            this, getString(R.string.app_action_not_found, feature),
-                            Toast.LENGTH_LONG
-                        )
-                        return
-                    }
-                }
-            }
-            else -> {}
-        }
-    }
-
-    /**
      * Hardware keyboard support: custom key events are forwarded to PlaybackService
      */
     override fun onKeyUp(keyCode: Int, event: KeyEvent): Boolean {
-        val currentFocus = currentFocus
-        if (currentFocus is EditText) {
-            return super.onKeyUp(keyCode, event)
-        }
-        val audioManager = getSystemService(AUDIO_SERVICE) as AudioManager
-        var customKeyCode: Int? = null
-        EventBus.getDefault().post(event)
-        when (keyCode) {
-            KeyEvent.KEYCODE_P -> customKeyCode = KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE
-            KeyEvent.KEYCODE_J, KeyEvent.KEYCODE_A, KeyEvent.KEYCODE_COMMA -> customKeyCode =
-                KeyEvent.KEYCODE_MEDIA_REWIND
-            KeyEvent.KEYCODE_K, KeyEvent.KEYCODE_D, KeyEvent.KEYCODE_PERIOD -> customKeyCode =
-                KeyEvent.KEYCODE_MEDIA_FAST_FORWARD
-            KeyEvent.KEYCODE_PLUS, KeyEvent.KEYCODE_W -> {
-                audioManager.adjustStreamVolume(
-                    AudioManager.STREAM_MUSIC,
-                    AudioManager.ADJUST_RAISE, AudioManager.FLAG_SHOW_UI
-                )
-                return true
-            }
-            KeyEvent.KEYCODE_MINUS, KeyEvent.KEYCODE_S -> {
-                audioManager.adjustStreamVolume(
-                    AudioManager.STREAM_MUSIC,
-                    AudioManager.ADJUST_LOWER, AudioManager.FLAG_SHOW_UI
-                )
-                return true
-            }
-            KeyEvent.KEYCODE_M -> if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                audioManager.adjustStreamVolume(
-                    AudioManager.STREAM_MUSIC,
-                    AudioManager.ADJUST_TOGGLE_MUTE, AudioManager.FLAG_SHOW_UI
-                )
-                return true
-            }
-        }
-        if (customKeyCode != null) {
-            val intent = Intent(this, PlaybackService::class.java)
-            intent.putExtra(MediaButtonReceiver.EXTRA_KEYCODE, customKeyCode)
-            ContextCompat.startForegroundService(this, intent)
-            return true
-        }
-        return super.onKeyUp(keyCode, event)
+        return hardwareKeys.onKeyUp(keyCode, event) ?: super.onKeyUp(keyCode, event)
     }
 
     override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences, key: String?) {

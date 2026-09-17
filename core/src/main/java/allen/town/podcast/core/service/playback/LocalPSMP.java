@@ -1,188 +1,100 @@
 package allen.town.podcast.core.service.playback;
 
-import android.Manifest;
 import android.app.UiModeManager;
 import android.content.Context;
-import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.media.AudioManager;
-import android.os.Build;
-import android.os.Handler;
-import android.os.Looper;
-import android.os.PowerManager;
-import androidx.annotation.NonNull;
-import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.util.Pair;
 import android.view.SurfaceHolder;
 
-import androidx.core.app.ActivityCompat;
-import androidx.media.AudioAttributesCompat;
-import androidx.media.AudioFocusRequestCompat;
-import androidx.media.AudioManagerCompat;
+import androidx.annotation.NonNull;
 
 import allen.town.podcast.core.feed.util.AudioEffectUtils;
 import allen.town.podcast.event.PlayerErrorEvent;
-import allen.town.podcast.event.playback.BufferUpdateEvent;
-import allen.town.podcast.event.playback.SpeedChangedEvent;
-import allen.town.podcast.core.util.playback.MediaPlayerError;
 import allen.town.podcast.playback.base.PlaybackServiceMediaPlayer;
 import allen.town.podcast.playback.base.PlayerStatus;
-import org.antennapod.audio.MediaPlayer;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
-import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Future;
-import java.util.concurrent.FutureTask;
-import java.util.concurrent.LinkedBlockingDeque;
-import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.locks.ReentrantLock;
 
 import allen.town.podcast.model.feed.FeedMedia;
 import allen.town.podcast.model.feed.FeedPreferences;
 import allen.town.podcast.model.playback.MediaType;
-import allen.town.podcast.model.feed.VolumeAdaptionSetting;
 import allen.town.podcast.core.feed.util.PlaybackSpeedUtils;
 import allen.town.podcast.core.pref.Prefs;
 import allen.town.podcast.playback.base.RewindAfterPauseUtils;
 import allen.town.podcast.core.util.playback.IPlayer;
 import allen.town.podcast.model.playback.Playable;
-import allen.town.podcast.core.util.playback.PlaybackServiceStarter;
 import allen.town.podcast.core.util.playback.VideoPlayer;
 import org.greenrobot.eventbus.EventBus;
 
 /**
  * Manages the MediaPlayer object of the PlaybackService.
+ * <p/>
+ * This class owns the player, the media it plays and the player status, and keeps every entry
+ * point of {@code PlaybackServiceMediaPlayer}. Cohesive groups of its work are delegated to
+ * collaborators in this package, which reach back into it through the package-private members and
+ * bridges below: audio focus ({@link LocalPSMPAudioFocus}), creating the player and wiring up its
+ * listeners ({@link LocalPSMPPlayerFactory}), seeking ({@link LocalPSMPSeeker}), speed / volume /
+ * audio effects ({@link LocalPSMPAudioEffects}) and what happens once the current media stops
+ * playing ({@link LocalPSMPPlaybackEnder}). The threading policy - run everything on the caller
+ * thread for ExoPlayer, on a single background thread otherwise - lives in {@link PlayerExecutor}
+ * and {@link PlayerLock}.
  */
 public class LocalPSMP extends PlaybackServiceMediaPlayer {
     private static final String TAG = "LocalMediaPlayer";
 
-    private final AudioManager audioManager;
-
-    private volatile PlayerStatus statusBeforeSeeking;
-    private volatile IPlayer mediaPlayer;
-    private volatile Playable media;
+    volatile IPlayer mediaPlayer;
+    volatile Playable media;
 
     private volatile boolean stream;
     private volatile MediaType mediaType;
-    private final AtomicBoolean startWhenPrepared;
-    private volatile boolean pausedBecauseOfTransientAudiofocusLoss;
+    final AtomicBoolean startWhenPrepared;
     private volatile Pair<Integer, Integer> videoSize;
-    private final AudioFocusRequestCompat audioFocusRequest;
-    private final Handler audioFocusCanceller;
 
     /**
      * Some asynchronous calls might change the state of the MediaPlayer object. Therefore calls in other threads
      * have to wait until these operations have finished.
      */
-    private final PlayerLock playerLock;
-    private final PlayerExecutor executor;
-    private boolean useCallerThread = true;
-    private boolean isShutDown = false;
-
-
-    private CountDownLatch seekLatch;
+    final PlayerLock playerLock;
+    final PlayerExecutor executor;
 
     /**
-     * All ExoPlayer methods must be executed on the same thread.
-     * We use the main application thread. This class allows to
-     * "fake" an executor that just calls the methods on the
-     * calling thread instead of submitting to an executor.
-     * Other players are still executed in a background thread.
+     * All ExoPlayer methods must be executed on the same thread, so for ExoPlayer everything runs
+     * on the calling thread and neither the lock nor the executor do anything. Shared with
+     * {@link PlayerLock} and {@link PlayerExecutor}, which read it on every call.
      */
-    private class PlayerExecutor {
-        private ThreadPoolExecutor threadPool;
+    final AtomicBoolean useCallerThread = new AtomicBoolean(true);
+    boolean isShutDown = false;
 
-        public Future<?> submit(Runnable r) {
-            if (useCallerThread) {
-                r.run();
-                return new FutureTask<Void>(() -> {}, null);
-            } else {
-                return threadPool.submit(r);
-            }
-        }
-
-        public void shutdown() {
-            threadPool.shutdown();
-        }
-    }
-
-    /**
-     * All ExoPlayer methods must be executed on the same thread.
-     * We use the main application thread. This class allows to
-     * "fake" a lock that does nothing. A lock is not needed if
-     * everything is called on the same thread.
-     * Other players are still executed in a background thread and
-     * therefore use a real lock.
-     */
-    private class PlayerLock {
-        private ReentrantLock lock = new ReentrantLock();
-
-        public void lock() {
-            if (!useCallerThread) {
-                lock.lock();
-            }
-        }
-
-        public boolean tryLock(int i, TimeUnit milliseconds) throws InterruptedException {
-            if (!useCallerThread) {
-                return lock.tryLock(i, milliseconds);
-            }
-            return true;
-        }
-
-        public boolean tryLock() {
-            if (!useCallerThread) {
-                return lock.tryLock();
-            }
-            return true;
-        }
-
-        public void unlock() {
-            if (!useCallerThread) {
-                lock.unlock();
-            }
-        }
-
-        public boolean isHeldByCurrentThread() {
-            if (!useCallerThread) {
-                return lock.isHeldByCurrentThread();
-            }
-            return true;
-        }
-    }
+    private final LocalPSMPAudioFocus audioFocus;
+    private final LocalPSMPSeeker seeker;
+    private final LocalPSMPPlayerFactory playerFactory;
+    private final LocalPSMPAudioEffects audioEffects;
+    private final LocalPSMPPlaybackEnder playbackEnder;
 
     public LocalPSMP(@NonNull Context context,
                      @NonNull PlaybackServiceMediaPlayer.PSMPCallback callback) {
         super(context, callback);
-        this.audioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
-        this.playerLock = new PlayerLock();
+        this.playerLock = new PlayerLock(useCallerThread);
         this.startWhenPrepared = new AtomicBoolean(false);
-        audioFocusCanceller = new Handler(Looper.getMainLooper());
+        this.seeker = new LocalPSMPSeeker(this);
+        this.playerFactory = new LocalPSMPPlayerFactory(this);
+        this.audioEffects = new LocalPSMPAudioEffects(this);
+        this.playbackEnder = new LocalPSMPPlaybackEnder(this);
 
-        executor = new PlayerExecutor();
-        executor.threadPool = new ThreadPoolExecutor(1, 1, 5, TimeUnit.MINUTES, new LinkedBlockingDeque<>(),
-                (r, executor) -> Log.d(TAG, "Rejected execution of runnable"));
+        executor = new PlayerExecutor(useCallerThread);
 
         mediaPlayer = null;
-        statusBeforeSeeking = null;
-        pausedBecauseOfTransientAudiofocusLoss = false;
         mediaType = MediaType.UNKNOWN;
         videoSize = null;
 
-        AudioAttributesCompat audioAttributes = new AudioAttributesCompat.Builder()
-                .setUsage(AudioAttributesCompat.USAGE_MEDIA)
-                .setContentType(AudioAttributesCompat.CONTENT_TYPE_SPEECH)
-                .build();
-        audioFocusRequest = new AudioFocusRequestCompat.Builder(AudioManagerCompat.AUDIOFOCUS_GAIN)
-                .setAudioAttributes(audioAttributes)
-                .setOnAudioFocusChangeListener(audioFocusChangeListener)
-                .setWillPauseWhenDucked(true)
-                .build();
+        audioFocus = new LocalPSMPAudioFocus(this, context);
     }
 
     /**
@@ -214,7 +126,7 @@ public class LocalPSMP extends PlaybackServiceMediaPlayer {
     @Override
     public void playMediaObject(@NonNull final Playable playable, final boolean stream, final boolean startWhenPrepared, final boolean prepareImmediately) {
         Log.d(TAG, "playing");
-        useCallerThread = Prefs.useExoplayer();
+        useCallerThread.set(Prefs.useExoplayer());
         executor.submit(() -> {
             playerLock.lock();
             try {
@@ -279,7 +191,7 @@ public class LocalPSMP extends PlaybackServiceMediaPlayer {
             callback.ensureMediaInfoLoaded(media);
             callback.onMediaChanged(false);
             setPlaybackParams(PlaybackSpeedUtils.getCurrentPlaybackSpeed(media), AudioEffectUtils.isSkipEnable(media));
-            setAudioEffect();
+            audioEffects.setAudioEffect();
             if (stream) {
                 if (playable instanceof FeedMedia) {
                     FeedMedia feedMedia = (FeedMedia) playable;
@@ -332,26 +244,26 @@ public class LocalPSMP extends PlaybackServiceMediaPlayer {
 
     private void resumeSync() {
         if (playerStatus == PlayerStatus.PAUSED || playerStatus == PlayerStatus.PREPARED) {
-            int focusGained = AudioManagerCompat.requestAudioFocus(audioManager, audioFocusRequest);
+            int focusGained = audioFocus.request();
 
             if (focusGained == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
                 Log.d(TAG, "audio focus requested");
                 acquireWifiLockIfNecessary();
 
                 setPlaybackParams(PlaybackSpeedUtils.getCurrentPlaybackSpeed(media), AudioEffectUtils.isSkipEnable(media));
-                setAudioEffect();
+                audioEffects.setAudioEffect();
                 setVolume(1.0f, 1.0f);
 
                 if (playerStatus == PlayerStatus.PREPARED && media.getPosition() > 0) {
                     int newPosition = RewindAfterPauseUtils.calculatePositionWithRewind(
                         media.getPosition(),
                         media.getLastPlayedTime());
-                    seekToSync(newPosition);
+                    seeker.seekToSync(newPosition);
                 }
                 mediaPlayer.start();
 
                 setPlayerStatus(PlayerStatus.PLAYING, media);
-                pausedBecauseOfTransientAudiofocusLoss = false;
+                audioFocus.clearTransientLossFlag();
             } else {
                 Log.e(TAG, "failed to request audio focus");
             }
@@ -382,8 +294,8 @@ public class LocalPSMP extends PlaybackServiceMediaPlayer {
                 setPlayerStatus(PlayerStatus.PAUSED, media, getPosition());
 
                 if (abandonFocus) {
-                    abandonAudioFocus();
-                    pausedBecauseOfTransientAudiofocusLoss = false;
+                    audioFocus.abandon();
+                    audioFocus.clearTransientLossFlag();
                 }
                 if (stream && reinit) {
                     reinit();
@@ -394,10 +306,6 @@ public class LocalPSMP extends PlaybackServiceMediaPlayer {
 
             playerLock.unlock();
         });
-    }
-
-    private void abandonAudioFocus() {
-        AudioManagerCompat.abandonAudioFocusRequest(audioManager, audioFocusRequest);
     }
 
     /**
@@ -443,14 +351,14 @@ public class LocalPSMP extends PlaybackServiceMediaPlayer {
         if (mediaType == MediaType.VIDEO && mediaPlayer instanceof ExoPlayerWrapper) {
             ExoPlayerWrapper vp = (ExoPlayerWrapper) mediaPlayer;
             videoSize = new Pair<>(vp.getVideoWidth(), vp.getVideoHeight());
-        } else if(mediaType == MediaType.VIDEO && mediaPlayer instanceof VideoPlayer) {
+        } else if (mediaType == MediaType.VIDEO && mediaPlayer instanceof VideoPlayer) {
             VideoPlayer vp = (VideoPlayer) mediaPlayer;
             videoSize = new Pair<>(vp.getVideoWidth(), vp.getVideoHeight());
         }
 
         // TODO this call has no effect!
         if (media.getPosition() > 0) {
-            seekToSync(media.getPosition());
+            seeker.seekToSync(media.getPosition());
         }
 
         if (media.getDuration() <= 0) {
@@ -472,7 +380,7 @@ public class LocalPSMP extends PlaybackServiceMediaPlayer {
      */
     @Override
     public void reinit() {
-        useCallerThread = Prefs.useExoplayer();
+        useCallerThread.set(Prefs.useExoplayer());
         executor.submit(() -> {
             playerLock.lock();
             Log.d(TAG, "re init");
@@ -488,63 +396,6 @@ public class LocalPSMP extends PlaybackServiceMediaPlayer {
         });
     }
 
-
-    /**
-     * Seeks to the specified position. If the PSMP object is in an invalid state, this method will do nothing.
-     *
-     * @param t The position to seek to in milliseconds. t < 0 will be interpreted as t = 0
-     *          <p/>
-     *          This method is executed on the caller's thread.
-     */
-    private void seekToSync(int t) {
-        if (t < 0) {
-            t = 0;
-        }
-
-        if (t >= getDuration()) {
-            Log.d(TAG, "Seek reached end of file, skipping to next episode");
-            skip();
-            return;
-        }
-
-        playerLock.lock();
-
-        if (playerStatus == PlayerStatus.PLAYING
-                || playerStatus == PlayerStatus.PAUSED
-                || playerStatus == PlayerStatus.PREPARED) {
-            if(seekLatch != null && seekLatch.getCount() > 0) {
-                try {
-                    seekLatch.await(3, TimeUnit.SECONDS);
-                } catch (InterruptedException e) {
-                    // Safe to continue: the new seek below supersedes the one we were waiting for.
-                    // Restore the flag so the executor still sees that it was interrupted.
-                    Thread.currentThread().interrupt();
-                    Log.e(TAG, "Interrupted while waiting for the previous seek to finish", e);
-                }
-            }
-            seekLatch = new CountDownLatch(1);
-            statusBeforeSeeking = playerStatus;
-            setPlayerStatus(PlayerStatus.SEEKING, media, getPosition());
-            mediaPlayer.seekTo(t);
-            if (statusBeforeSeeking == PlayerStatus.PREPARED) {
-                media.setPosition(t);
-            }
-            try {
-                seekLatch.await(3, TimeUnit.SECONDS);
-            } catch (InterruptedException e) {
-                // Safe to continue: the seek has already been handed to the player, we only stop
-                // waiting for its callback. Restore the flag for the executor.
-                Thread.currentThread().interrupt();
-                Log.e(TAG, "Interrupted while waiting for the seek to complete", e);
-            }
-        } else if (playerStatus == PlayerStatus.INITIALIZED) {
-            media.setPosition(t);
-            startWhenPrepared.set(false);
-            prepare();
-        }
-        playerLock.unlock();
-    }
-
     /**
      * Seeks to the specified position. If the PSMP object is in an invalid state, this method will do nothing.
      * Invalid time values (< 0) will be ignored.
@@ -553,7 +404,7 @@ public class LocalPSMP extends PlaybackServiceMediaPlayer {
      */
     @Override
     public void seekTo(final int t) {
-        executor.submit(() -> seekToSync(t));
+        executor.submit(() -> seeker.seekToSync(t));
     }
 
     /**
@@ -567,7 +418,7 @@ public class LocalPSMP extends PlaybackServiceMediaPlayer {
             playerLock.lock();
             int currentPosition = getPosition();
             if (currentPosition != INVALID_TIME) {
-                seekToSync(currentPosition + d);
+                seeker.seekToSync(currentPosition + d);
             } else {
                 Log.e(TAG, "getPosition() returned INVALID_TIME in seekDelta");
             }
@@ -638,36 +489,6 @@ public class LocalPSMP extends PlaybackServiceMediaPlayer {
     }
 
     /**
-     * Sets the playback speed.
-     * This method is executed on the caller's thread.
-     */
-    private void setSpeedSyncAndSkipSilence(float speed, boolean skipSilence) {
-        playerLock.lock();
-        Log.d(TAG, "speed was set to " + speed + " skipSilence -> "+ skipSilence);
-        EventBus.getDefault().post(new SpeedChangedEvent(speed));
-        mediaPlayer.setPlaybackParams(speed, skipSilence);
-        playerLock.unlock();
-    }
-
-    /**
-     * Sets the playback speed.
-     * This method is executed on the caller's thread.
-     */
-    private void setAudioEffect() {
-        executor.submit(() -> {
-            playerLock.lock();
-            boolean isLoudness = AudioEffectUtils.isLoudnessEnable(media);
-            boolean isMono = AudioEffectUtils.isMonoEnable(media);
-            Log.d(TAG, "set AudioEffect loudness -> " + isLoudness + " downmix ->" + isMono);
-            mediaPlayer.setLoudness(isLoudness);
-            mediaPlayer.setDownmix(isMono);
-            playerLock.unlock();
-        });
-
-    }
-
-
-    /**
      * Reads from the preferences whether mono downmix is enabled.
      * @return
      */
@@ -690,7 +511,7 @@ public class LocalPSMP extends PlaybackServiceMediaPlayer {
      */
     @Override
     public void setPlaybackParams(final float speed, final boolean skipSilence) {
-        executor.submit(() -> setSpeedSyncAndSkipSilence(speed, skipSilence));
+        audioEffects.setPlaybackParams(speed, skipSilence);
     }
 
     /**
@@ -698,19 +519,7 @@ public class LocalPSMP extends PlaybackServiceMediaPlayer {
      */
     @Override
     public float getPlaybackSpeed() {
-        if (!playerLock.tryLock()) {
-            return 1;
-        }
-
-        float retVal = 1;
-        if ((playerStatus == PlayerStatus.PLAYING
-                || playerStatus == PlayerStatus.PAUSED
-                || playerStatus == PlayerStatus.INITIALIZED
-                || playerStatus == PlayerStatus.PREPARED)) {
-            retVal = mediaPlayer.getCurrentSpeedMultiplier();
-        }
-        playerLock.unlock();
-        return retVal;
+        return audioEffects.getPlaybackSpeed();
     }
 
     /**
@@ -719,27 +528,15 @@ public class LocalPSMP extends PlaybackServiceMediaPlayer {
      */
     @Override
     public void setVolume(final float volumeLeft, float volumeRight) {
-        executor.submit(() -> setVolumeSync(volumeLeft, volumeRight));
+        audioEffects.setVolume(volumeLeft, volumeRight);
     }
 
     /**
      * Sets the playback volume.
      * This method is executed on the caller's thread.
      */
-    private void setVolumeSync(float volumeLeft, float volumeRight) {
-        playerLock.lock();
-        Playable playable = getPlayable();
-        if (playable instanceof FeedMedia) {
-            FeedMedia feedMedia = (FeedMedia) playable;
-            FeedPreferences preferences = feedMedia.getItem().getFeed().getPreferences();
-            VolumeAdaptionSetting volumeAdaptionSetting = preferences.getVolumeAdaptionSetting();
-            float adaptionFactor = volumeAdaptionSetting.getAdaptionFactor();
-            volumeLeft *= adaptionFactor;
-            volumeRight *= adaptionFactor;
-        }
-        mediaPlayer.setVolume(volumeLeft, volumeRight);
-        Log.d(TAG, "volume was set to " + volumeLeft + " " + volumeRight);
-        playerLock.unlock();
+    void setVolumeSync(float volumeLeft, float volumeRight) {
+        audioEffects.setVolumeSync(volumeLeft, volumeRight);
     }
 
     /**
@@ -747,31 +544,17 @@ public class LocalPSMP extends PlaybackServiceMediaPlayer {
      */
     @Override
     public boolean canDownmix() {
-        boolean retVal = false;
-        if (mediaPlayer != null && media != null && media.getMediaType() == MediaType.AUDIO) {
-            retVal = mediaPlayer.canDownmix();
-        }
-        return retVal;
+        return audioEffects.canDownmix();
     }
 
     @Override
     public void setDownmix(boolean enable) {
-        playerLock.lock();
-        if (media != null && media.getMediaType() == MediaType.AUDIO) {
-            mediaPlayer.setDownmix(enable);
-            Log.d(TAG, "downmix was set to " + enable);
-        }
-        playerLock.unlock();
+        audioEffects.setDownmix(enable);
     }
 
     @Override
     public void setLoudness(boolean enable) {
-        playerLock.lock();
-        if (media != null && media.getMediaType() == MediaType.AUDIO) {
-            mediaPlayer.setLoudness(enable);
-            Log.d(TAG, "loudness was set to " + enable);
-        }
-        playerLock.unlock();
+        audioEffects.setLoudness(enable);
     }
 
     @Override
@@ -791,7 +574,7 @@ public class LocalPSMP extends PlaybackServiceMediaPlayer {
     public void shutdown() {
         if (mediaPlayer != null) {
             try {
-                clearMediaPlayerListeners();
+                playerFactory.clearMediaPlayerListeners(mediaPlayer);
                 if (mediaPlayer.isPlaying()) {
                     mediaPlayer.stop();
                 }
@@ -806,10 +589,8 @@ public class LocalPSMP extends PlaybackServiceMediaPlayer {
         }
         isShutDown = true;
         executor.shutdown();
-        // The delayed "still no audio focus" callback holds this player; drop it so it cannot
-        // fire (and call pause()) after the player has been torn down.
-        audioFocusCanceller.removeCallbacksAndMessages(null);
-        abandonAudioFocus();
+        audioFocus.cancelPendingLossCallback();
+        audioFocus.abandon();
         releaseWifiLockIfNecessary();
     }
 
@@ -905,292 +686,86 @@ public class LocalPSMP extends PlaybackServiceMediaPlayer {
             return;
         }
 
-        if (Prefs.useExoplayer()) {
-            mediaPlayer = new ExoPlayerWrapper(context);
-        } else if (media.getMediaType() == MediaType.VIDEO) {
-            mediaPlayer = new VideoPlayer();
-        }
-
-        mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
-        mediaPlayer.setWakeMode(context, PowerManager.PARTIAL_WAKE_LOCK);
-        setMediaPlayerListeners(mediaPlayer);
+        mediaPlayer = playerFactory.createAndWire(mediaPlayer, media);
     }
-
-    private final AudioManager.OnAudioFocusChangeListener audioFocusChangeListener = new AudioManager.OnAudioFocusChangeListener() {
-
-        @Override
-        public void onAudioFocusChange(final int focusChange) {
-            if (isShutDown) {
-                return;
-            }
-            if (!PlaybackService.isRunning) {
-                abandonAudioFocus();
-                Log.d(TAG, "onAudioFocusChange and PlaybackService is no longer running");
-                return;
-            }
-
-            executor.submit(() -> {
-                playerLock.lock();
-                Log.i(TAG, "there is a call");
-                playerLock.lock();
-                if (focusChange == AudioManager.AUDIOFOCUS_LOSS) {
-                    Log.d(TAG, "Lost audio focus");
-                    pause(true, false);
-                    callback.shouldStop();
-                } else if (focusChange == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK
-                        && !Prefs.shouldPauseForFocusLoss()) {
-                    if (playerStatus == PlayerStatus.PLAYING) {
-                        Log.d(TAG, "Lost audio focus temporarily. Ducking...");
-                        setVolumeSync(0.25f, 0.25f);
-                        pausedBecauseOfTransientAudiofocusLoss = false;
-                    }
-                } else if (focusChange == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT
-                        || focusChange == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK) {
-                    if (playerStatus == PlayerStatus.PLAYING) {
-                        Log.d(TAG, "Lost audio focus temporarily. Pausing...");
-                        mediaPlayer.pause(); // Pause without telling the PlaybackService
-                        pausedBecauseOfTransientAudiofocusLoss = true;
-
-                        audioFocusCanceller.removeCallbacksAndMessages(null);
-                        audioFocusCanceller.postDelayed(() -> {
-                            if (pausedBecauseOfTransientAudiofocusLoss) {
-                                // Still did not get back the audio focus. Now actually pause.
-                                pause(true, false);
-                            }
-                        }, 30000);
-                    }
-                } else if (focusChange == AudioManager.AUDIOFOCUS_GAIN) {
-                    Log.d(TAG, "Gained audio focus");
-                    audioFocusCanceller.removeCallbacksAndMessages(null);
-                    if (pausedBecauseOfTransientAudiofocusLoss) { // we paused => play now
-                        mediaPlayer.start();
-                    } else { // we ducked => raise audio level back
-                        setVolumeSync(1.0f, 1.0f);
-                    }
-                    pausedBecauseOfTransientAudiofocusLoss = false;
-                }
-                playerLock.unlock();
-            });
-        }
-    };
-
 
     @Override
     protected Future<?> endPlayback(final boolean hasEnded, final boolean wasSkipped,
                                     final boolean shouldContinue, final boolean toStoppedState) {
-        useCallerThread = Prefs.useExoplayer();
-        return executor.submit(() -> {
-            playerLock.lock();
-            releaseWifiLockIfNecessary();
-
-            boolean isPlaying = playerStatus == PlayerStatus.PLAYING;
-
-            // we're relying on the position stored in the Playable object for post-playback processing
-            if (media != null) {
-                int position = getPosition();
-                if (position >= 0) {
-                    media.setPosition(position);
-                }
-            }
-
-            if (mediaPlayer != null) {
-                mediaPlayer.reset();
-            }
-
-            abandonAudioFocus();
-
-            final Playable currentMedia = media;
-            Playable nextMedia = null;
-
-            if (shouldContinue) {
-                // Load next episode if previous episode was in the queue and if there
-                // is an episode in the queue left.
-                // Start playback immediately if continuous playback is enabled
-                nextMedia = callback.getNextInQueue(currentMedia);
-                boolean playNextEpisode = isPlaying && nextMedia != null;
-                if (playNextEpisode) {
-                    Log.d(TAG, "next episode will start later");
-                } else if (nextMedia == null) {
-                    Log.d(TAG, "no more episodes available to play");
-                } else {
-                    Log.d(TAG, "load next episode, but not playing automatically.");
-                }
-
-                if (nextMedia != null) {
-                    callback.onPlaybackEnded(nextMedia.getMediaType(), !playNextEpisode);
-                    // setting media to null signals to playMediaObject() that we're taking care of post-playback processing
-                    media = null;
-                    playMediaObject(nextMedia, false, !nextMedia.localFileAvailable(), playNextEpisode, playNextEpisode);
-                }
-            }
-            if (shouldContinue || toStoppedState) {
-                if (nextMedia == null) {
-                    callback.onPlaybackEnded(null, true);
-                    stop();
-                }
-                final boolean hasNext = nextMedia != null;
-
-                executor.submit(() -> callback.onPostPlayback(currentMedia, hasEnded, wasSkipped, hasNext));
-            } else if (isPlaying) {
-                callback.onPlaybackPause(currentMedia, currentMedia.getPosition());
-            }
-            playerLock.unlock();
-        });
-    }
-
-    /**
-     * Moves the LocalPSMP into STOPPED state. This call is only valid if the player is currently in
-     * INDETERMINATE state, for example after a call to endPlayback.
-     * This method will only take care of changing the PlayerStatus of this object! Other tasks like
-     * abandoning audio focus have to be done with other methods.
-     */
-    private void stop() {
-        executor.submit(() -> {
-            playerLock.lock();
-            releaseWifiLockIfNecessary();
-
-            if (playerStatus == PlayerStatus.INDETERMINATE) {
-                setPlayerStatus(PlayerStatus.STOPPED, null);
-            } else {
-                Log.d(TAG, "Ignored call to stop: Current player state is: " + playerStatus);
-            }
-            playerLock.unlock();
-
-        });
+        useCallerThread.set(Prefs.useExoplayer());
+        return playbackEnder.endPlayback(hasEnded, wasSkipped, shouldContinue, toStoppedState);
     }
 
     @Override
-    protected boolean shouldLockWifi(){
+    protected boolean shouldLockWifi() {
         return stream;
-    }
-
-    private void setMediaPlayerListeners(IPlayer mp) {
-        if (mp == null || media == null) {
-            return;
-        }
-        if (mp instanceof VideoPlayer) {
-            if (media.getMediaType() != MediaType.VIDEO) {
-                Log.w(TAG, "video player, but media type is " + media.getMediaType());
-            }
-            VideoPlayer vp = (VideoPlayer) mp;
-            vp.setOnCompletionListener(videoCompletionListener);
-            vp.setOnSeekCompleteListener(videoSeekCompleteListener);
-            vp.setOnErrorListener(videoErrorListener);
-            vp.setOnBufferingUpdateListener(videoBufferingUpdateListener);
-            vp.setOnInfoListener(videoInfoListener);
-        } else if (mp instanceof ExoPlayerWrapper) {
-            ExoPlayerWrapper ap = (ExoPlayerWrapper) mp;
-            ap.setOnCompletionListener(audioCompletionListener);
-            ap.setOnSeekCompleteListener(audioSeekCompleteListener);
-            ap.setOnBufferingUpdateListener(audioBufferingUpdateListener);
-            ap.setOnErrorListener(message -> EventBus.getDefault().postSticky(new PlayerErrorEvent(message)));
-            ap.setOnInfoListener(audioInfoListener);
-        } else {
-            Log.w(TAG, "Unknown media player: " + mp);
-        }
-    }
-
-    private void clearMediaPlayerListeners() {
-        if (mediaPlayer instanceof VideoPlayer) {
-            VideoPlayer vp = (VideoPlayer) mediaPlayer;
-            vp.setOnCompletionListener(x -> { });
-            vp.setOnSeekCompleteListener(x -> { });
-            vp.setOnErrorListener((mediaPlayer, i, i1) -> false);
-            vp.setOnBufferingUpdateListener((mediaPlayer, i) -> { });
-            vp.setOnInfoListener((mediaPlayer, i, i1) -> false);
-        } else if (mediaPlayer instanceof ExoPlayerWrapper) {
-            ExoPlayerWrapper ap = (ExoPlayerWrapper) mediaPlayer;
-            ap.setOnCompletionListener(x -> { });
-            ap.setOnSeekCompleteListener(x -> { });
-            ap.setOnBufferingUpdateListener((arg0, percent) -> { });
-            ap.setOnErrorListener(x -> { });
-            ap.setOnInfoListener((arg0, what, extra) -> false);
-        }
-    }
-
-    private final MediaPlayer.OnCompletionListener audioCompletionListener =
-            mp -> genericOnCompletion();
-
-    private final android.media.MediaPlayer.OnCompletionListener videoCompletionListener =
-            mp -> genericOnCompletion();
-
-    private void genericOnCompletion() {
-        endPlayback(true, false, true, true);
-    }
-
-    private final MediaPlayer.OnBufferingUpdateListener audioBufferingUpdateListener =
-            (mp, percent) -> EventBus.getDefault().post(BufferUpdateEvent.progressUpdate(0.01f * percent));
-
-    private final android.media.MediaPlayer.OnBufferingUpdateListener videoBufferingUpdateListener =
-            (mp, percent) -> EventBus.getDefault().post(BufferUpdateEvent.progressUpdate(0.01f * percent));
-
-    private final MediaPlayer.OnInfoListener audioInfoListener =
-            (mp, what, extra) -> genericInfoListener(what);
-
-    private final android.media.MediaPlayer.OnInfoListener videoInfoListener =
-            (mp, what, extra) -> genericInfoListener(what);
-
-    private boolean genericInfoListener(int what) {
-        switch (what) {
-            case android.media.MediaPlayer.MEDIA_INFO_BUFFERING_START:
-                EventBus.getDefault().post(BufferUpdateEvent.started());
-                return true;
-            case android.media.MediaPlayer.MEDIA_INFO_BUFFERING_END:
-                EventBus.getDefault().post(BufferUpdateEvent.ended());
-                return true;
-            default:
-                return true;
-        }
-    }
-
-    private final MediaPlayer.OnErrorListener audioErrorListener =
-            (mp, what, extra) -> {
-                if(mp != null && mp.canFallback()) {
-                    mp.fallback();
-                    return true;
-                } else {
-                    return genericOnError(mp, what, extra);
-                }
-            };
-
-    private final android.media.MediaPlayer.OnErrorListener videoErrorListener = this::genericOnError;
-
-    private boolean genericOnError(Object inObj, int what, int extra) {
-        EventBus.getDefault().postSticky(new PlayerErrorEvent(MediaPlayerError.getErrorString(context, what)));
-        return true;
-    }
-
-    private final MediaPlayer.OnSeekCompleteListener audioSeekCompleteListener =
-            mp -> genericSeekCompleteListener();
-
-    private final android.media.MediaPlayer.OnSeekCompleteListener videoSeekCompleteListener =
-            mp -> genericSeekCompleteListener();
-
-    private void genericSeekCompleteListener() {
-        if (seekLatch != null) {
-            seekLatch.countDown();
-        }
-
-        Runnable r = () -> {
-            playerLock.lock();
-            if (playerStatus == PlayerStatus.PLAYING) {
-                callback.onPlaybackStart(media, getPosition());
-            }
-            if (playerStatus == PlayerStatus.SEEKING) {
-                setPlayerStatus(statusBeforeSeeking, media, getPosition());
-            }
-            playerLock.unlock();
-        };
-
-        if (useCallerThread) {
-            r.run();
-        } else {
-            executor.submit(r);
-        }
     }
 
     @Override
     public boolean isCasting() {
         return false;
+    }
+
+    // --- Bridges for the collaborators of this package, which cannot see the protected members
+    // --- of PlaybackServiceMediaPlayer or this class' private state.
+
+    /**
+     * The current player status, read without acquiring the monitor that
+     * {@link #getPlayerStatus()} takes.
+     */
+    PlayerStatus status() {
+        return playerStatus;
+    }
+
+    void updateStatus(PlayerStatus newStatus, Playable newMedia, int position) {
+        setPlayerStatus(newStatus, newMedia, position);
+    }
+
+    void updateStatus(PlayerStatus newStatus, Playable newMedia) {
+        setPlayerStatus(newStatus, newMedia);
+    }
+
+    void releaseWifiLock() {
+        releaseWifiLockIfNecessary();
+    }
+
+    void abandonAudioFocus() {
+        audioFocus.abandon();
+    }
+
+    /**
+     * Runs the internal implementation of {@code playMediaObject} on the caller's thread; requires
+     * the player lock, exactly like the private method it calls.
+     */
+    void playMediaObjectSync(@NonNull final Playable playable, final boolean forceReset,
+                             final boolean stream, final boolean startWhenPrepared,
+                             final boolean prepareImmediately) {
+        playMediaObject(playable, forceReset, stream, startWhenPrepared, prepareImmediately);
+    }
+
+    PSMPCallback playerCallback() {
+        return callback;
+    }
+
+    Context playerContext() {
+        return context;
+    }
+
+    void notifyShouldStop() {
+        callback.shouldStop();
+    }
+
+    /**
+     * Called by the player listeners when the current media played to its end.
+     */
+    void onPlaybackCompletedByPlayer() {
+        endPlayback(true, false, true, true);
+    }
+
+    /**
+     * Called by the player listeners once a seek has finished.
+     */
+    void onSeekComplete() {
+        seeker.onSeekComplete();
     }
 }
