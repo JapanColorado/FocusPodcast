@@ -1,14 +1,16 @@
 # FocusPodcast
-FocusPodcast helps you manage and play podcasts and virtual podcasts/audio books. This application is fully functional, allowing you to manage podcasts, audio books, YouTube and RSS news feeds with one application, and supports a high degree of customization to meet your different playback needs. Come and download it now!
 
-[<img src="https://play.google.com/intl/en_us/badges/images/generic/en_badge_web_generic.png"
-alt="Get it on Google Play"
-height="70">](https://play.google.com/store/apps/details?id=allen.town.focus.podcast)
-[<img src="https://fdroid.gitlab.io/artwork/badge/get-it-on.png"
-alt="Get it on F-Droid"
-height="70">](https://f-droid.org/app/allen.town.focus.podcast)
+FocusPodcast helps you manage and play podcasts and virtual podcasts/audio books. It lets you manage podcasts, audio books, YouTube and RSS news feeds in one application, and supports a high degree of customization to meet your different playback needs.
 
-<img src="https://raw.githubusercontent.com/allentown521/FocusPodcast/main/fastlane/metadata/android/en-US/images/phoneScreenshots/1.png" alt="Screenshot 0" height="200"> <img src="https://raw.githubusercontent.com/allentown521/FocusPodcast/main/fastlane/metadata/android/en-US/images/phoneScreenshots/2.png" alt="Screenshot 1" height="200"> <img src="https://raw.githubusercontent.com/allentown521/FocusPodcast/main/fastlane/metadata/android/en-US/images/phoneScreenshots/3.png" alt="Screenshot 2" height="200"> <img src="https://raw.githubusercontent.com/allentown521/FocusPodcast/main/fastlane/metadata/android/en-US/images/phoneScreenshots/4.png" alt="Screenshot 3" height="200"> <img src="https://raw.githubusercontent.com/allentown521/FocusPodcast/main/fastlane/metadata/android/en-US/images/phoneScreenshots/5.png" alt="Screenshot 4" height="200"><img src="https://raw.githubusercontent.com/allentown521/FocusPodcast/main/fastlane/metadata/android/en-US/images/phoneScreenshots/6.png" alt="Screenshot 4" height="200"><img src="https://raw.githubusercontent.com/allentown521/FocusPodcast/main/fastlane/metadata/android/en-US/images/phoneScreenshots/7.png" alt="Screenshot 4" height="200"><img src="https://raw.githubusercontent.com/allentown521/FocusPodcast/main/fastlane/metadata/android/en-US/images/phoneScreenshots/8.png" alt="Screenshot 4" height="200"><img src="https://raw.githubusercontent.com/allentown521/FocusPodcast/main/fastlane/metadata/android/en-US/images/phoneScreenshots/9.png" alt="Screenshot 4" height="200">
+This repository is an independent, F-Droid-style fork of [allentown521/FocusPodcast](https://github.com/allentown521/FocusPodcast) (itself derived from [AntennaPod](https://github.com/AntennaPod/AntennaPod)). Compared with upstream it:
+
+- ships a single build with **no ads, analytics, crash reporting, in-app purchases or cloud services** of any kind;
+- vendors its former submodules in-tree and keeps the whole codebase under `allen.town.podcast.*`;
+- has an English-only source tree (translations for Chinese and Japanese are kept);
+- enforces a set of quality gates in CI-style checks: zero Kotlin `!!`, zero `printStackTrace`, no empty catch blocks, every Rx chain with an error handler, detekt with no baseline, and a JVM unit-test suite;
+- is not published on Google Play. Upstream's F-Droid listing is not this fork; build it yourself or install a release APK from this repository.
+
+<img src="fastlane/metadata/android/en-US/images/phoneScreenshots/1.png" alt="Screenshot 1" height="200"> <img src="fastlane/metadata/android/en-US/images/phoneScreenshots/2.png" alt="Screenshot 2" height="200"> <img src="fastlane/metadata/android/en-US/images/phoneScreenshots/3.png" alt="Screenshot 3" height="200"> <img src="fastlane/metadata/android/en-US/images/phoneScreenshots/4.png" alt="Screenshot 4" height="200"> <img src="fastlane/metadata/android/en-US/images/phoneScreenshots/5.png" alt="Screenshot 5" height="200"> <img src="fastlane/metadata/android/en-US/images/phoneScreenshots/6.png" alt="Screenshot 6" height="200"> <img src="fastlane/metadata/android/en-US/images/phoneScreenshots/7.png" alt="Screenshot 7" height="200"> <img src="fastlane/metadata/android/en-US/images/phoneScreenshots/8.png" alt="Screenshot 8" height="200"> <img src="fastlane/metadata/android/en-US/images/phoneScreenshots/9.png" alt="Screenshot 9" height="200">
 
 The podcast app for your phone, tablet, car, watch or chromecast
 
@@ -72,7 +74,7 @@ other
 
 
 ## Feedback
-Bug reports and feature requests can be submitted [here](https://github.com/allentown521/FocusPodcast/issues) (please read the [instructions](https://github.com/allentown521/FocusPodcast/blob/main/CONTRIBUTING.md) on how to report a bug and how to submit a feature request first!).
+Bug reports and feature requests for this fork go in this repository's [issue tracker](../../issues). Please read [CONTRIBUTING.md](CONTRIBUTING.md) first for how to report a bug or request a feature. Issues with upstream FocusPodcast belong in the [upstream tracker](https://github.com/allentown521/FocusPodcast/issues).
 
 ## License
 
@@ -80,27 +82,21 @@ FocusPodcast is licensed under the GNU General Public License (GPL-3.0). You can
 
 ## Building FocusPodcast
 
-The build is driven by [pixi](https://pixi.sh), which provides JDK 17. You need an Android SDK with platform 35 and build-tools 34.0.0 (default location `~/Android/Sdk`, override with `ANDROID_HOME`).
+The build is driven by [pixi](https://pixi.sh), which provides JDK 17. You need an Android SDK with platform 35 and build-tools 34.0.0 (default location `~/Android/Sdk`, override with `ANDROID_HOME`). There are no git submodules and no build flavors.
 
 ```bash
 pixi install          # one-time: fetches the JDK
-pixi run build        # debug APK
-pixi run test         # JVM unit tests
-pixi run check        # build + test + lint
-pixi run install      # install on a connected device
+pixi run build        # debug APK (no secrets needed)
+pixi run test         # JVM unit tests (JUnit4 + Robolectric)
+pixi run lint         # Android lint
+pixi run detekt       # detekt static analysis
+pixi run nn           # Kotlin !! ratchet (must stay at 0)
+pixi run check        # build + test + lint + nn + detekt
+pixi run install      # install the debug APK on a connected device
+pixi run release      # signed, minified release APK
 ```
 
-Release builds additionally need a `secrets.properties` (copy `secrets.properties.sample`) with your signing keystore. See [CONTRIBUTING.md](CONTRIBUTING.md) for details.
+Release builds additionally need a `secrets.properties` (copy `secrets.properties.sample`) with your signing keystore. See [CONTRIBUTING.md](CONTRIBUTING.md) for details, and `docs/REFACTOR_BASELINE.md` for the metrics the fork's quality gates are built around.
 
-## Donate
-If you like this app, please consider sponsoring me  
-Ko-fi: [![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/focusapps)  
-Liberapay: [<img src="https://liberapay.com/assets/widgets/donate.svg"
-alt="Donate using Liberapay"
-height="70">](https://liberapay.com/FocusApps/donate)
-
-
-## About us
-[Author - allen town](https://bento.me/allentown)
-[FocusApps](https://focus.hk.cn?utm_source=github)
-[AIChatOne](https://aichatone.com?utm_source=github)
+## Credits
+The original FocusPodcast is written by [allen town](https://bento.me/allentown) ([FocusApps](https://focus.hk.cn)); if you like the app, consider sponsoring the upstream author on [Ko-fi](https://ko-fi.com/focusapps) or [Liberapay](https://liberapay.com/FocusApps/donate). FocusPodcast is in turn built on [AntennaPod](https://github.com/AntennaPod/AntennaPod).

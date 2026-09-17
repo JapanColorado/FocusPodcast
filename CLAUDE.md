@@ -4,9 +4,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What this is
 
-FocusPodcast is an Android podcast app (app id `allen.town.focus.podcast`, packages `allen.town.podcast.*`). It is a heavily modified fork of AntennaPod: the structure and most core classes match AntennaPod, but several were renamed (`PodDBAdapter` → `Db`, `UserPreferences` → `Prefs`, `de.danoeh.antennapod` → `allen.town.podcast`), so upstream docs do not map 1:1. Mixed Kotlin/Java: `app` is Kotlin-leaning, `core`/`model`/`parser`/`storage` are almost all Java. All comments and configuration are in English; only the `values-zh-rCN`, `values-zh-rTW` and `values-ja` translation resources contain non-Latin text.
+FocusPodcast is an Android podcast app (app id `allen.town.focus.podcast`, packages `allen.town.podcast.*`). This repository is a **hard fork** of [allentown521/FocusPodcast](https://github.com/allentown521/FocusPodcast), which is itself a heavily modified fork of AntennaPod. Upstream mergeability was abandoned in the September 2026 refactor (see `docs/REFACTOR_BASELINE.md` for the before/after numbers), so do not try to keep diffs upstream-friendly. The structure and most core classes still match AntennaPod, but several were renamed (`PodDBAdapter` → `Db`, `UserPreferences` → `Prefs`, `de.danoeh.antennapod` → `allen.town.podcast`), so upstream docs do not map 1:1. Mixed Kotlin/Java: `app` is Kotlin-leaning, `core`/`model`/`parser`/`storage` are almost all Java. All comments and configuration are in English; only the `values-zh-rCN`, `values-zh-rTW` and `values-ja` translation resources contain non-Latin text.
 
-The app is F-Droid-only: there are no build flavors, no Google Play / Firebase / ads / in-app-purchase code, and no pro gating.
+The app is F-Droid-only: there are no build flavors, no Google Play / Firebase / ads / in-app-purchase code, and no pro gating. Monetisation, analytics, crash reporting, LeanCloud, Cast, cloud backup and the GoRouter service locator were all deleted rather than stubbed; do not reintroduce them.
 
 ## Build prerequisites
 
@@ -64,6 +64,18 @@ Dependency direction (top depends on bottom):
 - **ui/common** (shared views), **ui/app-start-intent** (typed Intent builders so lower modules can launch app Activities without depending on `app`), **ui/i18n** and **ui/png-icons** (resources only).
 - **lib/common** (`allen.town.podcast.common.*` — base Activity/Application, dialogs, utils), **lib/theme** (`allen.town.podcast.theme.*`), **lib/searchpreference** (`allen.town.podcast.searchpreference.*`). These were git submodules until Phase 1; they are now ordinary in-tree modules and may be edited freely. Their packages were renamed out of their upstream namespaces into `allen.town.podcast.common.*`, `allen.town.podcast.theme.*` and `allen.town.podcast.searchpreference.*` (the handful of files that still declared a RetroMusic package were folded into the package matching their own directory), so every class in the build now lives under `allen.town.podcast.*` and upstream AppThemeHelper / RetroMusic / SearchPreference sources no longer apply as drop-in patches.
 
+### The big classes are split into collaborators
+
+The seven classes that used to exceed ~1,000 lines were split by pure extraction; every public API stayed on the original class, so callers did not change. When touching one of these, look for the logic in its helpers first:
+
+- `storage/db/Db.java` — `DbSchema` (column constants and CREATE statements), a `Dao` base class with the shared transaction wrapper, and per-table `FeedDao`, `FeedItemDao`, `FeedMediaDao`, `QueueDao`, `FavoritesDao`, `DownloadLogDao`. `Db` delegates to them.
+- `core/service/playback/PlaybackService.java` — `PlaybackServiceMediaSession`, `PlaybackServiceMediaBrowser`, `PlaybackServiceNotificationUpdater`, `PlaybackServiceReceivers`, `PlaybackServicePlayerCallback`, `PlaybackServiceAutoSkipper`.
+- `core/service/playback/LocalPSMP.java` — `LocalPSMPAudioFocus`, `LocalPSMPAudioEffects`, `LocalPSMPPlayerFactory`, `LocalPSMPSeeker`, `LocalPSMPPlaybackEnder`, plus `PlayerLock` and `PlayerExecutor`.
+- `core/pref/Prefs.kt` — `PrefsStore` plus the `PlaybackPrefs`, `DownloadPrefs`, `UiPrefs`, `NetworkPrefs` and `SyncPrefs` objects. `Prefs` remains the single facade for both Java and Kotlin callers; add new preferences to the matching group object and expose them through `Prefs`.
+- `core/service/download/DownloadService.java` — `DownloadQueue`, `DownloadPipeline`, `DownloadCompletionHandler`, `DownloadNotifier`.
+- `app/fragment/FeedItemlistFragment.kt` — header, loader, menu, multi-select and pager helpers under `fragment/feeditemlist/`.
+- `app/activity/MainActivity.kt` — nav drawer, fragment navigator, player sheet, intent handler and hardware-key helpers under `activity/main/`.
+
 ### How the layers talk to each other
 
 - **core → app callbacks via `ClientConfig`.** `MyApp.onCreate` calls `ClientConfig.initialize(context, DownloadServiceCallbacksImpl())`, which also initialises `Db`, `Prefs`, `NetworkUtils` and the sync settings. Receivers and workers that may start in a fresh process call `ClientConfig.ensureInitialized(context)`, which throws if the app never ran. `DownloadServiceCallbacks` (PendingIntents into app Activities) is the only interface core needs from app; if core needs something else only app knows, extend it rather than adding a module dependency.
@@ -92,3 +104,5 @@ Dependency direction (top depends on bottom):
 - **`pixi run lint` passes.** Three modules carry deliberate suppressions: `lib/theme/lint.xml` and `lib/common/lint.xml` downgrade `RestrictedApi` to a warning (vendored theme/preference code reaches into androidx internals that have no public equivalent), and `PlaybackService`/`PlaybackController`/`DownloadService` carry `@SuppressLint("UnspecifiedRegisterReceiverFlag")` on their pre-Android-13 `registerReceiver` branch (androidx.core 1.7.0 has no `ContextCompat.registerReceiver`). Cursor tinting now uses `TextView.setTextCursorDrawable` on API 29+ and only falls back to reflection below that.
 - `CONTRIBUTING.md` asks not to upgrade dependencies or build tools without a concrete reason; several pinned versions (e.g. ExoPlayer 2.15.1) have comments explaining why newer versions break.
 - The only long-lived branch is `main`.
+- `docs/REFACTOR_BASELINE.md` records the metrics the refactor drove to zero (`!!`, `printStackTrace`, empty catches, Rx chains without `onError`, CJK text outside translations, detekt findings). Treat those zeros as invariants when adding code, not as a one-off cleanup.
+- Known follow-ups not yet done: add `@Nullable`/`@NonNull` to the Java model/core getters that the `!!` sweep had to guard on the Kotlin side, and turn on Kotlin warnings-as-errors for `app` (only `core` has it).
