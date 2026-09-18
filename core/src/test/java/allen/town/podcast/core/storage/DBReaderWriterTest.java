@@ -493,6 +493,43 @@ public class DBReaderWriterTest {
         assertTrue(DBReader.getStatistics(false, 0, Long.MAX_VALUE).feedTime.isEmpty());
     }
 
+    @Test
+    public void clearPlaybackHistoryForOneFeedDropsItFromHistoryAndStatistics() throws Exception {
+        Feed keep = subscribedFeed("Keep", "https://k.example/feed.xml");
+        FeedItem keepItem = item(keep, "Keep episode");
+        FeedMedia keepMedia = new FeedMedia(keepItem, "https://k.example/1.mp3", 10L, "audio/mpeg");
+        keepItem.setMedia(keepMedia);
+        keep.setItems(new ArrayList<>(Arrays.asList(keepItem)));
+        Feed clear = subscribedFeed("Clear", "https://c.example/feed.xml");
+        FeedItem clearItem = item(clear, "Clear episode");
+        FeedMedia clearMedia = new FeedMedia(clearItem, "https://c.example/1.mp3", 10L, "audio/mpeg");
+        clearItem.setMedia(clearMedia);
+        clear.setItems(new ArrayList<>(Arrays.asList(clearItem)));
+        await(DBWriter.addNewFeed(context, keep, clear));
+        for (FeedMedia media : Arrays.asList(keepMedia, clearMedia)) {
+            media.setDuration(60_000);
+            media.setPlayedDuration(30_000);
+            media.setLastPlayedTime(System.currentTimeMillis());
+            media.setPosition(1234);
+            await(DBWriter.setFeedMediaPlaybackInformation(media));
+            await(DBWriter.addItemToPlaybackHistory(media));
+        }
+        assertEquals(2, DBReader.getPlaybackHistory(0, 100).size());
+
+        await(DBWriter.clearPlaybackHistory(clear.getId()));
+
+        assertEquals(Arrays.asList("Keep episode"), titles(DBReader.getPlaybackHistory(0, 100)));
+        DBReader.StatisticsResult stats = DBReader.getStatistics(false, 0, Long.MAX_VALUE);
+        assertEquals(1, stats.feedTime.size());
+        assertEquals("Keep", stats.feedTime.get(0).feed.getTitle());
+        FeedMedia afterClear = DBReader.getFeedMedia(clearMedia.getId());
+        assertNotNull(afterClear);
+        assertNull(afterClear.getPlaybackCompletionDate());
+        assertEquals(0, afterClear.getPlayedDuration());
+        assertEquals(0, afterClear.getLastPlayedTime());
+        assertEquals("the playback position is kept", 1234, afterClear.getPosition());
+    }
+
     // --------------------------------------------------------------- helpers
 
     private static void await(Future<?> future) throws InterruptedException, ExecutionException {

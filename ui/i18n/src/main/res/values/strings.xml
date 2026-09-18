@@ -51,6 +51,8 @@
     <string name="statistics_filter_past_year">Past year</string>
     <string name="statistics_reset_label">Delete playback stats</string>
     <string name="statistics_reset_msg">This will delete the listening time of every podcast from the playback stats. Playback positions and history are kept. Are you sure you want to proceed?</string>
+    <string name="statistics_feed_history_label">Delete playback history</string>
+    <string name="statistics_feed_history_msg">This will delete the entire playback history of \"%1$s\": its episodes disappear from the playback history and the playback stats. Playback positions and played marks are kept. Are you sure you want to proceed?</string>
     <string name="statistics_reset_feed_msg">This will delete the listening time of \"%1$s\" from the playback stats. Playback positions and history are kept. Are you sure you want to proceed?</string>
 
     <!-- Download Statistics fragment -->

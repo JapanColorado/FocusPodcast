@@ -267,6 +267,21 @@ public class DBWriter {
     }
 
     /**
+     * Deletes the playback history of one feed: its episodes disappear from the playback
+     * history screen and from the playback statistics. Positions and played flags are kept.
+     */
+    @NonNull
+    public static Future<?> clearPlaybackHistory(long feedId) {
+        return dbExec.submit(() -> {
+            Db adapter = Db.getInstance();
+            adapter.open();
+            adapter.clearPlaybackHistoryForFeed(feedId);
+            adapter.close();
+            EventBus.getDefault().post(PlaybackHistoryEvent.listUpdated());
+        });
+    }
+
+    /**
      * Deletes the entire download log.
      */
     public static Future<?> clearDownloadLog() {

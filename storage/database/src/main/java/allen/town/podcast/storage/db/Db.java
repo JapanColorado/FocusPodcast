@@ -609,6 +609,14 @@ public class Db {
     }
 
     /**
+     * Wipes the playback history (completion dates, played durations, last played times)
+     * of every episode of the given feed.
+     */
+    public void clearPlaybackHistoryForFeed(long feedId) {
+        mediaDao.clearPlaybackHistoryForFeed(feedId);
+    }
+
+    /**
      * Returns a cursor which contains feed media objects with a playback
      * completion date in ascending order.
      *

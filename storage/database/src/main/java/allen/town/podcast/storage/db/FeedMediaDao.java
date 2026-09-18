@@ -169,6 +169,23 @@ class FeedMediaDao extends Dao {
     }
 
     /**
+     * Wipes the playback history of one feed: completion dates, played durations and last
+     * played times of all of its episodes. Playback positions and played flags are kept.
+     */
+    void clearPlaybackHistoryForFeed(long feedId) {
+        inTransaction("clearPlaybackHistoryForFeed", () -> {
+            ContentValues values = new ContentValues();
+            values.put(KEY_PLAYBACK_COMPLETION_DATE, 0);
+            values.put(KEY_PLAYED_DURATION, 0);
+            values.put(KEY_LAST_PLAYED_TIME, 0);
+            db.update(TABLE_NAME_FEED_MEDIA, values,
+                    KEY_FEEDITEM + " IN (SELECT " + KEY_ID + " FROM " + TABLE_NAME_FEED_ITEMS
+                            + " WHERE " + KEY_FEED + " = ?)",
+                    new String[]{String.valueOf(feedId)});
+        });
+    }
+
+    /**
      * Returns a cursor which contains feed media objects with a playback
      * completion date in ascending order.
      *

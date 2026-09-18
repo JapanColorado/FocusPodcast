@@ -1,6 +1,7 @@
 package allen.town.podcast.statistics
 
 import allen.town.podcast.R
+import allen.town.podcast.common.views.AccentMaterialDialog
 import allen.town.podcast.core.dialog.ConfirmationDialog
 import allen.town.podcast.core.storage.DBReader
 import allen.town.podcast.core.storage.DBWriter
@@ -22,6 +23,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import java.util.*
+import java.util.concurrent.Future
 
 /**
  * Displays the 'playback statistics' screen
@@ -45,7 +47,7 @@ abstract class SubscriptionStatisticsBaseFragment : Fragment() {
     ): View? {
         val root = inflater.inflate(R.layout.statistics_fragment, container, false)
         feedStatisticsList = root.findViewById(R.id.statistics_list)
-        listAdapter = PlaybackStatisticsListAdapter(this) { item -> confirmResetFeed(item) }
+        listAdapter = PlaybackStatisticsListAdapter(this) { item -> showFeedActions(item) }
         feedStatisticsList.setLayoutManager(LinearLayoutManager(context))
         feedStatisticsList.setAdapter(listAdapter)
         ThemedFastScroller.create(feedStatisticsList)
@@ -77,18 +79,43 @@ abstract class SubscriptionStatisticsBaseFragment : Fragment() {
         loadStatistics()
     }
 
-    private fun confirmResetFeed(item: StatisticsItem) {
+    /** Long-press on a podcast: choose between dropping its stats or its whole history. */
+    private fun showFeedActions(item: StatisticsItem) {
+        val actions = arrayOf(
+            getString(R.string.statistics_reset_label),
+            getString(R.string.statistics_feed_history_label)
+        )
+        AccentMaterialDialog(requireContext(), R.style.MaterialAlertDialogTheme)
+            .setTitle(item.feed.title)
+            .setItems(actions) { dialog, which ->
+                dialog.dismiss()
+                when (which) {
+                    0 -> confirmFeedAction(item, R.string.statistics_reset_label,
+                        R.string.statistics_reset_feed_msg) { DBWriter.resetStatistics(item.feed.id) }
+                    else -> confirmFeedAction(item, R.string.statistics_feed_history_label,
+                        R.string.statistics_feed_history_msg) { DBWriter.clearPlaybackHistory(item.feed.id) }
+                }
+            }
+            .show()
+    }
+
+    private fun confirmFeedAction(
+        item: StatisticsItem,
+        titleRes: Int,
+        messageRes: Int,
+        write: () -> Future<*>
+    ) {
         val dialog = object : ConfirmationDialog(
             requireContext(),
-            R.string.statistics_reset_label,
-            getString(R.string.statistics_reset_feed_msg, item.feed.title)
+            titleRes,
+            getString(messageRes, item.feed.title)
         ) {
             override fun onConfirmButtonPressed(dialog: DialogInterface) {
                 dialog.dismiss()
-                val write = DBWriter.resetStatistics(item.feed.id)
+                val future = write()
                 val parent = parentFragment as? StatisticsFragment
                 if (parent != null) {
-                    parent.resetAndReload(write)
+                    parent.resetAndReload(future)
                 } else {
                     refreshStatistics()
                 }
