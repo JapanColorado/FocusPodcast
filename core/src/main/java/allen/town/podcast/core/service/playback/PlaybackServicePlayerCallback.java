@@ -95,8 +95,10 @@ class PlaybackServicePlayerCallback implements PlaybackServiceMediaPlayer.PSMPCa
                 service.stateManager.validStartCommandWasReceived();
                 service.stateManager.startForeground(R.id.notification_playing,
                         service.notificationUpdater.build());
-                // set sleep timer if auto-enabled
-                if (newInfo.oldPlayerStatus != null && newInfo.oldPlayerStatus != PlayerStatus.SEEKING
+                // Auto-enable arms the sleep timer only when an episode starts (PREPARED -> PLAYING).
+                // Resuming from pause or returning from a seek must not re-arm it: otherwise a timer
+                // the user just disabled or undid comes back on the next unpause.
+                if (newInfo.oldPlayerStatus == PlayerStatus.PREPARED
                         && SleepTimerPreferences.autoEnable() && !service.sleepTimerActive()) {
                     service.setSleepTimer(SleepTimerPreferences.timerMillis());
                     EventBus.getDefault().post(new MessageEvent(
