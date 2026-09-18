@@ -336,6 +336,7 @@ class FeedItemDao extends Dao {
                 + " ON " + TABLE_NAME_FEED_ITEMS + "." + KEY_FEED + "=" + TABLE_NAME_FEEDS + "." + KEY_ID
                 + " WHERE " + TABLE_NAME_FEED_ITEMS + "." + KEY_READ + "=" + FeedItem.NEW
                     + " AND " + TABLE_NAME_FEEDS + "." + KEY_KEEP_UPDATED + " > 0"
+                    + " AND " + TABLE_NAME_FEEDS + "." + KEY_IS_SUBSCRIBED + "=1"
                 + " ORDER BY " + TABLE_NAME_FEED_ITEMS + "." + KEY_PUBDATE + " DESC"
                 + " LIMIT " + offset + ", " + limit;
         return db.rawQuery(query, null);

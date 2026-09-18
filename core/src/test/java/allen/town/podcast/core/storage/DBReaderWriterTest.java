@@ -257,6 +257,21 @@ public class DBReaderWriterTest {
         assertEquals("Played episode", onlyPlayed.get(0).getTitle());
     }
 
+    @Test
+    public void newItemsListSkipsFeedsThatWereOnlyPreviewed() throws Exception {
+        Feed subscribed = subscribedFeed("Subscribed", "https://s.example/feed.xml");
+        subscribed.setItems(new ArrayList<>(Arrays.asList(item(subscribed, "Wanted episode"))));
+        Feed previewed = feed("Previewed", "https://pv.example/feed.xml");
+        previewed.setItems(new ArrayList<>(Arrays.asList(item(previewed, "Unwanted episode"))));
+        await(DBWriter.addNewFeed(context, subscribed, previewed));
+
+        assertEquals("only subscribed feeds may feed the new list (and auto-download)",
+                Arrays.asList("Wanted episode"), titles(DBReader.getNewItemsList(0, 100)));
+
+        await(DBWriter.subscribeFeed(previewed, context));
+        assertEquals(2, DBReader.getNewItemsList(0, 100).size());
+    }
+
     // ------------------------------------------------------------- the queue
 
     @Test
@@ -437,6 +452,45 @@ public class DBReaderWriterTest {
                 "https://old.example/feed.xml", "https://new.example/feed.xml"));
 
         assertEquals(Arrays.asList("https://new.example/feed.xml"), DBReader.getFeedListDownloadUrls());
+    }
+
+    // --------------------------------------------------------------- statistics
+
+    @Test
+    public void resetStatisticsForOneFeedLeavesTheOthersAlone() throws Exception {
+        Feed keep = subscribedFeed("Keep", "https://k.example/feed.xml");
+        FeedItem keepItem = item(keep, "Keep episode");
+        FeedMedia keepMedia = new FeedMedia(keepItem, "https://k.example/1.mp3", 10L, "audio/mpeg");
+        keepItem.setMedia(keepMedia);
+        keep.setItems(new ArrayList<>(Arrays.asList(keepItem)));
+        Feed reset = subscribedFeed("Reset", "https://r.example/feed.xml");
+        FeedItem resetItem = item(reset, "Reset episode");
+        FeedMedia resetMedia = new FeedMedia(resetItem, "https://r.example/1.mp3", 10L, "audio/mpeg");
+        resetItem.setMedia(resetMedia);
+        reset.setItems(new ArrayList<>(Arrays.asList(resetItem)));
+        await(DBWriter.addNewFeed(context, keep, reset));
+        for (FeedMedia media : Arrays.asList(keepMedia, resetMedia)) {
+            media.setDuration(60_000);
+            media.setPlayedDuration(30_000);
+            media.setLastPlayedTime(System.currentTimeMillis());
+            media.setPosition(1234);
+            await(DBWriter.setFeedMediaPlaybackInformation(media));
+        }
+        assertEquals(2, DBReader.getStatistics(false, 0, Long.MAX_VALUE).feedTime.size());
+
+        await(DBWriter.resetStatistics(reset.getId()));
+
+        DBReader.StatisticsResult stats = DBReader.getStatistics(false, 0, Long.MAX_VALUE);
+        assertEquals(1, stats.feedTime.size());
+        assertEquals("Keep", stats.feedTime.get(0).feed.getTitle());
+        assertEquals(30, stats.feedTime.get(0).timePlayed);
+        FeedMedia afterReset = DBReader.getFeedMedia(resetMedia.getId());
+        assertNotNull(afterReset);
+        assertEquals(0, afterReset.getPlayedDuration());
+        assertEquals("the playback position is not part of the statistics", 1234, afterReset.getPosition());
+
+        await(DBWriter.resetStatistics());
+        assertTrue(DBReader.getStatistics(false, 0, Long.MAX_VALUE).feedTime.isEmpty());
     }
 
     // --------------------------------------------------------------- helpers

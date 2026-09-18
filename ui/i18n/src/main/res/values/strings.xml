@@ -49,6 +49,9 @@
     <string name="statistics_filter_all_time">All time</string>
     <string name="statistics_filter_past_month">Past month</string>
     <string name="statistics_filter_past_year">Past year</string>
+    <string name="statistics_reset_label">Delete playback stats</string>
+    <string name="statistics_reset_msg">This will delete the listening time of every podcast from the playback stats. Playback positions and history are kept. Are you sure you want to proceed?</string>
+    <string name="statistics_reset_feed_msg">This will delete the listening time of \"%1$s\" from the playback stats. Playback positions and history are kept. Are you sure you want to proceed?</string>
 
     <!-- Download Statistics fragment -->
     <string name="total_size_downloaded_podcasts">Total size of episodes on the device</string>

@@ -2,8 +2,12 @@ package allen.town.podcast.statistics
 
 import allen.town.podcast.core.view.TopAppBarLayout
 import allen.town.podcast.R
+import allen.town.podcast.core.dialog.ConfirmationDialog
+import allen.town.podcast.core.storage.DBWriter
 import allen.town.podcast.ui.common.PagedToolbarFragment
+import android.content.DialogInterface
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
@@ -14,6 +18,11 @@ import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import com.google.android.material.tabs.TabLayoutMediator.TabConfigurationStrategy
+import io.reactivex.Completable
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.Disposable
+import io.reactivex.schedulers.Schedulers
+import java.util.concurrent.Future
 
 /**
  * Displays the 'statistics' screen
@@ -24,6 +33,7 @@ class StatisticsFragment : PagedToolbarFragment() {
     }
 
     private lateinit var tabLayout: TabLayout
+    private var resetDisposable: Disposable? = null
     private var viewPager: ViewPager2? = null
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -36,6 +46,7 @@ class StatisticsFragment : PagedToolbarFragment() {
         toolbar = rootView.findViewById<TopAppBarLayout>(R.id.appBarLayout).toolbar
         toolbar.setTitle(getString(R.string.statistics_label))
         toolbar.setNavigationOnClickListener(View.OnClickListener { v: View? -> parentFragmentManager.popBackStack() })
+        toolbar.inflateMenu(R.menu.statistics)
         viewPager.setAdapter(StatisticsPagerAdapter(this))
         // Give the TabLayout the ViewPager
         tabLayout = rootView.findViewById(R.id.sliding_tabs)
@@ -55,7 +66,47 @@ class StatisticsFragment : PagedToolbarFragment() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        if (item.itemId == R.id.statistics_reset_item) {
+            confirmResetAll()
+            return true
+        }
         return super.onOptionsItemSelected(item)
+    }
+
+    private fun confirmResetAll() {
+        val dialog = object : ConfirmationDialog(
+            requireContext(),
+            R.string.statistics_reset_label,
+            R.string.statistics_reset_msg
+        ) {
+            override fun onConfirmButtonPressed(dialog: DialogInterface) {
+                dialog.dismiss()
+                resetAndReload(DBWriter.resetStatistics())
+            }
+        }
+        dialog.setPositiveText(R.string.delete_label)
+        dialog.createNewDialog().show()
+    }
+
+    /** Waits for a statistics write to finish, then reloads every tab. */
+    fun resetAndReload(write: Future<*>) {
+        resetDisposable?.dispose()
+        resetDisposable = Completable.fromAction { write.get() }
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe({ reloadChildren() }) { error -> Log.e(TAG, Log.getStackTraceString(error)) }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        resetDisposable?.dispose()
+    }
+
+    /** Reloads every statistics tab after the stored durations changed. */
+    private fun reloadChildren() {
+        for (child in childFragmentManager.fragments) {
+            (child as? SubscriptionStatisticsBaseFragment)?.refreshStatistics()
+        }
     }
 
     class StatisticsPagerAdapter internal constructor(fragment: Fragment) :

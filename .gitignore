@@ -49,3 +49,6 @@ libs
 
 # pixi
 .pixi/
+
+# Claude Code worktrees
+.claude/worktrees/

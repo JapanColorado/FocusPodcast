@@ -1142,4 +1142,18 @@ public class DBWriter {
             adapter.close();
         });
     }
+
+    /**
+     * Resets the playback durations of every episode of one feed, so that the feed
+     * disappears from the playback statistics.
+     */
+    @NonNull
+    public static Future<?> resetStatistics(long feedId) {
+        return dbExec.submit(() -> {
+            Db adapter = Db.getInstance();
+            adapter.open();
+            adapter.resetMediaPlayedDurationForFeed(feedId);
+            adapter.close();
+        });
+    }
 }

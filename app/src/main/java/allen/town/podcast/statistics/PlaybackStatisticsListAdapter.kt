@@ -11,9 +11,10 @@ import androidx.fragment.app.Fragment
 /**
  * Adapter for the playback statistics list.
  */
-class PlaybackStatisticsListAdapter(private val fragment: Fragment) : StatisticsListAdapter(
-    fragment.requireContext()
-) {
+class PlaybackStatisticsListAdapter(
+    private val fragment: Fragment,
+    private val onLongClick: (StatisticsItem) -> Unit
+) : StatisticsListAdapter(fragment.requireContext()) {
     private var headStrRes = 0
     fun setTimeFilter(headStrRes: Int) {
         this.headStrRes = headStrRes
@@ -41,6 +42,10 @@ class PlaybackStatisticsListAdapter(private val fragment: Fragment) : Statistics
             val intent = getIntentToOpenFeedWithId(holder.itemView.context, statsItem.feed.id)
             intent.putExtra(MainActivity.EXTRA_STARTED_FROM_SEARCH, true)
             fragment.requireActivity().startActivity(intent)
+        }
+        holder.itemView.setOnLongClickListener {
+            onLongClick(statsItem)
+            true
         }
     }
 }

@@ -64,12 +64,14 @@ public class AutomaticDownloadAlgorithm {
                     }
                 }
 
-                // filter items that are not auto downloadable
+                // filter items that are not auto downloadable; episodes of feeds that were
+                // only previewed (never subscribed) are never auto-downloaded, even if they
+                // ended up in the queue
                 Iterator<FeedItem> it = candidates.iterator();
                 while (it.hasNext()) {
                     FeedItem item = it.next();
                     if (!item.isAutoDownloadable(System.currentTimeMillis()) || FeedItemUtil.isPlaying(item.getMedia())
-                            || item.getFeed().isLocalFeed()) {
+                            || item.getFeed().isLocalFeed() || !item.getFeed().isSubscribed()) {
                         it.remove();
                     }
                 }

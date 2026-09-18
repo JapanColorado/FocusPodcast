@@ -597,6 +597,13 @@ public class Db {
         mediaDao.resetAllMediaPlayedDuration();
     }
 
+    /**
+     * Resets the playback duration of every episode of the given feed to 0.
+     */
+    public void resetMediaPlayedDurationForFeed(long feedId) {
+        mediaDao.resetMediaPlayedDurationForFeed(feedId);
+    }
+
     public void clearPlaybackHistory() {
         mediaDao.clearPlaybackHistory();
     }

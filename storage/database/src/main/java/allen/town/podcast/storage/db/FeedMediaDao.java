@@ -4,6 +4,7 @@ import static allen.town.podcast.storage.db.DbSchema.KEYS_FEED_MEDIA;
 import static allen.town.podcast.storage.db.DbSchema.KEY_DOWNLOADED;
 import static allen.town.podcast.storage.db.DbSchema.KEY_DOWNLOAD_URL;
 import static allen.town.podcast.storage.db.DbSchema.KEY_DURATION;
+import static allen.town.podcast.storage.db.DbSchema.KEY_FEED;
 import static allen.town.podcast.storage.db.DbSchema.KEY_FEEDITEM;
 import static allen.town.podcast.storage.db.DbSchema.KEY_FILE_URL;
 import static allen.town.podcast.storage.db.DbSchema.KEY_HAS_EMBEDDED_PICTURE;
@@ -14,6 +15,7 @@ import static allen.town.podcast.storage.db.DbSchema.KEY_PLAYBACK_COMPLETION_DAT
 import static allen.town.podcast.storage.db.DbSchema.KEY_PLAYED_DURATION;
 import static allen.town.podcast.storage.db.DbSchema.KEY_POSITION;
 import static allen.town.podcast.storage.db.DbSchema.KEY_SIZE;
+import static allen.town.podcast.storage.db.DbSchema.TABLE_NAME_FEED_ITEMS;
 import static allen.town.podcast.storage.db.DbSchema.TABLE_NAME_FEED_MEDIA;
 
 import android.content.ContentValues;
@@ -142,6 +144,21 @@ class FeedMediaDao extends Dao {
             ContentValues values = new ContentValues();
             values.put(KEY_PLAYED_DURATION, 0);
             db.update(TABLE_NAME_FEED_MEDIA, values, null, new String[0]);
+        });
+    }
+
+    /**
+     * Resets the playback duration of every episode of one feed to 0, removing that feed
+     * from the playback statistics without touching its playback history or positions.
+     */
+    void resetMediaPlayedDurationForFeed(long feedId) {
+        inTransaction("resetMediaPlayedDurationForFeed", () -> {
+            ContentValues values = new ContentValues();
+            values.put(KEY_PLAYED_DURATION, 0);
+            db.update(TABLE_NAME_FEED_MEDIA, values,
+                    KEY_FEEDITEM + " IN (SELECT " + KEY_ID + " FROM " + TABLE_NAME_FEED_ITEMS
+                            + " WHERE " + KEY_FEED + " = ?)",
+                    new String[]{String.valueOf(feedId)});
         });
     }
 

@@ -342,7 +342,8 @@ public final class DBReader {
 
     /**
      * Loads a list of FeedItems that are considered new.
-     * Excludes items from feeds that do not have keep updated enabled.
+     * Excludes items from feeds that do not have keep updated enabled and items from
+     * feeds the user is not subscribed to (feeds that were only previewed).
      *
      * @param offset The first episode that should be loaded.
      * @param limit  The maximum number of episodes that should be loaded.
