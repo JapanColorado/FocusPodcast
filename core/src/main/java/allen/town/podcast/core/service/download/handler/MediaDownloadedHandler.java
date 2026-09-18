@@ -13,6 +13,8 @@ import java.io.IOException;
 import java.util.concurrent.ExecutionException;
 
 import allen.town.podcast.common.util.Timber;
+import allen.town.podcast.core.adskip.AdAnalysisWorker;
+import allen.town.podcast.core.pref.Prefs;
 import allen.town.podcast.event.UnreadItemsUpdateEvent;
 import allen.town.podcast.core.service.download.DownloadRequest;
 import allen.town.podcast.model.download.DownloadStatus;
@@ -116,6 +118,11 @@ public class MediaDownloadedHandler implements Runnable {
             Log.e(TAG, "ExecutionException in MediaHandlerThread: " + e.getMessage());
             updatedStatus = new DownloadStatus(media, media.getEpisodeTitle(),
                     DownloadError.ERROR_DB_ACCESS_ERROR, false, e.getMessage(), request.isInitiatedByUser());
+        }
+
+        if (item != null && Prefs.isAdSkipAnalyzeOnDownload()) {
+            // Best effort: enqueue is a no-op when ad skipping is off for the app or this feed.
+            AdAnalysisWorker.enqueue(context, media.getId(), false);
         }
 
         if (item != null) {

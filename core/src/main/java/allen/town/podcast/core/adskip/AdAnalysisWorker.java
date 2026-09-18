@@ -1,0 +1,230 @@
+package allen.town.podcast.core.adskip;
+
+import android.content.Context;
+import android.util.Log;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.work.Constraints;
+import androidx.work.Data;
+import androidx.work.ExistingWorkPolicy;
+import androidx.work.OneTimeWorkRequest;
+import androidx.work.WorkManager;
+import androidx.work.Worker;
+import androidx.work.WorkerParameters;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.ExecutionException;
+
+import allen.town.podcast.core.ClientConfig;
+import allen.town.podcast.core.pref.Prefs;
+import allen.town.podcast.core.storage.DBReader;
+import allen.town.podcast.core.storage.DBWriter;
+import allen.town.podcast.model.feed.AdSegment;
+import allen.town.podcast.model.feed.Chapter;
+import allen.town.podcast.model.feed.Feed;
+import allen.town.podcast.model.feed.FeedItem;
+import allen.town.podcast.model.feed.FeedMedia;
+
+/**
+ * Runs {@link AdAnalyzer} over one downloaded episode in the background and stores the result.
+ *
+ * <p>This class owns the <em>scheduling</em> side of ad detection: when analysis is worth running
+ * ({@link #enqueue}), how it is identified to WorkManager (one unique work name per media id) and
+ * how its output is split by {@link AdSegment.Source} into the two rows the storage layer keeps
+ * separate. It owns none of the detection itself; everything audio-related lives in
+ * {@link AdAnalyzer} and its collaborators.
+ *
+ * <p>Detected segments are stored with whatever confidence the detector reported, deliberately
+ * unfiltered: the user's sensitivity setting is applied at playback time, so lowering it does not
+ * require a re-analysis. Analysis is best effort — a file that cannot be decoded, or a run that
+ * WorkManager stops, fails without a retry and is picked up by the next download or by a manual
+ * request from the UI.
+ */
+public class AdAnalysisWorker extends Worker {
+
+    private static final String TAG = "AdAnalysisWorker";
+
+    /** Input data key: the id of the {@link FeedMedia} to analyse. */
+    public static final String PARAM_MEDIA_ID = "mediaId";
+
+    /** Tag on every request, so the UI can observe or cancel all analysis work at once. */
+    public static final String WORK_TAG = "ad-analysis";
+
+    private static final String WORK_NAME_PREFIX = "ad-analysis-";
+
+    public AdAnalysisWorker(@NonNull Context context, @NonNull WorkerParameters params) {
+        super(context, params);
+    }
+
+    @Override
+    @NonNull
+    public Result doWork() {
+        ClientConfig.ensureInitialized(getApplicationContext());
+
+        long mediaId = getInputData().getLong(PARAM_MEDIA_ID, 0);
+        FeedMedia media = DBReader.getFeedMedia(mediaId);
+        if (media == null) {
+            Log.e(TAG, "No media with id " + mediaId + ", nothing to analyse");
+            return Result.failure();
+        }
+        FeedItem item = media.getItem();
+        if (item == null) {
+            Log.e(TAG, "Media " + mediaId + " has no episode, nothing to analyse");
+            return Result.failure();
+        }
+        String filePath = media.getFile_url();
+        if (!media.isDownloaded() || filePath == null || !new File(filePath).exists()) {
+            Log.d(TAG, "Media " + mediaId + " is not downloaded, nothing to analyse");
+            return Result.failure();
+        }
+
+        // Publish whatever the chapters already say before spending minutes on the audio, so that
+        // an episode played right after its download can skip labelled breaks immediately.
+        List<Chapter> chapters = loadChapters(item);
+        storeChapterSegments(item, chapters);
+
+        List<AdSegment> segments;
+        try {
+            segments = new AdAnalyzer().analyze(filePath, item.getId(), media.getDuration(),
+                    chapters, this::isStopped);
+        } catch (DecodeException e) {
+            Log.e(TAG, "Could not analyse " + media.getEpisodeTitle(), e);
+            return Result.failure();
+        }
+
+        if (isStopped()) {
+            // Half the file was decoded at best. Dropping the run is better than storing segments
+            // derived from a truncated episode; the next download or a manual request re-enqueues.
+            Log.d(TAG, "Analysis of " + media.getEpisodeTitle() + " was stopped");
+            return Result.failure();
+        }
+
+        try {
+            DBWriter.replaceAdSegments(item.getId(), AdSegment.Source.DETECTED,
+                    segmentsOf(segments, AdSegment.Source.DETECTED)).get();
+            DBWriter.replaceAdSegments(item.getId(), AdSegment.Source.CHAPTER,
+                    segmentsOf(segments, AdSegment.Source.CHAPTER)).get();
+        } catch (InterruptedException e) {
+            Log.e(TAG, "Interrupted while storing ad segments");
+            Thread.currentThread().interrupt();
+            return Result.failure();
+        } catch (ExecutionException e) {
+            Log.e(TAG, "Could not store the ad segments of " + media.getEpisodeTitle(), e);
+            return Result.failure();
+        }
+        Log.d(TAG, "Analysed " + media.getEpisodeTitle() + ": " + segments.size() + " segments");
+        return Result.success();
+    }
+
+    /**
+     * Stores the chapter-derived ad segments of one episode without decoding any audio.
+     *
+     * <p>This is the cheap half of detection and the only half a streamed episode can get. It
+     * reads the chapters (from the item, or from the database when the item does not carry them)
+     * and replaces the episode's {@link AdSegment.Source#CHAPTER} segments; detected and manual
+     * segments are untouched. Both the database read and the write run on the caller's thread and
+     * the shared database executor respectively, so call this off the main thread.
+     */
+    public static void applyChapterSegments(@Nullable FeedItem item) {
+        if (item == null) {
+            return;
+        }
+        storeChapterSegments(item, loadChapters(item));
+    }
+
+    private static void storeChapterSegments(@NonNull FeedItem item,
+                                             @Nullable List<Chapter> chapters) {
+        long durationMs = item.getMedia() != null ? item.getMedia().getDuration() : 0;
+        List<AdSegment> fromChapters = ChapterAdMatcher.match(chapters, durationMs, item.getId());
+        DBWriter.replaceAdSegments(item.getId(), AdSegment.Source.CHAPTER, fromChapters);
+    }
+
+    /**
+     * Queues an analysis run for one downloaded episode.
+     *
+     * <p>Unless {@code force} is set this checks the global and per-feed ad-skip switches first,
+     * which reads the episode from the database; call it off the main thread in that case. A
+     * forced request (the UI's "analyse this episode") skips both checks and replaces any run
+     * already queued for the same media, so the user's tap is not swallowed by a pending job.
+     */
+    public static void enqueue(@NonNull Context context, long mediaId, boolean force) {
+        if (!force && !shouldAnalyze(mediaId)) {
+            return;
+        }
+        OneTimeWorkRequest request = new OneTimeWorkRequest.Builder(AdAnalysisWorker.class)
+                .setInputData(new Data.Builder().putLong(PARAM_MEDIA_ID, mediaId).build())
+                .setConstraints(new Constraints.Builder()
+                        .setRequiresBatteryNotLow(true)
+                        .build())
+                .addTag(WORK_TAG)
+                .build();
+        try {
+            WorkManager.getInstance(context).enqueueUniqueWork(workName(mediaId),
+                    force ? ExistingWorkPolicy.REPLACE : ExistingWorkPolicy.KEEP, request);
+        } catch (IllegalStateException e) {
+            // WorkManager is not initialised: a unit test, or a process that never ran the
+            // Application class. Ad analysis is optional, so this must not take the caller down.
+            Log.e(TAG, "Could not enqueue the ad analysis of media " + mediaId, e);
+        }
+    }
+
+    /** Cancels the analysis of one episode, if any is queued or running. */
+    public static void cancel(@NonNull Context context, long mediaId) {
+        try {
+            WorkManager.getInstance(context).cancelUniqueWork(workName(mediaId));
+        } catch (IllegalStateException e) {
+            Log.e(TAG, "Could not cancel the ad analysis of media " + mediaId, e);
+        }
+    }
+
+    private static String workName(long mediaId) {
+        return WORK_NAME_PREFIX + mediaId;
+    }
+
+    private static boolean shouldAnalyze(long mediaId) {
+        if (!Prefs.isAdSkipEnabled()) {
+            return false;
+        }
+        FeedMedia media = DBReader.getFeedMedia(mediaId);
+        return media != null && isFeedAdSkipEnabled(media.getItem());
+    }
+
+    /**
+     * Whether the feed an episode belongs to allows ad skipping. An episode whose feed could not
+     * be loaded counts as allowed: the global switch has already been checked and silently
+     * dropping the run would be harder to explain than an analysis that turns out unused.
+     */
+    private static boolean isFeedAdSkipEnabled(@Nullable FeedItem item) {
+        if (item == null) {
+            return true;
+        }
+        Feed feed = item.getFeed();
+        if (feed == null || feed.getPreferences() == null) {
+            return true;
+        }
+        return feed.getPreferences().isAdSkipEnabled();
+    }
+
+    @Nullable
+    private static List<Chapter> loadChapters(@NonNull FeedItem item) {
+        if (item.getChapters() != null) {
+            return item.getChapters();
+        }
+        return DBReader.loadChaptersOfFeedItem(item);
+    }
+
+    @NonNull
+    private static List<AdSegment> segmentsOf(@NonNull List<AdSegment> segments,
+                                              @NonNull AdSegment.Source source) {
+        List<AdSegment> out = new ArrayList<>();
+        for (AdSegment segment : segments) {
+            if (segment.getSource() == source) {
+                out.add(segment);
+            }
+        }
+        return out;
+    }
+}

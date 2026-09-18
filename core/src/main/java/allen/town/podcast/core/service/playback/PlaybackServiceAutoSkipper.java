@@ -80,6 +80,18 @@ class PlaybackServiceAutoSkipper {
     }
 
     /**
+     * Records that the given episode was skipped by the app rather than by the user, so that
+     * {@link #consumeAutoSkipped(FeedItem)} reports it and post-playback processing marks it as
+     * played. Used by {@link PlaybackServiceAdSkipper} when an ad segment runs to the very end of
+     * an episode and the only sensible skip is to the next one.
+     */
+    void markAutoSkipped(FeedItem item) {
+        if (item != null) {
+            this.autoSkippedFeedMediaId = item.getIdentifyingValue();
+        }
+    }
+
+    /**
      * @return true if the given item is the one this class auto-skipped, clearing the marker so
      *         that it is only reported once.
      */

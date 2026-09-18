@@ -73,7 +73,21 @@ public class FeedPreferences implements Serializable {
     private int feedSkipIntro;
     private int feedSkipEnding;
     private boolean showEpisodeNotification;
+    /**
+     * Per-feed switch for the ad auto-skip feature. Defaults to on: a feed only opts out when the
+     * user turns it off, and databases written before the column existed read back as on.
+     */
+    private boolean adSkipEnabled = true;
     private final Set<String> tags = new HashSet<>();
+
+    /** True when detected advertisement segments of this feed's episodes should be skipped. */
+    public boolean isAdSkipEnabled() {
+        return adSkipEnabled;
+    }
+
+    public void setAdSkipEnabled(boolean adSkipEnabled) {
+        this.adSkipEnabled = adSkipEnabled;
+    }
 
     public FeedPreferences(long feedID, boolean autoDownload, AutoDeleteAction autoDeleteAction,
                            VolumeAdaptionSetting volumeAdaptionSetting, String username, String password) {

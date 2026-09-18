@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string-array name="ad_skip_sensitivity_options">
+        <item>@string/ad_skip_sensitivity_low</item>
+        <item>@string/ad_skip_sensitivity_medium</item>
+        <item>@string/ad_skip_sensitivity_high</item>
+    </string-array>
+
+    <!-- MUST stay in sync with AdSkipPrefs.SENSITIVITY_* in core -->
+    <string-array name="ad_skip_sensitivity_values" translatable="false">
+        <item>low</item>
+        <item>medium</item>
+        <item>high</item>
+    </string-array>
+
+</resources>

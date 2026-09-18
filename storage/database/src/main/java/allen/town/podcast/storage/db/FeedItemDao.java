@@ -60,18 +60,20 @@ import allen.town.podcast.storage.db.mapper.FeedItemFilterQuery;
  * Owns every statement against the {@code episodes} table and the {@code chapters} rows that hang
  * off it: inserting or updating an item (delegating the feed row to {@link FeedDao} and the media
  * row to {@link FeedMediaDao}), the bulk and single-item stores, the played/unplayed state updates,
- * the cascade that removes items together with their chapters, media and download log entries, the
- * item search, and all the cursors that read episodes joined with their media.
+ * the cascade that removes items together with their chapters, ad segments, media and download log
+ * entries, the item search, and all the cursors that read episodes joined with their media.
  */
 class FeedItemDao extends Dao {
 
     private final FeedDao feedDao;
     private final FeedMediaDao mediaDao;
+    private final AdSegmentDao adSegmentDao;
 
-    FeedItemDao(SQLiteDatabase db, FeedDao feedDao, FeedMediaDao mediaDao) {
+    FeedItemDao(SQLiteDatabase db, FeedDao feedDao, FeedMediaDao mediaDao, AdSegmentDao adSegmentDao) {
         super(db);
         this.feedDao = feedDao;
         this.mediaDao = mediaDao;
+        this.adSegmentDao = adSegmentDao;
     }
 
     void storeFeedItemlist(List<FeedItem> items) {
@@ -244,6 +246,10 @@ class FeedItemDao extends Dao {
         try {
             StringBuilder mediaIds = new StringBuilder();
             StringBuilder itemIds = new StringBuilder();
+            long[] itemIdArray = new long[items.size()];
+            for (int i = 0; i < items.size(); i++) {
+                itemIdArray[i] = items.get(i).getId();
+            }
             for (FeedItem item : items) {
                 if (item.getMedia() != null) {
                     if (mediaIds.length() != 0) {
@@ -259,6 +265,7 @@ class FeedItemDao extends Dao {
 
             db.beginTransactionNonExclusive();
             db.delete(TABLE_NAME_SIMPLECHAPTERS, KEY_FEEDITEM + " IN (" + itemIds + ")", null);
+            adSegmentDao.deleteAdSegmentsOfItems(itemIdArray);
             db.delete(TABLE_NAME_DOWNLOAD_LOG, KEY_FEEDFILETYPE + "=" + FeedMedia.FEEDFILETYPE_FEEDMEDIA
                             + " AND " + KEY_FEEDFILE + " IN (" + mediaIds + ")", null);
             db.delete(TABLE_NAME_FEED_MEDIA, KEY_ID + " IN (" + mediaIds + ")", null);
@@ -329,6 +336,7 @@ class FeedItemDao extends Dao {
                 + " ON " + TABLE_NAME_FEED_ITEMS + "." + KEY_FEED + "=" + TABLE_NAME_FEEDS + "." + KEY_ID
                 + " WHERE " + TABLE_NAME_FEED_ITEMS + "." + KEY_READ + "=" + FeedItem.NEW
                     + " AND " + TABLE_NAME_FEEDS + "." + KEY_KEEP_UPDATED + " > 0"
+                    + " AND " + TABLE_NAME_FEEDS + "." + KEY_IS_SUBSCRIBED + "=1"
                 + " ORDER BY " + TABLE_NAME_FEED_ITEMS + "." + KEY_PUBDATE + " DESC"
                 + " LIMIT " + offset + ", " + limit;
         return db.rawQuery(query, null);

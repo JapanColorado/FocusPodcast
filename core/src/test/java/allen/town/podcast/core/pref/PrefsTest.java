@@ -98,6 +98,15 @@ public class PrefsTest {
         assertEquals(Prefs.EnqueueLocation.BACK, Prefs.getEnqueueLocation());
     }
 
+    @Test
+    public void adSkippingIsOffByDefaultButAnalysesDownloadsAndAnnouncesSkips() {
+        assertFalse(Prefs.isAdSkipEnabled());
+        assertEquals(AdSkipPrefs.SENSITIVITY_MEDIUM, Prefs.getAdSkipSensitivity());
+        assertEquals(0.60f, Prefs.getAdSkipMinConfidence(), 0.0001f);
+        assertTrue(Prefs.isAdSkipAnalyzeOnDownload());
+        assertTrue(Prefs.isAdSkipShowSnackbar());
+    }
+
     // ------------------------------------------------------------ round trips
 
     @Test
@@ -177,6 +186,31 @@ public class PrefsTest {
 
         Prefs.setSkipSilence(true);
         assertTrue(Prefs.isSkipSilence());
+    }
+
+    @Test
+    public void adSkipSettersRoundTrip() {
+        Prefs.setAdSkipEnabled(true);
+        Prefs.setAdSkipAnalyzeOnDownload(false);
+        Prefs.setAdSkipShowSnackbar(false);
+        assertTrue(Prefs.isAdSkipEnabled());
+        assertFalse(Prefs.isAdSkipAnalyzeOnDownload());
+        assertFalse(Prefs.isAdSkipShowSnackbar());
+    }
+
+    @Test
+    public void adSkipSensitivityPicksTheConfidenceThreshold() {
+        Prefs.setAdSkipSensitivity(AdSkipPrefs.SENSITIVITY_LOW);
+        assertEquals(0.75f, Prefs.getAdSkipMinConfidence(), 0.0001f);
+
+        Prefs.setAdSkipSensitivity(AdSkipPrefs.SENSITIVITY_HIGH);
+        assertEquals(0.45f, Prefs.getAdSkipMinConfidence(), 0.0001f);
+
+        // An unusable stored value must not break playback.
+        prefs().edit().putString(Prefs.PREF_AD_SKIP_SENSITIVITY, "nonsense").commit();
+        assertEquals(0.60f, Prefs.getAdSkipMinConfidence(), 0.0001f);
+        prefs().edit().putString(Prefs.PREF_AD_SKIP_SENSITIVITY, null).commit();
+        assertEquals(AdSkipPrefs.SENSITIVITY_MEDIUM, Prefs.getAdSkipSensitivity());
     }
 
     @Test

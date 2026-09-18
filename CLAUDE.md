@@ -58,7 +58,7 @@ Dependency direction (top depends on bottom):
 - **app** — Activities/fragments/adapters, `MyApp` Application. Depends on core and nearly everything else.
 - **core** — the workhorse: `DBReader`/`DBWriter`/`DBTasks`, `PlaybackService` + `LocalPSMP` + `ExoPlayerWrapper`, `DownloadService`, `FeedUpdateWorker`, `SyncService`, `Prefs`, widgets, Glide setup, backup/OPML.
 - **playback/base** — abstract `PlaybackServiceMediaPlayer`, `PlayerStatus`.
-- **storage/database** — raw SQLite `Db.java` (package `allen.town.podcast.storage.db`, `focusPodcastApp.db`, `VERSION = 3`, renumbered from AntennaPod), `DBUpgrade.java` hand-written ALTER ladder, `mapper/*CursorMapper`. No Room.
+- **storage/database** — raw SQLite `Db.java` (package `allen.town.podcast.storage.db`, `focusPodcastApp.db`, `VERSION = 4`, renumbered from AntennaPod), `DBUpgrade.java` hand-written ALTER ladder, `mapper/*CursorMapper`. No Room.
 - **parser/feed** (RSS/Atom), **parser/media** (ID3/Vorbis chapters), **net/ssl**, **net/sync/model** + **net/sync/gpoddernet**
 - **event** — EventBus payload classes only. **model** — POJOs (`Feed`, `FeedItem`, `FeedMedia`, ...).
 - **ui/common** (shared views), **ui/app-start-intent** (typed Intent builders so lower modules can launch app Activities without depending on `app`), **ui/i18n** and **ui/png-icons** (resources only).
@@ -68,13 +68,33 @@ Dependency direction (top depends on bottom):
 
 The seven classes that used to exceed ~1,000 lines were split by pure extraction; every public API stayed on the original class, so callers did not change. When touching one of these, look for the logic in its helpers first:
 
-- `storage/db/Db.java` — `DbSchema` (column constants and CREATE statements), a `Dao` base class with the shared transaction wrapper, and per-table `FeedDao`, `FeedItemDao`, `FeedMediaDao`, `QueueDao`, `FavoritesDao`, `DownloadLogDao`. `Db` delegates to them.
-- `core/service/playback/PlaybackService.java` — `PlaybackServiceMediaSession`, `PlaybackServiceMediaBrowser`, `PlaybackServiceNotificationUpdater`, `PlaybackServiceReceivers`, `PlaybackServicePlayerCallback`, `PlaybackServiceAutoSkipper`.
+- `storage/db/Db.java` — `DbSchema` (column constants and CREATE statements), a `Dao` base class with the shared transaction wrapper, and per-table `FeedDao`, `FeedItemDao`, `FeedMediaDao`, `QueueDao`, `FavoritesDao`, `DownloadLogDao`, `AdSegmentDao`. `Db` delegates to them.
+- `core/service/playback/PlaybackService.java` — `PlaybackServiceMediaSession`, `PlaybackServiceMediaBrowser`, `PlaybackServiceNotificationUpdater`, `PlaybackServiceReceivers`, `PlaybackServicePlayerCallback`, `PlaybackServiceAutoSkipper`, `PlaybackServiceAdSkipper`.
 - `core/service/playback/LocalPSMP.java` — `LocalPSMPAudioFocus`, `LocalPSMPAudioEffects`, `LocalPSMPPlayerFactory`, `LocalPSMPSeeker`, `LocalPSMPPlaybackEnder`, plus `PlayerLock` and `PlayerExecutor`.
 - `core/pref/Prefs.kt` — `PrefsStore` plus the `PlaybackPrefs`, `DownloadPrefs`, `UiPrefs`, `NetworkPrefs` and `SyncPrefs` objects. `Prefs` remains the single facade for both Java and Kotlin callers; add new preferences to the matching group object and expose them through `Prefs`.
 - `core/service/download/DownloadService.java` — `DownloadQueue`, `DownloadPipeline`, `DownloadCompletionHandler`, `DownloadNotifier`.
 - `app/fragment/FeedItemlistFragment.kt` — header, loader, menu, multi-select and pager helpers under `fragment/feeditemlist/`.
 - `app/activity/MainActivity.kt` — nav drawer, fragment navigator, player sheet, intent handler and hardware-key helpers under `activity/main/`.
+
+### Ad auto-skip
+
+Ad skipping is opt-in (`Prefs.isAdSkipEnabled`, default off) and has no ML runtime: `core/adskip/` is
+pure-Java DSP. `PcmDecoder` streams a downloaded file through `MediaCodec` to mono 16 kHz float,
+`AudioFeatureExtractor` turns it into one `FeatureFrame` per half second (RMS, crest factor, spectral
+flatness/centroid/rolloff/flux, low-band ratio, 8-band timbre vector), and `AdDetector` robust-normalises
+those against the episode median, finds change points, and scores regions that differ in timbre, carry
+a music bed or are louder/more compressed, modulated by duration and position priors. `ChapterAdMatcher`
+flags chapters titled like sponsor breaks, `AdSegmentMerger` gives manual > chapter > detected
+precedence, and `AdAnalyzer` is the facade. `AdAnalysisWorker` (WorkManager, unique per media id,
+enqueued from `MediaDownloadedHandler`) stores every result with confidence >= 0.3 in the `ad_segments`
+table (`AdSegmentDao`, DB version 4); the sensitivity preference is applied at playback time, so
+changing it needs no re-analysis. `PlaybackServiceAdSkipper` runs on the service's one-second ticker
+next to the intro/ending skipper: it only skips when playback *entered* a segment within a 3 s window,
+treats a seek into the middle as "let it play", posts `AdSkippedEvent` (the app shows the Undo
+snackbar and answers with `AdSkipUndoEvent`), and never shows UI itself. The detector's honest limits:
+host-read ads with no music bed and no level change are invisible to it, and timbre outliers such as
+phone-line guests or archival clips are the likely false positives, which is why segments are drawn on
+the seek bar and can be disabled or deleted per episode.
 
 ### How the layers talk to each other
 

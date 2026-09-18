@@ -36,16 +36,16 @@ import allen.town.podcast.storage.db.mapper.FeedItemCursorMapper;
 import allen.town.podcast.storage.db.mapper.FeedMediaCursorMapper;
 
 /**
- * Tests for the raw SQLite layer: schema creation, the (currently empty) upgrade ladder,
- * the cursor mappers and the search queries.
+ * Tests for the raw SQLite layer: schema creation, the upgrade ladder, the cursor mappers and the
+ * search queries.
  *
- * <p>Note on the upgrade tests: {@link DBUpgrade#upgrade} is a no-op in this fork — the
- * AntennaPod ALTER ladder was dropped when the schema was renumbered, and no version-1 or
- * version-2 CREATE statements survive anywhere in the tree. The lowest schema the code can
- * construct is therefore the current one, so the upgrade tests build a version-3 schema,
- * stamp an older {@code user_version} onto it and assert that reopening runs
- * {@code onUpgrade} without error, leaves the rows intact and lands on {@link Db#VERSION}.
- * That is exactly what a real 1 -&gt; 3 or 2 -&gt; 3 upgrade does today.</p>
+ * <p>Note on the upgrade tests: no version-1, -2 or -3 CREATE statements survive anywhere in the
+ * tree — the AntennaPod ladder was dropped when the schema was renumbered. The lowest schema the
+ * code can construct is therefore the current one, so the upgrade tests build a version-4 schema,
+ * stamp an older {@code user_version} onto it and assert that reopening runs {@code onUpgrade}
+ * without error, leaves the rows intact and lands on {@link Db#VERSION}. That is what makes every
+ * statement in {@link DBUpgrade} re-runnable against objects that already exist; the 3 -&gt; 4 step
+ * is additionally exercised directly against a database the new objects were dropped from.</p>
  */
 @RunWith(RobolectricTestRunner.class)
 public class DbTest {
@@ -67,8 +67,8 @@ public class DbTest {
     // ---------------------------------------------------------------- schema
 
     @Test
-    public void freshDatabaseIsAtSchemaVersion3() {
-        assertEquals(3, Db.VERSION);
+    public void freshDatabaseIsAtSchemaVersion4() {
+        assertEquals(4, Db.VERSION);
         assertEquals(Db.VERSION, Db.getInstance().getDb().getVersion());
     }
 
@@ -82,7 +82,8 @@ public class DbTest {
                 Db.TABLE_NAME_DOWNLOAD_LOG,
                 Db.TABLE_NAME_QUEUE,
                 Db.TABLE_NAME_SIMPLECHAPTERS,
-                Db.TABLE_NAME_FAVORITES)));
+                Db.TABLE_NAME_FAVORITES,
+                Db.TABLE_NAME_AD_SEGMENTS)));
     }
 
     @Test
@@ -100,19 +101,52 @@ public class DbTest {
                 Db.TABLE_NAME_FEED_ITEMS + "_" + Db.KEY_READ,
                 Db.TABLE_NAME_QUEUE + "_" + Db.KEY_FEEDITEM,
                 Db.TABLE_NAME_FEED_MEDIA + "_" + Db.KEY_FEEDITEM,
-                Db.TABLE_NAME_SIMPLECHAPTERS + "_" + Db.KEY_FEEDITEM)));
+                Db.TABLE_NAME_SIMPLECHAPTERS + "_" + Db.KEY_FEEDITEM,
+                Db.TABLE_NAME_AD_SEGMENTS + "_" + Db.KEY_FEEDITEM)));
     }
 
     // --------------------------------------------------------------- upgrade
 
     @Test
-    public void upgradeFromVersion1ReachesVersion3AndKeepsRows() {
+    public void upgradeFromVersion1ReachesTheCurrentVersionAndKeepsRows() {
         assertUpgradePreservesRows(1);
     }
 
     @Test
-    public void upgradeFromVersion2ReachesVersion3AndKeepsRows() {
+    public void upgradeFromVersion2ReachesTheCurrentVersionAndKeepsRows() {
         assertUpgradePreservesRows(2);
+    }
+
+    @Test
+    public void upgradeFromVersion3ReachesTheCurrentVersionAndKeepsRows() {
+        assertUpgradePreservesRows(3);
+    }
+
+    /**
+     * The real 3 -&gt; 4 step: strip the objects version 4 added, then run the ladder and check it
+     * puts them back.
+     */
+    @Test
+    public void upgradeFromVersion3AddsTheAdSkipTableAndColumn() {
+        SQLiteDatabase db = Db.getInstance().getDb();
+        db.execSQL("DROP INDEX " + Db.TABLE_NAME_AD_SEGMENTS + "_" + Db.KEY_FEEDITEM);
+        db.execSQL("DROP TABLE " + Db.TABLE_NAME_AD_SEGMENTS);
+        // SQLite cannot drop a column on this API level, so the feeds table is rebuilt without it.
+        db.execSQL("DROP TABLE " + Db.TABLE_NAME_FEEDS);
+        db.execSQL(DbSchema.CREATE_TABLE_FEEDS.replace(
+                "," + Db.KEY_FEED_AD_SKIP + " INTEGER DEFAULT 1)", ")"));
+        assertFalse(tableNames(db).contains(Db.TABLE_NAME_AD_SEGMENTS));
+        assertFalse(columnNames(db, Db.TABLE_NAME_FEEDS).contains(Db.KEY_FEED_AD_SKIP));
+
+        DBUpgrade.upgrade(db, 3, Db.VERSION);
+
+        assertTrue(tableNames(db).contains(Db.TABLE_NAME_AD_SEGMENTS));
+        assertTrue(columnNames(db, Db.TABLE_NAME_FEEDS).contains(Db.KEY_FEED_AD_SKIP));
+
+        // Running it again must not fail on the objects it just created.
+        DBUpgrade.upgrade(db, 3, Db.VERSION);
+        assertTrue(tableNames(db).contains(Db.TABLE_NAME_AD_SEGMENTS));
+        assertEquals(0, rowCount(db, Db.TABLE_NAME_AD_SEGMENTS));
     }
 
     private void assertUpgradePreservesRows(int oldVersion) {
@@ -520,6 +554,17 @@ public class DbTest {
         } catch (ReflectiveOperationException e) {
             throw new AssertionError(e);
         }
+    }
+
+    private static List<String> columnNames(SQLiteDatabase db, String table) {
+        List<String> columns = new ArrayList<>();
+        try (Cursor cursor = db.rawQuery("PRAGMA table_info(" + table + ")", null)) {
+            int nameIndex = cursor.getColumnIndex("name");
+            while (cursor.moveToNext()) {
+                columns.add(cursor.getString(nameIndex));
+            }
+        }
+        return columns;
     }
 
     private static List<String> tableNames(SQLiteDatabase db) {

@@ -136,6 +136,40 @@
     </allen.town.podcast.common.common.prefs.supportv7.ATEPreferenceCategory>
 
     <allen.town.podcast.common.common.prefs.supportv7.ATEPreferenceCategory
+        android:layout="@layout/preference_category_title" android:title="@string/pref_ad_skip_category">
+        <allen.town.podcast.common.common.prefs.supportv7.ATESwitchPreference
+            android:layout="@layout/list_item_view_switch"
+            android:defaultValue="false"
+            android:key="pref_ad_skip_enabled"
+            android:summary="@string/pref_ad_skip_enabled_sum"
+            android:title="@string/pref_ad_skip_enabled_title"
+            app:icon="@drawable/ic_skip_24dp" />
+        <allen.town.podcast.common.common.prefs.supportv7.ATEListPreference
+            android:layout="@layout/list_item_view"
+            android:defaultValue="medium"
+            android:dependency="pref_ad_skip_enabled"
+            android:entries="@array/ad_skip_sensitivity_options"
+            android:entryValues="@array/ad_skip_sensitivity_values"
+            android:key="pref_ad_skip_sensitivity"
+            android:summary="@string/pref_ad_skip_sensitivity_sum"
+            android:title="@string/pref_ad_skip_sensitivity_title" />
+        <allen.town.podcast.common.common.prefs.supportv7.ATESwitchPreference
+            android:layout="@layout/list_item_view_switch"
+            android:defaultValue="true"
+            android:dependency="pref_ad_skip_enabled"
+            android:key="pref_ad_skip_analyze_on_download"
+            android:summary="@string/pref_ad_skip_analyze_on_download_sum"
+            android:title="@string/pref_ad_skip_analyze_on_download_title" />
+        <allen.town.podcast.common.common.prefs.supportv7.ATESwitchPreference
+            android:layout="@layout/list_item_view_switch"
+            android:defaultValue="true"
+            android:dependency="pref_ad_skip_enabled"
+            android:key="pref_ad_skip_show_snackbar"
+            android:summary="@string/pref_ad_skip_show_snackbar_sum"
+            android:title="@string/pref_ad_skip_show_snackbar_title" />
+    </allen.town.podcast.common.common.prefs.supportv7.ATEPreferenceCategory>
+
+    <allen.town.podcast.common.common.prefs.supportv7.ATEPreferenceCategory
         android:layout="@layout/preference_category_title" android:title="@string/reassign_hardware_buttons">
         <allen.town.podcast.common.common.prefs.supportv7.ATEListPreference
         android:layout="@layout/list_item_view"

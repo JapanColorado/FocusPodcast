@@ -56,6 +56,9 @@ internal class FeedItemListHeader(
     /** The header container; the fragment still owns its status bar / orientation padding. */
     val headerView: View = root.findViewById(R.id.headerContainer)
 
+    /** The blurred artwork behind the header; sized together with [headerView]. */
+    val backgroundView: View get() = imgvBackground
+
     private val detailInfoView: SeriesDetailInfoView = root.findViewById(R.id.detailInfoView)
     private val infoViewToggleButton: View = root.findViewById(R.id.info_view_toggle_button)
     private val detailInfoViewContainer: FrameLayout =
