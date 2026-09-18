@@ -2,7 +2,6 @@ package allen.town.podcast.fragment
 
 import allen.town.podcast.common.util.DoubleClickBackToContentTopListener
 import allen.town.podcast.common.util.MenuIconUtil.showToolbarMenuIcon
-import allen.town.podcast.common.util.StatusBarUtils.setPaddingStatusBarTop
 import allen.town.podcast.common.util.Timber
 import allen.town.podcast.R
 import allen.town.podcast.activity.MainActivity
@@ -36,6 +35,10 @@ import android.os.Handler
 import android.os.Looper
 import android.util.Log
 import android.view.*
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.updateLayoutParams
+import androidx.core.view.updatePadding
 import android.view.ContextMenu.ContextMenuInfo
 import android.widget.*
 import android.widget.AdapterView.OnItemClickListener
@@ -136,9 +139,7 @@ class FeedItemlistFragment() : Fragment(), OnItemClickListener, Toolbar.OnMenuIt
         appBar = binding.appBar
         val collapsingToolbar = binding.collapsingToolbar
 
-        //top padding is required
-        setPaddingStatusBarTop(requireActivity(), toolbar)
-        setPaddingStatusBarTop(requireActivity(), header.headerView)
+        applyStatusBarPadding(root, toolbar, header)
         val tintManager =
             FeedItemListToolbarIconTintHelper(requireContext(), toolbar, collapsingToolbar)
         iconTintManager = tintManager
@@ -193,6 +194,29 @@ class FeedItemlistFragment() : Fragment(), OnItemClickListener, Toolbar.OnMenuIt
             iconTintManager?.updateTint()
         }
         super.onHiddenChanged(hidden)
+    }
+
+    /**
+     * Offsets the pinned toolbar and the header by the real status bar inset. The toolbar is padded;
+     * the header (a fixed-height block) is padded and grown by the same amount so its content keeps its
+     * full height and stays below the toolbar instead of sliding up underneath it. The insets are read
+     * on the fragment root because CollapsingToolbarLayout consumes them before they reach its
+     * children. When the window is not edge-to-edge the inset is zero and nothing moves.
+     */
+    private fun applyStatusBarPadding(root: View, toolbar: View, header: FeedItemListHeader) {
+        val toolbarPadding = toolbar.paddingTop
+        val headerPadding = header.headerView.paddingTop
+        val headerHeight = header.headerView.layoutParams.height
+        val backgroundHeight = header.backgroundView.layoutParams.height
+        ViewCompat.setOnApplyWindowInsetsListener(root) { _, insets ->
+            val top = insets.getInsets(WindowInsetsCompat.Type.statusBars()).top
+            toolbar.updatePadding(top = toolbarPadding + top)
+            header.headerView.updatePadding(top = headerPadding + top)
+            header.headerView.updateLayoutParams { height = headerHeight + top }
+            header.backgroundView.updateLayoutParams { height = backgroundHeight + top }
+            insets
+        }
+        ViewCompat.requestApplyInsets(root)
     }
 
     override fun onDestroyView() {
