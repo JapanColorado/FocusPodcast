@@ -3,7 +3,6 @@ package allen.town.podcast.core.adskip;
 import androidx.annotation.NonNull;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -14,95 +13,86 @@ import allen.town.podcast.model.feed.AdSegment;
  * Finds advertisement regions in an episode's {@link FeatureFrame} profile.
  *
  * <p>Pure Java, deterministic and side-effect free: the same profile always yields the same
- * segments. It owns the whole decision, from normalisation through change-point detection and
- * scoring to merging and capping; nothing upstream or downstream needs to know the thresholds.
+ * segments. It owns the whole decision, from the per-frame score through segmentation to
+ * confidence and capping; nothing upstream or downstream needs to know the thresholds.
  *
- * <h2>Why this works at all</h2>
- * An episode is mostly one thing: the host talking, recorded once, through one chain. Ads are
- * recorded elsewhere, mixed with a music bed, and mastered louder and more compressed. So instead
- * of asking "does this sound like an ad", which would need a model we are not allowed to ship, the
- * detector asks "is this region unlike the rest of this episode, in the particular ways ads are
- * unlike hosts". Everything is normalised against the episode's own median, which makes the
- * thresholds independent of the show, the microphone and the mastering level.
+ * <h2>What it listens for</h2>
+ * A music bed. Almost every produced ad, host-read or not, runs music underneath the voice, and
+ * the show around it almost never does. The bed shows up in the spectral floor of each one-second
+ * window ({@link FeatureFrame#floorDb}, {@link FeatureFrame#floorFlatness}): speech pauses several
+ * times a second, and in those pauses plain speech drops to quiet, noise-like room tone while a
+ * bed stays up at a steady level with a tonal spectrum. Both readings are absolute, so the detector
+ * needs no per-episode normalisation and is indifferent to how many voices the show has, how they
+ * are miked, or how the episode was mastered. An earlier design scored "how unlike the rest of the
+ * episode is this region"; measured against labelled episodes it turned out that ads are quieter
+ * than the show on one podcast and louder on the next, flatter on one and peakier on another, and
+ * on interview shows the guest's voice is at least as unlike the median as any ad. Only the bed
+ * held up across shows.
  *
  * <h2>The pipeline</h2>
  * <ol>
- *   <li><b>Robust normalisation.</b> Every feature is turned into a z-score against the episode
- *       median and MAD. Median and MAD are used rather than mean and standard deviation precisely
- *       because the ads are the outliers we are hunting: they must not be allowed to move the
- *       reference. Each feature also has an absolute scale floor, so an episode with almost no
- *       variation does not get its noise amplified into apparent outliers.</li>
- *   <li><b>Change points.</b> At every hop, the mean normalised profile of the preceding context
- *       window is compared with that of the following one; the distance peaks where the material
- *       actually changes. Peaks above a threshold, greedily picked with a minimum separation,
- *       become region boundaries.</li>
- *   <li><b>Scoring.</b> Each region between boundaries gets a 0..1 confidence (see
- *       {@link #scoreRegion}).</li>
- *   <li><b>Merging and capping.</b> Flagged regions closer than three seconds are merged; the total
- *       flagged time is capped at a fraction of the episode, keeping the most confident.</li>
+ *   <li><b>Bed score.</b> Each frame gets a 0..1 score, the product of two saturating ramps: how
+ *       far the floor level is above {@link Config#floorDbMin} and how far its flatness is below
+ *       {@link Config#floorFlatnessMax}. Noisy-room speech fails the flatness ramp, a quiet hum
+ *       fails the level ramp, and a bed passes both.</li>
+ *   <li><b>Segmentation.</b> The score is averaged over a {@link Config#smoothingMs} window, since
+ *       a bed dips under loud syllables and between sentences, and runs are cut with hysteresis
+ *       ({@link Config#enterThreshold} to open, {@link Config#stayThreshold} to keep going). The
+ *       long average blurs the edges, so each edge is then re-placed on a short (1.5 s) average.
+ *       Runs closer than {@link Config#mergeGapMs} are joined, because one ad break is often two
+ *       spots with a spoken hand-over between them.</li>
+ *   <li><b>Confidence.</b> The mean bed score over the run, scaled so that
+ *       {@link Config#evidenceFullAt} reads as certain, then multiplied by a mild prior that
+ *       prefers typical ad lengths and the usual pre-roll and mid-roll positions. The prior can
+ *       scale evidence down by at most 30%; it never creates any.</li>
+ *   <li><b>Capping.</b> The total flagged time is limited to {@link Config#maxFlaggedFraction} of
+ *       the episode, keeping the most confident runs.</li>
  * </ol>
  *
  * <p>The detector returns everything at or above {@link Config#minConfidence} (0.3 by default) with
- * its confidence attached. It is the caller's job to apply the user's sensitivity setting on top;
- * a sensible "normal" setting is 0.5.
+ * its confidence attached. It is the caller's job to apply the user's sensitivity setting on top.
+ *
+ * <p>Honest limits: an ad read by the host with no bed and no level change is invisible to this
+ * detector, and a theme tune (intro or outro) looks exactly like a produced spot and will be
+ * flagged when it is long enough. Both are why segments are shown on the seek bar and can be
+ * undone, disabled or deleted per episode.
  */
 public final class AdDetector {
 
-    // --- feature vector layout ---------------------------------------------------------------
-    private static final int IDX_RMS = 0;
-    private static final int IDX_CREST = 1;
-    private static final int IDX_CENTROID = 2;
-    private static final int IDX_FLATNESS = 3;
-    private static final int IDX_ROLLOFF = 4;
-    private static final int IDX_ZCR = 5;
-    private static final int IDX_FLUX = 6;
-    private static final int IDX_LOW = 7;
-    private static final int IDX_BAND0 = 8;
-    private static final int DIM = IDX_BAND0 + FeatureFrame.BAND_COUNT;
-
     /**
-     * Smallest deviation of each feature that counts as real, in the feature's own units. The
-     * robust scale never goes below this, which stops a very uniform episode from turning
-     * microscopic wobble into large z-scores.
-     */
-    private static final double[] SCALE_FLOOR = {
-            1.5,    // rmsDb, dB
-            0.50,   // crest, ratio
-            100.0,  // centroid, Hz
-            0.02,   // flatness, 0..1
-            200.0,  // rolloff, Hz
-            0.01,   // zcr, fraction
-            0.02,   // flux, 0..1
-            0.02,   // low band ratio, 0..1
-            0.015, 0.015, 0.015, 0.015, 0.015, 0.015, 0.015, 0.015 // band shares, 0..1 each
-    };
-
-    /** Dimensions the change-point statistic looks at: timbre, tonality, level and brightness. */
-    private static final int[] CHANGE_DIMS = {
-            IDX_BAND0, IDX_BAND0 + 1, IDX_BAND0 + 2, IDX_BAND0 + 3,
-            IDX_BAND0 + 4, IDX_BAND0 + 5, IDX_BAND0 + 6, IDX_BAND0 + 7,
-            IDX_FLATNESS, IDX_RMS, IDX_CENTROID
-    };
-
-    /**
-     * Tuning knobs. Public final fields with a {@link Builder}; defaults are what the synthetic and
-     * hand-checked episodes were tuned on.
+     * Tuning knobs. Public final fields with a {@link Builder}; the defaults were fitted on
+     * twenty-three labelled sponsor breaks across six shows and checked on a synthetic episode.
      */
     public static final class Config {
 
         /** Segments below this confidence are not returned at all. */
         public final float minConfidence;
 
-        /** Change-point statistic (normalised distance) a peak must exceed to become a boundary. */
-        public final float changePointThreshold;
+        /** Floor level at or below which a frame has no bed, in dB relative to the window mean. */
+        public final float floorDbMin;
 
-        /** Half-width of the before/after context compared at each hop, in milliseconds. */
-        public final int contextWindowMs;
+        /** The level ramp saturates this many dB above {@link #floorDbMin}. */
+        public final float floorDbRange;
 
-        /** Two boundaries may not be closer than this, in milliseconds. */
-        public final int minBoundarySeparationMs;
+        /** Floor flatness at or above which a frame has no bed. */
+        public final float floorFlatnessMax;
 
-        /** Flagged regions separated by less than this are merged, in milliseconds. */
+        /** The flatness ramp saturates this far below {@link #floorFlatnessMax}. */
+        public final float floorFlatnessRange;
+
+        /** Length of the moving average the segmentation runs on, in milliseconds. */
+        public final int smoothingMs;
+
+        /** Smoothed score needed to open a run. */
+        public final float enterThreshold;
+
+        /** Smoothed score below which an open run closes. */
+        public final float stayThreshold;
+
+        /** Short-average score an edge is moved out to, when re-placing the blurred edges. */
+        public final float edgeThreshold;
+
+        /** Runs separated by less than this are merged, in milliseconds. */
         public final int mergeGapMs;
 
         /** Upper bound on the share of the episode that may be flagged, in 0..1. */
@@ -120,13 +110,24 @@ public final class AdDetector {
         /** Nothing longer than this can be an ad, in milliseconds. */
         public final int maxAdMs;
 
-        /** How far a z-score has to travel before a term saturates at 1. */
-        public final float saturation;
+        /**
+         * Which quantile of the per-frame bed score over a run is taken as its evidence. The
+         * median (0.5) by default: a real bed is present in most frames of the run, while the
+         * false runs that a mean would admit are ones where the score flickers on and off.
+         */
+        public final float evidenceQuantile;
 
-        /** Evidence weights; they sum to 1. */
-        public final float profileWeight;
-        public final float musicWeight;
-        public final float loudnessWeight;
+        /** Evidence-quantile bed score that counts as full evidence. */
+        public final float evidenceFullAt;
+
+        /** Prior with both duration and position at their worst; the three weights sum to 1. */
+        public final float priorBase;
+
+        /** Weight of the duration prior. */
+        public final float durationWeight;
+
+        /** Weight of the position prior. */
+        public final float positionWeight;
 
         public Config() {
             this(new Builder());
@@ -134,19 +135,25 @@ public final class AdDetector {
 
         private Config(Builder b) {
             this.minConfidence = b.minConfidence;
-            this.changePointThreshold = b.changePointThreshold;
-            this.contextWindowMs = b.contextWindowMs;
-            this.minBoundarySeparationMs = b.minBoundarySeparationMs;
+            this.floorDbMin = b.floorDbMin;
+            this.floorDbRange = b.floorDbRange;
+            this.floorFlatnessMax = b.floorFlatnessMax;
+            this.floorFlatnessRange = b.floorFlatnessRange;
+            this.smoothingMs = b.smoothingMs;
+            this.enterThreshold = b.enterThreshold;
+            this.stayThreshold = b.stayThreshold;
+            this.edgeThreshold = b.edgeThreshold;
             this.mergeGapMs = b.mergeGapMs;
             this.maxFlaggedFraction = b.maxFlaggedFraction;
             this.minAdMs = b.minAdMs;
             this.idealMinAdMs = b.idealMinAdMs;
             this.idealMaxAdMs = b.idealMaxAdMs;
             this.maxAdMs = b.maxAdMs;
-            this.saturation = b.saturation;
-            this.profileWeight = b.profileWeight;
-            this.musicWeight = b.musicWeight;
-            this.loudnessWeight = b.loudnessWeight;
+            this.evidenceQuantile = b.evidenceQuantile;
+            this.evidenceFullAt = b.evidenceFullAt;
+            this.priorBase = b.priorBase;
+            this.durationWeight = b.durationWeight;
+            this.positionWeight = b.positionWeight;
         }
 
         @NonNull
@@ -157,37 +164,52 @@ public final class AdDetector {
         /** Mutable builder for {@link Config}; every setter returns {@code this}. */
         public static final class Builder {
             private float minConfidence = 0.3f;
-            private float changePointThreshold = 0.75f;
-            private int contextWindowMs = 10000;
-            private int minBoundarySeparationMs = 5000;
-            private int mergeGapMs = 3000;
+            private float floorDbMin = -31f;
+            private float floorDbRange = 8f;
+            private float floorFlatnessMax = 0.16f;
+            private float floorFlatnessRange = 0.08f;
+            private int smoothingMs = 10000;
+            private float enterThreshold = 0.35f;
+            private float stayThreshold = 0.20f;
+            private float edgeThreshold = 0.25f;
+            private int mergeGapMs = 10000;
             private float maxFlaggedFraction = 0.25f;
-            private int minAdMs = 10000;
-            private int idealMinAdMs = 15000;
-            private int idealMaxAdMs = 120000;
-            private int maxAdMs = 240000;
-            private float saturation = 1.5f;
-            private float profileWeight = 0.40f;
-            private float musicWeight = 0.30f;
-            private float loudnessWeight = 0.30f;
+            private int minAdMs = 20000;
+            private int idealMinAdMs = 60000;
+            private int idealMaxAdMs = 240000;
+            private int maxAdMs = 420000;
+            private float evidenceQuantile = 0.5f;
+            private float evidenceFullAt = 0.5f;
+            private float priorBase = 0.55f;
+            private float durationWeight = 0.30f;
+            private float positionWeight = 0.15f;
 
             public Builder minConfidence(float v) {
                 minConfidence = v;
                 return this;
             }
 
-            public Builder changePointThreshold(float v) {
-                changePointThreshold = v;
+            public Builder floorLevel(float minDb, float rangeDb) {
+                floorDbMin = minDb;
+                floorDbRange = rangeDb;
                 return this;
             }
 
-            public Builder contextWindowMs(int v) {
-                contextWindowMs = v;
+            public Builder floorFlatness(float max, float range) {
+                floorFlatnessMax = max;
+                floorFlatnessRange = range;
                 return this;
             }
 
-            public Builder minBoundarySeparationMs(int v) {
-                minBoundarySeparationMs = v;
+            public Builder smoothingMs(int v) {
+                smoothingMs = v;
+                return this;
+            }
+
+            public Builder thresholds(float enter, float stay, float edge) {
+                enterThreshold = enter;
+                stayThreshold = stay;
+                edgeThreshold = edge;
                 return this;
             }
 
@@ -209,15 +231,16 @@ public final class AdDetector {
                 return this;
             }
 
-            public Builder saturation(float v) {
-                saturation = v;
+            public Builder evidence(float quantile, float fullAt) {
+                evidenceQuantile = quantile;
+                evidenceFullAt = fullAt;
                 return this;
             }
 
-            public Builder weights(float profile, float music, float loudness) {
-                profileWeight = profile;
-                musicWeight = music;
-                loudnessWeight = loudness;
+            public Builder priors(float base, float duration, float position) {
+                priorBase = base;
+                durationWeight = duration;
+                positionWeight = position;
                 return this;
             }
 
@@ -227,6 +250,9 @@ public final class AdDetector {
             }
         }
     }
+
+    /** Frames the short edge-placement average spans (1.5 s). */
+    private static final int EDGE_SMOOTHING_FRAMES = 3;
 
     @NonNull
     private final Config config;
@@ -265,141 +291,150 @@ public final class AdDetector {
             return Collections.emptyList();
         }
 
-        double[][] z = normalise(frames);
+        float[] bed = new float[n];
+        for (int i = 0; i < n; i++) {
+            bed[i] = bedScore(frames.get(i));
+        }
         int hopMs = AudioFeatureExtractor.HOP_MS;
-        int context = Math.max(2, config.contextWindowMs / hopMs);
-        int minSeparation = Math.max(1, config.minBoundarySeparationMs / hopMs);
+        int smoothingFrames = Math.max(1, config.smoothingMs / hopMs);
+        float[] smoothed = movingAverage(bed, smoothingFrames);
+        float[] edges = movingAverage(bed, EDGE_SMOOTHING_FRAMES);
 
-        int[] boundaries = findBoundaries(z, n, context, minSeparation);
-        List<Candidate> candidates = scoreRegions(frames, z, boundaries, episodeMs);
-        List<Candidate> merged = mergeAndCap(candidates, episodeMs);
+        List<int[]> runs = hysteresis(smoothed);
+        refineEdges(runs, edges, smoothingFrames / 2, n);
+        runs = mergeRuns(runs, Math.max(1, config.mergeGapMs / hopMs));
 
-        List<AdSegment> out = new ArrayList<>(merged.size());
-        for (Candidate c : merged) {
-            long start = Math.max(0, c.startMs);
-            long end = Math.min(episodeMs, c.endMs);
-            if (end - start >= config.minAdMs) {
-                out.add(new AdSegment(feedItemId, start, end, AdSegment.Source.DETECTED,
-                        (float) c.confidence));
+        List<Candidate> candidates = new ArrayList<>();
+        for (int[] run : runs) {
+            long startMs = run[0] == 0 ? 0L : frames.get(run[0]).startMs;
+            long endMs = Math.min(episodeMs,
+                    frames.get(run[1] - 1).startMs + AudioFeatureExtractor.WINDOW_MS);
+            if (endMs - startMs < config.minAdMs) {
+                continue;
             }
+            double confidence = confidence(bed, run[0], run[1], startMs, endMs, episodeMs);
+            if (confidence >= config.minConfidence) {
+                candidates.add(new Candidate(startMs, endMs, confidence));
+            }
+        }
+
+        List<AdSegment> out = new ArrayList<>();
+        for (Candidate c : cap(candidates, episodeMs)) {
+            out.add(new AdSegment(feedItemId, c.startMs, c.endMs, AdSegment.Source.DETECTED,
+                    (float) c.confidence));
         }
         return out;
     }
 
     // ---------------------------------------------------------------------------------------
-    // 1. robust normalisation
+    // 1. per-frame bed score
     // ---------------------------------------------------------------------------------------
 
-    private static double[][] normalise(List<FeatureFrame> frames) {
-        int n = frames.size();
-        double[][] raw = new double[DIM][n];
-        for (int i = 0; i < n; i++) {
-            FeatureFrame f = frames.get(i);
-            raw[IDX_RMS][i] = f.rmsDb;
-            raw[IDX_CREST][i] = f.crest;
-            raw[IDX_CENTROID][i] = f.centroidHz;
-            raw[IDX_FLATNESS][i] = f.flatness;
-            raw[IDX_ROLLOFF][i] = f.rolloffHz;
-            raw[IDX_ZCR][i] = f.zcr;
-            raw[IDX_FLUX][i] = f.flux;
-            raw[IDX_LOW][i] = f.lowBandRatio;
-            for (int b = 0; b < FeatureFrame.BAND_COUNT; b++) {
-                raw[IDX_BAND0 + b][i] = f.bands[b];
-            }
-        }
-        double[][] z = new double[DIM][n];
-        double[] scratch = new double[n];
-        for (int d = 0; d < DIM; d++) {
-            System.arraycopy(raw[d], 0, scratch, 0, n);
-            double median = median(scratch);
-            for (int i = 0; i < n; i++) {
-                scratch[i] = Math.abs(raw[d][i] - median);
-            }
-            // 1.4826 * MAD estimates the standard deviation of a normal distribution.
-            double scale = Math.max(1.4826 * median(scratch), SCALE_FLOOR[d]);
-            for (int i = 0; i < n; i++) {
-                z[d][i] = (raw[d][i] - median) / scale;
-            }
-        }
-        return z;
+    /**
+     * How much this frame sounds like speech over a music bed, in 0..1. Exposed for tests and for
+     * the diagnostics that tune the thresholds.
+     */
+    float bedScore(@NonNull FeatureFrame frame) {
+        float level = clamp((frame.floorDb - config.floorDbMin) / config.floorDbRange, 0f, 1f);
+        float tonal = clamp((config.floorFlatnessMax - frame.floorFlatness)
+                / config.floorFlatnessRange, 0f, 1f);
+        return level * tonal;
     }
 
-    /** Sorts {@code values} in place and returns its median. */
-    private static double median(double[] values) {
-        Arrays.sort(values);
+    // ---------------------------------------------------------------------------------------
+    // 2. segmentation
+    // ---------------------------------------------------------------------------------------
+
+    /** Centred moving average over {@code width} frames, shrinking the window at both ends. */
+    private static float[] movingAverage(float[] values, int width) {
         int n = values.length;
-        return (n & 1) == 1 ? values[n / 2] : 0.5 * (values[n / 2 - 1] + values[n / 2]);
+        float[] out = new float[n];
+        int half = width / 2;
+        double[] prefix = new double[n + 1];
+        for (int i = 0; i < n; i++) {
+            prefix[i + 1] = prefix[i] + values[i];
+        }
+        for (int i = 0; i < n; i++) {
+            int from = Math.max(0, i - half);
+            int to = Math.min(n, i + half + 1);
+            out[i] = (float) ((prefix[to] - prefix[from]) / (to - from));
+        }
+        return out;
     }
 
-    // ---------------------------------------------------------------------------------------
-    // 2. change-point detection
-    // ---------------------------------------------------------------------------------------
-
-    private int[] findBoundaries(double[][] z, int n, int context, int minSeparation) {
-        double[] statistic = new double[n];
-        double inverseDim = 1.0 / Math.sqrt(CHANGE_DIMS.length);
-        for (int i = context; i <= n - context; i++) {
-            double sum = 0;
-            for (int d : CHANGE_DIMS) {
-                double before = 0;
-                double after = 0;
-                for (int k = 1; k <= context; k++) {
-                    before += z[d][i - k];
-                    after += z[d][i + k - 1];
+    /** Half-open {from, to} frame ranges where the smoothed score stays up. */
+    private List<int[]> hysteresis(float[] smoothed) {
+        List<int[]> runs = new ArrayList<>();
+        int start = -1;
+        for (int i = 0; i < smoothed.length; i++) {
+            if (start < 0) {
+                if (smoothed[i] >= config.enterThreshold) {
+                    start = i;
                 }
-                double delta = (after - before) / context;
-                sum += delta * delta;
+            } else if (smoothed[i] < config.stayThreshold) {
+                runs.add(new int[]{start, i});
+                start = -1;
             }
-            statistic[i] = Math.sqrt(sum) * inverseDim;
         }
+        if (start >= 0) {
+            runs.add(new int[]{start, smoothed.length});
+        }
+        return runs;
+    }
 
-        // Greedy non-maximum suppression: strongest peaks first, each blocking its neighbourhood.
-        List<Integer> order = new ArrayList<>();
-        for (int i = context; i <= n - context; i++) {
-            if (statistic[i] >= config.changePointThreshold) {
-                order.add(i);
-            }
-        }
-        final double[] stat = statistic;
-        Collections.sort(order, new Comparator<Integer>() {
-            @Override
-            public int compare(Integer a, Integer b) {
-                return Double.compare(stat[b], stat[a]);
-            }
-        });
-        List<Integer> accepted = new ArrayList<>();
-        for (int candidate : order) {
-            boolean clear = true;
-            for (int taken : accepted) {
-                if (Math.abs(taken - candidate) < minSeparation) {
-                    clear = false;
+    /**
+     * Pulls each run's edges inward to where the short average first reaches
+     * {@link Config#edgeThreshold}. The long average that cut the run crosses its thresholds while
+     * most of its window is still outside the bed, so a run's edges sit up to half a window too
+     * far out; walking inward from each edge on the short average finds where the bed really
+     * starts and stops. Edges only ever move inward here, never past each other.
+     */
+    private void refineEdges(List<int[]> runs, float[] edges, int reach, int n) {
+        for (int[] run : runs) {
+            int start = run[0];
+            int limit = Math.min(run[1] - 1, run[0] + reach);
+            for (int i = run[0]; i <= limit; i++) {
+                if (edges[i] >= config.edgeThreshold) {
+                    start = i;
                     break;
                 }
             }
-            if (clear) {
-                accepted.add(candidate);
+            int end = run[1];
+            int floor = Math.max(start + 1, run[1] - reach);
+            for (int i = run[1] - 1; i >= floor; i--) {
+                if (edges[i] >= config.edgeThreshold) {
+                    end = i + 1;
+                    break;
+                }
+            }
+            run[0] = start;
+            run[1] = Math.max(end, start + 1);
+        }
+    }
+
+    private static List<int[]> mergeRuns(List<int[]> runs, int gapFrames) {
+        List<int[]> merged = new ArrayList<>();
+        int[] current = null;
+        for (int[] run : runs) {
+            if (current != null && run[0] - current[1] < gapFrames) {
+                current[1] = Math.max(current[1], run[1]);
+            } else {
+                current = new int[]{run[0], run[1]};
+                merged.add(current);
             }
         }
-        Collections.sort(accepted);
-
-        int[] out = new int[accepted.size() + 2];
-        out[0] = 0;
-        for (int i = 0; i < accepted.size(); i++) {
-            out[i + 1] = accepted.get(i);
-        }
-        out[out.length - 1] = n;
-        return out;
+        return merged;
     }
 
     // ---------------------------------------------------------------------------------------
-    // 3. region scoring
+    // 3. confidence
     // ---------------------------------------------------------------------------------------
 
-    /** A scored region, before merging. */
+    /** A scored run, before capping. */
     private static final class Candidate {
-        long startMs;
-        long endMs;
-        double confidence;
+        final long startMs;
+        final long endMs;
+        final double confidence;
 
         Candidate(long startMs, long endMs, double confidence) {
             this.startMs = startMs;
@@ -408,118 +443,35 @@ public final class AdDetector {
         }
     }
 
-    private List<Candidate> scoreRegions(List<FeatureFrame> frames, double[][] z, int[] boundaries,
-                                         long episodeMs) {
-        int n = frames.size();
-        double episodeFlatnessSd = standardDeviation(frames, 0, n);
-        List<Candidate> out = new ArrayList<>();
-        for (int r = 0; r + 1 < boundaries.length; r++) {
-            int from = boundaries[r];
-            int to = boundaries[r + 1];
-            if (to - from < 2) {
-                continue;
-            }
-            long startMs = from == 0 ? 0L : frames.get(from).centerMs;
-            long endMs = to >= n ? episodeMs : frames.get(to).centerMs;
-            if (endMs <= startMs) {
-                continue;
-            }
-            double confidence = scoreRegion(frames, z, from, to, startMs, endMs, episodeMs,
-                    episodeFlatnessSd);
-            if (confidence >= config.minConfidence) {
-                out.add(new Candidate(startMs, endMs, confidence));
-            }
-        }
-        return out;
-    }
-
     /**
-     * Confidence for one region, in 0..1.
-     *
-     * <p>Three pieces of evidence, each a saturating function of how far the region's mean
-     * normalised profile sits from the episode median:
+     * Confidence for one run, in 0..1:
      * <pre>
-     *   profile  = |mean z of the 8 band shares| / sqrt(8)        the voice/mix changed
-     *   music    = 0.30 * (flatness below median)                 tonal, i.e. a music bed
-     *            + 0.25 * (low-band share above median)           bass the host chain does not have
-     *            + 0.25 * (crest below median)                    compressed, no pauses
-     *            + 0.20 * (flatness steadier than the episode)    the bed is sustained, not speech
-     *   loudness = (RMS above median)                             mastered hotter
-     *
-     *   evidence = 0.40 * profile + 0.30 * music + 0.30 * loudness
-     * </pre>
-     * Two priors then modulate it. They can only scale the evidence between one half and one, never
-     * create it, so a region that sounds exactly like the host can never be flagged because of
-     * where it sits or how long it is:
-     * <pre>
-     *   prior      = 0.5 + 0.25 * durationPrior + 0.25 * positionPrior
+     *   evidence   = evidenceQuantile of the bed score over the run / evidenceFullAt, capped at 1
+     *   prior      = priorBase + durationWeight * durationPrior + positionWeight * positionPrior
      *   confidence = evidence * prior
      * </pre>
+     * The duration prior carries real weight because it is the best single separator between ad
+     * breaks and everything else that has music under it: measured on labelled episodes, ad
+     * breaks ran from about a minute to six minutes, while stings, transitions, laughs and the
+     * odd hummy room all produced runs under a minute.
      */
-    private double scoreRegion(List<FeatureFrame> frames, double[][] z, int from, int to,
-                               long startMs, long endMs, long episodeMs, double episodeFlatnessSd) {
-        int count = to - from;
-        double[] meanZ = new double[DIM];
-        for (int d = 0; d < DIM; d++) {
-            double sum = 0;
-            for (int i = from; i < to; i++) {
-                sum += z[d][i];
-            }
-            meanZ[d] = sum / count;
-        }
-
-        double bandDistance = 0;
-        for (int b = 0; b < FeatureFrame.BAND_COUNT; b++) {
-            double v = meanZ[IDX_BAND0 + b];
-            bandDistance += v * v;
-        }
-        double profile = saturate(Math.sqrt(bandDistance) / Math.sqrt(FeatureFrame.BAND_COUNT));
-
-        double regionFlatnessSd = standardDeviation(frames, from, to);
-        double stability = episodeFlatnessSd > 1e-9
-                ? clamp(1.0 - regionFlatnessSd / episodeFlatnessSd, 0, 1)
-                : 0;
-        double music = 0.30 * saturate(-meanZ[IDX_FLATNESS])
-                + 0.25 * saturate(meanZ[IDX_LOW])
-                + 0.25 * saturate(-meanZ[IDX_CREST])
-                + 0.20 * stability;
-
-        double loudness = saturate(meanZ[IDX_RMS]);
-
-        double evidence = config.profileWeight * profile
-                + config.musicWeight * music
-                + config.loudnessWeight * loudness;
-
-        double prior = 0.5
-                + 0.25 * durationPrior(endMs - startMs)
-                + 0.25 * positionPrior(startMs, endMs, episodeMs);
-
+    private double confidence(float[] bed, int from, int to, long startMs, long endMs,
+                              long episodeMs) {
+        int count = Math.max(1, to - from);
+        float[] sorted = new float[count];
+        System.arraycopy(bed, from, sorted, 0, Math.min(count, bed.length - from));
+        float typical = AudioFeatureExtractor.percentile(sorted, count, config.evidenceQuantile);
+        double evidence = clamp(typical / config.evidenceFullAt, 0, 1);
+        double prior = config.priorBase
+                + config.durationWeight * durationPrior(endMs - startMs)
+                + config.positionWeight * positionPrior(startMs, endMs, episodeMs);
         return clamp(evidence * prior, 0, 1);
-    }
-
-    /** Standard deviation of the flatness feature over the half-open frame range. */
-    private static double standardDeviation(List<FeatureFrame> frames, int from, int to) {
-        int count = to - from;
-        if (count < 2) {
-            return 0;
-        }
-        double sum = 0;
-        for (int i = from; i < to; i++) {
-            sum += frames.get(i).flatness;
-        }
-        double mean = sum / count;
-        double variance = 0;
-        for (int i = from; i < to; i++) {
-            double d = frames.get(i).flatness - mean;
-            variance += d * d;
-        }
-        return Math.sqrt(variance / (count - 1));
     }
 
     /**
      * 1 across the typical ad length, tapering to 0 outside it. Real ad breaks run 15 s to 2 min;
-     * anything under 10 s is a jingle or a bad boundary and anything over 4 min is a segment of the
-     * show that happens to sound different.
+     * anything under 10 s is a jingle and anything over 4 min is a segment of the show that
+     * happens to have music under it.
      */
     private double durationPrior(long durationMs) {
         if (durationMs < config.minAdMs || durationMs > config.maxAdMs) {
@@ -558,8 +510,8 @@ public final class AdDetector {
         return Math.exp(-0.5 * t * t);
     }
 
-    private double saturate(double z) {
-        return clamp(z / config.saturation, 0, 1);
+    private static float clamp(float v, float lo, float hi) {
+        return v < lo ? lo : (v > hi ? hi : v);
     }
 
     private static double clamp(double v, double lo, double hi) {
@@ -567,45 +519,23 @@ public final class AdDetector {
     }
 
     // ---------------------------------------------------------------------------------------
-    // 4. merging and capping
+    // 4. capping
     // ---------------------------------------------------------------------------------------
 
-    private List<Candidate> mergeAndCap(List<Candidate> candidates, long episodeMs) {
-        if (candidates.isEmpty()) {
-            return candidates;
-        }
-        List<Candidate> sorted = new ArrayList<>(candidates);
-        Collections.sort(sorted, new Comparator<Candidate>() {
-            @Override
-            public int compare(Candidate a, Candidate b) {
-                return Long.compare(a.startMs, b.startMs);
-            }
-        });
-
-        List<Candidate> merged = new ArrayList<>();
-        Candidate current = null;
-        for (Candidate c : sorted) {
-            if (current != null && c.startMs - current.endMs < config.mergeGapMs) {
-                current.endMs = Math.max(current.endMs, c.endMs);
-                // The merged region is at least as ad-like as its strongest part, so keep the
-                // maximum rather than diluting a confident hit with a marginal neighbour.
-                current.confidence = Math.max(current.confidence, c.confidence);
-            } else {
-                current = new Candidate(c.startMs, c.endMs, c.confidence);
-                merged.add(current);
-            }
-        }
-
-        long budget = (long) (config.maxFlaggedFraction * episodeMs);
+    private List<Candidate> cap(List<Candidate> candidates, long episodeMs) {
+        // A short episode still gets room for one full-length break; the fraction is there to
+        // stop a long episode with music under everything from being flagged wholesale.
+        long budget = Math.max((long) (config.maxFlaggedFraction * episodeMs),
+                config.idealMaxAdMs);
         long total = 0;
-        for (Candidate c : merged) {
+        for (Candidate c : candidates) {
             total += c.endMs - c.startMs;
         }
         if (total <= budget) {
-            return merged;
+            return candidates;
         }
-        // Over budget: keep the most confident regions that fit, then restore time order.
-        List<Candidate> byConfidence = new ArrayList<>(merged);
+        // Over budget: keep the most confident runs that fit, then restore time order.
+        List<Candidate> byConfidence = new ArrayList<>(candidates);
         Collections.sort(byConfidence, new Comparator<Candidate>() {
             @Override
             public int compare(Candidate a, Candidate b) {

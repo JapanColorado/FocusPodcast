@@ -81,19 +81,32 @@ The seven classes that used to exceed ~1,000 lines were split by pure extraction
 Ad skipping is opt-in (`Prefs.isAdSkipEnabled`, default off) and has no ML runtime: `core/adskip/` is
 pure-Java DSP. `PcmDecoder` streams a downloaded file through `MediaCodec` to mono 16 kHz float,
 `AudioFeatureExtractor` turns it into one `FeatureFrame` per half second (RMS, crest factor, spectral
-flatness/centroid/rolloff/flux, low-band ratio, 8-band timbre vector), and `AdDetector` robust-normalises
-those against the episode median, finds change points, and scores regions that differ in timbre, carry
-a music bed or are louder/more compressed, modulated by duration and position priors. `ChapterAdMatcher`
-flags chapters titled like sponsor breaks, `AdSegmentMerger` gives manual > chapter > detected
-precedence, and `AdAnalyzer` is the facade. `AdAnalysisWorker` (WorkManager, unique per media id,
-enqueued from `MediaDownloadedHandler`) stores every result with confidence >= 0.3 in the `ad_segments`
-table (`AdSegmentDao`, DB version 4); the sensitivity preference is applied at playback time, so
-changing it needs no re-analysis. `PlaybackServiceAdSkipper` runs on the service's one-second ticker
-next to the intro/ending skipper: it only skips when playback *entered* a segment within a 3 s window,
-treats a seek into the middle as "let it play", posts `AdSkippedEvent` (the app shows the Undo
+flatness/centroid/rolloff/flux, low-band ratio, 8-band timbre vector, and the two "spectral floor"
+descriptors `floorDb`/`floorFlatness`: the per-bin 10th percentile across the window's sub-windows,
+i.e. what is still playing in the gaps between syllables). `AdDetector` listens for a music bed only:
+each frame gets a bed score from the floor being both loud (above -31 dB relative to the window) and
+tonal (flatness under 0.16), the score is averaged over 10 s and cut into runs with hysteresis, edges
+are re-placed on a 1.5 s average, runs closer than 10 s are merged, and confidence is the run's
+*median* bed score scaled by a prior that weights duration heavily (real breaks run about 1 to 6
+minutes; stings, transitions and hummy rooms produce runs under a minute). The earlier
+"differs-from-the-episode-median" scoring was dropped after measuring it on 23 labelled sponsor
+breaks across six shows: ad loudness, crest and flatness flip sign from show to show, and on
+interview shows the guest deviates as much as any ad. Do not tune thresholds by hand; the harness
+that produced the defaults (ffmpeg-decoded real episodes with sponsor chapters as ground truth,
+run through the real extractor and detector on the JVM) is described in `docs/AD_SKIP_TUNING.md`.
+`ChapterAdMatcher` flags chapters titled like sponsor breaks, `AdSegmentMerger` gives manual > chapter
+> detected precedence, and `AdAnalyzer` is the facade. `AdAnalysisWorker` (WorkManager, unique per
+media id) is enqueued from `MediaDownloadedHandler` after a download and from
+`PlaybackServiceAdSkipper` the first time a downloaded episode that was never analysed starts playing
+(completion is remembered in `Prefs.isAdAnalyzed`, a string-set preference, because "no ads found"
+and "never run" look the same in the table). It stores every result with confidence >= 0.3 in the
+`ad_segments` table (`AdSegmentDao`, DB version 4); the sensitivity preference is applied at playback
+time, so changing it needs no re-analysis. `PlaybackServiceAdSkipper` runs on the service's one-second
+ticker next to the intro/ending skipper: it only skips when playback *entered* a segment within a 3 s
+window, treats a seek into the middle as "let it play", posts `AdSkippedEvent` (the app shows the Undo
 snackbar and answers with `AdSkipUndoEvent`), and never shows UI itself. The detector's honest limits:
-host-read ads with no music bed and no level change are invisible to it, and timbre outliers such as
-phone-line guests or archival clips are the likely false positives, which is why segments are drawn on
+host-read ads with no music bed (ATP-style) are invisible to it, and intro/outro theme music and
+in-show music segments are the likely false positives, which is why segments are drawn on
 the seek bar and can be disabled or deleted per episode.
 
 ### How the layers talk to each other

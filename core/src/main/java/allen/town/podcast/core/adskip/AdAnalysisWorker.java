@@ -27,6 +27,9 @@ import allen.town.podcast.model.feed.Chapter;
 import allen.town.podcast.model.feed.Feed;
 import allen.town.podcast.model.feed.FeedItem;
 import allen.town.podcast.model.feed.FeedMedia;
+import io.reactivex.Completable;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.schedulers.Schedulers;
 
 /**
  * Runs {@link AdAnalyzer} over one downloaded episode in the background and stores the result.
@@ -115,8 +118,35 @@ public class AdAnalysisWorker extends Worker {
             Log.e(TAG, "Could not store the ad segments of " + media.getEpisodeTitle(), e);
             return Result.failure();
         }
+        Prefs.markAdAnalyzed(mediaId);
         Log.d(TAG, "Analysed " + media.getEpisodeTitle() + ": " + segments.size() + " segments");
         return Result.success();
+    }
+
+    /**
+     * Queues an analysis for a downloaded episode that is starting to play and has never been
+     * analysed, so that a library downloaded before ad skipping was switched on still gets
+     * covered without the user asking episode by episode. The database check runs off the main
+     * thread; an episode analysed once, even with nothing found, is never re-analysed by this
+     * path.
+     *
+     * @return the subscription doing the work, for the caller to own, or null when there was
+     *         nothing to do.
+     */
+    @Nullable
+    public static Disposable enqueueOnPlayback(@NonNull Context context,
+                                               @Nullable FeedMedia media) {
+        if (media == null || media.getId() <= 0 || !media.isDownloaded()
+                || !Prefs.isAdSkipEnabled() || Prefs.isAdAnalyzed(media.getId())) {
+            return null;
+        }
+        final Context applicationContext = context.getApplicationContext();
+        final long mediaId = media.getId();
+        return Completable.fromAction(() -> enqueue(applicationContext, mediaId, false))
+                .subscribeOn(Schedulers.io())
+                .subscribe(() -> { },
+                        error -> Log.e(TAG, "Could not queue the ad analysis of media "
+                                + mediaId, error));
     }
 
     /**

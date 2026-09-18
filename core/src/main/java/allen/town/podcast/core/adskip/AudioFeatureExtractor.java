@@ -12,14 +12,15 @@ import java.util.List;
  * <p>This is the only place in the ad-skip package that knows how audio becomes numbers. It is pure
  * Java with no Android imports so that it can be unit tested on the JVM, and it is a streaming
  * consumer: {@link #accept} may be called with arbitrarily sized chunks as the decoder produces
- * them, and nothing larger than one analysis window (one second, 64 KB) is ever retained. A three
- * hour episode as raw 16 kHz float PCM would be about 700 MB, which is why the decoder pushes into
- * this class instead of handing it an array.
+ * them, and nothing larger than one analysis window (one second, 64 KB, plus its thirty sub-window
+ * spectra) is ever retained. A three hour episode as raw 16 kHz float PCM would be about 700 MB,
+ * which is why the decoder pushes into this class instead of handing it an array.
  *
  * <p>Geometry: a 1.0 s analysis window advancing in 0.5 s hops. Inside each window the signal is
- * cut into 1024-point Hann sub-windows with 50% overlap and their power spectra are averaged, which
+ * cut into 1024-point Hann sub-windows with 50% overlap. Their power spectra are averaged, which
  * both smooths the periodogram (so spectral flatness is meaningful) and gives the window a single
- * representative timbre.
+ * representative timbre; and their per-bin 10th percentile is kept as the "floor", the spectrum
+ * of whatever is still playing when the voice pauses ({@link FeatureFrame#floorDb}).
  */
 public final class AudioFeatureExtractor {
 
@@ -46,6 +47,17 @@ public final class AudioFeatureExtractor {
 
     private static final float ROLLOFF_FRACTION = 0.85f;
 
+    /**
+     * The spectral floor is this percentile of each bin's power across the window's sub-windows.
+     * Speech pauses several times a second, so the bottom tenth of a one-second window is what
+     * plays underneath the voice: room tone, or a music bed.
+     */
+    private static final double FLOOR_PERCENTILE = 0.10;
+
+    /** Frequency range over which the floor's flatness is measured, in Hz. */
+    private static final float FLOOR_LOW_HZ = 50f;
+    private static final float FLOOR_HIGH_HZ = 3000f;
+
     /** Guards log(0) and 0/0. Relative epsilons are used wherever the quantity has a scale. */
     private static final double EPS = 1e-12;
 
@@ -54,12 +66,18 @@ public final class AudioFeatureExtractor {
     private final Fft fft = new Fft(FFT_SIZE);
     private final float[] hann = Fft.hann(FFT_SIZE);
     private final float[] windowed = new float[FFT_SIZE];
-    private final float[] subSpectrum = new float[bins];
     private final float[] avgSpectrum = new float[bins];
+    private final float[] floorSpectrum = new float[bins];
     private final float[] magnitude = new float[bins];
     private final float[] previousMagnitude = new float[bins];
     private final int[] bandOfBin = new int[bins];
     private final int lowBandBinLimit;
+    private final int floorFirstBin;
+    private final int floorLastBin;
+
+    /** One power spectrum per sub-window of the current window; the floor is read column-wise. */
+    private final float[][] subSpectra;
+    private final float[] column;
 
     private final float[] buffer = new float[WINDOW_SAMPLES];
     private final List<FeatureFrame> frames = new ArrayList<>();
@@ -83,6 +101,11 @@ public final class AudioFeatureExtractor {
             }
         }
         lowBandBinLimit = Math.min(bins, (int) Math.ceil(LOW_BAND_HZ / binWidthHz));
+        floorFirstBin = Math.max(1, (int) Math.ceil(FLOOR_LOW_HZ / binWidthHz));
+        floorLastBin = Math.min(bins - 1, (int) Math.floor(FLOOR_HIGH_HZ / binWidthHz));
+        int subWindowCount = (WINDOW_SAMPLES - FFT_SIZE) / FFT_HOP + 1;
+        subSpectra = new float[subWindowCount][bins];
+        column = new float[subWindowCount];
     }
 
     /** Convenience overload for callers holding a whole buffer. */
@@ -159,9 +182,10 @@ public final class AudioFeatureExtractor {
             for (int i = 0; i < FFT_SIZE; i++) {
                 windowed[i] = buffer[start + i] * hann[i];
             }
-            fft.powerSpectrum(windowed, 0, subSpectrum);
+            float[] spectrum = subSpectra[subWindows];
+            fft.powerSpectrum(windowed, 0, spectrum);
             for (int k = 0; k < bins; k++) {
-                avgSpectrum[k] += subSpectrum[k];
+                avgSpectrum[k] += spectrum[k];
             }
             subWindows++;
         }
@@ -171,6 +195,37 @@ public final class AudioFeatureExtractor {
                 avgSpectrum[k] *= inverse;
             }
         }
+
+        // --- spectral floor: what plays underneath the voice ---------------------------------
+        for (int k = 0; k < bins; k++) {
+            for (int s = 0; s < subWindows; s++) {
+                column[s] = subSpectra[s][k];
+            }
+            floorSpectrum[k] = percentile(column, subWindows, FLOOR_PERCENTILE);
+        }
+        double floorTotal = 0;
+        double meanTotal = 0;
+        for (int k = 1; k < bins; k++) {
+            floorTotal += floorSpectrum[k];
+            meanTotal += avgSpectrum[k];
+        }
+        float floorDb = meanTotal > EPS
+                ? (float) Math.min(0.0, 10.0 * Math.log10((floorTotal + EPS) / (meanTotal + EPS)))
+                : 0f;
+        int floorBins = floorLastBin - floorFirstBin + 1;
+        double floorMean = 0;
+        for (int k = floorFirstBin; k <= floorLastBin; k++) {
+            floorMean += floorSpectrum[k];
+        }
+        floorMean /= floorBins;
+        double floorGuard = floorMean * 1e-12 + 1e-20;
+        double floorLogSum = 0;
+        for (int k = floorFirstBin; k <= floorLastBin; k++) {
+            floorLogSum += Math.log(floorSpectrum[k] + floorGuard);
+        }
+        float floorFlatness = floorMean > 0
+                ? (float) Math.min(1.0, Math.exp(floorLogSum / floorBins) / (floorMean + floorGuard))
+                : 1f;
 
         // --- spectral descriptors ----------------------------------------------------------
         // Bin 0 is skipped everywhere: it is DC, not sound.
@@ -250,6 +305,23 @@ public final class AudioFeatureExtractor {
         hasPrevious = true;
 
         frames.add(new FeatureFrame(startMs, startMs + WINDOW_MS / 2, rmsDb, crest, centroidHz,
-                flatness, rolloffHz, zcr, flux, lowBandRatio, bands));
+                flatness, rolloffHz, zcr, flux, lowBandRatio, floorDb, floorFlatness, bands));
+    }
+
+    /**
+     * Linearly interpolated percentile of the first {@code count} values. Sorts the array in
+     * place; it is a scratch column. The window has only about thirty sub-windows, so a plain sort
+     * per bin costs nothing worth optimising.
+     */
+    static float percentile(float[] values, int count, double fraction) {
+        if (count <= 0) {
+            return 0f;
+        }
+        java.util.Arrays.sort(values, 0, count);
+        double position = fraction * (count - 1);
+        int below = (int) Math.floor(position);
+        int above = Math.min(count - 1, below + 1);
+        float weight = (float) (position - below);
+        return values[below] + weight * (values[above] - values[below]);
     }
 }

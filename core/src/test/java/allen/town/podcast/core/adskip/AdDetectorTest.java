@@ -141,11 +141,11 @@ public class AdDetectorTest {
 
     @Test
     public void findsAShortPreRollAndAnOffAnchorMidRoll() {
-        // A harder layout than the main fixture: a 20 s pre-roll, which sits right on the duration
+        // A harder layout than the main fixture: a 25 s pre-roll, which sits low on the duration
         // prior's ramp, and a 45 s mid-roll deliberately placed away from the 1/3 and 2/3 marks so
         // the position prior cannot help.
         long durationMs = 30 * 60 * 1000L;
-        long[][] ads = {{15_000L, 35_000L}, {742_000L, 787_000L}};
+        long[][] ads = {{15_000L, 40_000L}, {742_000L, 787_000L}};
         List<FeatureFrame> frames = SyntheticEpisode.render(durationMs, ads, 31337L);
         List<AdSegment> found = new AdDetector().detect(frames, durationMs, FEED_ITEM_ID);
         String report = describe(found);

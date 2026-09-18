@@ -81,6 +81,7 @@ object Prefs {
     const val PREF_AD_SKIP_SENSITIVITY = "pref_ad_skip_sensitivity"
     const val PREF_AD_SKIP_ANALYZE_ON_DOWNLOAD = "pref_ad_skip_analyze_on_download"
     const val PREF_AD_SKIP_SHOW_SNACKBAR = "pref_ad_skip_show_snackbar"
+    const val PREF_AD_SKIP_ANALYZED_MEDIA = "pref_ad_skip_analyzed_media"
 
     // Network
     const val PREF_UPDATE_INTERVAL = "pref_auto_refresh_interval"
@@ -605,6 +606,14 @@ object Prefs {
         set(show) {
             AdSkipPrefs.isAdSkipShowSnackbar = show
         }
+
+    /** Whether the ad analysis has already completed for a media id; see [AdSkipPrefs]. */
+    @JvmStatic
+    fun isAdAnalyzed(mediaId: Long): Boolean = AdSkipPrefs.isAdAnalyzed(mediaId)
+
+    /** Remembers that the ad analysis completed for a media id. */
+    @JvmStatic
+    fun markAdAnalyzed(mediaId: Long) = AdSkipPrefs.markAdAnalyzed(mediaId)
 
     fun shouldShowColumnInLandscape(): Boolean = UiPrefs.shouldShowColumnInLandscape()
 

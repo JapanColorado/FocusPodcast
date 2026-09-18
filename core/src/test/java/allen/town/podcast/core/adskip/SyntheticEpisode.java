@@ -11,13 +11,14 @@ import java.util.Random;
  * <p>Two voices:
  * <ul>
  *   <li><b>host speech</b> -- band-limited noise (250 Hz to 3 kHz, two poles each side) with a 4 Hz
- *       amplitude modulation standing in for syllables, plus randomly placed breathing pauses. Left
- *       at a moderate level with plenty of headroom, so its crest factor is high.</li>
+ *       syllable envelope that dips almost to silence between syllables, plus randomly placed
+ *       breathing pauses. Left at a moderate level with plenty of headroom, so its crest factor
+ *       is high, and in its gaps only the room is audible.</li>
  *   <li><b>ad</b> -- a different band (450 Hz to 4.5 kHz, i.e. a different voice and mic chain),
- *       modulated faster and more shallowly, driven hard into a clipper so it is compressed and its
- *       crest factor collapses, then mixed with a sustained six-tone music bed weighted towards the
- *       bass. The result is louder, more tonal, bassier and flatter in dynamics: exactly the four
- *       things the detector looks for.</li>
+ *       with a faster syllable envelope and no breathing pauses, driven hard into a clipper so it
+ *       is compressed, then mixed with a sustained six-tone music bed weighted towards the bass.
+ *       In the gaps between its syllables the bed is what remains, which is exactly what
+ *       {@link AdDetector} listens for.</li>
  * </ul>
  *
  * <p>Nothing here is tuned to the detector's thresholds; the two signals are built from the
@@ -118,15 +119,25 @@ final class SyntheticEpisode {
 
     private double speechSample(double t, double room) {
         double voice = filter(speechChain, random.nextGaussian()) * speechGain;
-        // Syllable-rate modulation plus breathing pauses; both leave the peaks far above the RMS.
-        double syllables = 0.35 + 0.65 * (0.5 + 0.5 * Math.sin(2 * Math.PI * 4.0 * t));
-        double envelope = gateSmoother.lp((float) gate()) * syllables;
+        // Syllable-rate modulation plus breathing pauses; both leave the peaks far above the RMS,
+        // and between syllables the voice all but stops, leaving only the room.
+        double envelope = gateSmoother.lp((float) gate()) * syllables(4.0, t);
         return voice * envelope + room;
+    }
+
+    /**
+     * A syllable envelope: a raised cosine at the given rate, cubed so that the gaps between
+     * syllables are deep and short, the way speech actually pauses. Never quite zero.
+     */
+    private static double syllables(double rateHz, double t) {
+        double raised = 0.5 + 0.5 * Math.sin(2 * Math.PI * rateHz * t);
+        return 0.03 + 0.97 * raised * raised * raised;
     }
 
     private double adSample(double t, double room) {
         double voice = filter(adChain, random.nextGaussian()) * adGain;
-        double envelope = 0.78 + 0.22 * Math.sin(2 * Math.PI * 5.5 * t);
+        // A faster talker who never stops for breath, but still pauses between syllables.
+        double envelope = syllables(5.5, t);
         double driven = voice * envelope * AD_DRIVE;
         double clipped = Math.max(-AD_CLIP, Math.min(AD_CLIP, driven));
 

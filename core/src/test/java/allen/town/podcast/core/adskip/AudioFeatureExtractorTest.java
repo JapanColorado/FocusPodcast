@@ -115,6 +115,60 @@ public class AudioFeatureExtractorTest {
         }
     }
 
+    /** Noise bursts of 150 ms every 250 ms: speech-like gaps, four per second. */
+    private static float[] gatedNoise(int seconds, float amplitude, long seed) {
+        float[] x = whiteNoise(seconds, amplitude, seed);
+        int period = RATE / 4;
+        int on = period * 6 / 10;
+        for (int i = 0; i < x.length; i++) {
+            if (i % period >= on) {
+                x[i] = 0f;
+            }
+        }
+        return x;
+    }
+
+    private static float[] mix(float[] a, float[] b) {
+        float[] out = new float[Math.min(a.length, b.length)];
+        for (int i = 0; i < out.length; i++) {
+            out[i] = a[i] + b[i];
+        }
+        return out;
+    }
+
+    @Test
+    public void continuousNoiseHasAHighFloorAndGatedNoiseALowOne() {
+        FeatureFrame continuous = analyse(whiteNoise(3, 0.1f, 3)).get(1);
+        FeatureFrame gated = analyse(mix(gatedNoise(3, 0.1f, 3), whiteNoise(3, 0.0005f, 4)))
+                .get(1);
+        // Even a steady signal's per-bin 10th percentile sits several dB under its mean, because
+        // each bin's power fluctuates between sub-windows; the point is the gap to gated audio.
+        assertTrue("uninterrupted noise keeps its floor near its mean, was " + continuous.floorDb,
+                continuous.floorDb > -12f);
+        assertTrue("gaps drop the floor to the room, was " + gated.floorDb,
+                gated.floorDb < -25f);
+        assertTrue("a noisy room has a flat floor, was " + gated.floorFlatness,
+                gated.floorFlatness > 0.3f);
+    }
+
+    @Test
+    public void aSustainedToneUnderGatedNoiseHoldsTheFloorUpAndMakesItTonal() {
+        float[] bed = tone(3, 220f, 0.02f);
+        FeatureFrame frame = analyse(mix(gatedNoise(3, 0.1f, 5), bed)).get(1);
+        assertTrue("the bed fills the gaps, floor was " + frame.floorDb, frame.floorDb > -25f);
+        assertTrue("the floor is the tone, flatness was " + frame.floorFlatness,
+                frame.floorFlatness < 0.1f);
+    }
+
+    @Test
+    public void percentileInterpolatesLinearly() {
+        float[] values = {10f, 3f, 7f, 1f, 9f, 5f, 8f, 2f, 6f, 4f};
+        assertEquals(1.9f, AudioFeatureExtractor.percentile(values, values.length, 0.1), 1e-6);
+        assertEquals(1f, AudioFeatureExtractor.percentile(values, values.length, 0.0), 1e-6);
+        assertEquals(10f, AudioFeatureExtractor.percentile(values, values.length, 1.0), 1e-6);
+        assertEquals(0f, AudioFeatureExtractor.percentile(values, 0, 0.5), 1e-6);
+    }
+
     @Test
     public void crestFactorIsLowerForACompressedSignal() {
         float[] square = new float[RATE * 2];

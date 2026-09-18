@@ -60,6 +60,26 @@ public final class FeatureFrame {
     public final float lowBandRatio;
 
     /**
+     * Level of the spectral floor relative to the window's mean power, in dB (at most 0).
+     *
+     * <p>The floor is the 10th percentile of each bin's power across the window's sub-windows:
+     * what is left when the voice pauses between syllables. Plain speech in a quiet room drops
+     * to -35 dB and below in its gaps; a music bed under the voice holds the floor up around
+     * -30 to -20 dB, and wall-to-wall music has no gaps at all and sits near 0 dB. This is the
+     * most reliable single sign of an advert, because it does not depend on whose voice is on the
+     * microphone.
+     */
+    public final float floorDb;
+
+    /**
+     * Spectral flatness of that floor spectrum between 50 Hz and 3 kHz, in 0..1. Room tone is
+     * noise-like (0.15 and up); a music bed leaves a set of sustained harmonics and reads well
+     * below 0.1. Together with {@link #floorDb} this distinguishes "a bed is playing" from
+     * "this host has a noisy room" and from "this room has a hum".
+     */
+    public final float floorFlatness;
+
+    /**
      * Energy in eight log-spaced bands between 50 Hz and 8 kHz, normalised to sum to 1. This is the
      * "timbre signature": it ignores level and describes only the shape of the spectrum, which is
      * what changes when the voice, the microphone chain or the music bed changes.
@@ -69,7 +89,7 @@ public final class FeatureFrame {
 
     FeatureFrame(long startMs, long centerMs, float rmsDb, float crest, float centroidHz,
                  float flatness, float rolloffHz, float zcr, float flux, float lowBandRatio,
-                 @NonNull float[] bands) {
+                 float floorDb, float floorFlatness, @NonNull float[] bands) {
         if (bands.length != BAND_COUNT) {
             throw new IllegalArgumentException("expected " + BAND_COUNT + " bands");
         }
@@ -83,6 +103,8 @@ public final class FeatureFrame {
         this.zcr = zcr;
         this.flux = flux;
         this.lowBandRatio = lowBandRatio;
+        this.floorDb = floorDb;
+        this.floorFlatness = floorFlatness;
         this.bands = bands;
     }
 
@@ -91,8 +113,9 @@ public final class FeatureFrame {
     public String toString() {
         return String.format(Locale.US,
                 "FeatureFrame{t=%.1fs rms=%.1fdB crest=%.2f centroid=%.0fHz flat=%.3f "
-                        + "rolloff=%.0fHz zcr=%.3f flux=%.3f low=%.3f}",
+                        + "rolloff=%.0fHz zcr=%.3f flux=%.3f low=%.3f floor=%.1fdB "
+                        + "floorFlat=%.3f}",
                 centerMs / 1000.0, rmsDb, crest, centroidHz, flatness, rolloffHz, zcr, flux,
-                lowBandRatio);
+                lowBandRatio, floorDb, floorFlatness);
     }
 }

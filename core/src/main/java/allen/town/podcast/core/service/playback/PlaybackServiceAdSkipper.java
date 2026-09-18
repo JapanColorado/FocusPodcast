@@ -13,6 +13,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import allen.town.podcast.core.adskip.AdAnalysisWorker;
 import allen.town.podcast.core.pref.Prefs;
 import allen.town.podcast.core.storage.DBReader;
 import allen.town.podcast.event.adskip.AdSkipUndoEvent;
@@ -100,6 +101,12 @@ class PlaybackServiceAdSkipper {
         reset();
         segmentsItemId = itemId;
         load(itemId);
+        // A downloaded episode that predates the feature (or slipped past the download hook) is
+        // analysed the first time it is played; results arrive through AdSegmentsChangedEvent.
+        Disposable analysis = AdAnalysisWorker.enqueueOnPlayback(service, (FeedMedia) playable);
+        if (analysis != null) {
+            service.addServiceDisposable(analysis);
+        }
     }
 
     /** Re-reads the segments of the current episode after they changed in the database. */

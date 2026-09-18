@@ -65,4 +65,26 @@ internal object AdSkipPrefs {
         set(show) {
             prefs.edit().putBoolean(Prefs.PREF_AD_SKIP_SHOW_SNACKBAR, show).apply()
         }
+
+    /**
+     * Whether the audio analysis has completed for a media id. The result of an analysis is a
+     * set of segments, and "none found" is indistinguishable from "never run" in that table, so
+     * completion is remembered here. It only gates the analysis that playback of a downloaded
+     * episode triggers; a fresh download and the "analyse this episode" action always run.
+     */
+    fun isAdAnalyzed(mediaId: Long): Boolean =
+        prefs.getStringSet(Prefs.PREF_AD_SKIP_ANALYZED_MEDIA, emptySet())
+            ?.contains(mediaId.toString()) == true
+
+    fun markAdAnalyzed(mediaId: Long) {
+        val current = prefs.getStringSet(Prefs.PREF_AD_SKIP_ANALYZED_MEDIA, emptySet())
+            ?: emptySet()
+        if (mediaId.toString() in current) {
+            return
+        }
+        // getStringSet's result must never be mutated; write a fresh copy.
+        val updated = HashSet(current)
+        updated.add(mediaId.toString())
+        prefs.edit().putStringSet(Prefs.PREF_AD_SKIP_ANALYZED_MEDIA, updated).apply()
+    }
 }
