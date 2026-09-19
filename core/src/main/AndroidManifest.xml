@@ -25,6 +25,13 @@
             android:foregroundServiceType="dataSync"
             android:enabled="true" />
 
+        <!-- WorkManager's foreground service, used by AdAnalysisWorker. WorkManager 2.7 declares
+             it without a type; Android 14+ refuses to start it unless one is merged in. -->
+        <service
+            android:name="androidx.work.impl.foreground.SystemForegroundService"
+            android:foregroundServiceType="dataSync"
+            tools:node="merge" />
+
         <service android:name="allen.town.podcast.core.service.playback.PlaybackService"
             android:label="@string/app_name"
             android:foregroundServiceType="mediaPlayback"

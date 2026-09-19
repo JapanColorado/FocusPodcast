@@ -80,6 +80,15 @@ public final class AdDetector {
         /** The flatness ramp saturates this far below {@link #floorFlatnessMax}. */
         public final float floorFlatnessRange;
 
+        /**
+         * Floor level, in dB relative to the window mean, from which a frame counts as "filled"
+         * regardless of flatness: a produced spot whose music leaves no gaps at all.
+         */
+        public final float filledFloorDbMin;
+
+        /** The filled-floor ramp saturates this many dB above {@link #filledFloorDbMin}. */
+        public final float filledFloorDbRange;
+
         /** Length of the moving average the segmentation runs on, in milliseconds. */
         public final int smoothingMs;
 
@@ -139,6 +148,8 @@ public final class AdDetector {
             this.floorDbRange = b.floorDbRange;
             this.floorFlatnessMax = b.floorFlatnessMax;
             this.floorFlatnessRange = b.floorFlatnessRange;
+            this.filledFloorDbMin = b.filledFloorDbMin;
+            this.filledFloorDbRange = b.filledFloorDbRange;
             this.smoothingMs = b.smoothingMs;
             this.enterThreshold = b.enterThreshold;
             this.stayThreshold = b.stayThreshold;
@@ -168,6 +179,8 @@ public final class AdDetector {
             private float floorDbRange = 8f;
             private float floorFlatnessMax = 0.16f;
             private float floorFlatnessRange = 0.08f;
+            private float filledFloorDbMin = -21f;
+            private float filledFloorDbRange = 6f;
             private int smoothingMs = 10000;
             private float enterThreshold = 0.35f;
             private float stayThreshold = 0.20f;
@@ -198,6 +211,12 @@ public final class AdDetector {
             public Builder floorFlatness(float max, float range) {
                 floorFlatnessMax = max;
                 floorFlatnessRange = range;
+                return this;
+            }
+
+            public Builder filledFloor(float minDb, float rangeDb) {
+                filledFloorDbMin = minDb;
+                filledFloorDbRange = rangeDb;
                 return this;
             }
 
@@ -338,7 +357,12 @@ public final class AdDetector {
         float level = clamp((frame.floorDb - config.floorDbMin) / config.floorDbRange, 0f, 1f);
         float tonal = clamp((config.floorFlatnessMax - frame.floorFlatness)
                 / config.floorFlatnessRange, 0f, 1f);
-        return level * tonal;
+        // A produced spot with drums or broadband music under the voice has a floor that is not
+        // tonal but is so high that speech gaps have all but vanished; nothing a host records in
+        // a room gets there, except heavily processed shows, which the duration prior handles.
+        float filled = clamp((frame.floorDb - config.filledFloorDbMin) / config.filledFloorDbRange,
+                0f, 1f);
+        return Math.max(level * tonal, filled);
     }
 
     // ---------------------------------------------------------------------------------------

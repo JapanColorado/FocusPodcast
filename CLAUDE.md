@@ -85,7 +85,8 @@ flatness/centroid/rolloff/flux, low-band ratio, 8-band timbre vector, and the tw
 descriptors `floorDb`/`floorFlatness`: the per-bin 10th percentile across the window's sub-windows,
 i.e. what is still playing in the gaps between syllables). `AdDetector` listens for a music bed only:
 each frame gets a bed score from the floor being both loud (above -31 dB relative to the window) and
-tonal (flatness under 0.16), the score is averaged over 10 s and cut into runs with hysteresis, edges
+tonal (flatness under 0.16), or from the floor being filled outright (above -21 dB, any flatness:
+a produced spot with drums under the voice), the score is averaged over 10 s and cut into runs with hysteresis, edges
 are re-placed on a 1.5 s average, runs closer than 10 s are merged, and confidence is the run's
 *median* bed score scaled by a prior that weights duration heavily (real breaks run about 1 to 6
 minutes; stings, transitions and hummy rooms produce runs under a minute). The earlier
@@ -98,7 +99,7 @@ run through the real extractor and detector on the JVM) is described in `docs/AD
 > detected precedence, and `AdAnalyzer` is the facade. `AdAnalysisWorker` (WorkManager, unique per
 media id) is enqueued from `MediaDownloadedHandler` after a download and from
 `PlaybackServiceAdSkipper` the first time a downloaded episode that was never analysed starts playing
-(completion is remembered in `Prefs.isAdAnalyzed`, a string-set preference, because "no ads found"
+(it promotes itself to foreground work with a quiet notification, since a plain worker is stopped after about ten minutes; completion is remembered in `Prefs.isAdAnalyzed`, a string-set preference, because "no ads found"
 and "never run" look the same in the table). It stores every result with confidence >= 0.3 in the
 `ad_segments` table (`AdSegmentDao`, DB version 4); the sensitivity preference is applied at playback
 time, so changing it needs no re-analysis. `PlaybackServiceAdSkipper` runs on the service's one-second

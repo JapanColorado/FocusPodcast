@@ -1,13 +1,18 @@
 package allen.town.podcast.core.adskip;
 
+import android.app.Notification;
 import android.content.Context;
+import android.content.pm.ServiceInfo;
+import android.os.Build;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.app.NotificationCompat;
 import androidx.work.Constraints;
 import androidx.work.Data;
 import androidx.work.ExistingWorkPolicy;
+import androidx.work.ForegroundInfo;
 import androidx.work.OneTimeWorkRequest;
 import androidx.work.WorkManager;
 import androidx.work.Worker;
@@ -19,7 +24,9 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 import allen.town.podcast.core.ClientConfig;
+import allen.town.podcast.core.R;
 import allen.town.podcast.core.pref.Prefs;
+import allen.town.podcast.core.util.ui.NotificationUtils;
 import allen.town.podcast.core.storage.DBReader;
 import allen.town.podcast.core.storage.DBWriter;
 import allen.town.podcast.model.feed.AdSegment;
@@ -58,6 +65,9 @@ public class AdAnalysisWorker extends Worker {
 
     private static final String WORK_NAME_PREFIX = "ad-analysis-";
 
+    /** Id of the foreground notification shown while an episode is being analysed. */
+    private static final int NOTIFICATION_ID = 0xAD5C1F;
+
     public AdAnalysisWorker(@NonNull Context context, @NonNull WorkerParameters params) {
         super(context, params);
     }
@@ -89,6 +99,12 @@ public class AdAnalysisWorker extends Worker {
         List<Chapter> chapters = loadChapters(item);
         storeChapterSegments(item, chapters);
 
+        // Decoding a two hour episode takes minutes of CPU. A plain background job is stopped by
+        // the system after about ten minutes, and sooner on some devices when the app is not in
+        // front, so promote the run to a foreground service for its duration.
+        promoteToForeground(media);
+
+        long started = System.currentTimeMillis();
         List<AdSegment> segments;
         try {
             segments = new AdAnalyzer().analyze(filePath, item.getId(), media.getDuration(),
@@ -97,11 +113,13 @@ public class AdAnalysisWorker extends Worker {
             Log.e(TAG, "Could not analyse " + media.getEpisodeTitle(), e);
             return Result.failure();
         }
+        long elapsedMs = System.currentTimeMillis() - started;
 
         if (isStopped()) {
             // Half the file was decoded at best. Dropping the run is better than storing segments
             // derived from a truncated episode; the next download or a manual request re-enqueues.
-            Log.d(TAG, "Analysis of " + media.getEpisodeTitle() + " was stopped");
+            Log.w(TAG, "Analysis of " + media.getEpisodeTitle() + " was stopped after "
+                    + elapsedMs / 1000 + " s");
             return Result.failure();
         }
 
@@ -119,8 +137,43 @@ public class AdAnalysisWorker extends Worker {
             return Result.failure();
         }
         Prefs.markAdAnalyzed(mediaId);
-        Log.d(TAG, "Analysed " + media.getEpisodeTitle() + ": " + segments.size() + " segments");
+        Log.i(TAG, "Analysed " + media.getEpisodeTitle() + " in " + elapsedMs / 1000 + " s: "
+                + segments.size() + " segments");
         return Result.success();
+    }
+
+    /**
+     * Asks WorkManager to run the rest of this job inside its foreground service, with a quiet
+     * progress notification. Best effort: on Android 12 and later the system refuses to start a
+     * foreground service from a background app, and the analysis then simply runs as ordinary
+     * background work with the limits that implies.
+     */
+    private void promoteToForeground(@NonNull FeedMedia media) {
+        Context context = getApplicationContext();
+        Notification notification = new NotificationCompat.Builder(context,
+                NotificationUtils.CHANNEL_ID_DOWNLOADING)
+                .setContentTitle(context.getString(R.string.ad_analysis_notification_title))
+                .setContentText(media.getEpisodeTitle())
+                .setSmallIcon(R.drawable.ic_notification)
+                .setOngoing(true)
+                .setSilent(true)
+                .setPriority(NotificationCompat.PRIORITY_LOW)
+                .setProgress(0, 0, true)
+                .build();
+        ForegroundInfo info;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            info = new ForegroundInfo(NOTIFICATION_ID, notification,
+                    ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC);
+        } else {
+            info = new ForegroundInfo(NOTIFICATION_ID, notification);
+        }
+        try {
+            setForegroundAsync(info).get();
+        } catch (ExecutionException | IllegalStateException e) {
+            Log.w(TAG, "Could not run the ad analysis in the foreground; continuing anyway", e);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
     }
 
     /**

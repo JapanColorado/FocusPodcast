@@ -94,6 +94,27 @@ level ramp admits. Most of the remaining false segments at medium are outro musi
 chapter files did not label. Partial coverage on some breaks (Changelog's Buildkite spots, for
 example) is a bed that drops out mid-ad; the skipper then jumps the first part and the rest plays.
 
+## Produced (dynamically inserted) spots
+
+Distractible "Would You Rather (Part 2)" (Megaphone, 2026-09-19 fetch) was transcribed offline
+with vosk to label its spots, since it has no chapters: a 34 s carrier spot at 0:00 and a 30 s
+Purina spot at 75:27. Both are mastered spots with drums under the voice: their floor is high
+(-15 to -22 dB) but noise-like (flatness 0.2 to 0.5), which the tonal-bed gate rejects. A second
+per-frame cue, the *filled floor* (level alone, from -21 dB, saturating at -15 dB, no flatness
+condition), catches both; non-ad audio with a floor that high is almost only theme music, plus
+JS Party's heavily compressed hosts. Cost on the labelled set at medium sensitivity: false
+segments 5 to 9, non-ad minutes 8.9 to 12.7. The pre-roll still only reaches 0.55 (high
+sensitivity), because the run merges with the show's own intro bed and a light bed under the
+first minute of chat, which dilutes its median. That episode also produces four false runs of
+ordinary chat at 0.56 to 0.69, so this show is a good regression case for any further change.
+
+## Foreground work
+
+On the phone the analysis of that 78 min episode was stopped twice before it finished ("was
+cancelled" in the WorkManager log), so nothing was ever stored. A plain `Worker` is limited to
+about ten minutes and can be stopped sooner; `AdAnalysisWorker` now promotes itself to
+foreground work (dataSync type, quiet notification) for the duration of the decode.
+
 ## Re-running it
 
 The harness lives outside the repository (it hard-codes local paths and needs ffmpeg and the

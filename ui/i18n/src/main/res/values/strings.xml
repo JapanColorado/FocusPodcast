@@ -902,6 +902,7 @@
     <string name="ad_skip_sensitivity_high">High</string>
     <string name="pref_ad_skip_analyze_on_download_title">Analyse new downloads</string>
     <string name="pref_ad_skip_analyze_on_download_sum">Look for ads as soon as an episode has finished downloading</string>
+    <string name="ad_analysis_notification_title">Analysing for ads</string>
     <string name="pref_ad_skip_show_snackbar_title">Show a message when an ad is skipped</string>
     <string name="pref_ad_skip_show_snackbar_sum">The message offers an Undo action</string>
     <string name="feed_ad_skip_title">Skip ads in this podcast</string>
