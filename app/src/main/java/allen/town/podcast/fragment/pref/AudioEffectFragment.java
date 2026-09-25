@@ -29,6 +29,9 @@ public class AudioEffectFragment extends AbsSettingsFragment {
 
     @Override
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
+        // The switches show one feed's stored values, so they must not persist to (or restore
+        // from) the app-wide SharedPreferences, whose keys every feed would share.
+        getPreferenceManager().setPreferenceDataStore(new DiscardingPreferenceDataStore());
         addPreferencesFromResource(R.xml.pref_audio_effect);
         init();
     }

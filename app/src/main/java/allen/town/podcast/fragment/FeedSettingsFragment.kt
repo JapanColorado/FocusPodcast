@@ -22,6 +22,7 @@ import allen.town.podcast.event.settings.SpeedPresetChangedEvent
 import allen.town.podcast.event.settings.VolumeAdaptionChangedEvent
 import allen.town.podcast.fragment.pref.AbsSettingsFragment
 import allen.town.podcast.fragment.pref.AudioEffectFragment
+import allen.town.podcast.fragment.pref.DiscardingPreferenceDataStore
 import allen.town.podcast.model.feed.*
 import allen.town.podcast.model.feed.FeedPreferences.AutoDeleteAction
 import allen.town.podcast.model.playback.MediaType
@@ -141,6 +142,11 @@ class FeedSettingsFragment : Fragment() {
             checkNotNull(findPreference(key)) { "feed_settings.xml has no preference '$key'" }
 
         override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
+            // Every value on this screen belongs to one feed and is loaded from its database row
+            // below, so nothing may be persisted to (or restored from) the app-wide
+            // SharedPreferences: those keys would be shared by all feeds, and a key whose type
+            // changed (feedAdSkip went from a switch to a list) would throw on inflation.
+            preferenceManager.preferenceDataStore = DiscardingPreferenceDataStore()
             addPreferencesFromResource(R.xml.feed_settings)
             // To prevent displaying partially loaded data
             requirePreference<Preference>(PREF_SCREEN).isVisible = false
