@@ -14,6 +14,7 @@
     <!-- targetSDK=34 makes foreground service types mandatory, requires permissions https://developer.android.com/about/versions/14/changes/fgs-types-required#data-sync -->
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PROCESSING" />
 
     <application
         android:allowBackup="true"
@@ -25,11 +26,13 @@
             android:foregroundServiceType="dataSync"
             android:enabled="true" />
 
-        <!-- WorkManager's foreground service, used by AdAnalysisWorker. WorkManager 2.7 declares
-             it without a type; Android 14+ refuses to start it unless one is merged in. -->
+        <!-- WorkManager's foreground service, used by AdAnalysisWorker. WorkManager declares it
+             without a type; Android 14+ refuses to start it unless one is merged in. The worker
+             asks for mediaProcessing on Android 15+ (its own daily time limit, separate from the
+             downloads' dataSync one) and dataSync below that. -->
         <service
             android:name="androidx.work.impl.foreground.SystemForegroundService"
-            android:foregroundServiceType="dataSync"
+            android:foregroundServiceType="dataSync|mediaProcessing"
             tools:node="merge" />
 
         <service android:name="allen.town.podcast.core.service.playback.PlaybackService"

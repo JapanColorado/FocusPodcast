@@ -1,5 +1,6 @@
 package allen.town.podcast.core.service.playback;
 
+import android.annotation.SuppressLint;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -63,6 +64,9 @@ class PlaybackServiceNotificationUpdater {
      * Replaces a still visible "playing" notification with a stopped one, so that the notification
      * does not keep claiming that playback is running after the service is gone.
      */
+    // Without POST_NOTIFICATIONS (Android 13+, not granted) the system drops the notification
+    // instead of throwing, which is the intended fallback here.
+    @SuppressLint("MissingPermission")
     void notifyStoppedIfPlaying() {
         if (notificationBuilder.getPlayerStatus() == PlayerStatus.PLAYING) {
             notificationBuilder.setPlayerStatus(PlayerStatus.STOPPED);
@@ -98,6 +102,9 @@ class PlaybackServiceNotificationUpdater {
     /**
      * Prepares notification and starts the service in the foreground.
      */
+    // Without POST_NOTIFICATIONS (Android 13+, not granted) the system drops the notification
+    // instead of throwing, which is the intended fallback here.
+    @SuppressLint("MissingPermission")
     void setupNotification(final Playable playable) {
         Log.d(TAG, "setupNotification");
         if (playableIconLoader != null) {
@@ -134,6 +141,9 @@ class PlaybackServiceNotificationUpdater {
         }
     }
 
+    // Without POST_NOTIFICATIONS (Android 13+, not granted) the system drops the notification
+    // instead of throwing, which is the intended fallback here.
+    @SuppressLint("MissingPermission")
     void displayStreamingNotAllowedNotification(Intent originalIntent) {
         Intent intentAllowThisTime = new Intent(originalIntent);
         intentAllowThisTime.setAction(PlaybackService.EXTRA_ALLOW_STREAM_THIS_TIME);

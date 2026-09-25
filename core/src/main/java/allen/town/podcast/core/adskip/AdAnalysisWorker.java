@@ -161,7 +161,13 @@ public class AdAnalysisWorker extends Worker {
                 .setProgress(0, 0, true)
                 .build();
         ForegroundInfo info;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.VANILLA_ICE_CREAM) {
+            // Decoding audio is what mediaProcessing is for, and its daily time limit is separate
+            // from dataSync's, so a long analysis cannot use up the time downloads need. When
+            // the limit runs out, WorkManager stops this worker and isStopped() ends the run.
+            info = new ForegroundInfo(NOTIFICATION_ID, notification,
+                    ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PROCESSING);
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             info = new ForegroundInfo(NOTIFICATION_ID, notification,
                     ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC);
         } else {

@@ -1,5 +1,6 @@
 package allen.town.podcast.core.service.download;
 
+import android.annotation.SuppressLint;
 import android.app.Notification;
 import android.app.PendingIntent;
 import android.content.ComponentName;
@@ -55,6 +56,9 @@ public class NewEpisodesNotification {
         }
     }
 
+    // Without POST_NOTIFICATIONS (Android 13+, not granted) the system drops the notification
+    // instead of throwing, which is the intended fallback here.
+    @SuppressLint("MissingPermission")
     private static void showNotification(int newEpisodes, Feed feed, Context context,
                                          NotificationManagerCompat notificationManager) {
         Resources res = context.getResources();
@@ -88,6 +92,9 @@ public class NewEpisodesNotification {
         showGroupSummaryNotification(context, notificationManager);
     }
 
+    // Without POST_NOTIFICATIONS (Android 13+, not granted) the system drops the notification
+    // instead of throwing, which is the intended fallback here.
+    @SuppressLint("MissingPermission")
     private static void showGroupSummaryNotification(Context context, NotificationManagerCompat notificationManager) {
         Intent intent = new Intent();
         intent.setAction("NewEpisodes");

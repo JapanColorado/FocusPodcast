@@ -56,7 +56,9 @@ project.ext {
     preferenceVersion = "1.2.0"
     recyclerViewVersion = "1.2.1"
     viewPager2Version = "1.1.0-beta01"
-    workManagerVersion = "2.7.1"
+    // 2.10 is the first release whose SystemForegroundService implements Service.onTimeout;
+    // with 2.7.1 an exhausted Android 15 FGS time limit killed the process.
+    workManagerVersion = "2.10.5"
     googleMaterialVersion = "1.7.0-alpha02"
     lifecycle_version = "2.0.0"
 
