@@ -62,7 +62,11 @@ public class FeedItemMenuProcess {
         final boolean hasMedia = selectedItem.getMedia() != null;
         final boolean isPlaying = hasMedia && FeedItemUtil.isPlaying(selectedItem.getMedia());
         final boolean isInQueue = selectedItem.isTagged(FeedItem.TAG_QUEUE);
-        final boolean fileDownloaded = hasMedia && selectedItem.getMedia().fileExists();
+        // Use the downloaded flag, like the list checkmark and the episode page do. A file on disk
+        // alone is not enough: an interrupted download leaves a partial file behind, and local
+        // folder episodes (content:// URIs) always "exist" but are never marked downloaded.
+        final boolean fileDownloaded = hasMedia && selectedItem.getMedia().isDownloaded()
+                && !selectedItem.getFeed().isLocalFeed();
         final boolean isFavorite = selectedItem.isTagged(FeedItem.TAG_FAVORITE);
 
         setItemVisibility(menu, R.id.skip_episode_item, isPlaying);
