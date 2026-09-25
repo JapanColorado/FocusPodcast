@@ -6,6 +6,8 @@ import android.widget.Toast;
 import androidx.annotation.PluralsRes;
 import androidx.core.util.Consumer;
 
+import org.greenrobot.eventbus.EventBus;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -15,6 +17,7 @@ import allen.town.podcast.common.views.AccentMaterialDialog;
 import allen.town.podcast.MyApp;
 import allen.town.podcast.R;
 import allen.town.podcast.activity.MainActivity;
+import allen.town.podcast.core.pref.Prefs;
 import allen.town.podcast.core.storage.DBWriter;
 import allen.town.podcast.databinding.PlaybackSpeedFeedSettingDialogBinding;
 import allen.town.podcast.dialog.RemoveFeedDialog;
@@ -22,7 +25,9 @@ import allen.town.podcast.dialog.TagEditDialog;
 import allen.town.podcast.common.common.prefs.supportv7.dialogs.PreferenceListDialog;
 import allen.town.podcast.fragment.pref.dialog.PreferenceSwitchDialog;
 import allen.town.podcast.model.feed.Feed;
+import allen.town.podcast.event.settings.SpeedPresetChangedEvent;
 import allen.town.podcast.model.feed.FeedPreferences;
+import allen.town.podcast.model.playback.MediaType;
 
 public class FeedMultiSelectActionHandler {
     private static final String TAG = "FeedSelectHandler";
@@ -75,7 +80,7 @@ public class FeedMultiSelectActionHandler {
             viewBinding.seekBar.setAlpha(isChecked ? 0.4f : 1f);
             viewBinding.currentSpeedLabel.setAlpha(isChecked ? 0.4f : 1f);
         });
-        viewBinding.seekBar.updateSpeed(1.0f);
+        viewBinding.seekBar.updateSpeed(Prefs.getPlaybackSpeed(MediaType.AUDIO));
         new AccentMaterialDialog(
                 activity,
                 R.style.MaterialAlertDialogTheme
@@ -86,6 +91,10 @@ public class FeedMultiSelectActionHandler {
                     float newSpeed = viewBinding.useGlobalCheckbox.isChecked()
                             ? FeedPreferences.SPEED_USE_GLOBAL : viewBinding.seekBar.getCurrentSpeed();
                     saveFeedPreferences(feedPreferences -> feedPreferences.setFeedPlaybackSpeed(newSpeed));
+                    for (Feed feed : selectedItems) {
+                        // a playing episode of one of these podcasts switches right away
+                        EventBus.getDefault().post(new SpeedPresetChangedEvent(newSpeed, feed.getId()));
+                    }
                 })
                 .setNegativeButton(R.string.cancel_label, null)
                 .show();

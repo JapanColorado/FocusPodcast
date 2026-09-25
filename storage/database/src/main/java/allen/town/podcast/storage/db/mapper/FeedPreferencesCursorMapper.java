@@ -66,11 +66,11 @@ public abstract class FeedPreferencesCursorMapper {
         if (TextUtils.isEmpty(tagsString)) {
             tagsString = FeedPreferences.TAG_ROOT;
         }
-        // Old cursors (and projections that predate the column) simply have no ad-skip column;
-        // getColumnIndex then returns -1 and the preference keeps its default of "enabled".
-        int indexAdSkip = cursor.getColumnIndex(Db.KEY_FEED_AD_SKIP);
-        boolean adSkipEnabled = indexAdSkip < 0 || cursor.isNull(indexAdSkip)
-                || cursor.getInt(indexAdSkip) > 0;
+        // NULL means "follow the global default". A projection without the column (getColumnIndex
+        // returns -1) reads the same way.
+        int indexAdSkip = cursor.getColumnIndex(Db.KEY_FEED_AD_SKIP_OVERRIDE);
+        Boolean adSkipOverride = indexAdSkip < 0 || cursor.isNull(indexAdSkip)
+                ? null : cursor.getInt(indexAdSkip) > 0;
 
         FeedPreferences preferences = new FeedPreferences(feedId,
                 autoDownload,
@@ -85,7 +85,7 @@ public abstract class FeedPreferencesCursorMapper {
                 feedAutoSkipEnding,
                 showNotification,
                 new HashSet<>(Arrays.asList(tagsString.split(FeedPreferences.TAG_SEPARATOR))),skipSilence,loudness,mono,isUseFeedEffect);
-        preferences.setAdSkipEnabled(adSkipEnabled);
+        preferences.setAdSkipOverride(adSkipOverride);
         return preferences;
     }
 }

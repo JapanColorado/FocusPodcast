@@ -436,8 +436,8 @@
   <string name="synchronization_force_sync_summary">重新同步所有订阅和剧集状态</string>
   <string name="synchronization_sync_summary">同步订阅和剧集状态更改</string>
   <string name="dialog_choose_sync_service_title">选择同步提供商</string>
-  <string name="pref_playback_speed_sum">自定义可用于变速播放的速度</string>
-  <string name="pref_feed_playback_speed_sum">选择默认的播放速度</string>
+  <string name="pref_playback_speed_sum">没有专属速度的播客使用此速度。在播放器中调整速度只会改变该播客的速度</string>
+  <string name="pref_feed_playback_speed_sum">使用设置中的默认速度，或为此播客单独设置</string>
   <string name="pref_feed_skip">自动跳过</string>
   <string name="pref_feed_skip_sum">跳过开头和结尾</string>
   <string name="pref_feed_skip_ending">跳过最后多少秒</string>
@@ -478,8 +478,8 @@
   <string name="pref_enqueue_downloaded_title">开始下载时加入播放列表</string>
   <string name="pref_enqueue_downloaded_summary">下载单集时自动添加到播放列表</string>
   <string name="pref_skip_silence_title">跳过没有声音的音频</string>
-  <string name="pref_custom_for_podcast">对此播客进行自定义</string>
-  <string name="pref_custom_for_podcast_sum">您最近一次的播放效果设置会保存并应用于所有频道，如果您想仅对此频道进行自定义设置，可以开启此开关</string>
+  <string name="pref_custom_for_podcast">为此播客自定义</string>
+  <string name="pref_custom_for_podcast_sum">关闭时，此播客使用设置中的默认音效。在播放器中更改音效会自动开启此项</string>
   <string name="behavior">行为</string>
   <string name="pref_back_button_behavior_title">返回键行为</string>
   <string name="pref_back_button_behavior_sum">改变返回键的行为</string>
@@ -801,8 +801,6 @@
   <string name="blur_card">模糊卡片</string>
   <string name="full">全屏</string>
 
-  <string name="custom_effect_applied">已应用自定义效果</string>
-  <string name="clear">清除</string>
 
 
   <string name="limit_subs_notify">已达免费版订阅数的上限</string>
@@ -817,4 +815,20 @@
 
 
 
+  <!-- Ad auto-skip -->
+  <string name="detect_ads">检测广告</string>
+  <string name="pref_ad_skip_enabled_sum">所有播客的默认设置。你可以在播放器的音频效果或播客设置中为单个播客单独开启或关闭。检测会识别广告时段下的背景音乐和赞助商章节，并跳过找到的内容；它可能漏掉广告，也可能多跳过一点。</string>
+  <string name="feed_ad_skip_default_on">使用默认设置（开启）</string>
+  <string name="feed_ad_skip_default_off">使用默认设置（关闭）</string>
+  <string name="feed_ad_skip_on">开启</string>
+  <string name="feed_ad_skip_off">关闭</string>
+  <string name="feed_ad_skip_default_on_sum">跟随播放设置中的默认设置，当前为开启</string>
+  <string name="feed_ad_skip_default_off_sum">跟随播放设置中的默认设置，当前为关闭</string>
+  <string name="feed_ad_skip_on_sum">此播客始终开启，不受默认设置影响</string>
+  <string name="feed_ad_skip_off_sum">此播客始终关闭，不受默认设置影响</string>
+  <string name="reset_to_default">恢复默认</string>
+  <string name="podcast_own_settings_applied">正在使用此播客的专属设置</string>
+  <string name="use_default">使用默认值</string>
+  <string name="default_playback_speed">默认播放速度</string>
+  <string name="pref_default_effect_sum">适用于没有专属音效的播客</string>
 </resources>

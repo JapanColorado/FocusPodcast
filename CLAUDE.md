@@ -58,7 +58,7 @@ Dependency direction (top depends on bottom):
 - **app** — Activities/fragments/adapters, `MyApp` Application. Depends on core and nearly everything else.
 - **core** — the workhorse: `DBReader`/`DBWriter`/`DBTasks`, `PlaybackService` + `LocalPSMP` + `ExoPlayerWrapper`, `DownloadService`, `FeedUpdateWorker`, `SyncService`, `Prefs`, widgets, Glide setup, backup/OPML.
 - **playback/base** — abstract `PlaybackServiceMediaPlayer`, `PlayerStatus`.
-- **storage/database** — raw SQLite `Db.java` (package `allen.town.podcast.storage.db`, `focusPodcastApp.db`, `VERSION = 4`, renumbered from AntennaPod), `DBUpgrade.java` hand-written ALTER ladder, `mapper/*CursorMapper`. No Room.
+- **storage/database** — raw SQLite `Db.java` (package `allen.town.podcast.storage.db`, `focusPodcastApp.db`, `VERSION = 5`, renumbered from AntennaPod), `DBUpgrade.java` hand-written ALTER ladder, `mapper/*CursorMapper`. No Room.
 - **parser/feed** (RSS/Atom), **parser/media** (ID3/Vorbis chapters), **net/ssl**, **net/sync/model** + **net/sync/gpoddernet**
 - **event** — EventBus payload classes only. **model** — POJOs (`Feed`, `FeedItem`, `FeedMedia`, ...).
 - **ui/common** (shared views), **ui/app-start-intent** (typed Intent builders so lower modules can launch app Activities without depending on `app`), **ui/i18n** and **ui/png-icons** (resources only).
@@ -76,9 +76,22 @@ The seven classes that used to exceed ~1,000 lines were split by pure extraction
 - `app/fragment/FeedItemlistFragment.kt` — header, loader, menu, multi-select and pager helpers under `fragment/feeditemlist/`.
 - `app/activity/MainActivity.kt` — nav drawer, fragment navigator, player sheet, intent handler and hardware-key helpers under `activity/main/`.
 
+### Per-podcast speed, effects and ad detection
+
+Settings > Playback holds only the global defaults (speed via `PlaySpeedDialog.newGlobalDefaultInstance()`, skip silence / stereo to mono / vocal enhancement switches). A subscribed podcast follows them until the user changes speed or an effect in the player, which stores the change on that podcast (`FeedPreferences.feedPlaybackSpeed`, `useFeedEffect` + the three effect flags, `adSkipOverride`); the player's "Reset to default" clears it again. Unsubscribed (previewed) feeds and non-feed media always read and write the globals. Resolution lives in `core/feed/util`: `PlayableFeedPreferences` (which prefs apply), `PlaybackSpeedUtils` (`getCurrentPlaybackSpeed`, `rememberSpeed`), `AudioEffectUtils` (`isSkipSilence`/`isMono`/`isLoudness`, `customize`, `saveFeedEffects`) and `AdSkipUtils`. Writes from possibly stale copies go through `DBWriter.updateFeedPreferences(feedId, change)` (read-modify-write of the current row); live changes reach the service's in-memory `FeedPreferences` through `SpeedPresetChangedEvent` / `AudioEffectsChangedEvent` (feed id 0 = the global default changed).
+
 ### Ad auto-skip
 
-Ad skipping is opt-in (`Prefs.isAdSkipEnabled`, default off) and has no ML runtime: `core/adskip/` is
+Ad skipping is opt-in and has no ML runtime. It is a per-feed setting whose default is global:
+`Prefs.isAdSkipEnabled` (default off, shown as "Detect ads" in Settings > Playback) is only the default,
+and `FeedPreferences.getAdSkipOverride()` is a tri-state `Boolean` (null = follow the default, TRUE/FALSE
+= the user's choice for that feed, stored in `feeds.feed_ad_skip_override` as NULL/1/0). Never read the
+override as the effective value: every gate (analysis, skipping, drawing segments) goes through
+`core/feed/util/AdSkipUtils.isAdSkipEnabled(FeedPreferences|Playable)`, and writes go through
+`AdSkipUtils.setAdSkipForFeed`/`resetAdSkipForFeed`, which persist and then post `AdSkipChangedEvent(feedId)`
+(0 = the global default changed). A feed switched on analyses and skips even while the default is off.
+The feed settings screen offers "Use default / On / Off"; the player's audio-effects dialog has a
+"Detect ads" switch. `core/adskip/` is
 pure-Java DSP. `PcmDecoder` streams a downloaded file through `MediaCodec` to mono 16 kHz float,
 `AudioFeatureExtractor` turns it into one `FeatureFrame` per half second (RMS, crest factor, spectral
 flatness/centroid/rolloff/flux, low-band ratio, 8-band timbre vector, and the two "spectral floor"
@@ -98,10 +111,12 @@ run through the real extractor and detector on the JVM) is described in `docs/AD
 `ChapterAdMatcher` flags chapters titled like sponsor breaks, `AdSegmentMerger` gives manual > chapter
 > detected precedence, and `AdAnalyzer` is the facade. `AdAnalysisWorker` (WorkManager, unique per
 media id) is enqueued from `MediaDownloadedHandler` after a download and from
-`PlaybackServiceAdSkipper` the first time a downloaded episode that was never analysed starts playing
+`PlaybackServiceAdSkipper` the first time a downloaded episode that was never analysed starts playing,
+or when ads get switched on (globally or for its feed) while such an episode is playing
 (it promotes itself to foreground work with a quiet notification, since a plain worker is stopped after about ten minutes; completion is remembered in `Prefs.isAdAnalyzed`, a string-set preference, because "no ads found"
 and "never run" look the same in the table). It stores every result with confidence >= 0.3 in the
-`ad_segments` table (`AdSegmentDao`, DB version 4); the sensitivity preference is applied at playback
+`ad_segments` table (`AdSegmentDao`, added in DB version 4; version 5 replaced the old per-feed opt-out
+column `feed_ad_skip` with `feed_ad_skip_override`, mapping 1 to NULL and keeping 0); the sensitivity preference is applied at playback
 time, so changing it needs no re-analysis. `PlaybackServiceAdSkipper` runs on the service's one-second
 ticker next to the intro/ending skipper: it only skips when playback *entered* a segment within a 3 s
 window, treats a seek into the middle as "let it play", posts `AdSkippedEvent` (the app shows the Undo

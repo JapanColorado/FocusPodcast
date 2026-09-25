@@ -8,14 +8,25 @@
 
     <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical">
 
         <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/speed_dialog_title"
                 android:text="@string/playback_speed"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 style="@style/FocusPodcast.TextView.ListItemPrimaryTitle"/>
+
+        <com.google.android.material.button.MaterialButton
+                android:id="@+id/reset_speed"
+                style="@style/Widget.Material3.Button.TextButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:text="@string/reset_to_default"
+                android:visibility="gone"/>
 
         <com.google.android.material.chip.Chip
             style="@style/Widget.Material3.Chip.Assist"

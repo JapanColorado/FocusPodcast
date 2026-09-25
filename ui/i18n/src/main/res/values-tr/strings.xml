@@ -870,7 +870,5 @@
     <string name="podcast_search_podcast_index" translatable="false">Podcast Index</string>
     <string name="feed_url_copied_tip">Belki kopyalanan URL üzerinden abone olmak istersiniz, arama giriş kutusunu otomatik olarak doldurduk</string>
 
-    <string name="custom_effect_applied">Özel efektler uygulandı</string>
-    <string name="clear">Temizle</string>
 
 </resources>

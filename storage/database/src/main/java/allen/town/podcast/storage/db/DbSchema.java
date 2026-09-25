@@ -12,7 +12,7 @@ import static allen.town.podcast.model.feed.FeedPreferences.SPEED_USE_GLOBAL;
 final class DbSchema {
 
     public static final String DATABASE_NAME = "focusPodcastApp.db";
-    public static final int VERSION = 4;
+    public static final int VERSION = 5;
 
     /**
      * Maximum number of arguments for IN-operator.
@@ -85,7 +85,17 @@ final class DbSchema {
     public static final String KEY_FEED_TAGS = "tags";
     public static final String KEY_EPISODE_NOTIFICATION = "episode_notification";
     public static final String KEY_FEED_PLAYBACK_SPEED = "feed_playback_speed";
-    public static final String KEY_FEED_AD_SKIP = "feed_ad_skip";
+    /**
+     * A feed's own ad-skip choice: NULL follows the global default, 1 is on, 0 is off. It has no
+     * DEFAULT clause on purpose, so a feed row inserted without its preferences follows the default.
+     */
+    public static final String KEY_FEED_AD_SKIP_OVERRIDE = "feed_ad_skip_override";
+    /**
+     * The version-4 per-feed opt-out ({@code INTEGER DEFAULT 1}, 0 meaning "never skip in this
+     * feed"). Only {@link DBUpgrade} still reads it; SQLite on older API levels cannot drop the
+     * column, so upgraded databases keep it unused.
+     */
+    static final String KEY_FEED_AD_SKIP_V4 = "feed_ad_skip";
     public static final String KEY_AD_START_MS = "start_ms";
     public static final String KEY_AD_END_MS = "end_ms";
     public static final String KEY_AD_SOURCE = "source";
@@ -138,7 +148,7 @@ final class DbSchema {
             + KEY_FEED_TAGS + " TEXT,"
             + KEY_EPISODE_NOTIFICATION + " INTEGER DEFAULT 0,"
             + KEY_FEED_SKIP_INTRO + " INTEGER DEFAULT 0,"
-            + KEY_FEED_AD_SKIP + " INTEGER DEFAULT 1)";
+            + KEY_FEED_AD_SKIP_OVERRIDE + " INTEGER)";
 
     static final String CREATE_TABLE_FEED_ITEMS = "CREATE TABLE "
             + TABLE_NAME_FEED_ITEMS + " (" + TABLE_PRIMARY_KEY
@@ -265,7 +275,7 @@ final class DbSchema {
             TABLE_NAME_FEEDS + "." + KEY_FEED_SKIP_INTRO,
             TABLE_NAME_FEEDS + "." + KEY_FEED_SKIP_ENDING,
             TABLE_NAME_FEEDS + "." + KEY_EPISODE_NOTIFICATION,
-            TABLE_NAME_FEEDS + "." + KEY_FEED_AD_SKIP
+            TABLE_NAME_FEEDS + "." + KEY_FEED_AD_SKIP_OVERRIDE
     };
 
     /**

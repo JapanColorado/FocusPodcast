@@ -83,6 +83,29 @@
         </LinearLayout>
 
         <LinearLayout
+            android:id="@+id/detect_ads_row"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:visibility="gone"
+            tools:visibility="visible">
+
+            <allen.town.podcast.common.views.AccentImageView
+                style="@style/Widget.Material3.Button.IconButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_sound_waves" />
+
+            <allen.town.podcast.common.common.views.ATESwitch
+                android:id="@+id/detect_ads"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/detect_ads"
+                android:thumb="@drawable/switch_thumb"
+                app:track="@drawable/switch_track" />
+        </LinearLayout>
+
+        <LinearLayout
             android:id="@+id/equalizer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -104,35 +127,40 @@
         </LinearLayout>
 
         <com.google.android.material.card.MaterialCardView
-            android:id="@+id/custom_effect_l"
-            android:layout_marginTop="32dp"
+            android:id="@+id/own_settings_card"
             android:layout_width="match_parent"
-            android:layout_height="60dp"
-            android:layout_centerVertical="true"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="32dp"
             android:visibility="gone"
-            tools:visibility="visible"
             app:cardBackgroundColor="?colorSecondaryContainer"
             app:cardCornerRadius="12dp"
             app:cardElevation="0dp"
-            app:cardPreventCornerOverlap="false">
+            app:cardPreventCornerOverlap="false"
+            tools:visibility="visible">
 
-            <com.google.android.material.textview.MaterialTextView
-                android:text="@string/custom_effect_applied"
-                android:layout_gravity="center_vertical"
-                android:layout_marginLeft="8dp"
-                android:textColor="?colorSecondary"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:minHeight="60dp"
+                android:orientation="horizontal"
+                android:paddingStart="12dp"
+                android:paddingEnd="4dp">
 
-            <com.google.android.material.button.MaterialButton
-                style="@style/Widget.Material3.Button.TextButton"
-                android:layout_gravity="center_vertical|right"
-                android:id="@+id/custom_effect_clear"
-                android:text="@string/clear"
-                android:textSize="16sp"
-                android:textAllCaps="true"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+                <com.google.android.material.textview.MaterialTextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/podcast_own_settings_applied"
+                    android:textColor="?colorSecondary" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/reset_to_default"
+                    style="@style/Widget.Material3.Button.TextButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/reset_to_default" />
+            </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
     </LinearLayout>
 

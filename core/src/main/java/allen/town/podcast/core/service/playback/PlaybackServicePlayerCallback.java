@@ -236,7 +236,6 @@ class PlaybackServicePlayerCallback implements PlaybackServiceMediaPlayer.PSMPCa
     @Override
     public void onPlaybackEnded(MediaType mediaType, boolean stopPlaying) {
         Log.d(TAG, "playback end");
-        PlaybackPreferences.clearCurrentlyPlayingTemporaryPlaybackSpeed();
         if (stopPlaying) {
             service.taskManager.cancelPositionSaver();
             service.cancelPositionObserver();

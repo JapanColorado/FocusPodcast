@@ -3,6 +3,7 @@ package allen.town.podcast.core.storage;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import android.app.Application;
@@ -40,7 +41,7 @@ import allen.town.podcast.storage.db.Db;
 
 /**
  * Round trips for the ad auto-skip storage layer: the {@code ad_segments} table through
- * {@link DBWriter} and {@link DBReader}, and the per-feed {@code adSkipEnabled} preference.
+ * {@link DBWriter} and {@link DBReader}, and the per-feed ad-skip override.
  *
  * <p>The setup mirrors {@link DBReaderWriterTest}: core is initialised piece by piece rather than
  * through {@code ClientConfig.initialize}, and every write is awaited through its {@link Future} so
@@ -167,25 +168,27 @@ public class AdSegmentStorageTest {
     }
 
     @Test
-    public void feedPreferencesPersistAdSkipEnabled() throws Exception {
+    public void feedPreferencesPersistAdSkipOverride() throws Exception {
         Feed feed = subscribedFeed("Prefs", "https://p.example/feed.xml");
         await(DBWriter.addNewFeed(context, feed));
 
         Feed reloaded = DBReader.getFeed(feed.getId());
         assertNotNull(reloaded);
-        assertTrue("ad skip must default to on", reloaded.getPreferences().isAdSkipEnabled());
+        assertNull("a new feed must follow the global default",
+                reloaded.getPreferences().getAdSkipOverride());
 
         FeedPreferences preferences = reloaded.getPreferences();
-        preferences.setAdSkipEnabled(false);
+        preferences.setAdSkipOverride(Boolean.FALSE);
         await(DBWriter.setFeedPreferences(preferences));
+        assertEquals(Boolean.FALSE, DBReader.getFeedPreferences(feed.getId()).getAdSkipOverride());
 
-        Feed afterWrite = DBReader.getFeed(feed.getId());
-        assertNotNull(afterWrite);
-        assertFalse(afterWrite.getPreferences().isAdSkipEnabled());
-
-        preferences.setAdSkipEnabled(true);
+        preferences.setAdSkipOverride(Boolean.TRUE);
         await(DBWriter.setFeedPreferences(preferences));
-        assertTrue(DBReader.getFeed(feed.getId()).getPreferences().isAdSkipEnabled());
+        assertEquals(Boolean.TRUE, DBReader.getFeed(feed.getId()).getPreferences().getAdSkipOverride());
+
+        preferences.setAdSkipOverride(null);
+        await(DBWriter.setFeedPreferences(preferences));
+        assertNull(DBReader.getFeedPreferences(feed.getId()).getAdSkipOverride());
     }
 
     // --------------------------------------------------------------- helpers

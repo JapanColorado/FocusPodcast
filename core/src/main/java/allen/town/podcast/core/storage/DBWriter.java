@@ -7,6 +7,7 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.NotificationManagerCompat;
+import androidx.core.util.Consumer;
 
 
 import org.greenrobot.eventbus.EventBus;
@@ -927,6 +928,44 @@ public class DBWriter {
             adapter.open();
             adapter.setFeedDownloadUrl(original, updated);
             adapter.close();
+        });
+    }
+
+    /**
+     * Changes some fields of a feed's stored preferences: the current row is read on the database
+     * thread, {@code change} is applied to it and the result is written back. Use this instead of
+     * {@link #setFeedPreferences(FeedPreferences)} when the caller's FeedPreferences object may be
+     * older than the database (the playback service keeps one for the whole episode), so settings
+     * changed elsewhere in the meantime are not overwritten with stale values.
+     */
+    public static Future<?> updateFeedPreferences(final long feedId,
+                                                  @NonNull final Consumer<FeedPreferences> change) {
+        return updateFeedPreferences(feedId, change, null);
+    }
+
+    /**
+     * Like {@link #updateFeedPreferences(long, Consumer)}, then posts {@code afterWrite} (if not
+     * null) once the row is stored, so subscribers that re-read the preferences from the database
+     * see the new values.
+     */
+    public static Future<?> updateFeedPreferences(final long feedId,
+                                                  @NonNull final Consumer<FeedPreferences> change,
+                                                  @Nullable final Object afterWrite) {
+        return dbExec.submit(() -> {
+            FeedPreferences stored = DBReader.getFeedPreferences(feedId);
+            if (stored == null) {
+                Log.w(TAG, "updateFeedPreferences: feed " + feedId + " has no preferences");
+                return;
+            }
+            change.accept(stored);
+            Db adapter = Db.getInstance();
+            adapter.open();
+            adapter.setFeedPreferences(stored);
+            adapter.close();
+            EventBus.getDefault().post(new FeedListUpdateEvent(feedId));
+            if (afterWrite != null) {
+                EventBus.getDefault().post(afterWrite);
+            }
         });
     }
 

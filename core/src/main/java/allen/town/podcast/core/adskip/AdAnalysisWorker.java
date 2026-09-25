@@ -25,13 +25,13 @@ import java.util.concurrent.ExecutionException;
 
 import allen.town.podcast.core.ClientConfig;
 import allen.town.podcast.core.R;
+import allen.town.podcast.core.feed.util.AdSkipUtils;
 import allen.town.podcast.core.pref.Prefs;
 import allen.town.podcast.core.util.ui.NotificationUtils;
 import allen.town.podcast.core.storage.DBReader;
 import allen.town.podcast.core.storage.DBWriter;
 import allen.town.podcast.model.feed.AdSegment;
 import allen.town.podcast.model.feed.Chapter;
-import allen.town.podcast.model.feed.Feed;
 import allen.town.podcast.model.feed.FeedItem;
 import allen.town.podcast.model.feed.FeedMedia;
 import io.reactivex.Completable;
@@ -177,11 +177,11 @@ public class AdAnalysisWorker extends Worker {
     }
 
     /**
-     * Queues an analysis for a downloaded episode that is starting to play and has never been
-     * analysed, so that a library downloaded before ad skipping was switched on still gets
-     * covered without the user asking episode by episode. The database check runs off the main
-     * thread; an episode analysed once, even with nothing found, is never re-analysed by this
-     * path.
+     * Queues an analysis for a downloaded episode that is playing and has never been analysed, so
+     * that a library downloaded before ad skipping was switched on (globally or for its feed) still
+     * gets covered without the user asking episode by episode. The first check uses the in-memory
+     * feed preferences of {@code media}; the database check runs off the main thread. An episode
+     * analysed once, even with nothing found, is never re-analysed by this path.
      *
      * @return the subscription doing the work, for the caller to own, or null when there was
      *         nothing to do.
@@ -190,7 +190,7 @@ public class AdAnalysisWorker extends Worker {
     public static Disposable enqueueOnPlayback(@NonNull Context context,
                                                @Nullable FeedMedia media) {
         if (media == null || media.getId() <= 0 || !media.isDownloaded()
-                || !Prefs.isAdSkipEnabled() || Prefs.isAdAnalyzed(media.getId())) {
+                || !AdSkipUtils.isAdSkipEnabled(media) || Prefs.isAdAnalyzed(media.getId())) {
             return null;
         }
         final Context applicationContext = context.getApplicationContext();
@@ -228,8 +228,9 @@ public class AdAnalysisWorker extends Worker {
     /**
      * Queues an analysis run for one downloaded episode.
      *
-     * <p>Unless {@code force} is set this checks the global and per-feed ad-skip switches first,
-     * which reads the episode from the database; call it off the main thread in that case. A
+     * <p>Unless {@code force} is set this first checks that ad skipping is on for the episode's
+     * feed (its own choice, else the global default), which reads the episode from the database;
+     * call it off the main thread in that case. A
      * forced request (the UI's "analyse this episode") skips both checks and replaces any run
      * already queued for the same media, so the user's tap is not swallowed by a pending job.
      */
@@ -268,27 +269,8 @@ public class AdAnalysisWorker extends Worker {
     }
 
     private static boolean shouldAnalyze(long mediaId) {
-        if (!Prefs.isAdSkipEnabled()) {
-            return false;
-        }
         FeedMedia media = DBReader.getFeedMedia(mediaId);
-        return media != null && isFeedAdSkipEnabled(media.getItem());
-    }
-
-    /**
-     * Whether the feed an episode belongs to allows ad skipping. An episode whose feed could not
-     * be loaded counts as allowed: the global switch has already been checked and silently
-     * dropping the run would be harder to explain than an analysis that turns out unused.
-     */
-    private static boolean isFeedAdSkipEnabled(@Nullable FeedItem item) {
-        if (item == null) {
-            return true;
-        }
-        Feed feed = item.getFeed();
-        if (feed == null || feed.getPreferences() == null) {
-            return true;
-        }
-        return feed.getPreferences().isAdSkipEnabled();
+        return media != null && AdSkipUtils.isAdSkipEnabled(media);
     }
 
     @Nullable

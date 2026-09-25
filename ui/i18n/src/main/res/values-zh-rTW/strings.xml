@@ -378,8 +378,8 @@
   <string name="pref_episode_cache_unlimited">無限</string>
   <string name="pref_gpodnet_setlogin_information_title">變更登入資訊</string>
   <string name="pref_gpodnet_setlogin_information_sum">修改您的 gpodder.net 帳號登入資訊</string>
-  <string name="pref_playback_speed_sum">自訂可選用的播放速度</string>
-  <string name="pref_feed_playback_speed_sum">选择默认的播放速度</string>
+  <string name="pref_playback_speed_sum">沒有專屬速度的播客使用此速度。在播放器中調整速度只會改變該播客的速度</string>
+  <string name="pref_feed_playback_speed_sum">使用設定中的預設速度，或為此播客單獨設定</string>
   <string name="pref_feed_skip">自動跳過</string>
   <string name="pref_feed_skip_sum">跳過開場和結尾鳴謝</string>
   <string name="pref_feed_skip_ending">跳過最後幾秒</string>
@@ -420,8 +420,8 @@
   <string name="pref_enqueue_downloaded_title">開始下載時加入播放列表</string>
   <string name="pref_enqueue_downloaded_summary">下載單集将自動加入待播清單</string>
   <string name="pref_skip_silence_title">跳過沒有聲音的部分</string>
-  <string name="pref_custom_for_podcast">自定義設置此播客</string>
-  <string name="pref_custom_for_podcast_sum">您最近一次的播放效果設置會保存並應用於所有頻道，如果您想僅對此頻道進行自定義設置，可以開啟此開關</string>
+  <string name="pref_custom_for_podcast">為此播客自訂</string>
+  <string name="pref_custom_for_podcast_sum">關閉時，此播客使用設定中的預設音效。在播放器中變更音效會自動開啟此項</string>
   <string name="behavior">操作行為</string>
   <string name="pref_back_button_behavior_title">返回鍵行為</string>
   <string name="pref_back_button_behavior_sum">調整按下返回鍵時的行為</string>
@@ -744,8 +744,6 @@
   <string name="opml_sum_pro">您擁有無限訂閱數</string>
   <string name="feed_url_copied_tip">或許您想通過已復制的 URL 來訂閱，我們已為您自動填入搜索框</string>
 
-  <string name="custom_effect_applied">已應用自定義效果</string>
-  <string name="clear">清除</string>
 
   <string name="restore">恢復</string>
   <string name="purchase">購買</string>
@@ -766,4 +764,20 @@
   <string name="edit_tags">編輯標籤</string>
   <string name="rename_tag_label">重命名標籤</string>
 
+  <!-- Ad auto-skip -->
+  <string name="detect_ads">偵測廣告</string>
+  <string name="pref_ad_skip_enabled_sum">所有播客的預設值。你可以在播放器的音效調整或播客設定中，為單一播客個別開啟或關閉。偵測會辨識廣告時段下的背景音樂與贊助商章節，並跳過找到的內容；它可能漏掉廣告，也可能多跳過一點。</string>
+  <string name="feed_ad_skip_default_on">使用預設值（開啟）</string>
+  <string name="feed_ad_skip_default_off">使用預設值（關閉）</string>
+  <string name="feed_ad_skip_on">開啟</string>
+  <string name="feed_ad_skip_off">關閉</string>
+  <string name="feed_ad_skip_default_on_sum">依照播放設定中的預設值，目前為開啟</string>
+  <string name="feed_ad_skip_default_off_sum">依照播放設定中的預設值，目前為關閉</string>
+  <string name="feed_ad_skip_on_sum">此播客一律開啟，不受預設值影響</string>
+  <string name="feed_ad_skip_off_sum">此播客一律關閉，不受預設值影響</string>
+  <string name="reset_to_default">恢復預設</string>
+  <string name="podcast_own_settings_applied">正在使用此播客的專屬設定</string>
+  <string name="use_default">使用預設值</string>
+  <string name="default_playback_speed">預設播放速度</string>
+  <string name="pref_default_effect_sum">適用於沒有專屬音效的播客</string>
 </resources>

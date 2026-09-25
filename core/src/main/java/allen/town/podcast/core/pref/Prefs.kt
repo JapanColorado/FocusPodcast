@@ -100,8 +100,10 @@ object Prefs {
     const val EPISODE_CLEANUP_EXCEPT_FAVORITE = -3
     const val EPISODE_CLEANUP_DEFAULT = 0
 
-    //global audio playback speed
+    // Global default audio effects; a podcast with its own effects ignores them.
     const val PREF_PLAYBACK_SKIP_SILENCE = "pref_global_skip_silence"
+    const val PREF_STEREO_TO_MONO = "pref_stereo_to_mono"
+    const val PREF_AUDIO_LOUDNESS = "pref_audio_loudness"
 
     // Constants
     const val FEED_ORDER_COUNTER = 0
@@ -567,7 +569,10 @@ object Prefs {
     val appBarMode: AppBarMode
         get() = UiPrefs.appBarMode
 
-    /** The master switch of the ad auto-skip feature. Off on a fresh install. */
+    /**
+     * The default for ad detection and skipping, used by every feed without a choice of its own
+     * (see `AdSkipUtils`). Off on a fresh install.
+     */
     @JvmStatic
     var isAdSkipEnabled: Boolean
         get() = AdSkipPrefs.isAdSkipEnabled

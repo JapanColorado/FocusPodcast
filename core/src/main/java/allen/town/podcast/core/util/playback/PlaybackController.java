@@ -28,13 +28,14 @@ import java.util.List;
 
 import allen.town.podcast.core.feed.util.PlaybackSpeedUtils;
 import allen.town.podcast.core.pref.PlaybackPreferences;
-import allen.town.podcast.core.pref.Prefs;
 import allen.town.podcast.core.service.playback.PlaybackService;
 import allen.town.podcast.core.storage.DBWriter;
 import allen.town.podcast.event.playback.PlaybackPositionEvent;
 import allen.town.podcast.event.playback.PlaybackServiceEvent;
 import allen.town.podcast.event.playback.SpeedChangedEvent;
+import allen.town.podcast.event.settings.SpeedPresetChangedEvent;
 import allen.town.podcast.model.feed.FeedMedia;
+import allen.town.podcast.model.feed.FeedPreferences;
 import allen.town.podcast.model.playback.MediaType;
 import allen.town.podcast.model.playback.Playable;
 import allen.town.podcast.playback.base.PlaybackServiceMediaPlayer;
@@ -463,25 +464,29 @@ public abstract class PlaybackController {
         return status;
     }
 
+    /**
+     * Sets the speed of what is playing. For an episode of a subscribed podcast this becomes that
+     * podcast's own speed; other media changes the global default for its media type.
+     */
     public void setPlaybackSpeed(float speed) {
-        PlaybackPreferences.setCurrentlyPlayingTemporaryPlaybackSpeed(speed);
-        if (getMedia() != null && getMedia().getMediaType() == MediaType.VIDEO) {
-            Prefs.setVideoPlaybackSpeed(speed);
-        } else {
-            Prefs.setPlaybackSpeed(speed);
-        }
-
-        if (playbackService != null) {
-            playbackService.setSpeed(speed);
-        } else {
-            EventBus.getDefault().post(new SpeedChangedEvent(speed));
-        }
+        changeSpeedOfCurrentMedia(speed);
     }
 
-    public void setSkipSilence(boolean skipSilence) {
+    /** Makes the playing episode's podcast follow the global default speed again. */
+    public void resetPlaybackSpeed() {
+        changeSpeedOfCurrentMedia(FeedPreferences.SPEED_USE_GLOBAL);
+    }
+
+    private void changeSpeedOfCurrentMedia(float speed) {
         if (playbackService != null) {
-            playbackService.skipSilence(skipSilence);
+            playbackService.setSpeedForCurrentMedia(speed);
+            return;
         }
+        Playable playable = getMedia();
+        long feedId = PlaybackSpeedUtils.rememberSpeed(playable, speed);
+        // A service that is running but not bound yet still follows (feed id 0 = global default).
+        EventBus.getDefault().post(new SpeedPresetChangedEvent(speed, feedId));
+        EventBus.getDefault().post(new SpeedChangedEvent(PlaybackSpeedUtils.getCurrentPlaybackSpeed(playable)));
     }
 
     /**
@@ -493,22 +498,6 @@ public abstract class PlaybackController {
             return playbackService.getCurrentPlaybackSpeed();
         } else {
             return PlaybackSpeedUtils.getCurrentPlaybackSpeed(getMedia());
-        }
-    }
-
-    public boolean canDownmix() {
-        return (playbackService != null && playbackService.canDownmix());
-    }
-
-    public void setDownmix(boolean enable) {
-        if (playbackService != null) {
-            playbackService.setDownmix(enable);
-        }
-    }
-
-    public void setLoudness(boolean enable) {
-        if (playbackService != null) {
-            playbackService.setLoudness(enable);
         }
     }
 

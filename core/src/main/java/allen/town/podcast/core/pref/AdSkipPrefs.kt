@@ -4,9 +4,9 @@ import allen.town.podcast.core.pref.PrefsStore.getString
 import allen.town.podcast.core.pref.PrefsStore.prefs
 
 /**
- * Owns the global ad auto-skip settings: the master switch, how sure the detector has to be
- * before a segment is skipped (the "sensitivity" list preference and the confidence threshold
- * derived from it), whether a finished download queues an analysis run, and whether the player
+ * Owns the global ad auto-skip settings: the default on/off state (a feed can override it, see
+ * `AdSkipUtils`), how sure the detector has to be before a segment is skipped (the "sensitivity"
+ * list preference and the confidence threshold derived from it), whether a finished download queues an analysis run, and whether the player
  * announces a skip with a snackbar. It reads and writes through [PrefsStore]; [Prefs] exposes
  * every member of it unchanged.
  *

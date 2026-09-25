@@ -488,22 +488,6 @@ public class LocalPSMP extends PlaybackServiceMediaPlayer {
         this.startWhenPrepared.set(startWhenPrepared);
     }
 
-    /**
-     * Reads from the preferences whether mono downmix is enabled.
-     * @return
-     */
-    protected boolean downmix() {
-        return Prefs.stereoToMono();
-    }
-
-    /**
-     * Reads from the preferences whether loudness enhancement is enabled.
-     * @return
-     */
-    protected boolean loudness() {
-        return Prefs.audioLoudness();
-    }
-
 
     /**
      * Sets the playback speed.

@@ -118,7 +118,7 @@ public class Db {
     public static final String KEY_FEED_TAGS = DbSchema.KEY_FEED_TAGS;
     public static final String KEY_EPISODE_NOTIFICATION = DbSchema.KEY_EPISODE_NOTIFICATION;
     public static final String KEY_FEED_PLAYBACK_SPEED = DbSchema.KEY_FEED_PLAYBACK_SPEED;
-    public static final String KEY_FEED_AD_SKIP = DbSchema.KEY_FEED_AD_SKIP;
+    public static final String KEY_FEED_AD_SKIP_OVERRIDE = DbSchema.KEY_FEED_AD_SKIP_OVERRIDE;
     public static final String KEY_AD_START_MS = DbSchema.KEY_AD_START_MS;
     public static final String KEY_AD_END_MS = DbSchema.KEY_AD_END_MS;
     public static final String KEY_AD_SOURCE = DbSchema.KEY_AD_SOURCE;

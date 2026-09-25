@@ -29,13 +29,11 @@ internal object PlaybackPrefs {
     private const val PREF_PLAYBACK_SPEED_ARRAY = "pref_playback_speed_list"
     private const val PREF_RESUME_AFTER_CALL = "pref_replay_after_call"
     private const val PREF_TIME_RESPECTS_SPEED = "pref_respects_playbacktime_for_speed"
-    private const val PREF_AUDIO_LOUDNESS = "pref_audio_loudness"
     private const val PREF_PLAYBACK_SPEED = "pref_globa_playback_speed"
     private const val PREF_VIDEO_PLAYBACK_SPEED = "pref_global_video_playback_speed"
     private const val PREF_FAST_FORWARD_SECS = "pref_global_fast_forward_secs"
     private const val PREF_REWIND_SECS = "pref_global_rewind_secs"
     private const val PREF_QUEUE_LOCKED = "pref_queue_Locked"
-    private const val PREF_STEREO_TO_MONO = "pref_stereo_to_mono"
 
     val isPauseOnHeadsetDisconnect: Boolean
         get() = prefs.getBoolean(Prefs.PREF_PAUSE_ON_HEADSET_DISCONNECT, true)
@@ -254,22 +252,22 @@ internal object PlaybackPrefs {
     }
 
     fun stereoToMono(): Boolean {
-        return prefs.getBoolean(PREF_STEREO_TO_MONO, false)
+        return prefs.getBoolean(Prefs.PREF_STEREO_TO_MONO, false)
     }
 
     fun stereoToMono(enable: Boolean) {
         prefs.edit()
-            .putBoolean(PREF_STEREO_TO_MONO, enable)
+            .putBoolean(Prefs.PREF_STEREO_TO_MONO, enable)
             .apply()
     }
 
     fun audioLoudness(): Boolean {
-        return prefs.getBoolean(PREF_AUDIO_LOUDNESS, false)
+        return prefs.getBoolean(Prefs.PREF_AUDIO_LOUDNESS, false)
     }
 
     fun setAudioLoudness(enable: Boolean) {
         prefs.edit()
-            .putBoolean(PREF_AUDIO_LOUDNESS, enable)
+            .putBoolean(Prefs.PREF_AUDIO_LOUDNESS, enable)
             .apply()
     }
 }

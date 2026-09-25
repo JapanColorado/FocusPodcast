@@ -14,12 +14,12 @@ import java.util.List;
 import java.util.Set;
 
 import allen.town.podcast.core.adskip.AdAnalysisWorker;
+import allen.town.podcast.core.feed.util.AdSkipUtils;
 import allen.town.podcast.core.pref.Prefs;
 import allen.town.podcast.core.storage.DBReader;
 import allen.town.podcast.event.adskip.AdSkipUndoEvent;
 import allen.town.podcast.event.adskip.AdSkippedEvent;
 import allen.town.podcast.model.feed.AdSegment;
-import allen.town.podcast.model.feed.Feed;
 import allen.town.podcast.model.feed.FeedItem;
 import allen.town.podcast.model.feed.FeedMedia;
 import allen.town.podcast.model.feed.FeedPreferences;
@@ -101,8 +101,18 @@ class PlaybackServiceAdSkipper {
         reset();
         segmentsItemId = itemId;
         load(itemId);
-        // A downloaded episode that predates the feature (or slipped past the download hook) is
-        // analysed the first time it is played; results arrive through AdSegmentsChangedEvent.
+        enqueueAnalysisIfNeeded(playable);
+    }
+
+    /**
+     * A downloaded episode that predates the feature (or slipped past the download hook, or whose
+     * feed only just had detection switched on) is analysed while it plays; results arrive through
+     * AdSegmentsChangedEvent. Does nothing when ads are off for the episode or it was analysed.
+     */
+    private void enqueueAnalysisIfNeeded(@Nullable Playable playable) {
+        if (!(playable instanceof FeedMedia)) {
+            return;
+        }
         Disposable analysis = AdAnalysisWorker.enqueueOnPlayback(service, (FeedMedia) playable);
         if (analysis != null) {
             service.addServiceDisposable(analysis);
@@ -129,30 +139,39 @@ class PlaybackServiceAdSkipper {
     }
 
     /**
-     * Refreshes the ad-skip switch of the currently playing feed from the database. The event only
-     * says which feed changed; the new value is read from storage so that this cannot drift from
-     * what the settings screen actually stored.
+     * Re-evaluates ad skipping for the playing episode after a setting changed. A feed's change
+     * refreshes the in-memory override of the playing feed from the database (the event only
+     * says which feed changed; reading storage keeps this from drifting from what was stored).
+     * Either way, when ads are now on for the episode and it is downloaded but never analysed,
+     * the analysis is queued exactly as on first play.
+     *
+     * @param feedId the feed whose override changed, or 0 when the global default changed
      */
     void onAdSkipSettingChanged(long feedId) {
+        Playable playable = service.getPlayable();
         if (feedId == 0) {
-            // The global switch changed; skipIfNecessary reads it on every tick anyway.
+            // skipIfNecessary resolves the default on every tick; only the analysis may be due.
+            enqueueAnalysisIfNeeded(playable);
             return;
         }
-        Playable playable = service.getPlayable();
         FeedPreferences preferences = feedPreferencesOf(playable);
         if (preferences == null || feedIdOf(playable) != feedId) {
             return;
         }
         service.addServiceDisposable(Single.fromCallable(() -> {
-                    Feed feed = DBReader.getFeed(feedId);
-                    if (feed == null || feed.getPreferences() == null) {
-                        return preferences.isAdSkipEnabled();
-                    }
-                    return feed.getPreferences().isAdSkipEnabled();
+                    FeedPreferences stored = DBReader.getFeedPreferences(feedId);
+                    // Single cannot emit null, so the nullable override travels in a one-element array.
+                    return new Boolean[]{stored != null ? stored.getAdSkipOverride()
+                            : preferences.getAdSkipOverride()};
                 })
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(preferences::setAdSkipEnabled,
+                .subscribe(override -> {
+                            preferences.setAdSkipOverride(override[0]);
+                            if (playable == service.getPlayable()) {
+                                enqueueAnalysisIfNeeded(playable);
+                            }
+                        },
                         error -> Log.e(TAG, "Could not reload the ad-skip setting of feed "
                                 + feedId, error)));
     }
@@ -162,16 +181,12 @@ class PlaybackServiceAdSkipper {
      * if any.
      */
     void skipIfNecessary() {
-        if (!Prefs.isAdSkipEnabled()) {
-            return;
-        }
         Playable playable = service.getPlayable();
         long itemId = itemIdOf(playable);
         if (itemId == 0 || itemId != segmentsItemId || segments.isEmpty()) {
             return;
         }
-        FeedPreferences preferences = feedPreferencesOf(playable);
-        if (preferences != null && !preferences.isAdSkipEnabled()) {
+        if (!AdSkipUtils.isAdSkipEnabled(playable)) {
             return;
         }
 

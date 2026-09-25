@@ -362,7 +362,7 @@ class PlaybackServiceMediaSession {
         @Override
         public void onSetPlaybackSpeed(float speed) {
             Log.d(TAG, "onSetPlaybackSpeed()");
-            service.setSpeed(speed);
+            service.setSpeedForCurrentMedia(speed);
         }
 
         @Override

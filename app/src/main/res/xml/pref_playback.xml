@@ -130,6 +130,27 @@
         <allen.town.podcast.common.common.prefs.supportv7.ATESwitchPreference
             android:layout="@layout/list_item_view_switch"
                 android:defaultValue="false"
+                android:key="pref_global_skip_silence"
+                android:summary="@string/pref_default_effect_sum"
+                android:title="@string/pref_skip_silence_title"
+                app:icon="@drawable/ic_trim"/>
+        <allen.town.podcast.common.common.prefs.supportv7.ATESwitchPreference
+            android:layout="@layout/list_item_view_switch"
+                android:defaultValue="false"
+                android:key="pref_stereo_to_mono"
+                android:summary="@string/pref_default_effect_sum"
+                android:title="@string/stereo_to_mono"
+                app:icon="@drawable/ic_volume_adaption"/>
+        <allen.town.podcast.common.common.prefs.supportv7.ATESwitchPreference
+            android:layout="@layout/list_item_view_switch"
+                android:defaultValue="false"
+                android:key="pref_audio_loudness"
+                android:summary="@string/pref_default_effect_sum"
+                android:title="@string/vocal_enhancement"
+                app:icon="@drawable/ic_vocal_enhancement"/>
+        <allen.town.podcast.common.common.prefs.supportv7.ATESwitchPreference
+            android:layout="@layout/list_item_view_switch"
+                android:defaultValue="false"
                 android:key="pref_respects_playbacktime_for_speed"
                 android:summary="@string/pref_playback_time_respects_speed_sum"
                 android:title="@string/pref_playback_time_respects_speed_title"/>
@@ -142,12 +163,11 @@
             android:defaultValue="false"
             android:key="pref_ad_skip_enabled"
             android:summary="@string/pref_ad_skip_enabled_sum"
-            android:title="@string/pref_ad_skip_enabled_title"
+            android:title="@string/detect_ads"
             app:icon="@drawable/ic_skip_24dp" />
         <allen.town.podcast.common.common.prefs.supportv7.ATEListPreference
             android:layout="@layout/list_item_view"
             android:defaultValue="medium"
-            android:dependency="pref_ad_skip_enabled"
             android:entries="@array/ad_skip_sensitivity_options"
             android:entryValues="@array/ad_skip_sensitivity_values"
             android:key="pref_ad_skip_sensitivity"
@@ -156,14 +176,12 @@
         <allen.town.podcast.common.common.prefs.supportv7.ATESwitchPreference
             android:layout="@layout/list_item_view_switch"
             android:defaultValue="true"
-            android:dependency="pref_ad_skip_enabled"
             android:key="pref_ad_skip_analyze_on_download"
             android:summary="@string/pref_ad_skip_analyze_on_download_sum"
             android:title="@string/pref_ad_skip_analyze_on_download_title" />
         <allen.town.podcast.common.common.prefs.supportv7.ATESwitchPreference
             android:layout="@layout/list_item_view_switch"
             android:defaultValue="true"
-            android:dependency="pref_ad_skip_enabled"
             android:key="pref_ad_skip_show_snackbar"
             android:summary="@string/pref_ad_skip_show_snackbar_sum"
             android:title="@string/pref_ad_skip_show_snackbar_title" />

@@ -41,11 +41,11 @@ import allen.town.podcast.storage.db.mapper.FeedMediaCursorMapper;
  *
  * <p>Note on the upgrade tests: no version-1, -2 or -3 CREATE statements survive anywhere in the
  * tree — the AntennaPod ladder was dropped when the schema was renumbered. The lowest schema the
- * code can construct is therefore the current one, so the upgrade tests build a version-4 schema,
+ * code can construct is therefore the current one, so the upgrade tests build a current schema,
  * stamp an older {@code user_version} onto it and assert that reopening runs {@code onUpgrade}
  * without error, leaves the rows intact and lands on {@link Db#VERSION}. That is what makes every
- * statement in {@link DBUpgrade} re-runnable against objects that already exist; the 3 -&gt; 4 step
- * is additionally exercised directly against a database the new objects were dropped from.</p>
+ * statement in {@link DBUpgrade} re-runnable against objects that already exist; the 3 -&gt; 4 and
+ * 4 -&gt; 5 steps are additionally exercised directly against a database rebuilt in the old layout.</p>
  */
 @RunWith(RobolectricTestRunner.class)
 public class DbTest {
@@ -67,8 +67,8 @@ public class DbTest {
     // ---------------------------------------------------------------- schema
 
     @Test
-    public void freshDatabaseIsAtSchemaVersion4() {
-        assertEquals(4, Db.VERSION);
+    public void freshDatabaseIsAtSchemaVersion5() {
+        assertEquals(5, Db.VERSION);
         assertEquals(Db.VERSION, Db.getInstance().getDb().getVersion());
     }
 
@@ -122,9 +122,14 @@ public class DbTest {
         assertUpgradePreservesRows(3);
     }
 
+    @Test
+    public void upgradeFromVersion4ReachesTheCurrentVersionAndKeepsRows() {
+        assertUpgradePreservesRows(4);
+    }
+
     /**
-     * The real 3 -&gt; 4 step: strip the objects version 4 added, then run the ladder and check it
-     * puts them back.
+     * The real 3 -&gt; 5 path: strip the objects versions 4 and 5 added, then run the ladder and
+     * check it puts them back.
      */
     @Test
     public void upgradeFromVersion3AddsTheAdSkipTableAndColumn() {
@@ -132,21 +137,109 @@ public class DbTest {
         db.execSQL("DROP INDEX " + Db.TABLE_NAME_AD_SEGMENTS + "_" + Db.KEY_FEEDITEM);
         db.execSQL("DROP TABLE " + Db.TABLE_NAME_AD_SEGMENTS);
         // SQLite cannot drop a column on this API level, so the feeds table is rebuilt without it.
-        db.execSQL("DROP TABLE " + Db.TABLE_NAME_FEEDS);
-        db.execSQL(DbSchema.CREATE_TABLE_FEEDS.replace(
-                "," + Db.KEY_FEED_AD_SKIP + " INTEGER DEFAULT 1)", ")"));
+        rebuildFeedsTable(db, ")");
         assertFalse(tableNames(db).contains(Db.TABLE_NAME_AD_SEGMENTS));
-        assertFalse(columnNames(db, Db.TABLE_NAME_FEEDS).contains(Db.KEY_FEED_AD_SKIP));
+        assertFalse(columnNames(db, Db.TABLE_NAME_FEEDS).contains(Db.KEY_FEED_AD_SKIP_OVERRIDE));
 
         DBUpgrade.upgrade(db, 3, Db.VERSION);
 
         assertTrue(tableNames(db).contains(Db.TABLE_NAME_AD_SEGMENTS));
-        assertTrue(columnNames(db, Db.TABLE_NAME_FEEDS).contains(Db.KEY_FEED_AD_SKIP));
+        assertTrue(columnNames(db, Db.TABLE_NAME_FEEDS).contains(Db.KEY_FEED_AD_SKIP_OVERRIDE));
+        assertFalse("a pre-4 database never needs the version-4 column",
+                columnNames(db, Db.TABLE_NAME_FEEDS).contains(DbSchema.KEY_FEED_AD_SKIP_V4));
 
         // Running it again must not fail on the objects it just created.
         DBUpgrade.upgrade(db, 3, Db.VERSION);
         assertTrue(tableNames(db).contains(Db.TABLE_NAME_AD_SEGMENTS));
         assertEquals(0, rowCount(db, Db.TABLE_NAME_AD_SEGMENTS));
+    }
+
+    /**
+     * The real 4 -&gt; 5 step: the version-4 opt-out column ({@code DEFAULT 1}, 0 = opted out) is
+     * mapped onto the override column. 1 meant "follow the global master switch" and becomes
+     * NULL; 0 stays an explicit "off".
+     */
+    @Test
+    public void upgradeFromVersion4MapsTheAdSkipOptOutOntoTheOverride() {
+        SQLiteDatabase db = Db.getInstance().getDb();
+        rebuildFeedsTable(db, "," + DbSchema.KEY_FEED_AD_SKIP_V4 + " INTEGER DEFAULT 1)");
+        long optedIn = insertV4Feed(db, "Default", 1);
+        long optedOut = insertV4Feed(db, "Opted out", 0);
+        db.execSQL("INSERT INTO " + Db.TABLE_NAME_FEEDS + " (" + Db.KEY_TITLE + ") VALUES ('Unset')");
+        long unset = lastInsertId(db);
+
+        DBUpgrade.upgrade(db, 4, Db.VERSION);
+
+        assertTrue(columnNames(db, Db.TABLE_NAME_FEEDS).contains(Db.KEY_FEED_AD_SKIP_OVERRIDE));
+        assertEquals(null, adSkipOverrideOf(optedIn));
+        assertEquals(Boolean.FALSE, adSkipOverrideOf(optedOut));
+        assertEquals(null, adSkipOverrideOf(unset));
+
+        // A choice made after the upgrade survives the ladder being run again.
+        db.execSQL("UPDATE " + Db.TABLE_NAME_FEEDS + " SET " + Db.KEY_FEED_AD_SKIP_OVERRIDE
+                + " = 1 WHERE " + Db.KEY_ID + " = " + optedIn);
+        DBUpgrade.upgrade(db, 4, Db.VERSION);
+        assertEquals(Boolean.TRUE, adSkipOverrideOf(optedIn));
+        assertEquals(Boolean.FALSE, adSkipOverrideOf(optedOut));
+    }
+
+    @Test
+    public void feedAdSkipOverrideRoundTripsAllThreeStates() {
+        Db db = Db.getInstance();
+        Feed feed = newFeed("Override feed");
+        db.setCompleteFeed(feed);
+        assertEquals("a new feed follows the global default", null, mappedAdSkipOverrideOf(feed.getId()));
+
+        feed.getPreferences().setAdSkipOverride(Boolean.TRUE);
+        db.setFeedPreferences(feed.getPreferences());
+        assertEquals(Boolean.TRUE, mappedAdSkipOverrideOf(feed.getId()));
+
+        feed.getPreferences().setAdSkipOverride(Boolean.FALSE);
+        db.setFeedPreferences(feed.getPreferences());
+        assertEquals(Boolean.FALSE, mappedAdSkipOverrideOf(feed.getId()));
+
+        feed.getPreferences().setAdSkipOverride(null);
+        db.setFeedPreferences(feed.getPreferences());
+        assertEquals(null, mappedAdSkipOverrideOf(feed.getId()));
+    }
+
+    /** Replaces the feeds table with the current layout minus the override column. */
+    private static void rebuildFeedsTable(SQLiteDatabase db, String tail) {
+        String current = "," + Db.KEY_FEED_AD_SKIP_OVERRIDE + " INTEGER)";
+        assertTrue(DbSchema.CREATE_TABLE_FEEDS.endsWith(current));
+        db.execSQL("DROP TABLE " + Db.TABLE_NAME_FEEDS);
+        db.execSQL(DbSchema.CREATE_TABLE_FEEDS.replace(current, tail));
+    }
+
+    private static long insertV4Feed(SQLiteDatabase db, String title, int adSkip) {
+        db.execSQL("INSERT INTO " + Db.TABLE_NAME_FEEDS + " (" + Db.KEY_TITLE + ", "
+                + DbSchema.KEY_FEED_AD_SKIP_V4 + ") VALUES ('" + title + "', " + adSkip + ")");
+        return lastInsertId(db);
+    }
+
+    private static long lastInsertId(SQLiteDatabase db) {
+        try (Cursor cursor = db.rawQuery("SELECT last_insert_rowid()", null)) {
+            assertTrue(cursor.moveToFirst());
+            return cursor.getLong(0);
+        }
+    }
+
+    /** The raw stored override: null for SQL NULL, else whether the INTEGER is non-zero. */
+    private static Boolean adSkipOverrideOf(long feedId) {
+        try (Cursor cursor = Db.getInstance().getDb().rawQuery("SELECT "
+                + Db.KEY_FEED_AD_SKIP_OVERRIDE + " FROM " + Db.TABLE_NAME_FEEDS
+                + " WHERE " + Db.KEY_ID + " = " + feedId, null)) {
+            assertTrue(cursor.moveToFirst());
+            return cursor.isNull(0) ? null : cursor.getInt(0) != 0;
+        }
+    }
+
+    /** Reads a feed's override back through the real cursor mapper. */
+    private static Boolean mappedAdSkipOverrideOf(long feedId) {
+        try (Cursor cursor = Db.getInstance().getFeedCursor(feedId)) {
+            assertTrue(cursor.moveToFirst());
+            return FeedCursorMapper.convert(cursor).getPreferences().getAdSkipOverride();
+        }
     }
 
     private void assertUpgradePreservesRows(int oldVersion) {

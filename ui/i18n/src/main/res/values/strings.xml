@@ -488,8 +488,8 @@
     <string name="synchronization_force_sync_summary">Re-synchronize all subscriptions and episode states</string>
     <string name="synchronization_sync_summary">Synchronize subscription and episode state changes</string>
     <string name="dialog_choose_sync_service_title">Choose synchronization provider</string>
-    <string name="pref_playback_speed_sum">Customize the speeds available for variable speed playback</string>
-    <string name="pref_feed_playback_speed_sum">Select the default playback speed</string>
+    <string name="pref_playback_speed_sum">Default for podcasts without their own speed. Changing the speed in the player sets it for that podcast only</string>
+    <string name="pref_feed_playback_speed_sum">Use the default speed from Settings, or set one for this podcast</string>
     <string name="pref_feed_skip">Auto Skip</string>
     <string name="pref_feed_skip_sum">Skip the beginning and the end</string>
     <string name="pref_feed_skip_ending">Skip last</string>
@@ -530,8 +530,8 @@
     <string name="pref_enqueue_downloaded_title">Add to playlist when download starts</string>
     <string name="pref_enqueue_downloaded_summary">Automatically add to playlist when downloading episodes</string>
     <string name="pref_skip_silence_title">Skip Silence in Audio</string>
-    <string name="pref_custom_for_podcast">Custom for the Podcast</string>
-    <string name="pref_custom_for_podcast_sum">We will remember your last playback effects and use them on all podcasts. You can enable this if you want to create custom ones for just this podcast</string>
+    <string name="pref_custom_for_podcast">Customize for this podcast</string>
+    <string name="pref_custom_for_podcast_sum">When off, this podcast uses the default effects from Settings. Changing an effect in the player turns this on</string>
     <string name="behavior">Behavior</string>
     <string name="pref_back_button_behavior_title">Back Button Behavior</string>
     <string name="pref_back_button_behavior_sum">Change behavior of the back button</string>
@@ -888,13 +888,11 @@
     <string name="podcast_search_podcast_index" translatable="false">Podcast Index</string>
     <string name="feed_url_copied_tip">Maybe you want to subscribe via the copied URL, we have auto-populated the search input box for you</string>
 
-    <string name="custom_effect_applied">Custom effects applied</string>
-    <string name="clear">clear</string>
 
     <!-- Ad auto-skip -->
     <string name="pref_ad_skip_category">Ad skipping</string>
-    <string name="pref_ad_skip_enabled_title">Skip ads automatically</string>
-    <string name="pref_ad_skip_enabled_sum">Analyses downloaded episodes for music beds, louder advertising voices and sponsor chapters, and jumps over what it finds. This is a heuristic: it can miss an ad or skip a little too much.</string>
+    <string name="detect_ads">Detect ads</string>
+    <string name="pref_ad_skip_enabled_sum">Default for all podcasts. You can turn it on or off for a single podcast from the player\'s audio effects or the podcast\'s settings. Detection listens for the music bed under ad breaks and for sponsor chapters, and skips what it finds; it can miss an ad or skip a little too much.</string>
     <string name="pref_ad_skip_sensitivity_title">Detection sensitivity</string>
     <string name="pref_ad_skip_sensitivity_sum">How sure the detector has to be before an ad is skipped: %1$s</string>
     <string name="ad_skip_sensitivity_low">Low</string>
@@ -905,8 +903,14 @@
     <string name="ad_analysis_notification_title">Analysing for ads</string>
     <string name="pref_ad_skip_show_snackbar_title">Show a message when an ad is skipped</string>
     <string name="pref_ad_skip_show_snackbar_sum">The message offers an Undo action</string>
-    <string name="feed_ad_skip_title">Skip ads in this podcast</string>
-    <string name="feed_ad_skip_sum">Uses the global ad-skip settings</string>
+    <string name="feed_ad_skip_default_on">Use default (on)</string>
+    <string name="feed_ad_skip_default_off">Use default (off)</string>
+    <string name="feed_ad_skip_on">On</string>
+    <string name="feed_ad_skip_off">Off</string>
+    <string name="feed_ad_skip_default_on_sum">Follows the default from the playback settings, currently on</string>
+    <string name="feed_ad_skip_default_off_sum">Follows the default from the playback settings, currently off</string>
+    <string name="feed_ad_skip_on_sum">On for this podcast, whatever the default</string>
+    <string name="feed_ad_skip_off_sum">Off for this podcast, whatever the default</string>
     <string name="mark_ad_start_label">Mark ad start</string>
     <string name="mark_ad_end_label">Mark ad end</string>
     <string name="ad_segments_label">Ad segments\u2026</string>
@@ -927,4 +931,9 @@
     <string name="ad_segment_delete_label">Delete this ad segment</string>
     <string name="ad_segment_enabled_label">Skip this ad segment</string>
 
+    <string name="reset_to_default">Reset to default</string>
+    <string name="podcast_own_settings_applied">Using this podcast\'s own settings</string>
+    <string name="use_default">Use default</string>
+    <string name="default_playback_speed">Default playback speed</string>
+    <string name="pref_default_effect_sum">Default for podcasts without their own effects</string>
 </resources>

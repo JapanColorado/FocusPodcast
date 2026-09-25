@@ -5,6 +5,7 @@
 
     <allen.town.podcast.common.common.prefs.supportv7.ATESwitchPreference
         android:defaultValue="false"
+        android:persistent="false"
         app:icon="@drawable/ic_sliders"
         android:key="feed_audio_effect_pref"
         android:layout="@layout/list_item_view_switch"
@@ -13,6 +14,7 @@
 
     <allen.town.podcast.common.common.prefs.supportv7.ATESwitchPreference
         android:defaultValue="false"
+        android:persistent="false"
         android:dependency="feed_audio_effect_pref"
         android:key="feed_skip_silence"
         android:layout="@layout/list_item_view_switch_no_title"
@@ -20,6 +22,7 @@
         app:icon="@drawable/ic_trim" />
     <allen.town.podcast.common.common.prefs.supportv7.ATESwitchPreference
         android:defaultValue="false"
+        android:persistent="false"
         android:dependency="feed_audio_effect_pref"
         android:icon="@drawable/ic_volume_adaption"
         android:key="feed_mono_pref"
@@ -27,6 +30,7 @@
         android:title="@string/stereo_to_mono" />
     <allen.town.podcast.common.common.prefs.supportv7.ATESwitchPreference
         android:defaultValue="false"
+        android:persistent="false"
         android:dependency="feed_audio_effect_pref"
         android:icon="@drawable/ic_vocal_enhancement"
         android:key="feed_loudness_pref"

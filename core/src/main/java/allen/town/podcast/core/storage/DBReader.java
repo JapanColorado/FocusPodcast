@@ -604,6 +604,23 @@ public final class DBReader {
         }
     }
 
+    /**
+     * Loads only the preferences of a feed (not its items), or null when the feed does not exist.
+     */
+    @Nullable
+    public static FeedPreferences getFeedPreferences(final long feedId) {
+        Db adapter = Db.getInstance();
+        adapter.open();
+        try (Cursor cursor = adapter.getFeedCursor(feedId)) {
+            if (cursor.moveToNext()) {
+                return extractFeedFromCursorRow(cursor).getPreferences();
+            }
+            return null;
+        } finally {
+            adapter.close();
+        }
+    }
+
     @Nullable
     public static Feed getFeed(final String feedUrl, boolean filtered) {
         Db adapter = Db.getInstance();

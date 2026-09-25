@@ -54,6 +54,7 @@ import allen.town.podcast.activity.DriveModeActivity;
 import allen.town.podcast.activity.LockScreenActivity;
 import allen.town.podcast.activity.MainActivity;
 import allen.town.podcast.core.adskip.AdAnalysisWorker;
+import allen.town.podcast.core.feed.util.AdSkipUtils;
 import allen.town.podcast.core.feed.util.PlaybackSpeedUtils;
 import allen.town.podcast.core.playback.NowPlayingScreen;
 import allen.town.podcast.core.pref.Prefs;
@@ -74,6 +75,7 @@ import allen.town.podcast.event.CoverColorChangeEvent;
 import allen.town.podcast.event.adskip.AdSegmentsChangedEvent;
 import allen.town.podcast.event.adskip.AdSkipUndoEvent;
 import allen.town.podcast.event.adskip.AdSkippedEvent;
+import allen.town.podcast.event.settings.AdSkipChangedEvent;
 import allen.town.podcast.event.FavoritesEvent;
 import allen.town.podcast.event.FeedItemEvent;
 import allen.town.podcast.event.PlayerErrorEvent;
@@ -88,6 +90,7 @@ import allen.town.podcast.model.feed.AdSegment;
 import allen.town.podcast.model.feed.Chapter;
 import allen.town.podcast.model.feed.FeedItem;
 import allen.town.podcast.model.feed.FeedMedia;
+import allen.town.podcast.model.feed.FeedPreferences;
 import allen.town.podcast.model.playback.Playable;
 import allen.town.podcast.playback.LibraryViewModel;
 import allen.town.podcast.view.AdMarkerSeekBar;
@@ -750,7 +753,7 @@ public class AudioPlayerFragment extends Fragment implements
             new SleepTimerDialog().show(getChildFragmentManager(), "SleepTimerDialog");
             return true;
         } else if (itemId == R.id.audio_controls) {
-            PlaybackControlsDialog dialog = PlaybackControlsDialog.newInstance(feedItem.getFeedId());
+            PlaybackControlsDialog dialog = PlaybackControlsDialog.newInstance(feedItem != null ? feedItem.getFeedId() : 0);
             dialog.show(getChildFragmentManager(), "playback_controls");
             return true;
         } else if (itemId == R.id.open_feed_item) {
@@ -842,7 +845,10 @@ public class AudioPlayerFragment extends Fragment implements
 
     /**
      * Paints the ad segments of the episode onto the position bar. Nothing is drawn while ad
-     * skipping is switched off globally, so the bands never claim a skip that will not happen.
+     * skipping is off for the episode's feed (its own choice, else the global default), so the
+     * bands never claim a skip that will not happen. The feed's preferences are re-read from the
+     * database because a change made elsewhere (the audio-effects dialog, the feed settings) may
+     * not have touched the object this screen holds.
      */
     private void loadAdSegments(@Nullable Playable media) {
         if (adSegmentsDisposable != null) {
@@ -853,15 +859,23 @@ public class AudioPlayerFragment extends Fragment implements
             return;
         }
         FeedItem item = (media instanceof FeedMedia) ? ((FeedMedia) media).getItem() : null;
-        if (item == null || !Prefs.isAdSkipEnabled()) {
-            adSegmentsItemId = item == null ? 0 : item.getId();
+        if (item == null) {
+            adSegmentsItemId = 0;
             sbPosition.setAdSegments(Collections.emptyList(), 0);
             return;
         }
         final long itemId = item.getId();
+        final long feedId = item.getFeedId();
         final long mediaDuration = media.getDuration();
         adSegmentsItemId = itemId;
-        adSegmentsDisposable = Single.fromCallable(() -> DBReader.loadAdSegmentsOfFeedItem(itemId))
+        adSegmentsDisposable = Single.fromCallable(() -> {
+                    FeedPreferences stored = feedId != 0 ? DBReader.getFeedPreferences(feedId) : null;
+                    boolean enabled = stored != null
+                            ? AdSkipUtils.isAdSkipEnabled(stored)
+                            : AdSkipUtils.isAdSkipEnabled(media);
+                    return enabled ? DBReader.loadAdSegmentsOfFeedItem(itemId)
+                            : Collections.<AdSegment>emptyList();
+                })
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(segments -> {
@@ -874,6 +888,15 @@ public class AudioPlayerFragment extends Fragment implements
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onAdSegmentsChanged(AdSegmentsChangedEvent event) {
         if (controller == null || event.getFeedItemId() != adSegmentsItemId) {
+            return;
+        }
+        loadAdSegments(controller.getMedia());
+    }
+
+    /** Ad skipping was switched on or off, globally or for a feed: redraw or clear the bands. */
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onAdSkipChanged(AdSkipChangedEvent event) {
+        if (controller == null || adSegmentsItemId == 0) {
             return;
         }
         loadAdSegments(controller.getMedia());

@@ -22,6 +22,7 @@ import allen.town.podcast.core.pref.Prefs;
 import allen.town.podcast.dialog.SkipPrefDialog;
 import allen.town.podcast.dialog.PlaySpeedDialog;
 import allen.town.podcast.event.settings.AdSkipChangedEvent;
+import allen.town.podcast.event.settings.AudioEffectsChangedEvent;
 
 import org.greenrobot.eventbus.EventBus;
 
@@ -60,7 +61,7 @@ public class PlaybackPrefFragment extends AbsSettingsFragment implements SharedP
         final Activity activity = getActivity();
 
         findPreference(PREF_PLAYBACK_SPEED_LAUNCHER).setOnPreferenceClickListener(preference -> {
-            new PlaySpeedDialog().show(getChildFragmentManager(), null);
+            PlaySpeedDialog.newGlobalDefaultInstance().show(getChildFragmentManager(), null);
             return true;
         });
         findPreference(PREF_PLAYBACK_REWIND_DELTA_LAUNCHER).setOnPreferenceClickListener(preference -> {
@@ -183,6 +184,12 @@ public class PlaybackPrefFragment extends AbsSettingsFragment implements SharedP
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
         if(Prefs.NOW_PLAYING_SCREEN_ID.equals(key)){
             updateAdapterColor();
+        }
+        if (Prefs.PREF_PLAYBACK_SKIP_SILENCE.equals(key)
+                || Prefs.PREF_STEREO_TO_MONO.equals(key)
+                || Prefs.PREF_AUDIO_LOUDNESS.equals(key)) {
+            // The global default effects changed; a playing podcast without its own follows them.
+            EventBus.getDefault().post(AudioEffectsChangedEvent.global());
         }
         if (Prefs.PREF_AD_SKIP_ENABLED.equals(key)
                 || Prefs.PREF_AD_SKIP_SENSITIVITY.equals(key)

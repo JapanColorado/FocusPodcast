@@ -3,6 +3,9 @@ package allen.town.podcast.fragment
 import allen.town.podcast.common.common.prefs.supportv7.ATESwitchPreference
 import allen.town.podcast.common.views.AccentMaterialDialog
 import allen.town.podcast.R
+import allen.town.podcast.core.feed.util.AdSkipUtils
+import allen.town.podcast.core.feed.util.PlaybackSpeedUtils
+import allen.town.podcast.core.pref.Prefs
 import allen.town.podcast.core.pref.Prefs.isEnableAutodownload
 import allen.town.podcast.core.storage.DBReader
 import allen.town.podcast.core.storage.DBTasks
@@ -21,6 +24,7 @@ import allen.town.podcast.fragment.pref.AbsSettingsFragment
 import allen.town.podcast.fragment.pref.AudioEffectFragment
 import allen.town.podcast.model.feed.*
 import allen.town.podcast.model.feed.FeedPreferences.AutoDeleteAction
+import allen.town.podcast.model.playback.MediaType
 import android.content.DialogInterface
 import android.os.Bundle
 import android.util.Log
@@ -220,24 +224,57 @@ class FeedSettingsFragment : Fragment() {
         }
 
         /**
-         * The per-podcast ad-skip switch. It only gates the global feature for this feed, so the
-         * summary points at the global settings rather than repeating them. Writing it posts an
-         * [AdSkipChangedEvent] so a playing episode of this feed re-evaluates immediately.
+         * The per-podcast ad-skip choice: follow the default from the playback settings, or on or
+         * off for this podcast only. The entries are built here so that the "use default" entry
+         * can say what the default currently is. Writes go through [AdSkipUtils], which stores the
+         * override and then posts an [AdSkipChangedEvent], so a playing episode of this feed
+         * re-evaluates immediately.
          */
         private fun setupFeedAdSkipPreference() {
             val feedPreferences = this.feedPreferences ?: return
             val feed = this.feed ?: return
-            val pref = requirePreference<ATESwitchPreference>(PREF_AD_SKIP)
-            pref.isChecked = feedPreferences.isAdSkipEnabled
+            val pref = requirePreference<ListPreference>(PREF_AD_SKIP)
+            pref.entries = arrayOf(
+                getString(
+                    if (Prefs.isAdSkipEnabled) R.string.feed_ad_skip_default_on
+                    else R.string.feed_ad_skip_default_off
+                ),
+                getString(R.string.feed_ad_skip_on),
+                getString(R.string.feed_ad_skip_off)
+            )
+            pref.entryValues = arrayOf(AD_SKIP_DEFAULT, AD_SKIP_ON, AD_SKIP_OFF)
+            updateFeedAdSkipSummary(pref, feedPreferences.adSkipOverride)
             pref.onPreferenceChangeListener =
-                Preference.OnPreferenceChangeListener { _: Preference?, newValue: Any ->
-                    val checked = newValue === java.lang.Boolean.TRUE
-                    feedPreferences.isAdSkipEnabled = checked
-                    DBWriter.setFeedPreferences(feedPreferences)
-                    pref.isChecked = checked
-                    EventBus.getDefault().post(AdSkipChangedEvent(feed.id))
+                Preference.OnPreferenceChangeListener { _: Preference?, newValue: Any? ->
+                    when (newValue as? String) {
+                        AD_SKIP_ON -> AdSkipUtils.setAdSkipForFeed(feed, true)
+                        AD_SKIP_OFF -> AdSkipUtils.setAdSkipForFeed(feed, false)
+                        else -> AdSkipUtils.resetAdSkipForFeed(feed)
+                    }
+                    updateFeedAdSkipSummary(pref, feedPreferences.adSkipOverride)
                     false
                 }
+        }
+
+        /** Selects the stored choice and spells out the effective state in the summary. */
+        private fun updateFeedAdSkipSummary(pref: ListPreference, override: Boolean?) {
+            when (override) {
+                null -> {
+                    pref.value = AD_SKIP_DEFAULT
+                    pref.setSummary(
+                        if (Prefs.isAdSkipEnabled) R.string.feed_ad_skip_default_on_sum
+                        else R.string.feed_ad_skip_default_off_sum
+                    )
+                }
+                true -> {
+                    pref.value = AD_SKIP_ON
+                    pref.setSummary(R.string.feed_ad_skip_on_sum)
+                }
+                false -> {
+                    pref.value = AD_SKIP_OFF
+                    pref.setSummary(R.string.feed_ad_skip_off_sum)
+                }
+            }
         }
 
         private fun setupPlaybackSpeedPreference() {
@@ -263,7 +300,10 @@ class FeedSettingsFragment : Fragment() {
                     }
                     viewBinding.useGlobalCheckbox.isChecked =
                         speed == FeedPreferences.SPEED_USE_GLOBAL
-                    viewBinding.seekBar.updateSpeed(if (speed == FeedPreferences.SPEED_USE_GLOBAL) 1f else speed)
+                    // A podcast that follows the default starts from the default speed.
+                    viewBinding.seekBar.updateSpeed(
+                        PlaybackSpeedUtils.resolveSpeed(feedPreferences, Prefs.getPlaybackSpeed(MediaType.AUDIO))
+                    )
                     AccentMaterialDialog(
                         requireContext(),
                         R.style.MaterialAlertDialogTheme
@@ -274,13 +314,9 @@ class FeedSettingsFragment : Fragment() {
                             val newSpeed =
                                 if (viewBinding.useGlobalCheckbox.isChecked) FeedPreferences.SPEED_USE_GLOBAL else viewBinding.seekBar.currentSpeed
                             feedPreferences.feedPlaybackSpeed = newSpeed
-                            DBWriter.setFeedPreferences(feedPreferences)
-                            EventBus.getDefault().post(
-                                SpeedPresetChangedEvent(
-                                    feedPreferences.feedPlaybackSpeed,
-                                    feed.id
-                                )
-                            )
+                            // only the speed column: the player may have changed other fields since this screen loaded
+                            DBWriter.updateFeedPreferences(feed.id) { it.feedPlaybackSpeed = newSpeed }
+                            EventBus.getDefault().post(SpeedPresetChangedEvent(newSpeed, feed.id))
                         }
                         .setNegativeButton(R.string.cancel_label, null)
                         .show()
@@ -515,6 +551,9 @@ class FeedSettingsFragment : Fragment() {
             private const val PREF_FEED_PLAYBACK_SPEED = "feedPlaybackSpeed"
             private const val PREF_AUTO_SKIP = "feedAutoSkip"
             private const val PREF_AD_SKIP = "feedAdSkip"
+            private const val AD_SKIP_DEFAULT = "default"
+            private const val AD_SKIP_ON = "on"
+            private const val AD_SKIP_OFF = "off"
             private const val PREF_AUDIO_EFFECT = "feed_audio_effect_pref"
             private const val PREF_TAGS = "tags"
             private const val PREF_VOLUME_REDUCTION = "volumeReduction"

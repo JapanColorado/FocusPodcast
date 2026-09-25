@@ -302,7 +302,7 @@
   <string name="pref_episode_cache_unlimited">無制限</string>
   <string name="pref_gpodnet_setlogin_information_title">ログイン情報を変更</string>
   <string name="pref_gpodnet_setlogin_information_sum">gpodder.netアカウントのログイン情報を変更します</string>
-  <string name="pref_feed_playback_speed_sum">このポッドキャストでエピソードのオーディオ再生を開始するときに使用する速度</string>
+  <string name="pref_feed_playback_speed_sum">設定のデフォルト速度を使うか、このポッドキャスト用に設定します</string>
   <string name="pref_playback_time_respects_speed_title">メディア情報を再生速度に調整</string>
   <string name="pref_playback_time_respects_speed_sum">表示される位置と時間が再生速度に調整されます</string>
   <string name="pref_fast_forward">早送りのスキップ時間</string>
@@ -492,4 +492,23 @@
   <string name="notification_channel_episode_auto_download">エピソードが自動ダウンロードされた時に表示します</string>
   <!--Widget settings-->
   <!--On-Demand configuration-->
+  <!-- Ad auto-skip -->
+  <string name="detect_ads">広告を検出</string>
+  <string name="pref_ad_skip_enabled_sum">すべてのポッドキャストの既定値です。プレーヤーのオーディオエフェクトやポッドキャストの設定から、ポッドキャストごとにオン・オフを切り替えられます。広告枠の背景音楽とスポンサーのチャプターを検出してスキップしますが、広告を見逃したり、少し余分にスキップしたりすることがあります。</string>
+  <string name="feed_ad_skip_default_on">既定値を使用（オン）</string>
+  <string name="feed_ad_skip_default_off">既定値を使用（オフ）</string>
+  <string name="feed_ad_skip_on">オン</string>
+  <string name="feed_ad_skip_off">オフ</string>
+  <string name="feed_ad_skip_default_on_sum">再生設定の既定値に従います（現在はオン）</string>
+  <string name="feed_ad_skip_default_off_sum">再生設定の既定値に従います（現在はオフ）</string>
+  <string name="feed_ad_skip_on_sum">既定値に関係なく、このポッドキャストではオン</string>
+  <string name="feed_ad_skip_off_sum">既定値に関係なく、このポッドキャストではオフ</string>
+  <string name="reset_to_default">デフォルトに戻す</string>
+  <string name="podcast_own_settings_applied">このポッドキャスト独自の設定を使用中</string>
+  <string name="use_default">デフォルトを使用</string>
+  <string name="default_playback_speed">デフォルトの再生速度</string>
+  <string name="pref_default_effect_sum">独自のエフェクトがないポッドキャストのデフォルト</string>
+  <string name="pref_playback_speed_sum">独自の速度がないポッドキャストで使用されます。プレーヤーで速度を変更すると、そのポッドキャストだけに適用されます</string>
+  <string name="pref_custom_for_podcast">このポッドキャスト用にカスタマイズ</string>
+  <string name="pref_custom_for_podcast_sum">オフのときは設定のデフォルトのエフェクトを使用します。プレーヤーでエフェクトを変更するとオンになります</string>
 </resources>

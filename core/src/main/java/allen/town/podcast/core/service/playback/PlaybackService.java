@@ -1,7 +1,5 @@
 package allen.town.podcast.core.service.playback;
 
-import static allen.town.podcast.model.feed.FeedPreferences.SPEED_USE_GLOBAL;
-
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
@@ -33,6 +31,9 @@ import java.util.concurrent.TimeUnit;
 
 import allen.town.podcast.common.util.TopSnackbarUtil;
 import allen.town.podcast.core.R;
+import allen.town.podcast.core.feed.util.AudioEffectUtils;
+import allen.town.podcast.core.feed.util.PlayableFeedPreferences;
+import allen.town.podcast.core.feed.util.PlaybackSpeedUtils;
 import allen.town.podcast.core.pref.PlaybackPreferences;
 import allen.town.podcast.core.pref.Prefs;
 import allen.town.podcast.core.receiver.MediaButtonReceiver;
@@ -50,10 +51,8 @@ import allen.town.podcast.event.playback.PlaybackPositionEvent;
 import allen.town.podcast.event.playback.PlaybackServiceEvent;
 import allen.town.podcast.event.playback.SleepTimerUpdatedEvent;
 import allen.town.podcast.event.settings.AdSkipChangedEvent;
-import allen.town.podcast.event.settings.LoudnessChangedEvent;
-import allen.town.podcast.event.settings.MonoChangedEvent;
+import allen.town.podcast.event.settings.AudioEffectsChangedEvent;
 import allen.town.podcast.event.settings.SkipIntroEndingChangedEvent;
-import allen.town.podcast.event.settings.SkipSilenceChangedEvent;
 import allen.town.podcast.event.settings.SpeedPresetChangedEvent;
 import allen.town.podcast.event.settings.VolumeAdaptionChangedEvent;
 import allen.town.podcast.model.feed.FeedMedia;
@@ -509,10 +508,6 @@ public class PlaybackService extends MediaBrowserServiceCompat {
             return;
         }
 
-        if (!playable.getIdentifier().equals(PlaybackPreferences.getCurrentlyPlayingFeedMediaId())) {
-            PlaybackPreferences.clearCurrentlyPlayingTemporaryPlaybackSpeed();
-        }
-
         mediaPlayer.playMediaObject(playable, stream, true, true);
         stateManager.validStartCommandWasReceived();
         stateManager.startForeground(R.id.notification_playing, notificationUpdater.build());
@@ -662,47 +657,55 @@ public class PlaybackService extends MediaBrowserServiceCompat {
         playbackVolumeUpdater.updateVolumeIfNecessary(mediaPlayer, event.getFeedId(), event.getVolumeAdaptionSetting());
     }
 
+    /**
+     * A podcast's own speed changed outside the player (Feed Settings, bulk edit), or the global
+     * default did (feed id 0). A podcast change is copied into the in-memory preferences of the
+     * playing episode's feed so a later re-prepare uses it; either way the effective speed is
+     * re-applied if it concerns what is playing.
+     */
     @Subscribe(threadMode = ThreadMode.MAIN)
     @SuppressWarnings("unused")
     public void speedPresetChanged(SpeedPresetChangedEvent event) {
-        if (getPlayable() instanceof FeedMedia) {
-            if (((FeedMedia) getPlayable()).getItem().getFeed().getId() == event.getFeedId()) {
-                if (event.getSpeed() == SPEED_USE_GLOBAL) {
-                    setSpeed(Prefs.getPlaybackSpeed(getPlayable().getMediaType()));
-                } else {
-                    setSpeed(event.getSpeed());
-                }
+        Playable playable = getPlayable();
+        if (playable == null) {
+            return;
+        }
+        FeedPreferences playingPreferences = PlayableFeedPreferences.of(playable);
+        if (event.isGlobal()) {
+            if (!PlaybackSpeedUtils.hasOwnSpeed(playingPreferences)) {
+                setSpeed(PlaybackSpeedUtils.getCurrentPlaybackSpeed(playable));
             }
+        } else if (playingPreferences != null
+                && PlayableFeedPreferences.feedIdOf(playable) == event.getFeedId()) {
+            playingPreferences.setFeedPlaybackSpeed(event.getSpeed());
+            setSpeed(PlaybackSpeedUtils.getCurrentPlaybackSpeed(playable));
         }
     }
 
+    /**
+     * The audio effects of a podcast, or the global defaults (feed id 0), changed. Like
+     * {@link #speedPresetChanged}, a podcast change is copied into the in-memory preferences of
+     * the playing episode's feed, then the effective effects are re-applied.
+     */
     @Subscribe(threadMode = ThreadMode.MAIN)
     @SuppressWarnings("unused")
-    public void skipSilenceChanged(SkipSilenceChangedEvent event) {
-        if (getPlayable() instanceof FeedMedia) {
-            if (((FeedMedia) getPlayable()).getItem().getFeed().getId() == event.getFeedId()) {
-                skipSilence(event.isEnable());
-            }
+    public void audioEffectsChanged(AudioEffectsChangedEvent event) {
+        Playable playable = getPlayable();
+        if (playable == null) {
+            return;
         }
-    }
-
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    @SuppressWarnings("unused")
-    public void monoChanged(MonoChangedEvent event) {
-        if (getPlayable() instanceof FeedMedia) {
-            if (((FeedMedia) getPlayable()).getItem().getFeed().getId() == event.getFeedId()) {
-                setDownmix(event.isEnable());
+        FeedPreferences playingPreferences = PlayableFeedPreferences.of(playable);
+        if (event.isGlobal()) {
+            if (!AudioEffectUtils.hasOwnEffects(playingPreferences)) {
+                applyAudioEffects();
             }
-        }
-    }
-
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    @SuppressWarnings("unused")
-    public void loudnessChanged(LoudnessChangedEvent event) {
-        if (getPlayable() instanceof FeedMedia) {
-            if (((FeedMedia) getPlayable()).getItem().getFeed().getId() == event.getFeedId()) {
-                setLoudness(event.isEnable());
-            }
+        } else if (playingPreferences != null
+                && PlayableFeedPreferences.feedIdOf(playable) == event.getFeedId()) {
+            playingPreferences.setUseFeedEffect(event.isUseFeedEffect());
+            playingPreferences.setSkipSilence(event.isSkipSilence());
+            playingPreferences.setMono(event.isMono());
+            playingPreferences.setLoudness(event.isLoudness());
+            applyAudioEffects();
         }
     }
 
@@ -778,12 +781,32 @@ public class PlaybackService extends MediaBrowserServiceCompat {
         return mediaPlayer.getPlayable();
     }
 
+    /** Applies {@code speed} to the player without storing it anywhere. */
     public void setSpeed(float speed) {
-        mediaPlayer.setPlaybackParams(speed, Prefs.isSkipSilence());
+        mediaPlayer.setPlaybackParams(speed, AudioEffectUtils.isSkipEnable(getPlayable()));
     }
 
-    public void skipSilence(boolean skipSilence) {
-        mediaPlayer.setPlaybackParams(getCurrentPlaybackSpeed(), skipSilence);
+    /**
+     * A speed the user chose in the player for what is playing: it becomes the podcast's own
+     * speed (or the global default for media without a subscribed podcast) and is applied.
+     * {@link FeedPreferences#SPEED_USE_GLOBAL} makes the podcast follow the default again.
+     */
+    public void setSpeedForCurrentMedia(float speed) {
+        Playable playable = getPlayable();
+        PlaybackSpeedUtils.rememberSpeed(playable, speed);
+        setSpeed(PlaybackSpeedUtils.getCurrentPlaybackSpeed(playable));
+    }
+
+    /**
+     * Re-applies skip silence, stereo to mono and vocal enhancement as configured for what is
+     * playing (its podcast's own effects or the global defaults).
+     */
+    private void applyAudioEffects() {
+        Playable playable = getPlayable();
+        mediaPlayer.setPlaybackParams(PlaybackSpeedUtils.getCurrentPlaybackSpeed(playable),
+                AudioEffectUtils.isSkipEnable(playable));
+        mediaPlayer.setDownmix(AudioEffectUtils.isMonoEnable(playable));
+        mediaPlayer.setLoudness(AudioEffectUtils.isLoudnessEnable(playable));
     }
 
     public float getCurrentPlaybackSpeed() {
@@ -791,18 +814,6 @@ public class PlaybackService extends MediaBrowserServiceCompat {
             return 1.0f;
         }
         return mediaPlayer.getPlaybackSpeed();
-    }
-
-    public boolean canDownmix() {
-        return mediaPlayer.canDownmix();
-    }
-
-    public void setDownmix(boolean enable) {
-        mediaPlayer.setDownmix(enable);
-    }
-
-    public void setLoudness(boolean enable) {
-        mediaPlayer.setLoudness(enable);
     }
 
 

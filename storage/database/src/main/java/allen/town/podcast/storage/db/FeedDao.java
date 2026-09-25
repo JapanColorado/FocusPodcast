@@ -20,7 +20,7 @@ import static allen.town.podcast.storage.db.DbSchema.KEY_FEEDITEM;
 import static allen.town.podcast.storage.db.DbSchema.KEY_FEED_IDENTIFIER;
 import static allen.town.podcast.storage.db.DbSchema.KEY_FEED_PLAYBACK_SPEED;
 import static allen.town.podcast.storage.db.DbSchema.KEY_FEED_SKIP_ENDING;
-import static allen.town.podcast.storage.db.DbSchema.KEY_FEED_AD_SKIP;
+import static allen.town.podcast.storage.db.DbSchema.KEY_FEED_AD_SKIP_OVERRIDE;
 import static allen.town.podcast.storage.db.DbSchema.KEY_FEED_SKIP_INTRO;
 import static allen.town.podcast.storage.db.DbSchema.KEY_FEED_TAGS;
 import static allen.town.podcast.storage.db.DbSchema.KEY_FEED_VOLUME_ADAPTION;
@@ -160,7 +160,13 @@ class FeedDao extends Dao {
         values.put(KEY_FEED_SKIP_INTRO, prefs.getFeedSkipIntro());
         values.put(KEY_FEED_SKIP_ENDING, prefs.getFeedSkipEnding());
         values.put(KEY_EPISODE_NOTIFICATION, prefs.getShowEpisodeNotification());
-        values.put(KEY_FEED_AD_SKIP, prefs.isAdSkipEnabled());
+        // Boolean → INTEGER 1/0, and null stays NULL: "follow the global default".
+        Boolean adSkipOverride = prefs.getAdSkipOverride();
+        if (adSkipOverride == null) {
+            values.putNull(KEY_FEED_AD_SKIP_OVERRIDE);
+        } else {
+            values.put(KEY_FEED_AD_SKIP_OVERRIDE, adSkipOverride);
+        }
         db.update(TABLE_NAME_FEEDS, values, KEY_ID + "=?", new String[]{String.valueOf(prefs.getFeedID())});
     }
 

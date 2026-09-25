@@ -1,6 +1,7 @@
 package allen.town.podcast.model.feed;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import android.text.TextUtils;
 
 import java.io.Serializable;
@@ -74,19 +75,26 @@ public class FeedPreferences implements Serializable {
     private int feedSkipEnding;
     private boolean showEpisodeNotification;
     /**
-     * Per-feed switch for the ad auto-skip feature. Defaults to on: a feed only opts out when the
-     * user turns it off, and databases written before the column existed read back as on.
+     * This feed's own choice for ad detection and skipping, or null to follow the global default
+     * ({@code Prefs.isAdSkipEnabled()}). Never read this as the effective value; the core helper
+     * {@code AdSkipUtils.isAdSkipEnabled(FeedPreferences)} resolves it against the default.
      */
-    private boolean adSkipEnabled = true;
+    @Nullable
+    private Boolean adSkipOverride = null;
     private final Set<String> tags = new HashSet<>();
 
-    /** True when detected advertisement segments of this feed's episodes should be skipped. */
-    public boolean isAdSkipEnabled() {
-        return adSkipEnabled;
+    /**
+     * @return TRUE or FALSE when the user chose ad skipping for this feed, null when the feed
+     *         follows the global default.
+     */
+    @Nullable
+    public Boolean getAdSkipOverride() {
+        return adSkipOverride;
     }
 
-    public void setAdSkipEnabled(boolean adSkipEnabled) {
-        this.adSkipEnabled = adSkipEnabled;
+    /** @param override TRUE or FALSE for this feed's own choice, null to follow the default. */
+    public void setAdSkipOverride(@Nullable Boolean override) {
+        this.adSkipOverride = override;
     }
 
     public FeedPreferences(long feedID, boolean autoDownload, AutoDeleteAction autoDeleteAction,
