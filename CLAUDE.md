@@ -29,6 +29,7 @@ pixi run detekt     # detekt static analysis (config/detekt/detekt.yml)
 pixi run check      # build + test + lint + nn + detekt
 pixi run release    # assembleRelease (needs secrets.properties)
 pixi run install    # adb install the debug APK
+pixi run install-release  # adb install the release APK (needs secrets.properties)
 pixi run clean
 
 # Raw Gradle equivalents (inside `pixi shell`):

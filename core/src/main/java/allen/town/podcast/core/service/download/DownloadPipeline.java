@@ -119,6 +119,10 @@ class DownloadPipeline {
                 }
             }
             if (downloader.cancelled || queue.isShutdown()) {
+                if (downloader.cancelled) {
+                    // cancelled before it started: writeFileUrl() already created an empty file
+                    completionHandler.discardCancelled(request);
+                }
                 return;
             }
             try {

@@ -125,6 +125,16 @@ class DownloadCompletionHandler {
     }
 
     /**
+     * Drops what a cancelled media download left behind. Skipped when the same episode is
+     * already being downloaded again, since that request owns the file and file_url now.
+     */
+    void discardCancelled(DownloadRequest request) {
+        if (!DownloadService.isDownloadingFile(request.getSource())) {
+            FailedDownloadHandler.discardPartialMedia(request);
+        }
+    }
+
+    /**
      * Handles a download that did not succeed.
      *
      * @return true if the request should be re-submitted automatically (the caller takes care
@@ -138,11 +148,13 @@ class DownloadCompletionHandler {
         final int type = status.getFeedfileType();
 
         if (status.isCancelled()) {
+            discardCancelled(request);
             return false;
         }
 
         if (status.getReason() == DownloadError.ERROR_UNAUTHORIZED) {
             notifier.postAuthenticationNotification(request);
+            FailedDownloadHandler.discardPartialMedia(request);
             return false;
         }
 

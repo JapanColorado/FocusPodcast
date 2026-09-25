@@ -28,3 +28,4 @@ check = { depends-on = ["build", "test", "lint", "nn", "detekt"], description = 
 
 # Device
 install = { cmd = "bash scripts/install.sh", depends-on = ["build"], description = "Install the debug APK on the connected adb device" }
+install-release = { cmd = "bash scripts/install.sh release", depends-on = ["release"], description = "Install the release APK on the connected adb device (needs secrets.properties)" }
