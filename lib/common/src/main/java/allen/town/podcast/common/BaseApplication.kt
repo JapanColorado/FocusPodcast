@@ -1,6 +1,5 @@
 package allen.town.podcast.common
 
-import allen.town.podcast.common.crash.CustomCrashHandler
 import allen.town.podcast.common.error.RxJavaErrorHandlerSetup
 import allen.town.podcast.common.util.BasePreferenceUtil
 import allen.town.podcast.common.util.Timber
@@ -76,9 +75,6 @@ open class BaseApplication: MultiDexApplication() {
     override fun onCreate() {
         super.onCreate()
         BasePreferenceUtil.instance(this)
-        if (!BuildConfig.DEBUG) {
-            CustomCrashHandler.getInstance().setCustomCrashHandler()
-        }
         setLog()
         RxJavaErrorHandlerSetup.setupRxJavaErrorHandler()
         if(needInitDefaultWallpaperAccent()){

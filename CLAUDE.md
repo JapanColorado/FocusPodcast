@@ -136,6 +136,7 @@ the seek bar and can be disabled or deleted per episode.
 ## Gotchas
 
 - `app/build.gradle` has a `copyLicense` task hooked to `preBuild` that copies the root `LICENSE` to `app/build/generated/license-assets/LICENSE.txt`; that directory is registered as an extra `assets` srcDir. It no longer writes into the source tree — do not reintroduce a source-tree write.
+- Uncaught exceptions crash the app normally. `lib/common/.../crash/CustomCrashHandler` (a Cockroach-style handler that swallowed main-thread exceptions and finished the failing Activity through hidden APIs) is no longer installed: on Android 17 the finish step fails, so a swallowed lifecycle exception left a windowless Activity and an ANR instead of a crash. Do not reinstall it.
 - ProGuard rules are in `app/proguard.cfg`; release enables `minifyEnabled` and `shrinkResources`.
 - **detekt is a build gate.** Config lives in `config/detekt/detekt.yml`; it starts from detekt's
   default config and switches off everything stylistic (naming, complexity, `MagicNumber`,
@@ -151,7 +152,7 @@ the seek bar and can be disabled or deleted per episode.
 - **`core` compiles Kotlin with `allWarningsAsErrors`** (`core/build.gradle`). It has only a
   handful of Kotlin files, so keeping them warning-free is cheap. `app` deliberately does not.
 - All UI uses ViewBinding (ButterKnife was removed). kapt runs two processors (Glide, EventBus) and is the usual source of opaque build errors.
-- **`pixi run lint` passes.** Three modules carry deliberate suppressions: `lib/theme/lint.xml` and `lib/common/lint.xml` downgrade `RestrictedApi` to a warning (vendored theme/preference code reaches into androidx internals that have no public equivalent), and `PlaybackService`/`PlaybackController`/`DownloadService` carry `@SuppressLint("UnspecifiedRegisterReceiverFlag")` on their pre-Android-13 `registerReceiver` branch (androidx.core 1.7.0 has no `ContextCompat.registerReceiver`). Cursor tinting now uses `TextView.setTextCursorDrawable` on API 29+ and only falls back to reflection below that.
+- **`pixi run lint` passes.** Three modules carry deliberate suppressions: `lib/theme/lint.xml` and `lib/common/lint.xml` downgrade `RestrictedApi` to a warning (vendored theme/preference code reaches into androidx internals that have no public equivalent), and `PlaybackService`/`PlaybackController`/`DownloadService` carry `@SuppressLint("UnspecifiedRegisterReceiverFlag")` on their pre-Android-13 `registerReceiver` branch (written when androidx.core resolved to 1.7.0, which has no `ContextCompat.registerReceiver`; WorkManager 2.10 now pulls in 1.12, so they could move to it). Cursor tinting now uses `TextView.setTextCursorDrawable` on API 29+ and only falls back to reflection below that.
 - `CONTRIBUTING.md` asks not to upgrade dependencies or build tools without a concrete reason; several pinned versions (e.g. ExoPlayer 2.15.1) have comments explaining why newer versions break.
 - The only long-lived branch is `main`.
 - `docs/REFACTOR_BASELINE.md` records the metrics the refactor drove to zero (`!!`, `printStackTrace`, empty catches, Rx chains without `onError`, CJK text outside translations, detekt findings). Treat those zeros as invariants when adding code, not as a one-off cleanup.
