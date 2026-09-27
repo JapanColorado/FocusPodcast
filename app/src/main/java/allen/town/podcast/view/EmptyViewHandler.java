@@ -48,7 +48,7 @@ public class EmptyViewHandler {
     }
 
     public void setIcon(@DrawableRes int icon) {
-        ivIcon.setImageResource(R.drawable.ic_binoculars_svgrepo_com);
+        ivIcon.setImageResource(icon);
         ivIcon.setVisibility(View.VISIBLE);
     }
 

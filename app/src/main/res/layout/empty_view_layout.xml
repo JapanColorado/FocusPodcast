@@ -14,7 +14,7 @@
             android:layout_width="64dp"
             android:layout_height="64dp"
             android:visibility="gone"
-            tools:src="@drawable/ic_binoculars_svgrepo_com"
+            tools:src="@drawable/ic_playlist"
             tools:visibility="visible"/>
 
     <com.google.android.material.textview.MaterialTextView
