@@ -30,13 +30,6 @@
 
 
     </allen.town.podcast.common.common.prefs.supportv7.ATEPreferenceCategory>
-    <allen.town.podcast.common.common.prefs.supportv7.ATEPreference
-        android:key="prefImportExport"
-        android:layout="@layout/list_item_view_no_title"
-        android:icon="@drawable/ic_round_import_export_24"
-        android:summary="@string/import_export_summary"
-        android:title="@string/import_export_pref"
-        search:ignore="true" />
     <allen.town.podcast.common.common.prefs.supportv7.ATEPreferenceCategory
         android:layout="@layout/preference_category_title"
         android:title="@string/pref_geek">

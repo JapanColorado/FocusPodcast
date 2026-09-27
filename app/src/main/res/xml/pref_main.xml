@@ -53,8 +53,8 @@
         android:icon="@drawable/ic_cloud"
         android:key="pref_sync"
         android:layout="@layout/list_item_view_no_title_main"
-        android:summary="@string/synchronization_sum"
-        android:title="@string/synchronization_pref" />
+        android:summary="@string/pref_sync_backup_sum"
+        android:title="@string/pref_sync_backup_title" />
 
 
 

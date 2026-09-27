@@ -19,7 +19,6 @@ import io.reactivex.schedulers.Schedulers;
 public class StoragePrefFragment extends AbsSettingsFragment {
     private static final String TAG = "StoragePrefFragment";
     private static final String PREF_CHOOSE_DATA_DIR = "prefChooseDataDir";
-    private static final String PREF_IMPORT_EXPORT = "prefImportExport";
 
     @Override
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
@@ -54,12 +53,6 @@ public class StoragePrefFragment extends AbsSettingsFragment {
                                 .subscribe(() -> { },
                                         error -> Log.e(TAG, Log.getStackTraceString(error)));
                     });
-                    return true;
-                }
-        );
-        findPreference(PREF_IMPORT_EXPORT).setOnPreferenceClickListener(
-                preference -> {
-                    ((SettingsActivity) getActivity()).openScreen(R.xml.pref_import_export);
                     return true;
                 }
         );

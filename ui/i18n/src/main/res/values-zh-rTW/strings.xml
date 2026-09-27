@@ -807,4 +807,6 @@
   <string name="pref_appearance_sum">主題、顏色、版面、播放畫面、滑動操作</string>
   <string name="pref_ad_skip_category">跳過廣告</string>
   <string name="pref_ad_skip_sum">偵測並跳過已下載單集中的廣告</string>
+  <string name="pref_sync_backup_title">同步與備份</string>
+  <string name="pref_sync_backup_sum">gpodder.net 或 Nextcloud 同步、資料庫備份、OPML 匯入和匯出</string>
 </resources>

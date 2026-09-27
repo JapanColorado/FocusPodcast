@@ -538,4 +538,6 @@
   <string name="pref_appearance_sum">テーマ、色、レイアウト、再生画面、スワイプ操作</string>
   <string name="pref_ad_skip_category">広告スキップ</string>
   <string name="pref_ad_skip_sum">ダウンロード済みエピソードの広告を検出してスキップ</string>
+  <string name="pref_sync_backup_title">同期とバックアップ</string>
+  <string name="pref_sync_backup_sum">gpodder.net または Nextcloud との同期、データベースのバックアップ、OPML のインポートとエクスポート</string>
 </resources>

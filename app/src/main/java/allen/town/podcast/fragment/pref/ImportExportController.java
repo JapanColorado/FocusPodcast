@@ -6,7 +6,6 @@ import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
-import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -20,6 +19,8 @@ import androidx.annotation.StringRes;
 import androidx.appcompat.app.AlertDialog;
 import androidx.core.app.ShareCompat;
 import androidx.core.content.FileProvider;
+import androidx.fragment.app.Fragment;
+import androidx.preference.PreferenceFragmentCompat;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
@@ -32,7 +33,6 @@ import allen.town.podcast.common.views.AccentProgressDialog;
 import allen.town.podcast.MyApp;
 import allen.town.podcast.R;
 import allen.town.podcast.activity.ImportOPMLActivity;
-import allen.town.podcast.activity.SettingsActivity;
 import allen.town.podcast.asynctask.DocumentFileExportWorker;
 import allen.town.podcast.asynctask.ExportWorker;
 import allen.town.podcast.core.export.ExportWriter;
@@ -44,7 +44,13 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 
-public class ImportExportPreferencesFragment extends AbsSettingsFragment {
+/**
+ * Database backup/restore and OPML import/export for the settings screen that shows them. Create
+ * it as a field of that fragment, so the activity-result launchers are registered before the
+ * fragment is created, call {@link #bind} once its preferences are inflated and {@link #dispose}
+ * from its {@code onStop}.
+ */
+public class ImportExportController {
     private static final String TAG = "ImportExportPrefs";
     private static final String PREF_OPML_EXPORT = "prefOpmlExport";
     private static final String PREF_OPML_IMPORT = "prefOpmlImport";
@@ -53,38 +59,29 @@ public class ImportExportPreferencesFragment extends AbsSettingsFragment {
     private static final String DEFAULT_OPML_OUTPUT_NAME = "focusPodcast_feeds_%s.opml";
     //a stricter type prevents some apps from importing
     private static final String CONTENT_TYPE_OPML = "text/*";
-    private static final String DEFAULT_HTML_OUTPUT_NAME = "focusPodcast_feeds_%s.html";
-    private static final String CONTENT_TYPE_HTML = "text/html";
-    private static final String DEFAULT_FAVORITES_OUTPUT_NAME = "focusPodcast_favorites-%s.html";
     private static final String DATABASE_EXPORT_FILENAME = "focusPodcastBackup-%s.db";
-    private final ActivityResultLauncher<Intent> chooseOpmlExportPathLauncher =
-            registerForActivityResult(new StartActivityForResult(), this::chooseOpmlExportPathResult);
-    private final ActivityResultLauncher<Intent> restoreDatabaseLauncher =
-            registerForActivityResult(new StartActivityForResult(), this::restoreDatabaseResult);
-    private final ActivityResultLauncher<String> backupDatabaseLauncher =
-            registerForActivityResult(new BackupDatabase(), this::backupDatabaseResult);
-    private final ActivityResultLauncher<String> chooseOpmlImportPathLauncher =
-            registerForActivityResult(new GetContent(), this::chooseOpmlImportPathResult);
+    private final Fragment fragment;
+    private final ActivityResultLauncher<Intent> chooseOpmlExportPathLauncher;
+    private final ActivityResultLauncher<Intent> restoreDatabaseLauncher;
+    private final ActivityResultLauncher<String> backupDatabaseLauncher;
+    private final ActivityResultLauncher<String> chooseOpmlImportPathLauncher;
     private Disposable disposable;
     private ProgressDialog progressDialog;
 
-    @Override
-    public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
-        addPreferencesFromResource(R.xml.pref_import_export);
-        setupStorageScreen();
-        progressDialog = AccentProgressDialog.instance(getContext(),"",
-                getContext().getString(R.string.please_wait),true,true,null);
+    public ImportExportController(@NonNull Fragment fragment) {
+        this.fragment = fragment;
+        chooseOpmlExportPathLauncher = fragment.registerForActivityResult(
+                new StartActivityForResult(), this::chooseOpmlExportPathResult);
+        restoreDatabaseLauncher = fragment.registerForActivityResult(
+                new StartActivityForResult(), this::restoreDatabaseResult);
+        backupDatabaseLauncher = fragment.registerForActivityResult(
+                new BackupDatabase(), this::backupDatabaseResult);
+        chooseOpmlImportPathLauncher = fragment.registerForActivityResult(
+                new GetContent(), this::chooseOpmlImportPathResult);
     }
 
-    @Override
-    public void onStart() {
-        super.onStart();
-        ((SettingsActivity) getActivity()).setTitle(R.string.import_export_pref);
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
+    /** Cancels a running export or import; its progress dialog goes with the screen. */
+    public void dispose() {
         if (disposable != null) {
             disposable.dispose();
         }
@@ -94,30 +91,33 @@ public class ImportExportPreferencesFragment extends AbsSettingsFragment {
         return String.format(fname, new SimpleDateFormat("yyyy-MM-dd", Locale.US).format(new Date()));
     }
 
-    private void setupStorageScreen() {
-        findPreference(PREF_OPML_EXPORT).setOnPreferenceClickListener(
+    /** Wires the four backup preferences of {@code screen}, which must be the owning fragment. */
+    public void bind(@NonNull PreferenceFragmentCompat screen) {
+        progressDialog = AccentProgressDialog.instance(fragment.requireContext(), "",
+                fragment.getString(R.string.please_wait), true, true, null);
+        screen.findPreference(PREF_OPML_EXPORT).setOnPreferenceClickListener(
                 preference -> {
                     openExportPathPicker(Export.OPML, chooseOpmlExportPathLauncher, new OpmlWriter());
                     return true;
                 }
         );
-        findPreference(PREF_OPML_IMPORT).setOnPreferenceClickListener(
+        screen.findPreference(PREF_OPML_IMPORT).setOnPreferenceClickListener(
                 preference -> {
                     try {
                         chooseOpmlImportPathLauncher.launch("*/*");
                     } catch (ActivityNotFoundException e) {
                         Log.e(TAG, "no file manager to pick an OPML file with", e);
-                        TopSnackbarUtil.showSnack(getActivity(),
+                        TopSnackbarUtil.showSnack(fragment.requireActivity(),
                                 R.string.unable_to_start_system_file_manager, Toast.LENGTH_LONG);
                     }
                     return true;
                 });
-        findPreference(PREF_DATABASE_IMPORT).setOnPreferenceClickListener(
+        screen.findPreference(PREF_DATABASE_IMPORT).setOnPreferenceClickListener(
                 preference -> {
                     importDatabase();
                     return true;
                 });
-        findPreference(PREF_DATABASE_EXPORT).setOnPreferenceClickListener(
+        screen.findPreference(PREF_DATABASE_EXPORT).setOnPreferenceClickListener(
                 preference -> {
                     exportDatabase();
                     return true;
@@ -125,10 +125,10 @@ public class ImportExportPreferencesFragment extends AbsSettingsFragment {
     }
 
     private void exportWithWriter(ExportWriter exportWriter, Uri uri, Export exportType) {
-        Context context = getActivity();
+        Context context = fragment.requireActivity();
         progressDialog.show();
         if (uri == null) {
-            Observable<File> observable = new ExportWorker(exportWriter, getContext()).exportObservable();
+            Observable<File> observable = new ExportWorker(exportWriter, fragment.requireContext()).exportObservable();
             disposable = observable.subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(output -> {
@@ -154,7 +154,7 @@ public class ImportExportPreferencesFragment extends AbsSettingsFragment {
     private void importDatabase() {
         // setup the alert builder
         AlertDialog.Builder builder = new AccentMaterialDialog(
-                getActivity(),
+                fragment.requireActivity(),
                 R.style.MaterialAlertDialogTheme
         );
         builder.setTitle(R.string.database_import_label);
@@ -174,7 +174,7 @@ public class ImportExportPreferencesFragment extends AbsSettingsFragment {
 
     private void showDatabaseImportSuccessDialog() {
         AlertDialog.Builder builder =            new AccentMaterialDialog(
-                    getContext(),
+                    fragment.requireContext(),
                     R.style.MaterialAlertDialogTheme
             );
         builder.setTitle(R.string.successful_import_label);
@@ -186,15 +186,15 @@ public class ImportExportPreferencesFragment extends AbsSettingsFragment {
 
     private void showExportSuccessDialog(String path, Uri streamUri, Export exportType) {
         final AlertDialog.Builder alert =            new AccentMaterialDialog(
-                    getContext(),
+                    fragment.requireContext(),
                     R.style.MaterialAlertDialogTheme
             );
         alert.setNeutralButton(android.R.string.ok, (dialog, which) -> dialog.dismiss());
         alert.setTitle(R.string.export_success_title);
         alert.setPositiveButton(R.string.share_label, (dialog, which) -> {
-            new ShareCompat.IntentBuilder(getContext())
+            new ShareCompat.IntentBuilder(fragment.requireContext())
                     .setType(exportType.contentType)
-                    .setSubject(getString(exportType.labelResId))
+                    .setSubject(fragment.getString(exportType.labelResId))
                     .addStream(streamUri)
                     .setChooserTitle(R.string.share_label)
                     .startChooser();
@@ -206,7 +206,7 @@ public class ImportExportPreferencesFragment extends AbsSettingsFragment {
         Log.e(TAG, "import/export failed", error);
         progressDialog.dismiss();
         final AlertDialog.Builder alert =            new AccentMaterialDialog(
-                    getContext(),
+                    fragment.requireContext(),
                     R.style.MaterialAlertDialogTheme
             );
         alert.setPositiveButton(android.R.string.ok, (dialog, which) -> dialog.dismiss());
@@ -231,7 +231,7 @@ public class ImportExportPreferencesFragment extends AbsSettingsFragment {
         }
         final Uri uri = result.getData().getData();
         progressDialog.show();
-        final Context appContext = requireContext().getApplicationContext();
+        final Context appContext = fragment.requireContext().getApplicationContext();
         // Missing-file reconciliation for the imported database is deliberately NOT done here:
         // importBackup() swaps the file under the open Db singleton and the success dialog asks
         // for a restart; the once-per-process check in MainActivity runs after that restart.
@@ -249,11 +249,12 @@ public class ImportExportPreferencesFragment extends AbsSettingsFragment {
             return;
         }
         progressDialog.show();
-        disposable = Completable.fromAction(() -> DatabaseExporter.exportToDocument(uri, getContext()))
+        final Context appContext = fragment.requireContext().getApplicationContext();
+        disposable = Completable.fromAction(() -> DatabaseExporter.exportToDocument(uri, appContext))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(() -> {
-                    TopSnackbarUtil.showSnack(getActivity(), R.string.export_success_title, Toast.LENGTH_LONG);
+                    TopSnackbarUtil.showSnack(fragment.requireActivity(), R.string.export_success_title, Toast.LENGTH_LONG);
                     progressDialog.dismiss();
                 }, this::showExportErrorDialog);
     }
@@ -262,9 +263,9 @@ public class ImportExportPreferencesFragment extends AbsSettingsFragment {
         if (uri == null) {
             return;
         }
-        final Intent intent = new Intent(getContext(), ImportOPMLActivity.class);
+        final Intent intent = new Intent(fragment.requireContext(), ImportOPMLActivity.class);
         intent.setData(uri);
-        startActivity(intent);
+        fragment.startActivity(intent);
     }
 
     private void openExportPathPicker(Export exportType, ActivityResultLauncher<Intent> result, ExportWriter writer) {
@@ -288,11 +289,6 @@ public class ImportExportPreferencesFragment extends AbsSettingsFragment {
         // If we are using a SDK lower than API 21 or the implicit intent failed
         // fallback to the legacy export process
         exportWithWriter(writer, null, exportType);
-    }
-
-    @Override
-    public void invalidateSettings() {
-
     }
 
     private static class BackupDatabase extends ActivityResultContracts.CreateDocument {

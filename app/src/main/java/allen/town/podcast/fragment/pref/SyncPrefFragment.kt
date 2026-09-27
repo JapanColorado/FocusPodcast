@@ -30,22 +30,28 @@ import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
 
+/** Episode sync with gpodder.net or Nextcloud, plus database backup and OPML import/export. */
 class SyncPrefFragment : AbsSettingsFragment() {
+    // A field, so its activity-result launchers are registered before the fragment is created.
+    private val importExport = ImportExportController(this)
+
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         addPreferencesFromResource(R.xml.pref_sync)
+        importExport.bind(this)
         setupScreen()
         updateScreen()
     }
 
     override fun onStart() {
         super.onStart()
-        (activity as? SettingsActivity)?.setTitle(R.string.synchronization_pref)
+        (activity as? SettingsActivity)?.setTitle(R.string.pref_sync_backup_title)
         updateScreen()
         EventBus.getDefault().register(this)
     }
 
     override fun onStop() {
         super.onStop()
+        importExport.dispose()
         EventBus.getDefault().unregister(this)
         (activity as? SettingsActivity)?.setSubtitle("")
     }
