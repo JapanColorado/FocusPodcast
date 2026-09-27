@@ -937,4 +937,22 @@
     <string name="use_default">Use default</string>
     <string name="default_playback_speed">Default playback speed</string>
     <string name="pref_default_effect_sum">Default for podcasts without their own effects</string>
+    <string name="add_podcast_by_url_label">Add podcast by URL</string>
+    <string name="feed_url_hint">RSS feed URL</string>
+    <string name="invalid_feed_url_error">Enter a link that starts with http:// or https://</string>
+    <string name="search_podcasts_label">Search podcasts</string>
+    <string name="browse_episodes_label">Browse episodes</string>
+    <string name="clear_filter_label">Clear filter</string>
+    <string name="notification_rationale_title">Allow notifications?</string>
+    <string name="notification_rationale_message">FocusPodcast uses notifications to show download progress and to tell you about new episodes and failed downloads.</string>
+    <string name="allow_label">Allow</string>
+    <string name="not_now_label">Not now</string>
+    <plurals name="feed_filter_hides_all_episodes">
+        <item quantity="one">The only episode is hidden by your filter</item>
+        <item quantity="other">All %d episodes are hidden by your filter</item>
+    </plurals>
+    <plurals name="feed_filter_hidden_count">
+        <item quantity="one">%d hidden</item>
+        <item quantity="other">%d hidden</item>
+    </plurals>
 </resources>

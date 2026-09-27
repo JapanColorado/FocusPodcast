@@ -781,4 +781,20 @@
   <string name="use_default">使用預設值</string>
   <string name="default_playback_speed">預設播放速度</string>
   <string name="pref_default_effect_sum">適用於沒有專屬音效的播客</string>
+  <string name="add_podcast_by_url_label">透過網址新增播客</string>
+  <string name="feed_url_hint">RSS 訂閱網址</string>
+  <string name="invalid_feed_url_error">請輸入以 http:// 或 https:// 開頭的網址</string>
+  <string name="search_podcasts_label">搜尋播客</string>
+  <string name="browse_episodes_label">瀏覽單集</string>
+  <string name="clear_filter_label">清除篩選</string>
+  <string name="notification_rationale_title">允許通知？</string>
+  <string name="notification_rationale_message">FocusPodcast 透過通知顯示下載進度，並提醒你新單集和下載失敗。</string>
+  <string name="allow_label">允許</string>
+  <string name="not_now_label">稍後再說</string>
+  <plurals name="feed_filter_hides_all_episodes">
+    <item quantity="other">全部 %d 個單集都被篩選隱藏了</item>
+  </plurals>
+  <plurals name="feed_filter_hidden_count">
+    <item quantity="other">已隱藏 %d 個</item>
+  </plurals>
 </resources>

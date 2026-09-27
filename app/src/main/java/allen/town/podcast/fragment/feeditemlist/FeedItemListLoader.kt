@@ -41,6 +41,13 @@ internal class FeedItemListLoader(
     var isDownloadingFeed = false
         private set
 
+    /**
+     * How many episodes of the loaded feed its episode filter hides (0 without a filter). Set on the
+     * loading thread before [loadItems] reports the result.
+     */
+    var hiddenItemCount = 0
+        private set
+
     private var finalGetFeedUrl = false
     private var feeds: List<Feed>? = null
     private var disposable: Disposable? = null
@@ -99,6 +106,7 @@ internal class FeedItemListLoader(
 
     @SuppressLint("CheckResult") // fire-and-forget: app-scoped DB work with its own onError; nothing to dispose
     private fun loadData(): Feed? {
+        hiddenItemCount = 0
         if (feedID > 0) {
             //a feedId means the feed exists in the database
             feed = DBReader.getFeed(feedID, true)
@@ -174,7 +182,18 @@ internal class FeedItemListLoader(
             FeedItemPermutors.getPermutor(sortOrder).reorder(feedItems)
             currentFeed.items = feedItems
         }
+        hiddenItemCount = countHiddenItems(currentFeed)
         return currentFeed
+    }
+
+    /** The items were loaded through the feed's filter; the difference to the full count is hidden. */
+    private fun countHiddenItems(feed: Feed): Int {
+        val filterValues = feed.itemFilter?.values
+        if (filterValues == null || filterValues.isEmpty() || feed.id <= 0) {
+            return 0
+        }
+        val shown = feed.items?.size ?: 0
+        return (DBReader.getFeedItemCount(feed.id) - shown).coerceAtLeast(0)
     }
 
     private companion object {

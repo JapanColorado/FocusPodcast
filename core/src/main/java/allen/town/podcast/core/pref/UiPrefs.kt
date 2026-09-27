@@ -30,6 +30,7 @@ internal object UiPrefs {
     private const val PREF_DRAWER_FEED_COUNTER = "pref_feed_counts"
     private const val PREF_SHOW_DOWNLOAD_REPORT = "pref_show_download_sync_failed"
     private const val PREF_SHOW_AUTO_DOWNLOAD_REPORT = "pref_show_auto_downlod_result"
+    private const val PREF_NOTIFICATION_RATIONALE_SHOWN = "pref_notification_rationale_shown"
 
     private const val NOTIFICATION_BUTTON_REWIND = 0
     private const val NOTIFICATION_BUTTON_FAST_FORWARD = 1
@@ -331,4 +332,11 @@ internal object UiPrefs {
     fun shouldShowColumnInLandscape(): Boolean {
         return prefs.getBoolean(Prefs.PREF_COLUMN_IN_LANDSCAPE, true)
     }
+
+    /** Whether the notification permission explanation was shown (answered either way). */
+    var notificationRationaleShown: Boolean
+        get() = prefs.getBoolean(PREF_NOTIFICATION_RATIONALE_SHOWN, false)
+        set(value) {
+            prefs.edit().putBoolean(PREF_NOTIFICATION_RATIONALE_SHOWN, value).apply()
+        }
 }

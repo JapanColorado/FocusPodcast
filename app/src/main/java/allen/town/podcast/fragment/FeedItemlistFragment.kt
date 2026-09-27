@@ -24,8 +24,10 @@ import allen.town.podcast.fragment.feeditemlist.FeedItemListMultiSelect
 import allen.town.podcast.fragment.feeditemlist.FeedItemListPager
 import allen.town.podcast.fragment.swipeactions.SwipeActions
 import allen.town.podcast.menuprocess.FeedItemMenuProcess
+import allen.town.podcast.menuprocess.FeedMenuProcess
 import allen.town.podcast.model.feed.Feed
 import allen.town.podcast.util.SkeletonRecyclerDelay
+import allen.town.podcast.view.EmptyViewHandler
 import allen.town.podcast.view.FeedItemListToolbarIconTintHelper
 import allen.town.podcast.view.StorePositionRecyclerView
 import allen.town.podcast.viewholder.EpisodeItemViewHolder
@@ -81,6 +83,7 @@ class FeedItemlistFragment() : Fragment(), OnItemClickListener, Toolbar.OnMenuIt
     private lateinit var header: FeedItemListHeader
     private lateinit var menuController: FeedItemListMenu
     private lateinit var pager: FeedItemListPager
+    private lateinit var emptyView: EmptyViewHandler
 
     private val feed: Feed?
         get() = loader.feed
@@ -126,7 +129,12 @@ class FeedItemlistFragment() : Fragment(), OnItemClickListener, Toolbar.OnMenuIt
         skeleton = recyclerView.applySkeleton(R.layout.item_small_recyclerview_skeleton, 15)
         skeletonRecyclerDelay = SkeletonRecyclerDelay(skeleton, recyclerView)
         skeletonRecyclerDelay.showSkeleton()
-        header = FeedItemListHeader(this, root, binding.filterItems, { loader.feed }) {
+        emptyView = EmptyViewHandler(requireContext())
+        emptyView.attachTo(binding.emptyViewContainer)
+        header = FeedItemListHeader(
+            this, root, binding.filterItems, binding.filterChip,
+            { loader.feed }, { loader.hiddenItemCount }
+        ) {
             if (getParentFragmentManager().getBackStackEntryCount() > 0) {
                 getParentFragmentManager().popBackStack()
             } else {
@@ -417,8 +425,36 @@ class FeedItemlistFragment() : Fragment(), OnItemClickListener, Toolbar.OnMenuIt
             listAdapter.updateItems(currentFeed.items)
             swipeActions?.setFilter(currentFeed.itemFilter)
         }
+        updateEmptyState(currentFeed)
         menuController.refreshToolbarState()
         updateSyncProgressBarVisibility()
+    }
+
+    /**
+     * A stored feed without visible episodes says why: it has none yet, or the episode filter hides
+     * all of them (then with a way out). Feeds still being fetched show no empty state.
+     */
+    private fun updateEmptyState(currentFeed: Feed?) {
+        val items = currentFeed?.items
+        if (currentFeed == null || currentFeed.id <= 0 || items == null || items.isNotEmpty()) {
+            binding.emptyViewContainer.visibility = View.GONE
+            return
+        }
+        emptyView.clearActions()
+        val hidden = loader.hiddenItemCount
+        if (hidden > 0) {
+            emptyView.setIcon(R.drawable.ic_filter)
+            emptyView.setTitle(
+                resources.getQuantityString(R.plurals.feed_filter_hides_all_episodes, hidden, hidden)
+            )
+            emptyView.addAction(R.string.clear_filter_label, R.drawable.ic_filter_disable) {
+                FeedMenuProcess.clearFilter(currentFeed)
+            }
+        } else {
+            emptyView.setIcon(R.drawable.ic_episodes)
+            emptyView.setTitle(R.string.no_all_episodes_head_label)
+        }
+        binding.emptyViewContainer.visibility = View.VISIBLE
     }
 
     private fun loadItems() {

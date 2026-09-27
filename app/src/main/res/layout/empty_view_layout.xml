@@ -22,6 +22,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             tools:text="Title"
+            android:textAlignment="center"
             android:textSize="16sp"
             android:textColor="?android:attr/textColorPrimary"/>
 
@@ -32,5 +33,14 @@
             android:textSize="14sp"
             tools:text="Message"
             android:textAlignment="center"/>
+
+    <LinearLayout
+            android:id="@+id/emptyViewActions"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:orientation="vertical"
+            android:visibility="gone"
+            tools:visibility="visible"/>
 
 </LinearLayout>

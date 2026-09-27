@@ -516,6 +516,11 @@ public class Db {
         return itemDao.getRecentlyPublishedItemsCursor(offset, limit, filter);
     }
 
+    /** Number of items of the feed, ignoring the feed's item filter. */
+    public final int getFeedItemCount(long feedId) {
+        return itemDao.getFeedItemCount(feedId);
+    }
+
     public final Cursor getTotalEpisodeCountCursor(FeedItemFilter filter) {
         return itemDao.getTotalEpisodeCountCursor(filter);
     }

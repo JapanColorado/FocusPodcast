@@ -26,6 +26,7 @@ import allen.town.podcast.core.util.download.AutoUpdateManager
 import allen.town.podcast.core.util.menuhandler.MenuItemUtils
 import allen.town.podcast.core.util.menuhandler.MenuItemUtils.UpdateRefreshMenuItemChecker
 import allen.town.podcast.core.view.TopAppBarLayout
+import allen.town.podcast.discovery.CombinedSearcher
 import allen.town.podcast.event.FeedItemEvent
 import allen.town.podcast.event.PlayerStatusEvent
 import allen.town.podcast.event.QueueEvent
@@ -390,6 +391,16 @@ class PlaylistFragment : Fragment(), Toolbar.OnMenuItemClickListener, OnSelectMo
         emptyView.attachToRecyclerView(recyclerView)
         emptyView.setIcon(R.drawable.ic_playlist)
         emptyView.setTitle(R.string.no_items_header_label)
+        // An empty playlist is filled from episodes the user already has, so browsing them comes
+        // first; searching covers the user who has no subscriptions yet.
+        emptyView.addAction(R.string.browse_episodes_label, R.drawable.ic_episodes) {
+            (requireActivity() as MainActivity).loadFragment(EpisodesFragment.TAG, null)
+        }
+        emptyView.addAction(R.string.search_podcasts_label, R.drawable.ic_search) {
+            (requireActivity() as MainActivity).loadChildFragment(
+                OnlineSearchFragment.newInstance(CombinedSearcher::class.java, "")
+            )
+        }
         progLoading = root.findViewById(R.id.progLoading)
         toolbar.setTitle(getString(R.string.playlist_label))
         skeleton = recyclerView.applySkeleton(R.layout.item_small_recyclerview_skeleton, 15)

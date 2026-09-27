@@ -10,6 +10,7 @@ import androidx.annotation.NonNull;
 
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.Collections;
 import java.util.Set;
 
 import allen.town.podcast.R;
@@ -102,6 +103,14 @@ public class FeedMenuProcess {
         filterDialog.openDialog();
     }
 
+
+    /**
+     * Removes the feed's episode filter; the FILTER_CHANGED event this posts reloads the list.
+     */
+    public static void clearFilter(Feed selectedFeed) {
+        selectedFeed.setItemFilter(new String[0]);
+        DBWriter.setFeedItemsFilter(selectedFeed.getId(), Collections.emptySet());
+    }
 
     public static void showSortDialog(Context context, Feed selectedFeed) {
         BaseFeedSortDialog sortDialog = new BaseFeedSortDialog(context,selectedFeed.getSortOrder()) {

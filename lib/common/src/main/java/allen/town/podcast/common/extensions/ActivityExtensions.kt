@@ -15,15 +15,12 @@
 @file:JvmName("ActivityExtensionsUtils")
 package allen.town.podcast.common.extensions
 
-import android.Manifest
 import android.app.Activity
 import android.content.Intent
-import android.os.Build
 import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.DimenRes
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.app.NotificationManagerCompat
 import allen.town.podcast.theme.util.ToolbarContentTintHelper
 import com.google.android.material.appbar.MaterialToolbar
 
@@ -33,25 +30,6 @@ fun AppCompatActivity.applyToolbar(toolbar: MaterialToolbar?) {
         setSupportActionBar(this)
     }
 
-}
-
-/**
- * Android 13 requires requesting the notification permission at runtime.
- */
-fun AppCompatActivity.requestNotificationPermission() {
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU && !NotificationManagerCompat.from(this)
-            .areNotificationsEnabled()
-    ) {
-        requestPermissions(
-            arrayOf(
-                Manifest.permission.POST_NOTIFICATIONS
-            ), notificationRequestCode()
-        )
-    }
-}
-
-fun AppCompatActivity.notificationRequestCode(): Int {
-    return 10010
 }
 
 inline fun <reified T : Any> Activity.extra(key: String, default: T? = null) = lazy {

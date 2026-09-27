@@ -5,11 +5,13 @@ import allen.town.podcast.common.util.Timber
 import allen.town.podcast.common.util.Util.dp2Px
 import allen.town.podcast.MyApp.Companion.runOnUiThread
 import allen.town.podcast.R
+import allen.town.podcast.core.feed.FeedItemFilterGroup
 import allen.town.podcast.core.glide.ApGlideSettings
 import allen.town.podcast.core.glide.FastBlurTransformation
 import allen.town.podcast.core.storage.DBWriter
 import allen.town.podcast.dialog.RemoveFeedDialog.OnFeedRemovedListener
 import allen.town.podcast.dialog.RemoveFeedDialog.show
+import allen.town.podcast.menuprocess.FeedMenuProcess
 import allen.town.podcast.model.feed.Feed
 import allen.town.podcast.view.SeriesDetailInfoView
 import allen.town.podcast.view.SubscribeButton
@@ -29,12 +31,13 @@ import allen.town.podcast.theme.util.ATHUtil.resolveColor
 import allen.town.podcast.util.TouchTargets
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
+import com.google.android.material.chip.Chip
 import com.joanzapata.iconify.Iconify
 
 /**
  * Owns the collapsing header of [allen.town.podcast.fragment.FeedItemlistFragment]: the podcast
  * title/author labels, the blurred background and cover images, the "update failed" and "updates
- * disabled" notices, the filter icon state, the subscribe/unsubscribe button (including the remove
+ * disabled" notices, the filter icon and active-filter chip, the subscribe/unsubscribe button (including the remove
  * confirmation dialog) and the expandable [SeriesDetailInfoView] together with its open/close
  * animation. It never reads the fragment's state directly: the feed it renders is supplied through
  * the `currentFeed` provider, and the only thing it hands back is the navigation that has to happen
@@ -44,7 +47,9 @@ internal class FeedItemListHeader(
     private val fragment: Fragment,
     root: View,
     private val filterIcon: ImageView,
+    private val filterChip: Chip,
     private val currentFeed: () -> Feed?,
+    private val hiddenItemCount: () -> Int,
     private val onFeedRemoved: () -> Unit
 ) {
     private val txtvTitle: TextView = root.findViewById(R.id.txtvTitle)
@@ -73,6 +78,15 @@ internal class FeedItemListHeader(
         // The toggle's circular background is drawn at its view size, so it keeps its 24dp
         // and borrows a 48dp touch area from the header instead.
         TouchTargets.expandTouchArea(infoViewToggleButton, root.findViewById(R.id.logo_overlay))
+        filterChip.setOnClickListener {
+            val feed = currentFeed() ?: return@setOnClickListener
+            FeedMenuProcess.showFilterDialog(fragment.requireContext(), feed)
+        }
+        filterChip.closeIconContentDescription = fragment.getString(R.string.clear_filter_label)
+        filterChip.setOnCloseIconClickListener {
+            val feed = currentFeed() ?: return@setOnCloseIconClickListener
+            FeedMenuProcess.clearFilter(feed)
+        }
         subscribeButton.setTickSize(dp2Px(fragment.requireContext(), 18.0f))
         subscribeButton.setOnClickListener {
             val feed = currentFeed() ?: return@setOnClickListener
@@ -136,12 +150,31 @@ internal class FeedItemListHeader(
         }
         txtvTitle.text = feed.title
         txtvAuthor.text = feed.author
-        val itemFilter = feed.itemFilter
-        if (itemFilter != null && itemFilter.values.isNotEmpty()) {
+        val filterValues = feed.itemFilter?.values ?: emptyArray()
+        if (filterValues.isNotEmpty()) {
             filterIcon.setImageResource(R.drawable.ic_filter_disable)
         } else {
             filterIcon.setImageResource(R.drawable.ic_filter)
         }
+        refreshFilterChip(filterValues)
+    }
+
+    /** "Not played / Downloaded / 42 hidden" (dot and dash separated) while a filter is active, hidden otherwise. */
+    private fun refreshFilterChip(filterValues: Array<String>) {
+        val labels = FeedItemFilterGroup.displayNamesOf(filterValues)
+        if (labels.isEmpty()) {
+            filterChip.visibility = View.GONE
+            return
+        }
+        val text = StringBuilder(labels.joinToString(" \u00B7 ") { fragment.getString(it) })
+        val hidden = hiddenItemCount()
+        if (hidden > 0) {
+            text.append(" \u2014 ").append(
+                fragment.resources.getQuantityString(R.plurals.feed_filter_hidden_count, hidden, hidden)
+            )
+        }
+        filterChip.text = text
+        filterChip.visibility = View.VISIBLE
     }
 
     private fun setupHeaderView() {

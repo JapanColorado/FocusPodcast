@@ -7,12 +7,12 @@ import allen.town.podcast.R
 import allen.town.podcast.activity.RssSearchActivity
 import allen.town.podcast.core.pref.Prefs.clearOnlinePodcastSearchHistory
 import allen.town.podcast.core.pref.Prefs.onlinePodcastSearchHistory
+import allen.town.podcast.core.util.FeedUrlInput
 import allen.town.podcast.discovery.PodcastSearcher
 import allen.town.podcast.event.SearchOnlineEvent
 import allen.town.podcast.fragment.onlinesearch.OnlineSearchEpisodesFragment
 import allen.town.podcast.fragment.onlinesearch.OnlineSearchPodcastFragment
-import android.content.ClipData
-import android.content.ClipboardManager
+import allen.town.podcast.util.ClipboardFeedUrl
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -160,17 +160,10 @@ constructor() : Fragment() {
             }
         })
         searchItem.expandActionView()
-        val clipboard: ClipboardManager =
-            requireContext().getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-        val clipData: ClipData? = clipboard.getPrimaryClip()
-        if ((clipData != null) && (clipData.getItemCount() > 0) && (clipData.getItemAt(0)
-                .getText() != null)
-        ) {
-            val clipboardContent: String = clipData.getItemAt(0).getText().toString()
-            if (clipboardContent.trim({ it <= ' ' }).startsWith("http")) {
-                TopSnackbarUtil.showSnack(context,R.string.feed_url_copied_tip,Toast.LENGTH_LONG)
-                sv.setQuery(clipboardContent.trim({ it <= ' ' }), false)
-            }
+        val clipboardUrl = ClipboardFeedUrl.read(requireContext())
+        if (clipboardUrl != null) {
+            TopSnackbarUtil.showSnack(context, R.string.feed_url_copied_tip, Toast.LENGTH_LONG)
+            sv.setQuery(clipboardUrl, false)
         }
 
         /*if (getArguments().getString(ARG_QUERY, null) != null) {
@@ -195,13 +188,14 @@ constructor() : Fragment() {
     }
 
     private fun search(query: String) {
-        //e.g. "https://feed.nashownotes.com/rss.xml " - urls copied from WeChat contain whitespace (including non-breaking spaces), and trim() alone is not enough
-        val finalQuery: String = query.trim({ it <= ' ' }).replace("\\s*".toRegex(), "")
-        //if it is an http url, open the feed parsing screen
-        if (finalQuery.matches(Regex("http[s]?://.*"))) {
-            addUrl(finalQuery)
+        // A pasted feed URL (possibly wrapped in the invisible spaces chat apps add) opens the
+        // feed preview instead of searching
+        val feedUrl = FeedUrlInput.normalize(query)
+        if (feedUrl != null) {
+            addUrl(feedUrl)
             return
         }
+        val finalQuery: String = query.trim()
         if (!searchKeywordHistory.contains(finalQuery)) {
             searchKeywordHistory.add(finalQuery)
             onlinePodcastSearchHistory = searchKeywordHistory

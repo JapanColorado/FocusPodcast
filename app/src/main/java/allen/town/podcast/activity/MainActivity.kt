@@ -1,8 +1,6 @@
 package allen.town.podcast.activity
 
 import android.annotation.SuppressLint
-import allen.town.podcast.common.extensions.notificationRequestCode
-import allen.town.podcast.common.extensions.requestNotificationPermission
 import allen.town.podcast.common.extensions.setLightNavigationBarAuto
 import allen.town.podcast.common.extensions.setLightStatusBarAuto
 import allen.town.podcast.common.extensions.setNavigationBarColor
@@ -19,6 +17,8 @@ import allen.town.podcast.activity.main.MainHardwareKeys
 import allen.town.podcast.activity.main.MainIntentHandler
 import allen.town.podcast.activity.main.MainNavDrawer
 import allen.town.podcast.activity.main.MainPlayerSheet
+import allen.town.podcast.activity.main.NotificationPermissionPrompter
+import allen.town.podcast.core.event.DownloadEvent
 import allen.town.podcast.core.pref.Prefs
 import allen.town.podcast.core.pref.Prefs.BackButtonBehavior
 import allen.town.podcast.core.storage.DBTasks
@@ -82,6 +82,7 @@ class MainActivity : SimpleToolbarActivity(), OnSharedPreferenceChangeListener {
     private lateinit var playerSheet: MainPlayerSheet
     private lateinit var intentHandler: MainIntentHandler
     private val hardwareKeys = MainHardwareKeys(this)
+    private val notificationPrompter = NotificationPermissionPrompter(this)
 
     val bottomSheet: BottomSheetBehavior<View>
         get() = playerSheet.bottomSheet
@@ -170,20 +171,6 @@ class MainActivity : SimpleToolbarActivity(), OnSharedPreferenceChangeListener {
 
         if (Prefs.shouldSyncOnStart()) {
             AutoUpdateManager.runImmediate(this)
-        }
-
-        requestNotificationPermission()
-    }
-
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<out String>,
-        grantResults: IntArray
-    ) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        if(requestCode == notificationRequestCode()){
-            //written this way because requesting both permissions together only asks for the notification one the first time; the phone one is not asked until the app is opened again (reason unknown)
-//            requestPhonePermission()
         }
     }
 
@@ -403,6 +390,12 @@ class MainActivity : SimpleToolbarActivity(), OnSharedPreferenceChangeListener {
         if (action != null) {
             snackbar.setAction(getString(R.string.undo)) { v: View? -> action.run() }
         }
+    }
+
+    /** Episode downloads are the moment to ask for the notification permission (Android 13+). */
+    @Subscribe(sticky = true, threadMode = ThreadMode.MAIN)
+    fun onDownloadEvent(event: DownloadEvent) {
+        notificationPrompter.onDownloadEvent(event)
     }
 
     override fun onNewIntent(intent: Intent) {

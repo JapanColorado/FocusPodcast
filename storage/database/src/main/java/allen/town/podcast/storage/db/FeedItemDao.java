@@ -352,6 +352,15 @@ class FeedItemDao extends Dao {
         return db.rawQuery(query, null);
     }
 
+    /** Number of items of the feed, ignoring the feed's item filter. */
+    final int getFeedItemCount(long feedId) {
+        final String query = "SELECT COUNT(" + KEY_ID + ") FROM " + TABLE_NAME_FEED_ITEMS
+                + " WHERE " + KEY_FEED + "=?";
+        try (Cursor c = db.rawQuery(query, new String[]{String.valueOf(feedId)})) {
+            return c.moveToFirst() ? c.getInt(0) : 0;
+        }
+    }
+
     final Cursor getTotalEpisodeCountCursor(FeedItemFilter filter) {
         String filterQuery = FeedItemFilterQuery.generateFrom(filter);
         String whereClause = "".equals(filterQuery) ? "" : " WHERE " + filterQuery;

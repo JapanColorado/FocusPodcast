@@ -432,6 +432,19 @@ public final class DBReader {
     }
 
     /**
+     * Number of items of a feed, ignoring the feed's item filter (subscribed or not).
+     */
+    public static int getFeedItemCount(long feedId) {
+        Db adapter = Db.getInstance();
+        adapter.open();
+        try {
+            return adapter.getFeedItemCount(feedId);
+        } finally {
+            adapter.close();
+        }
+    }
+
+    /**
      * Returns the number of subscribed feeds.
      * @return
      */

@@ -20,7 +20,6 @@ import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.activity.result.contract.ActivityResultContracts.GetContent;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
@@ -51,7 +50,6 @@ import allen.town.podcast.common.util.Timber;
 import allen.town.podcast.common.util.TopSnackbarUtil;
 import allen.town.podcast.MyApp;
 import allen.town.podcast.R;
-import allen.town.podcast.activity.ImportOPMLActivity;
 import allen.town.podcast.activity.MainActivity;
 import allen.town.podcast.adapter.ItunesAdapter;
 import allen.town.podcast.core.storage.DBReader;
@@ -65,6 +63,8 @@ import allen.town.podcast.event.ItunesCategoryChangeEvent;
 import allen.town.podcast.common.common.prefs.supportv7.dialogs.PreferenceListDialog;
 import allen.town.podcast.model.feed.Feed;
 import allen.town.podcast.model.feed.SortOrder;
+import allen.town.podcast.dialog.AddFeedByUrlDialog;
+import allen.town.podcast.util.OpmlImportLauncher;
 import allen.town.podcast.util.SkeletonRecyclerDelay;
 import allen.town.podcast.view.TagsSectionView;
 import allen.town.podcast.theme.util.scroll.ThemedFastScroller;
@@ -123,8 +123,7 @@ public class DiscoverFragment extends Fragment implements Toolbar.OnMenuItemClic
         adapter.addAll(result);
     }
 
-    private final ActivityResultLauncher<String> chooseOpmlImportPathLauncher =
-            registerForActivityResult(new GetContent(), this::chooseOpmlImportPathResult);
+    private final OpmlImportLauncher opmlImportLauncher = new OpmlImportLauncher(this);
     private final ActivityResultLauncher<Uri> addLocalFolderLauncher =
             registerForActivityResult(new AddLocalFolder(), this::addLocalFolderResult);
 
@@ -210,11 +209,10 @@ public class DiscoverFragment extends Fragment implements Toolbar.OnMenuItemClic
             }
             return true;
         } else if (itemId == R.id.opmlImport) {
-            try {
-                chooseOpmlImportPathLauncher.launch("*/*");
-            } catch (ActivityNotFoundException e) {
-                TopSnackbarUtil.showSnack(getActivity(), R.string.unable_to_start_system_file_manager, Toast.LENGTH_LONG);
-            }
+            opmlImportLauncher.launch();
+            return true;
+        } else if (itemId == R.id.addByUrl) {
+            AddFeedByUrlDialog.show(requireContext());
             return true;
         } else if (itemId == R.id.switch_country) {
             showSwitchCountryDialog();
@@ -241,15 +239,6 @@ public class DiscoverFragment extends Fragment implements Toolbar.OnMenuItemClic
         prefs = getActivity().getSharedPreferences(ItunesCategoryTopLoader.PREFS, MODE_PRIVATE);
         countryCode = prefs.getString(ItunesCategoryTopLoader.PREF_KEY_COUNTRY_CODE, Locale.getDefault().getCountry());
         categoryCode = prefs.getInt(ItunesCategoryTopLoader.PREF_KEY_CATEGORY_CODE, 0);
-    }
-
-    private void chooseOpmlImportPathResult(final Uri uri) {
-        if (uri == null) {
-            return;
-        }
-        final Intent intent = new Intent(getContext(), ImportOPMLActivity.class);
-        intent.setData(uri);
-        startActivity(intent);
     }
 
     private void addLocalFolderResult(final Uri uri) {

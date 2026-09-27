@@ -1,5 +1,9 @@
 package allen.town.podcast.core.feed;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import allen.town.podcast.core.R;
 import allen.town.podcast.model.feed.FeedItemFilter;
 
@@ -23,6 +27,23 @@ public enum FeedItemFilterGroup {
 
     FeedItemFilterGroup(ItemProperties... values) {
         this.values = values;
+    }
+
+    /**
+     * The display-name string resources of the given filter values, in the order the filter
+     * dialog lists them. Values no group knows about are skipped.
+     */
+    public static List<Integer> displayNamesOf(String[] filterValues) {
+        List<String> active = Arrays.asList(filterValues);
+        List<Integer> names = new ArrayList<>();
+        for (FeedItemFilterGroup group : values()) {
+            for (ItemProperties properties : group.values) {
+                if (active.contains(properties.filterId)) {
+                    names.add(properties.displayName);
+                }
+            }
+        }
+        return names;
     }
 
     public static class ItemProperties {

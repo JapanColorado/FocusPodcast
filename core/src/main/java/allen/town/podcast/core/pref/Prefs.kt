@@ -203,6 +203,13 @@ object Prefs {
         get() = UiPrefs.showAutoDownloadReportRaw
 
     @JvmStatic
+    var notificationRationaleShown: Boolean
+        get() = UiPrefs.notificationRationaleShown
+        set(value) {
+            UiPrefs.notificationRationaleShown = value
+        }
+
+    @JvmStatic
     fun enqueueDownloadedEpisodes(): Boolean = DownloadPrefs.enqueueDownloadedEpisodes()
 
     @VisibleForTesting

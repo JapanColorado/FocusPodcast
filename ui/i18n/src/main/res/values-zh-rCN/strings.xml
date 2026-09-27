@@ -832,4 +832,20 @@
   <string name="use_default">使用默认值</string>
   <string name="default_playback_speed">默认播放速度</string>
   <string name="pref_default_effect_sum">适用于没有专属音效的播客</string>
+  <string name="add_podcast_by_url_label">通过链接添加播客</string>
+  <string name="feed_url_hint">RSS 订阅链接</string>
+  <string name="invalid_feed_url_error">请输入以 http:// 或 https:// 开头的链接</string>
+  <string name="search_podcasts_label">搜索播客</string>
+  <string name="browse_episodes_label">浏览单集</string>
+  <string name="clear_filter_label">清除过滤</string>
+  <string name="notification_rationale_title">允许通知？</string>
+  <string name="notification_rationale_message">FocusPodcast 通过通知显示下载进度，并提醒你新单集和下载失败。</string>
+  <string name="allow_label">允许</string>
+  <string name="not_now_label">以后再说</string>
+  <plurals name="feed_filter_hides_all_episodes">
+    <item quantity="other">全部 %d 个单集都被过滤隐藏了</item>
+  </plurals>
+  <plurals name="feed_filter_hidden_count">
+    <item quantity="other">已隐藏 %d 个</item>
+  </plurals>
 </resources>

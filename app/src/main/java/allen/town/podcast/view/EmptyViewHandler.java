@@ -8,13 +8,18 @@ import android.widget.FrameLayout;
 import android.widget.ListAdapter;
 
 import androidx.annotation.DrawableRes;
+import androidx.annotation.StringRes;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+
+import com.google.android.material.button.MaterialButton;
 
 import allen.town.podcast.R;
 
@@ -27,15 +32,21 @@ public class EmptyViewHandler {
     private final TextView tvTitle;
     private final TextView tvMessage;
     private final ImageView ivIcon;
+    private final LinearLayout actionsContainer;
 
     public EmptyViewHandler(Context context) {
         emptyView = View.inflate(context, R.layout.empty_view_layout, null);
         tvTitle = emptyView.findViewById(R.id.emptyViewTitle);
         tvMessage = emptyView.findViewById(R.id.emptyViewMessage);
         ivIcon = emptyView.findViewById(R.id.emptyViewIcon);
+        actionsContainer = emptyView.findViewById(R.id.emptyViewActions);
     }
 
     public void setTitle(int title) {
+        tvTitle.setText(title);
+    }
+
+    public void setTitle(CharSequence title) {
         tvTitle.setText(title);
     }
 
@@ -50,6 +61,25 @@ public class EmptyViewHandler {
     public void setIcon(@DrawableRes int icon) {
         ivIcon.setImageResource(icon);
         ivIcon.setVisibility(View.VISIBLE);
+    }
+
+    /**
+     * Adds a button below the message. Actions stack vertically in the order they were added.
+     */
+    public void addAction(@StringRes int label, @DrawableRes int icon, View.OnClickListener listener) {
+        MaterialButton button = (MaterialButton) LayoutInflater.from(emptyView.getContext())
+                .inflate(R.layout.empty_view_action, actionsContainer, false);
+        button.setText(label);
+        button.setIconResource(icon);
+        button.setOnClickListener(listener);
+        actionsContainer.addView(button);
+        actionsContainer.setVisibility(View.VISIBLE);
+    }
+
+    /** Removes every button added through {@link #addAction}. */
+    public void clearActions() {
+        actionsContainer.removeAllViews();
+        actionsContainer.setVisibility(View.GONE);
     }
 
     public void hide() {
@@ -73,6 +103,21 @@ public class EmptyViewHandler {
         addToParentView(recyclerView);
         layoutAdded = true;
         updateAdapter(recyclerView.getAdapter());
+    }
+
+    /**
+     * Places the empty view inside a container the caller owns and shows or hides itself
+     * (for screens where walking up from the list would land in the wrong parent). The caller
+     * decides when the container is visible; the empty view itself stays visible.
+     */
+    public void attachTo(ViewGroup container) {
+        if (layoutAdded) {
+            throw new IllegalStateException("Can not attach EmptyView multiple times");
+        }
+        container.addView(emptyView, new FrameLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT, Gravity.CENTER));
+        layoutAdded = true;
+        emptyView.setVisibility(View.VISIBLE);
     }
 
     private void addToParentView(View view) {

@@ -18,6 +18,10 @@
                     android:id="@+id/addLocalFolder"
                     android:icon="@drawable/ic_add_virtual_podcast"/>
                 <item
+                    android:title="@string/add_podcast_by_url_label"
+                    android:id="@+id/addByUrl"
+                    android:icon="@drawable/ic_link"/>
+                <item
                     android:title="@string/opml_add_podcast_label"
                     android:id="@+id/opmlImport"
                     android:icon="@drawable/ic_import_opml"/>

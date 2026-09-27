@@ -512,4 +512,20 @@
   <string name="pref_playback_speed_sum">独自の速度がないポッドキャストで使用されます。プレーヤーで速度を変更すると、そのポッドキャストだけに適用されます</string>
   <string name="pref_custom_for_podcast">このポッドキャスト用にカスタマイズ</string>
   <string name="pref_custom_for_podcast_sum">オフのときは設定のデフォルトのエフェクトを使用します。プレーヤーでエフェクトを変更するとオンになります</string>
+  <string name="add_podcast_by_url_label">URLでポッドキャストを追加</string>
+  <string name="feed_url_hint">RSSフィードのURL</string>
+  <string name="invalid_feed_url_error">http:// または https:// で始まるリンクを入力してください</string>
+  <string name="search_podcasts_label">ポッドキャストを検索</string>
+  <string name="browse_episodes_label">エピソードを見る</string>
+  <string name="clear_filter_label">フィルターを解除</string>
+  <string name="notification_rationale_title">通知を許可しますか？</string>
+  <string name="notification_rationale_message">FocusPodcast は通知でダウンロードの進行状況を表示し、新しいエピソードやダウンロードの失敗をお知らせします。</string>
+  <string name="allow_label">許可</string>
+  <string name="not_now_label">後で</string>
+  <plurals name="feed_filter_hides_all_episodes">
+    <item quantity="other">%d 件のエピソードがすべてフィルターで非表示になっています</item>
+  </plurals>
+  <plurals name="feed_filter_hidden_count">
+    <item quantity="other">%d 件を非表示</item>
+  </plurals>
 </resources>

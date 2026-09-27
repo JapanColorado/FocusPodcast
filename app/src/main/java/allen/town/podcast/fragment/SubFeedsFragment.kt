@@ -19,16 +19,19 @@ import allen.town.podcast.core.storage.NavDrawerData.*
 import allen.town.podcast.core.util.download.AutoUpdateManager
 import allen.town.podcast.core.util.menuhandler.MenuItemUtils
 import allen.town.podcast.core.util.menuhandler.MenuItemUtils.UpdateRefreshMenuItemChecker
+import allen.town.podcast.dialog.AddFeedByUrlDialog
 import allen.town.podcast.dialog.FeedsSortDialog.Companion.newInstance
 import allen.town.podcast.dialog.RemoveFeedDialog.show
 import allen.town.podcast.dialog.RenameItemDialog
 import allen.town.podcast.dialog.SubsFilterDialog.showDialog
 import allen.town.podcast.dialog.TagEditDialog
 import allen.town.podcast.dialog.TagEditDialog.Companion.newInstance
+import allen.town.podcast.discovery.CombinedSearcher
 import allen.town.podcast.event.FeedListUpdateEvent
 import allen.town.podcast.event.UnreadItemsUpdateEvent
 import allen.town.podcast.fragment.actions.FeedMultiSelectActionHandler
 import allen.town.podcast.statistics.StatisticsFragment
+import allen.town.podcast.util.OpmlImportLauncher
 import allen.town.podcast.util.SkeletonRecyclerDelay
 import allen.town.podcast.view.EmptyViewHandler
 import android.content.Context
@@ -67,6 +70,7 @@ class SubFeedsFragment : Fragment(), Toolbar.OnMenuItemClickListener, OnSelectMo
     private lateinit var subscriptionAdapter: SubFeedsAdapter
     private lateinit var subscriptionAddButton: FloatingActionButton
     private lateinit var emptyView: EmptyViewHandler
+    private val opmlImportLauncher = OpmlImportLauncher(this)
     private lateinit var toolbar: Toolbar
     private var displayedFolder: String? = null
     private var isUpdatingFeeds = false
@@ -207,6 +211,17 @@ class SubFeedsFragment : Fragment(), Toolbar.OnMenuItemClickListener, OnSelectMo
         emptyView.setIcon(R.drawable.ic_add_subscription)
         emptyView.setTitle(R.string.no_subscriptions_head_label)
         emptyView.setMessage(R.string.no_subscriptions_label)
+        emptyView.addAction(R.string.search_podcasts_label, R.drawable.ic_search) {
+            (requireActivity() as MainActivity).loadChildFragment(
+                OnlineSearchFragment.newInstance(CombinedSearcher::class.java, "")
+            )
+        }
+        emptyView.addAction(R.string.opml_add_podcast_label, R.drawable.ic_import_opml) {
+            opmlImportLauncher.launch()
+        }
+        emptyView.addAction(R.string.add_podcast_by_url_label, R.drawable.ic_link) {
+            AddFeedByUrlDialog.show(requireContext())
+        }
         emptyView.attachToRecyclerView(subscriptionRecycler)
     }
 
