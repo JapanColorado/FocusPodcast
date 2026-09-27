@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name" translate="false">FocusPodcast Debug</string>
+    <!-- Must differ from the release build's authority or the two cannot be installed together -->
+    <string name="provider_authority" translatable="false">allen.town.podcast.debug.provider</string>
 </resources>

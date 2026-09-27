@@ -56,6 +56,9 @@ android {
 
     buildTypes {
         debug {
+            // Separate package so the debug build installs next to the release build with its own data
+            applicationIdSuffix ".debug"
+            versionNameSuffix "-debug"
             signingConfig hasSigningSecrets ? signingConfigs.debugConfig : signingConfigs.debug
         }
         release {
