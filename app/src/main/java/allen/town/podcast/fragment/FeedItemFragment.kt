@@ -357,6 +357,7 @@ class FeedItemFragment : Fragment() {
             } else {
                 binding.downloadIcon.setImageResource(downloadButton.drawable)
             }
+            binding.downloadIcon.contentDescription = getString(downloadButton.label)
 
             binding.downloadLayout.visibility = downloadButton.isVisibility
         }

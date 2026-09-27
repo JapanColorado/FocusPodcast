@@ -29,6 +29,7 @@
 
             <allen.town.podcast.common.views.AccentImageView
                 style="@style/Widget.Material3.Button.IconButton"
+                android:importantForAccessibility="no"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:src="@drawable/ic_trim" />
@@ -49,6 +50,7 @@
 
             <allen.town.podcast.common.views.AccentImageView
                 style="@style/Widget.Material3.Button.IconButton"
+                android:importantForAccessibility="no"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:src="@drawable/ic_volume_adaption" />
@@ -69,6 +71,7 @@
 
             <allen.town.podcast.common.views.AccentImageView
                 style="@style/Widget.Material3.Button.IconButton"
+                android:importantForAccessibility="no"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:src="@drawable/ic_vocal_enhancement" />
@@ -92,6 +95,7 @@
 
             <allen.town.podcast.common.views.AccentImageView
                 style="@style/Widget.Material3.Button.IconButton"
+                android:importantForAccessibility="no"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:src="@drawable/ic_sound_waves" />
@@ -115,6 +119,7 @@
 
             <allen.town.podcast.common.views.AccentImageView
                 style="@style/Widget.Material3.Button.IconButton"
+                android:importantForAccessibility="no"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:src="@drawable/ic_equalizer" />

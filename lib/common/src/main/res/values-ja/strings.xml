@@ -58,4 +58,8 @@
 
     <string name="pref_custom_launcher_title">カスタム ランチャー アイコン</string>
     <string name="pref_custom_launcher_summary">すべての携帯電話がこの機能をサポートしているわけではありません。ご自身でテストしてください。</string>
+    <string name="custom_launcher_pick_image">アイコン画像を選択</string>
+    <string name="custom_launcher_shape_round">円形</string>
+    <string name="custom_launcher_shape_rounded_square">角丸四角形</string>
+    <string name="custom_launcher_shape_square">四角形</string>
 </resources>

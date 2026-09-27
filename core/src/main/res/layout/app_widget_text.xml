@@ -57,6 +57,7 @@
 
         <ImageButton
             android:id="@+id/butRew"
+            android:contentDescription="@string/rewind_label"
             android:layout_width="0dp"
             android:layout_height="@dimen/app_widget_small_button_height"
             android:layout_weight="1"
@@ -75,6 +76,7 @@
 
         <ImageButton
             android:id="@+id/butFastForward"
+            android:contentDescription="@string/fast_forward_label"
             android:layout_width="0dp"
             android:layout_height="@dimen/app_widget_small_button_height"
             android:layout_weight="1"
@@ -84,6 +86,7 @@
 
         <ImageButton
             android:id="@+id/butSkip"
+            android:contentDescription="@string/skip_episode_label"
             android:layout_width="0dp"
             android:layout_height="@dimen/app_widget_small_button_height"
             android:layout_weight="1"

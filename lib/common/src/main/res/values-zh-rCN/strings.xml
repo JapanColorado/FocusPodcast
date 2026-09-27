@@ -61,4 +61,8 @@
     <string name="donate">捐赠</string>
     <string name="donate_summary">为开发者们购买咖啡</string>
 
+    <string name="custom_launcher_pick_image">选择图标图片</string>
+    <string name="custom_launcher_shape_round">圆形</string>
+    <string name="custom_launcher_shape_rounded_square">圆角方形</string>
+    <string name="custom_launcher_shape_square">方形</string>
 </resources>

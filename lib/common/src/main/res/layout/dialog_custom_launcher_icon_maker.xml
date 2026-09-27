@@ -10,6 +10,7 @@
 
     <ImageView
         android:id="@+id/iconView"
+        android:contentDescription="@string/custom_launcher_pick_image"
         android:layout_width="64dp"
         android:layout_height="64dp" />
 
@@ -40,6 +41,7 @@
 
             <ImageView
                 android:id="@+id/roundMaskView"
+                android:contentDescription="@string/custom_launcher_shape_round"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
                 android:layout_weight="1"
@@ -47,6 +49,7 @@
 
             <ImageView
                 android:id="@+id/roundedSquareMaskView"
+                android:contentDescription="@string/custom_launcher_shape_rounded_square"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
                 android:layout_weight="1"
@@ -54,6 +57,7 @@
 
             <ImageView
                 android:id="@+id/SquareMaskView"
+                android:contentDescription="@string/custom_launcher_shape_square"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
                 android:layout_weight="1"

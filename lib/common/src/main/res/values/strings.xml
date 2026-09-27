@@ -68,4 +68,8 @@
     <!-- Not yet translated into de/fr/ja; the zh translations exist. -->
     <string name="donate" tools:ignore="MissingTranslation">Donate</string>
     <string name="donate_summary" tools:ignore="MissingTranslation">Buy our devs a coffee</string>
+    <string name="custom_launcher_pick_image">Choose icon image</string>
+    <string name="custom_launcher_shape_round">Round</string>
+    <string name="custom_launcher_shape_rounded_square">Rounded square</string>
+    <string name="custom_launcher_shape_square">Square</string>
 </resources>

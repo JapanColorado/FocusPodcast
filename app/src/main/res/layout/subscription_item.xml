@@ -10,6 +10,7 @@
 
     <allen.town.podcast.ui.common.SquareImageView
         android:id="@+id/imgvCover"
+        android:importantForAccessibility="no"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@color/non_square_icon_background"

@@ -75,9 +75,10 @@
     <allen.town.podcast.view.PlayPauseProgressButton
         android:id="@+id/secondaryActionButton"
         style="@style/Widget_PlayerFM_PlayPauseButton"
-        android:layout_width="44dp"
-        android:layout_height="44dp"
-        android:layout_marginRight="12dp"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_marginLeft="-2dp"
+        android:layout_marginRight="10dp"
         android:background="?roundSelector"
         android:visibility="gone"
         app:circleFillColor="@color/accent_dark"

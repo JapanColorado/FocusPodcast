@@ -7,6 +7,7 @@
 
     <ImageView
         android:id="@+id/imgvCover"
+        android:contentDescription="@string/media_player"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"

@@ -132,6 +132,7 @@
 
                 <allen.town.podcast.common.views.AccentImageView
                     style="@style/Widget.Material3.Button.IconButton"
+                    android:importantForAccessibility="no"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:src="@drawable/ic_shake" />
@@ -152,6 +153,7 @@
 
                 <allen.town.podcast.common.views.AccentImageView
                     style="@style/Widget.Material3.Button.IconButton"
+                    android:importantForAccessibility="no"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:src="@drawable/ic_round_vibration_24" />
@@ -172,6 +174,7 @@
 
                 <allen.town.podcast.common.views.AccentImageView
                     style="@style/Widget.Material3.Button.IconButton"
+                    android:importantForAccessibility="no"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:src="@drawable/ic_auto" />

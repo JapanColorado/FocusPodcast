@@ -72,7 +72,6 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:importantForAccessibility="no"
                         android:textSize="16sp"
                         tools:background="@android:color/holo_green_dark"
                         tools:text="Podcast title , long text title , yes ,i am a long title long ong than you can see" />
@@ -81,6 +80,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:clickable="false"
+                        android:importantForAccessibility="no"
                         app:srcCompat="@drawable/ic_round_keyboard_arrow_right_24" />
                 </LinearLayout>
 
@@ -174,6 +174,7 @@
 
                             <androidx.appcompat.widget.AppCompatImageView
                                 android:id="@+id/add_to_queue_item_icon"
+                                android:contentDescription="@string/add_to_queue_label"
                                 android:layout_width="42dp"
                                 android:layout_height="42dp"
                                 android:layout_gravity="center"
@@ -187,6 +188,7 @@
                             style="@style/FocusPodcast.TextView.ListItemSecondaryTitle"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:importantForAccessibility="no"
                             android:text="@string/add_to_queue_label"
                             tools:background="@android:color/holo_green_dark" />
                     </LinearLayout>
@@ -208,6 +210,7 @@
 
                             <androidx.appcompat.widget.AppCompatImageView
                                 android:id="@+id/remove_from_queue_item_icon"
+                                android:contentDescription="@string/remove_from_queue_label"
                                 android:layout_width="42dp"
                                 android:layout_height="42dp"
                                 android:layout_gravity="center"
@@ -221,6 +224,7 @@
                             style="@style/FocusPodcast.TextView.ListItemSecondaryTitle"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:importantForAccessibility="no"
                             android:text="@string/remove_from_queue_label"
                             tools:background="@android:color/holo_green_dark" />
                     </LinearLayout>
@@ -242,6 +246,7 @@
 
                             <androidx.appcompat.widget.AppCompatImageView
                                 android:id="@+id/add_to_favorites_item_icon"
+                                android:contentDescription="@string/add_to_favorite_label"
                                 android:layout_width="42dp"
                                 android:layout_height="42dp"
                                 android:layout_gravity="center"
@@ -255,6 +260,7 @@
                             style="@style/FocusPodcast.TextView.ListItemSecondaryTitle"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:importantForAccessibility="no"
                             android:text="@string/add_to_favorite_label"
                             tools:background="@android:color/holo_green_dark" />
                     </LinearLayout>
@@ -276,6 +282,7 @@
 
                             <androidx.appcompat.widget.AppCompatImageView
                                 android:id="@+id/remove_from_favorites_item_icon"
+                                android:contentDescription="@string/remove_from_favorite_label"
                                 android:layout_width="42dp"
                                 android:layout_height="42dp"
                                 android:layout_gravity="center"
@@ -289,6 +296,7 @@
                             style="@style/FocusPodcast.TextView.ListItemSecondaryTitle"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:importantForAccessibility="no"
                             android:text="@string/remove_from_favorite_label"
                             tools:background="@android:color/holo_green_dark" />
                     </LinearLayout>

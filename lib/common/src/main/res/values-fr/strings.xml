@@ -61,4 +61,8 @@
 
     <string name="pref_custom_launcher_title">Lanceur personnalisé</string>
     <string name="pref_custom_launcher_summary">Tous les téléphones portables ne prennent pas en charge cette fonctionnalité, veuillez tester par vous-même</string>
+    <string name="custom_launcher_pick_image">Choisir l\'image de l\'icône</string>
+    <string name="custom_launcher_shape_round">Rond</string>
+    <string name="custom_launcher_shape_rounded_square">Carré arrondi</string>
+    <string name="custom_launcher_shape_square">Carré</string>
 </resources>

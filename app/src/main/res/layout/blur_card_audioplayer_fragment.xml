@@ -10,6 +10,7 @@
 
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/colorBackground"
+        android:importantForAccessibility="no"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="?attr/colorSurface"
@@ -363,6 +364,7 @@
 
                             <androidx.appcompat.widget.AppCompatImageView
                                 android:id="@+id/swipe_up_iv"
+                                android:importantForAccessibility="no"
                                 android:layout_width="18dp"
                                 android:layout_height="18dp"
                                 android:src="@drawable/ic_double_arrow_up" />

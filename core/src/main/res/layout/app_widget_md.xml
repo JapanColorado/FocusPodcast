@@ -11,6 +11,7 @@
 
     <ImageView
         android:id="@+id/imgvCover"
+        android:contentDescription="@string/media_player"
         android:src="@drawable/default_audio_art"
         android:layout_width="@dimen/app_widget_classic_image_size"
         android:layout_height="@dimen/app_widget_classic_image_size"
@@ -34,6 +35,7 @@
 
             <ImageButton
                 android:id="@+id/butRew"
+                android:contentDescription="@string/rewind_label"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
@@ -52,6 +54,7 @@
 
             <ImageButton
                 android:id="@+id/butFastForward"
+                android:contentDescription="@string/fast_forward_label"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
@@ -61,6 +64,7 @@
 
             <ImageButton
                 android:id="@+id/butSkip"
+                android:contentDescription="@string/skip_episode_label"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_weight="1"

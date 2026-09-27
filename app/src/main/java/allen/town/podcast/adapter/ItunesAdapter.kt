@@ -317,6 +317,10 @@ class ItunesAdapter(
                     })
             }
         }
+        // setPlayingAndPlayed labels the button "Play"/"Pause"; here it subscribes or unsubscribes.
+        viewHolder.subscribe_button.contentDescription = context.getString(
+            if (isSub) R.string.remove_feed_label else R.string.subscribe_label
+        )
         viewHolder.subscribe_button.setOnClickListener { v: View? ->
             val feedToRemove = createFeed(podcast)
             feedToRemove.id = RssSearchActivity.getFeedId(subscribedFeedsList, feedToRemove)

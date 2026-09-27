@@ -82,6 +82,7 @@
                         android:layout_alignParentRight="true"
                         android:layout_centerVertical="true"
                         android:background="?roundSelector"
+                        android:contentDescription="@string/copy_url_label"
                         android:src="@drawable/ic_round_content_copy_24" />
                 </RelativeLayout>
 
@@ -124,6 +125,7 @@
                         android:layout_alignParentRight="true"
                         android:layout_centerVertical="true"
                         android:background="?roundSelector"
+                        android:contentDescription="@string/copy_url_label"
                         android:src="@drawable/ic_round_content_copy_24" />
                 </RelativeLayout>
 

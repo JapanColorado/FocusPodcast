@@ -113,6 +113,7 @@ class DownloadLogAdapter(private val context: Activity) :
                     )
                 )
                 holder.secondaryActionButton.visibility = View.VISIBLE
+                holder.secondaryActionButton.contentDescription = context.getString(R.string.retry_label)
                 if (status.feedfileType == Feed.FEEDFILETYPE_FEED) {
                     holder.secondaryActionButton.setOnClickListener { v: View? ->
                         holder.secondaryActionButton.visibility = View.INVISIBLE

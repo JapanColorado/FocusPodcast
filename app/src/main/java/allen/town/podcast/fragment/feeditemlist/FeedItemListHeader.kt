@@ -26,6 +26,7 @@ import android.widget.TextView
 import androidx.fragment.app.Fragment
 import allen.town.podcast.theme.ThemeStore.Companion.accentColor
 import allen.town.podcast.theme.util.ATHUtil.resolveColor
+import allen.town.podcast.util.TouchTargets
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import com.joanzapata.iconify.Iconify
@@ -69,6 +70,9 @@ internal class FeedItemListHeader(
 
     init {
         imgvBackground.setOnClickListener { openAbout() }
+        // The toggle's circular background is drawn at its view size, so it keeps its 24dp
+        // and borrows a 48dp touch area from the header instead.
+        TouchTargets.expandTouchArea(infoViewToggleButton, root.findViewById(R.id.logo_overlay))
         subscribeButton.setTickSize(dp2Px(fragment.requireContext(), 18.0f))
         subscribeButton.setOnClickListener {
             val feed = currentFeed() ?: return@setOnClickListener

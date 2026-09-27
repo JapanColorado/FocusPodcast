@@ -19,6 +19,7 @@
             android:layout_width="match_parent"
             android:layout_height="236dp"
             android:foreground="?attr/selectableItemBackground"
+            android:importantForAccessibility="no"
             android:scaleType="centerCrop"
             android:background="@color/swipe_gray" />
 
@@ -29,6 +30,7 @@
             android:layout_gravity="bottom|center_horizontal"
             android:layout_marginBottom="-12dp"
             android:background="@drawable/shape_circle"
+            android:contentDescription="@string/show_info_label"
             android:visibility="gone"
             tools:visibility="visible">
 
@@ -39,6 +41,7 @@
                 android:layout_gravity="center"
                 android:adjustViewBounds="true"
                 android:background="?attr/selectableItemBackgroundBorderless"
+                android:importantForAccessibility="no"
                 android:rotation="90"
                 android:scaleType="fitCenter"
                 app:srcCompat="@drawable/ic_round_keyboard_arrow_right_24" />
@@ -49,6 +52,7 @@
             android:layout_height="12dp"
             android:layout_alignParentLeft="true"
             android:layout_gravity="bottom|left"
+            android:importantForAccessibility="no"
             android:scaleType="fitXY"
             android:src="@drawable/ic_rounded_corner_left" />
 
@@ -56,6 +60,7 @@
             android:layout_width="12dp"
             android:layout_height="12dp"
             android:layout_gravity="bottom|right"
+            android:importantForAccessibility="no"
             android:scaleType="fitXY"
             android:src="@drawable/ic_rounded_corner_right" />
     </FrameLayout>

@@ -18,6 +18,7 @@ import allen.town.podcast.event.playback.PlaybackPositionEvent
 import allen.town.podcast.model.feed.FeedItem
 import allen.town.podcast.model.feed.FeedMedia
 import allen.town.podcast.model.playback.MediaType
+import allen.town.podcast.util.TouchTargets
 import allen.town.podcast.view.PlayPauseProgressButton
 import android.content.Context
 import android.os.Build
@@ -302,6 +303,8 @@ class EpisodeItemViewHolder(private val activity: MainActivity, parent: ViewGrou
         selectCheckBox = itemView.findViewById(R.id.selectCheckBox)
         playPauseProgressButton = itemView.findViewById(R.id.play_pause_button)
         cancelDownloadButtons = itemView.findViewById(R.id.cancel_download_buttons)
+        // The cancel button lives in a 22dp-high text row, so it cannot grow to 48dp itself.
+        TouchTargets.expandTouchArea(cancelDownloadButtons, itemView.findViewById(R.id.container))
         downloadedButton = itemView.findViewById(R.id.downloaded_button)
         downloadProgress = itemView.findViewById(R.id.downloadProgress)
         downloadProgress.accentColor()

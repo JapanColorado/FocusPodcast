@@ -18,6 +18,7 @@
         tools:ignore="UnusedAttribute" />
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/close"
+        android:contentDescription="@string/close_label"
         android:layout_width="52dp"
         android:layout_height="52dp"
         android:layout_margin="16dp"
@@ -30,6 +31,7 @@
         app:srcCompat="@drawable/ic_close" />
 
     <androidx.appcompat.widget.AppCompatImageView
+        android:importantForAccessibility="no"
         android:layout_width="52dp"
         android:layout_height="52dp"
         android:layout_margin="16dp"
@@ -44,6 +46,7 @@
 
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/songFavourite"
+        android:importantForAccessibility="no"
         android:visibility="invisible"
         android:layout_width="52dp"
         android:layout_height="52dp"
@@ -57,6 +60,7 @@
 
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/colorBackground"
+        android:importantForAccessibility="no"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:background="?attr/colorSurface"
@@ -172,6 +176,7 @@
 
                 <com.google.android.material.floatingactionbutton.FloatingActionButton
                     android:id="@+id/playPauseButton"
+                    android:importantForAccessibility="no"
                     style="@style/Widget.MaterialComponents.FloatingActionButton"
                     android:layout_width="132dp"
                     android:layout_height="132dp"

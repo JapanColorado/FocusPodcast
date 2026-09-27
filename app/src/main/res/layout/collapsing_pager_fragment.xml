@@ -64,6 +64,7 @@
                 <androidx.appcompat.widget.AppCompatImageView
                     style="@style/Widget.Material3.Button.IconButton"
                     android:id="@+id/clear_history_iv"
+                    android:contentDescription="@string/clear_history_label"
                     android:src="@drawable/ic_cancel"
                     android:background="?roundSelector"
                     android:layout_width="40dp"

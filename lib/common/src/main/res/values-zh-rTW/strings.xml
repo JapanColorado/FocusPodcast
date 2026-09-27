@@ -58,4 +58,8 @@
     <string name="pref_custom_launcher_summary">並非所有手機都支持此功能，請自行測試</string>
     <string name="donate">捐贈</string>
     <string name="donate_summary">為開發者購買咖啡</string>
+    <string name="custom_launcher_pick_image">選擇圖示圖片</string>
+    <string name="custom_launcher_shape_round">圓形</string>
+    <string name="custom_launcher_shape_rounded_square">圓角方形</string>
+    <string name="custom_launcher_shape_square">方形</string>
 </resources>
