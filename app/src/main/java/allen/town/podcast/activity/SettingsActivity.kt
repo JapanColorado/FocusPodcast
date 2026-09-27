@@ -131,9 +131,9 @@ enum class SettingsScreen(
     AD_SKIP(R.xml.pref_ad_skip, R.string.pref_ad_skip_category, null, { AdSkipPrefFragment() }),
     SUBSCRIPTIONS(R.xml.pref_subscriptions, R.string.pref_subscriptions_updates_title, null, { SubscriptionsPrefFragment() }),
     DOWNLOADS(R.xml.pref_downloads, R.string.pref_downloads_storage_title, null, { DownloadsPrefFragment() }),
-    SYNC(R.xml.pref_sync, R.string.pref_sync_backup_title, null, { SyncPrefFragment() }),
     NOTIFICATIONS(R.xml.pref_notifications, R.string.notification_pref_fragment, null, { NotificationPrefFragment() }),
-    OTHERS(R.xml.pref_others, R.string.others, null, { OthersFragment() }),
+    SYNC(R.xml.pref_sync, R.string.pref_sync_backup_title, null, { SyncPrefFragment() }),
+    ABOUT(R.xml.pref_about, R.string.pref_about_support_title, null, { AboutSupportPrefFragment() }),
     FEED_SETTINGS(R.xml.feed_settings, R.string.feed_settings_label, null, null),
     AUDIO_EFFECT(R.xml.pref_audio_effect, R.string.audio_effects, FEED_SETTINGS, null);
 

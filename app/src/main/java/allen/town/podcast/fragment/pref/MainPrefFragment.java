@@ -8,32 +8,24 @@ import androidx.preference.Preference;
 import allen.town.podcast.searchpreference.SearchConfiguration;
 import allen.town.podcast.searchpreference.SearchPreference;
 
-import allen.town.podcast.common.util.Constants;
-import allen.town.podcast.common.util.LogUtils;
-import allen.town.podcast.BuildConfig;
 import allen.town.podcast.R;
 import allen.town.podcast.activity.SettingsActivity;
 import allen.town.podcast.activity.SettingsScreen;
-import allen.town.podcast.core.util.IntentUtils;
 
 /**
- * Top-level settings screen
+ * Top-level settings screen: the search bar and one entry per settings screen.
  */
 public class MainPrefFragment extends AbsSettingsFragment {
 
-    private static final String PREF_SCREEN_APPEARANCE = "pref_appearance";
-    private static final String PREF_SCREEN_PLAYBACK = "pref_playback";
-    private static final String PREF_SCREEN_SUBSCRIPTIONS = "pref_subscriptions";
-    private static final String PREF_SCREEN_AD_SKIP = "pref_ad_skip";
-    private static final String PREF_SCREEN_SYNCHRONIZATION = "pref_sync";
-    private static final String PREF_SCREEN_DOWNLOADS = "pref_downloads";
-    private static final String PREF_SEND_BUG_REPORT = "pref_report_bug";
-    private static final String PREF_DONATE = "pref_donate";
-
-    private static final String PREF_ABOUT = "pref_about";
-    private static final String PREF_NOTIFICATION = "notifications";
-    private static final String PREF_OTHER = "others";
-
+    /** Entry keys in {@code pref_main.xml} and the screen each one opens. */
+    private static final String[] ENTRY_KEYS = {
+            "pref_appearance", "pref_playback", "pref_ad_skip", "pref_subscriptions",
+            "pref_downloads", "notifications", "pref_sync", "pref_about_support",
+    };
+    private static final int[] ENTRY_SCREENS = {
+            R.xml.pref_appearance, R.xml.pref_playback, R.xml.pref_ad_skip, R.xml.pref_subscriptions,
+            R.xml.pref_downloads, R.xml.pref_notifications, R.xml.pref_sync, R.xml.pref_about,
+    };
 
     @Override
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
@@ -49,59 +41,17 @@ public class MainPrefFragment extends AbsSettingsFragment {
     }
 
     private void setupMainScreen() {
-        findPreference(PREF_SCREEN_APPEARANCE).setOnPreferenceClickListener(preference -> {
-            ((SettingsActivity) getActivity()).openScreen(R.xml.pref_appearance);
-            return true;
-        });
-
-
-        findPreference(PREF_SCREEN_PLAYBACK).setOnPreferenceClickListener(preference -> {
-            ((SettingsActivity) getActivity()).openScreen(R.xml.pref_playback);
-            return true;
-        });
-        findPreference(PREF_SCREEN_AD_SKIP).setOnPreferenceClickListener(preference -> {
-            ((SettingsActivity) getActivity()).openScreen(R.xml.pref_ad_skip);
-            return true;
-        });
-        findPreference(PREF_SCREEN_SUBSCRIPTIONS).setOnPreferenceClickListener(preference -> {
-            ((SettingsActivity) getActivity()).openScreen(R.xml.pref_subscriptions);
-            return true;
-        });
-        findPreference(PREF_SCREEN_SYNCHRONIZATION).setOnPreferenceClickListener(preference -> {
-            ((SettingsActivity) getActivity()).openScreen(R.xml.pref_sync);
-            return true;
-        });
-        findPreference(PREF_SCREEN_DOWNLOADS).setOnPreferenceClickListener(preference -> {
-            ((SettingsActivity) getActivity()).openScreen(R.xml.pref_downloads);
-            return true;
-        });
-        findPreference(PREF_NOTIFICATION).setOnPreferenceClickListener(preference -> {
-            ((SettingsActivity) getActivity()).openScreen(R.xml.pref_notifications);
-            return true;
-        });
-        findPreference(PREF_ABOUT).setOnPreferenceClickListener(
-                preference -> {
-                    new AboutFragment().show(getActivity().getSupportFragmentManager(), null);
-                    return true;
-                }
-        );
-        findPreference(PREF_OTHER).setOnPreferenceClickListener(preference -> {
-            ((SettingsActivity) getActivity()).openScreen(R.xml.pref_others);
-            return true;
-        });
-
-        findPreference(PREF_SEND_BUG_REPORT).setOnPreferenceClickListener(preference -> {
-            LogUtils.delegateFeedback("FocusPodcast", BuildConfig.VERSION_NAME, Constants.PRODUCT_EMAIL,getActivity(),getContext().getString(R.string.provider_authority));
-            return true;
-        });
-
-        Preference donatePref = findPreference(PREF_DONATE);
-        donatePref.setVisible(true);
-        donatePref.setOnPreferenceClickListener(preference -> {
-            IntentUtils.openInBrowser(getActivity(), "https://ko-fi.com/focusapps");
-            return true;
-        });
-
+        for (int i = 0; i < ENTRY_KEYS.length; i++) {
+            final int screen = ENTRY_SCREENS[i];
+            Preference entry = findPreference(ENTRY_KEYS[i]);
+            if (entry == null) {
+                throw new IllegalStateException("missing preference " + ENTRY_KEYS[i] + " in pref_main.xml");
+            }
+            entry.setOnPreferenceClickListener(preference -> {
+                ((SettingsActivity) getActivity()).openScreen(screen);
+                return true;
+            });
+        }
     }
 
     private void setupSearch() {

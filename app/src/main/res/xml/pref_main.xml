@@ -20,7 +20,7 @@
         android:icon="@drawable/ic_sound_waves"
         android:key="pref_playback"
         android:layout="@layout/list_item_view_no_title_main"
-        android:summary="@string/playback_pref_sum"
+        android:summary="@string/pref_playback_sum"
         android:title="@string/playback_pref" />
 
     <allen.town.podcast.common.common.prefs.supportv7.ATEPreference
@@ -45,41 +45,23 @@
         android:title="@string/pref_downloads_storage_title" />
 
     <allen.town.podcast.common.common.prefs.supportv7.ATEPreference
+        android:icon="@drawable/ic_notifications"
+        android:key="notifications"
+        android:layout="@layout/list_item_view_no_title_main"
+        android:summary="@string/pref_notifications_sum"
+        android:title="@string/notification_pref_fragment" />
+
+    <allen.town.podcast.common.common.prefs.supportv7.ATEPreference
         android:icon="@drawable/ic_cloud"
         android:key="pref_sync"
         android:layout="@layout/list_item_view_no_title_main"
         android:summary="@string/pref_sync_backup_sum"
         android:title="@string/pref_sync_backup_title" />
 
-
-
-    <allen.town.podcast.common.common.prefs.supportv7.ATEPreference
-        android:icon="@drawable/ic_notifications"
-        android:key="notifications"
-        android:layout="@layout/list_item_view_no_title_main"
-        android:title="@string/notification_pref_fragment" />
-
-    <allen.town.podcast.common.common.prefs.supportv7.ATEPreference
-        android:icon="@drawable/ic_others"
-        android:key="others"
-        android:layout="@layout/list_item_view_no_title_main"
-        android:title="@string/others" />
-
-    <allen.town.podcast.common.common.prefs.supportv7.ATEPreference
-        android:icon="@drawable/ic_bug"
-        android:key="pref_report_bug"
-        android:layout="@layout/list_item_view_no_title_main"
-        android:title="@string/bug_report_title" />
-    <allen.town.podcast.common.common.prefs.supportv7.ATEPreference
-        android:icon="@drawable/round_attach_money_24"
-        android:key="pref_donate"
-        search:isPreferenceVisible="false"
-        android:layout="@layout/list_item_view_no_title_main"
-        android:summary="@string/donate_summary"
-        android:title="@string/donate" />
     <allen.town.podcast.common.common.prefs.supportv7.ATEPreference
         android:icon="@drawable/ic_info"
-        android:key="pref_about"
+        android:key="pref_about_support"
         android:layout="@layout/list_item_view_no_title_main"
-        android:title="@string/about_pref" />
+        android:summary="@string/pref_about_support_sum"
+        android:title="@string/pref_about_support_title" />
 </androidx.preference.PreferenceScreen>

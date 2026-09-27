@@ -969,4 +969,8 @@
     <string name="pref_downloads_storage_title">Downloads &amp; storage</string>
     <string name="pref_downloads_storage_sum">Automatic downloads, mobile data, deleting episodes, storage folder</string>
     <string name="pref_deleting_episodes_category">Deleting episodes</string>
+    <string name="pref_about_support_title">About &amp; support</string>
+    <string name="pref_about_support_sum">Documentation, feedback, changelog, bug reports</string>
+    <string name="pref_playback_sum">Skip intervals, speed, audio effects, interruptions, playlist</string>
+    <string name="pref_notifications_sum">Playback notification and which notifications are shown</string>
 </resources>
