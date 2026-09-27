@@ -29,12 +29,7 @@ class FullAudioPlayerFragment : AudioPlayerFragment(false) {
         lastPlaybackControlsColor = event.color.primaryTextColor
         lastDisabledPlaybackControlsColor = ColorUtil.withAlpha(event.color.primaryTextColor, 0.5f)
 
-        butFF.setColorFilter(lastPlaybackControlsColor, PorterDuff.Mode.SRC_IN)
-        butRev.setColorFilter(lastPlaybackControlsColor, PorterDuff.Mode.SRC_IN)
-        butSkip.setColorFilter(lastPlaybackControlsColor, PorterDuff.Mode.SRC_IN)
-        txtvRev.setTextColor(lastPlaybackControlsColor)
-        txtvFF.setTextColor(lastPlaybackControlsColor)
-        txtvPlaybackSpeed.setTextColor(lastPlaybackControlsColor)
+        applyControlsColor(lastPlaybackControlsColor)
         txtvPosition.setTextColor(lastDisabledPlaybackControlsColor)
         txtvLength.setTextColor(lastDisabledPlaybackControlsColor)
 

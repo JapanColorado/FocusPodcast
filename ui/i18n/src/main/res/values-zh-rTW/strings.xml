@@ -177,6 +177,7 @@
   <string name="remove_from_favorite_label">移出最愛</string>
   <string name="visit_website_label">訪問網站</string>
   <string name="skip_episode_label">跳過這一集</string>
+  <string name="previous_episode_label">上一集</string>
   <string name="reset_position">重置播放進度</string>
   <string name="removed_item">項目已移除</string>
   <string name="no_items_selected">未選擇任何項目</string>

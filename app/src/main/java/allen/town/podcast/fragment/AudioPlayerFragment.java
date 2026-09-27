@@ -5,9 +5,12 @@ import android.animation.ValueAnimator;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.content.Context;
 import android.os.Bundle;
+import android.text.SpannableStringBuilder;
+import android.text.Spanned;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -22,8 +25,10 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.content.res.AppCompatResources;
 import androidx.appcompat.widget.Toolbar;
 import androidx.cardview.widget.CardView;
+import androidx.core.graphics.drawable.DrawableCompat;
 import androidx.fragment.app.Fragment;
 import androidx.interpolator.view.animation.FastOutSlowInInterpolator;
 import androidx.lifecycle.ViewModelProvider;
@@ -43,6 +48,7 @@ import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 
 import allen.town.podcast.common.extensions.ColorExtensionsUtils;
@@ -96,6 +102,7 @@ import allen.town.podcast.playback.LibraryViewModel;
 import allen.town.podcast.view.AdMarkerSeekBar;
 import allen.town.podcast.view.DrawableGradient;
 import allen.town.podcast.view.PlayButton;
+import allen.town.podcast.view.TextSizedIconSpan;
 import allen.town.podcast.theme.ThemeStore;
 import allen.town.podcast.theme.util.ATHUtil;
 import allen.town.podcast.theme.util.ColorUtil;
@@ -129,6 +136,12 @@ public class AudioPlayerFragment extends Fragment implements
     protected ImageButton butFF;
     protected TextView txtvFF;
     protected ImageButton butSkip;
+    /** Restarts the episode or goes back to the previous one; null in a layout without it. */
+    @Nullable
+    protected ImageButton butPrev;
+    /** Opens the sleep timer dialog and shows the time left; null where a layout has no room for it. */
+    @Nullable
+    protected TextView butSleepTimer;
     protected Toolbar toolbar;
     protected ProgressBar progressIndicator;
     protected CardView cardViewSeek;
@@ -139,6 +152,13 @@ public class AudioPlayerFragment extends Fragment implements
     /** Anything shorter is a mis-tap rather than an ad, and is refused with a message. */
     private static final long MIN_MANUAL_AD_LENGTH_MS = 2000;
     private static final String KEY_PENDING_AD_START = "allen.town.podcast.pendingAdStartMs";
+    /** {@link #sleepTimerShownMinutes} while the sleep timer button shows its idle icon. */
+    private static final long SLEEP_TIMER_IDLE = -1;
+    private static final long MINUTE_MS = 60_000;
+    /** Moon icon edge as a multiple of the text size while it stands alone. */
+    private static final float SLEEP_ICON_SCALE_IDLE = 1.6f;
+    /** Moon icon edge as a multiple of the text size next to the time left. */
+    private static final float SLEEP_ICON_SCALE_RUNNING = 1.15f;
 
     protected PlaybackController controller;
     protected Disposable disposable;
@@ -150,6 +170,14 @@ public class AudioPlayerFragment extends Fragment implements
     private long adSegmentsItemId;
     /** Where the user tapped "mark ad start", or {@link #NO_PENDING_AD_START}. */
     private long pendingAdStartMs = NO_PENDING_AD_START;
+    /**
+     * Whole minutes left that the sleep timer button's content description announces, or
+     * {@link #SLEEP_TIMER_IDLE}. The description only changes when this does, so TalkBack does
+     * not re-read a new value every second.
+     */
+    private long sleepTimerShownMinutes = SLEEP_TIMER_IDLE;
+    /** Time left that the sleep timer button shows while the timer runs. */
+    private long sleepTimerLeftMs;
     protected boolean showTimeLeft;
     protected boolean seekedToChapterStart = false;
     protected int currentChapterIndex = -1;
@@ -226,6 +254,8 @@ public class AudioPlayerFragment extends Fragment implements
         butFF = root.findViewById(R.id.butFF);
         txtvFF = root.findViewById(R.id.txtvFF);
         butSkip = root.findViewById(R.id.butSkip);
+        butPrev = root.findViewById(R.id.butPrev);
+        butSleepTimer = root.findViewById(R.id.butSleepTimer);
         progressIndicator = root.findViewById(R.id.progLoading);
         cardViewSeek = root.findViewById(R.id.cardViewSeek);
         txtvSeek = root.findViewById(R.id.txtvSeek);
@@ -243,6 +273,11 @@ public class AudioPlayerFragment extends Fragment implements
         setupLengthTextView();
         setupControlButtons();
         txtvPlaybackSpeed.setOnClickListener(v -> new PlaySpeedDialog().show(getChildFragmentManager(), null));
+        if (butSleepTimer != null) {
+            butSleepTimer.setOnClickListener(v -> showSleepTimerDialog());
+        }
+        sleepTimerShownMinutes = SLEEP_TIMER_IDLE;
+        renderSleepTimerButton();
         sbPosition.setOnSeekBarChangeListener(this);
 
         pager = root.findViewById(R.id.pager);
@@ -332,6 +367,13 @@ public class AudioPlayerFragment extends Fragment implements
                     SkipPrefDialog.SkipDirection.SKIP_FORWARD, txtvFF);
             return false;
         });
+        if (butPrev != null) {
+            butPrev.setOnClickListener(v -> {
+                if (controller != null) {
+                    controller.skipToPrevious();
+                }
+            });
+        }
         butSkip.setOnClickListener(v ->
                 IntentUtils.sendLocalBroadcast(getActivity(), PlaybackService.ACTION_SKIP_CURRENT_EPISODE));
     }
@@ -432,6 +474,8 @@ public class AudioPlayerFragment extends Fragment implements
         setChapterDividers(media);
         setupOptionsMenu(media);
         loadAdSegments(media);
+        // The timer events are not sticky, so the button learns the current state here.
+        updateSleepTimerButton(controller.sleepTimerActive(), controller.getSleepTimerTimeLeft());
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
@@ -440,6 +484,105 @@ public class AudioPlayerFragment extends Fragment implements
         if (event.isCancelled() || event.wasJustEnabled()) {
             AudioPlayerFragment.this.loadMediaInfo(false,false);
         }
+        updateSleepTimerButton(!event.isCancelled() && !event.isOver(), event.getTimeLeft());
+    }
+
+    private void showSleepTimerDialog() {
+        new SleepTimerDialog().show(getChildFragmentManager(), "SleepTimerDialog");
+    }
+
+    /**
+     * Shows the time left on the sleep timer button while the timer runs, and the moon icon
+     * otherwise.
+     */
+    private void updateSleepTimerButton(boolean active, long timeLeftMs) {
+        if (butSleepTimer == null) {
+            return;
+        }
+        if (!active || timeLeftMs <= 0) {
+            if (sleepTimerShownMinutes != SLEEP_TIMER_IDLE) {
+                sleepTimerShownMinutes = SLEEP_TIMER_IDLE;
+                butSleepTimer.setContentDescription(getString(R.string.sleep_timer_label));
+                renderSleepTimerButton();
+            }
+            return;
+        }
+        sleepTimerLeftMs = timeLeftMs;
+        long minutes = (timeLeftMs + MINUTE_MS - 1) / MINUTE_MS;
+        if (minutes != sleepTimerShownMinutes) {
+            sleepTimerShownMinutes = minutes;
+            butSleepTimer.setContentDescription(getString(R.string.sleep_timer_label) + ", "
+                    + getResources().getQuantityString(R.plurals.time_minutes_quantified,
+                    (int) minutes, (int) minutes));
+        }
+        renderSleepTimerButton();
+    }
+
+    /** Remaining time as mm:ss, or h:mm:ss from an hour up, rounded up to the next second. */
+    private static String formatSleepTimeLeft(long timeLeftMs) {
+        long seconds = (timeLeftMs + 999) / 1000;
+        long hours = seconds / 3600;
+        long minutes = (seconds % 3600) / 60;
+        long rest = seconds % 60;
+        if (hours > 0) {
+            return String.format(Locale.getDefault(), "%d:%02d:%02d", hours, minutes, rest);
+        }
+        return String.format(Locale.getDefault(), "%02d:%02d", minutes, rest);
+    }
+
+    /**
+     * Idle: the moon icon alone. Running: the moon followed by the time left; drive mode's round
+     * button is too small for both, so it shows only the time there. The icon is drawn as part
+     * of the text, so it follows the text colour and shrinks with auto-sized text.
+     */
+    private void renderSleepTimerButton() {
+        TextView button = butSleepTimer;
+        if (button == null) {
+            return;
+        }
+        boolean idle = sleepTimerShownMinutes == SLEEP_TIMER_IDLE;
+        SpannableStringBuilder text = new SpannableStringBuilder();
+        if (idle || !isDriveMode) {
+            Drawable icon = AppCompatResources.getDrawable(button.getContext(), R.drawable.ic_sleep);
+            if (icon != null) {
+                icon = DrawableCompat.wrap(icon.mutate());
+                DrawableCompat.setTint(icon, button.getCurrentTextColor());
+                text.append(" ", new TextSizedIconSpan(icon,
+                        idle ? SLEEP_ICON_SCALE_IDLE : SLEEP_ICON_SCALE_RUNNING),
+                        Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+            }
+        }
+        if (!idle) {
+            if (text.length() > 0) {
+                text.append(' ');
+            }
+            text.append(formatSleepTimeLeft(sleepTimerLeftMs));
+        }
+        button.setText(text);
+    }
+
+    /**
+     * Tints the secondary controls around the play button: previous, rewind, fast forward and
+     * next with their labels, the speed label and the sleep timer button.
+     */
+    protected void applyControlsColor(int color) {
+        tintSkipControls(color);
+        txtvPlaybackSpeed.setTextColor(color);
+        if (butSleepTimer != null) {
+            butSleepTimer.setTextColor(color);
+            renderSleepTimerButton();
+        }
+    }
+
+    private void tintSkipControls(int color) {
+        if (butPrev != null) {
+            butPrev.setColorFilter(color, PorterDuff.Mode.SRC_IN);
+        }
+        butFF.setColorFilter(color, PorterDuff.Mode.SRC_IN);
+        butRev.setColorFilter(color, PorterDuff.Mode.SRC_IN);
+        butSkip.setColorFilter(color, PorterDuff.Mode.SRC_IN);
+        txtvRev.setTextColor(color);
+        txtvFF.setTextColor(color);
     }
 
     protected ValueAnimator valueAnimator;
@@ -518,11 +661,9 @@ public class AudioPlayerFragment extends Fragment implements
         );
         TintHelper.setTintAuto(playPauseButton, colorFinal, true);
         ColorExtensionsUtils.applyColor(sbPosition,colorFinal);
-        butFF.setColorFilter(lastPlaybackControlsColor, PorterDuff.Mode.SRC_IN);
-        butRev.setColorFilter(lastPlaybackControlsColor, PorterDuff.Mode.SRC_IN);
-        butSkip.setColorFilter(lastPlaybackControlsColor, PorterDuff.Mode.SRC_IN);
-        txtvRev.setTextColor(lastPlaybackControlsColor);
-        txtvFF.setTextColor(lastPlaybackControlsColor);
+        // The speed label and sleep timer button keep their theme colour in the plain styles;
+        // the styles that paint their own background tint them through applyControlsColor.
+        tintSkipControls(lastPlaybackControlsColor);
 
         if(isFromScreenActivity){
             swipeUpIv.setColorFilter(lastPlaybackControlsColor, PorterDuff.Mode.SRC_IN);
@@ -722,8 +863,12 @@ public class AudioPlayerFragment extends Fragment implements
         toolbar.getMenu().findItem(R.id.mark_ad_end_item)
                 .setVisible(isFeedMedia && pendingAdStartMs != NO_PENDING_AD_START);
 
-        toolbar.getMenu().findItem(R.id.set_sleeptimer_item).setVisible(!controller.sleepTimerActive());
-        toolbar.getMenu().findItem(R.id.disable_sleeptimer_item).setVisible(controller.sleepTimerActive());
+        // Layouts with a sleep timer button in the control row do not repeat it in the toolbar.
+        boolean sleepTimerInToolbar = butSleepTimer == null;
+        toolbar.getMenu().findItem(R.id.set_sleeptimer_item)
+                .setVisible(sleepTimerInToolbar && !controller.sleepTimerActive());
+        toolbar.getMenu().findItem(R.id.disable_sleeptimer_item)
+                .setVisible(sleepTimerInToolbar && controller.sleepTimerActive());
         toolbar.getMenu().findItem(R.id.driver_mode).setVisible(true);
         MenuIconUtil.showToolbarMenuIcon(toolbar);
     }

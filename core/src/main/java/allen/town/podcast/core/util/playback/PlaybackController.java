@@ -443,6 +443,13 @@ public abstract class PlaybackController {
         }
     }
 
+    /** Restarts the episode, or goes back to the previously played one; see PlaybackService. */
+    public void skipToPrevious() {
+        if (playbackService != null) {
+            playbackService.skipToPrevious();
+        }
+    }
+
     public void seekTo(int time) {
         if (playbackService != null) {
             playbackService.seekTo(time);

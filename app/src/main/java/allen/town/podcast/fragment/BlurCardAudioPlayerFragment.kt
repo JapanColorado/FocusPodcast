@@ -37,12 +37,7 @@ open class BlurCardAudioPlayerFragment : AudioPlayerFragment(false) {
         updateBlur(event.bitmap)
         ToolbarContentTintHelper.colorizeToolbar(toolbar, lastPlaybackControlsColor, activity)
 
-        butFF.setColorFilter(lastPlaybackControlsColor, PorterDuff.Mode.SRC_IN)
-        butRev.setColorFilter(lastPlaybackControlsColor, PorterDuff.Mode.SRC_IN)
-        butSkip.setColorFilter(lastPlaybackControlsColor, PorterDuff.Mode.SRC_IN)
-        txtvRev.setTextColor(lastPlaybackControlsColor)
-        txtvFF.setTextColor(lastPlaybackControlsColor)
-        txtvPlaybackSpeed.setTextColor(lastPlaybackControlsColor)
+        applyControlsColor(lastPlaybackControlsColor)
         txtvPosition.setTextColor(lastPlaybackControlsColor)
         txtvLength.setTextColor(lastPlaybackControlsColor)
 

@@ -28,12 +28,7 @@ class ColorAudioPlayerFragment : AudioPlayerFragment(false) {
 
         lastPlaybackControlsColor = event.color.secondaryTextColor
 
-        butFF.setColorFilter(lastPlaybackControlsColor, PorterDuff.Mode.SRC_IN)
-        butRev.setColorFilter(lastPlaybackControlsColor, PorterDuff.Mode.SRC_IN)
-        butSkip.setColorFilter(lastPlaybackControlsColor, PorterDuff.Mode.SRC_IN)
-        txtvRev.setTextColor(lastPlaybackControlsColor)
-        txtvFF.setTextColor(lastPlaybackControlsColor)
-        txtvPlaybackSpeed.setTextColor(lastPlaybackControlsColor)
+        applyControlsColor(lastPlaybackControlsColor)
         txtvPosition.setTextColor(lastPlaybackControlsColor)
         txtvLength.setTextColor(lastPlaybackControlsColor)
 

@@ -1,6 +1,5 @@
 package allen.town.podcast.fragment
 
-import android.graphics.PorterDuff
 import android.os.Bundle
 import android.view.View
 import allen.town.podcast.theme.ThemeStore.Companion.accentColor
@@ -29,12 +28,7 @@ class CircleAudioPlayerFragment : AudioPlayerFragment(false) {
         sbPosition.applyColor(colorFinal)
 
 
-        butFF.setColorFilter(colorFinal, PorterDuff.Mode.SRC_IN)
-        butRev.setColorFilter(colorFinal, PorterDuff.Mode.SRC_IN)
-        butSkip.setColorFilter(colorFinal, PorterDuff.Mode.SRC_IN)
-        txtvRev.setTextColor(colorFinal)
-        txtvFF.setTextColor(colorFinal)
-        txtvPlaybackSpeed.setTextColor(colorFinal)
+        applyControlsColor(colorFinal)
 
     }
 

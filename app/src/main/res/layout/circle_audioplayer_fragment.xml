@@ -71,163 +71,15 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
-    <RelativeLayout
+    <include
         android:id="@+id/player_control"
+        layout="@layout/player_controls"
         android:layout_width="match_parent"
         android:layout_height="@dimen/audioplayer_playercontrols_length_big"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
-
-        <FrameLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
-            android:layout_marginStart="16dp"
-            android:layout_marginLeft="16dp"
-            android:layout_marginEnd="16dp"
-            android:layout_marginRight="16dp">
-
-            <com.google.android.material.floatingactionbutton.FloatingActionButton
-                android:id="@+id/playPauseButton"
-                style="@style/Widget.MaterialComponents.FloatingActionButton"
-                android:layout_width="@dimen/audioplayer_playercontrols_length_m"
-                android:layout_height="@dimen/audioplayer_playercontrols_length_m"
-                android:layout_centerInParent="true"
-                android:clickable="false"
-                app:elevation="0dp" />
-        </FrameLayout>
-
-
-        <allen.town.podcast.view.PlayButton
-            android:id="@+id/butPlay"
-            android:layout_width="@dimen/audioplayer_playercontrols_length_m"
-            android:layout_height="@dimen/audioplayer_playercontrols_length_m"
-            android:layout_centerHorizontal="true"
-            android:layout_centerVertical="true"
-            android:layout_marginStart="@dimen/audioplayer_playercontrols_margin"
-            android:layout_marginLeft="@dimen/audioplayer_playercontrols_margin"
-            android:layout_marginEnd="@dimen/audioplayer_playercontrols_margin"
-            android:layout_marginRight="@dimen/audioplayer_playercontrols_margin"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:contentDescription="@string/pause_label"
-            android:padding="8dp"
-            android:scaleType="fitCenter"
-            app:srcCompat="@drawable/ic_play_48dp"
-            tools:srcCompat="@drawable/ic_play_48dp" />
-
-        <allen.town.podcast.common.views.AccentProgressBar
-            android:id="@+id/progLoading"
-            android:layout_width="@dimen/audioplayer_playercontrols_length_big"
-            android:layout_height="@dimen/audioplayer_playercontrols_length_big"
-            android:layout_centerInParent="true"
-            android:visibility="gone"
-            tools:visibility="visible" />
-
-        <RelativeLayout
-            android:id="@+id/butRev_l"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:layout_toStartOf="@id/butPlay"
-            android:layout_toLeftOf="@id/butPlay">
-
-            <androidx.appcompat.widget.AppCompatImageButton
-                android:id="@+id/butRev"
-                android:layout_width="@dimen/audioplayer_playercontrols_length"
-                android:layout_height="@dimen/audioplayer_playercontrols_length"
-                android:layout_centerInParent="true"
-                android:layout_marginStart="@dimen/audioplayer_playercontrols_margin"
-                android:layout_marginLeft="@dimen/audioplayer_playercontrols_margin"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                android:contentDescription="@string/rewind_label"
-                android:foreground="?roundSelector"
-                android:padding="6dp"
-                android:scaleType="fitCenter"
-                app:srcCompat="@drawable/mini_player_skip_back"
-                tools:srcCompat="@drawable/mini_player_skip_back" />
-
-            <com.google.android.material.textview.MaterialTextView
-                android:id="@+id/txtvRev"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerInParent="true"
-                android:clickable="false"
-                android:gravity="center"
-                android:paddingTop="8dp"
-                android:text="30"
-                android:textColor="?android:attr/textColorSecondary"
-                android:textSize="11sp" />
-        </RelativeLayout>
-
-
-
-        <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/txtvPlaybackSpeed"
-            android:layout_width="@dimen/audioplayer_playercontrols_length"
-            android:layout_height="@dimen/audioplayer_playercontrols_length"
-            android:layout_centerVertical="true"
-            android:layout_toStartOf="@id/butRev_l"
-            android:layout_toLeftOf="@id/butRev_l"
-            android:background="?roundSelector"
-            android:clickable="true"
-            android:gravity="center"
-            android:text="1.0x"
-            android:textColor="?android:attr/textColorSecondary"
-            android:textSize="16sp" />
-
-        <RelativeLayout
-            android:id="@+id/butFF_l"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:layout_toEndOf="@id/butPlay"
-            android:layout_toRightOf="@id/butPlay">
-
-            <androidx.appcompat.widget.AppCompatImageButton
-                android:id="@+id/butFF"
-                android:layout_width="@dimen/audioplayer_playercontrols_length"
-                android:layout_height="@dimen/audioplayer_playercontrols_length"
-                android:layout_centerInParent="true"
-                android:layout_marginEnd="@dimen/audioplayer_playercontrols_margin"
-                android:layout_marginRight="@dimen/audioplayer_playercontrols_margin"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                android:contentDescription="@string/fast_forward_label"
-                android:foreground="?roundSelector"
-                android:padding="6dp"
-                android:scaleType="fitCenter"
-                app:srcCompat="@drawable/mini_player_skip_forward"
-                tools:srcCompat="@drawable/mini_player_skip_forward" />
-
-            <com.google.android.material.textview.MaterialTextView
-                android:id="@+id/txtvFF"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerInParent="true"
-                android:clickable="false"
-                android:gravity="center"
-                android:paddingTop="8dp"
-                android:text="30"
-                android:textColor="?android:attr/textColorSecondary"
-                android:textSize="11sp" />
-        </RelativeLayout>
-
-        <androidx.appcompat.widget.AppCompatImageButton
-            android:id="@+id/butSkip"
-            android:layout_width="@dimen/audioplayer_playercontrols_length"
-            android:layout_height="@dimen/audioplayer_playercontrols_length"
-            android:layout_centerVertical="true"
-            android:layout_toEndOf="@id/butFF_l"
-            android:layout_toRightOf="@id/butFF_l"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:contentDescription="@string/skip_episode_label"
-            android:foreground="?roundSelector"
-            android:scaleType="fitCenter"
-            app:srcCompat="@drawable/ic_skip_24dp"
-            tools:srcCompat="@drawable/ic_skip_24dp" />
-
-    </RelativeLayout>
+        app:layout_constraintTop_toTopOf="parent" />
 
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/cardViewSeek"
@@ -285,8 +137,8 @@
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:layout_marginBottom="4dp"
+            android:layout_marginTop="-12dp"
+            android:layout_marginBottom="-12dp"
             android:paddingLeft="8dp"
             android:paddingRight="8dp">
 
@@ -295,6 +147,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentStart="true"
+                android:layout_centerVertical="true"
                 android:layout_alignParentLeft="true"
                 android:layout_marginStart="16dp"
                 android:layout_marginLeft="16dp"
@@ -307,6 +160,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
                 android:layout_alignParentRight="true"
                 android:layout_marginEnd="16dp"
                 android:layout_marginRight="16dp"
@@ -314,6 +168,15 @@
                 android:text="@string/position_default_label"
                 android:textColor="?android:attr/textColorSecondary"
                 android:textSize="@dimen/text_size_micro" />
+
+            <include
+                layout="@layout/player_speed_sleep"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/audioplayer_playercontrols_length"
+                android:layout_toStartOf="@id/txtvLength"
+                android:layout_toLeftOf="@id/txtvLength"
+                android:layout_toEndOf="@id/txtvPosition"
+                android:layout_toRightOf="@id/txtvPosition" />
 
         </RelativeLayout>
 

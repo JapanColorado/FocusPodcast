@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    The playback control row shared by every player style except drive mode. Hosts include it
+    with their own width, height, margins and alignment; the include must set both
+    layout_width and layout_height or its other layout_* attributes are dropped.
+
+    Five slots: previous | rewind | play | fast forward | next. Every slot starts at its
+    button's size (48dp, or 64dp for play) and the leftover width is shared out equally; the
+    row is symmetric, so play stays exactly centred. The loading ring is wider than the play
+    slot on narrow rows, which is why the row does not clip its children. Transport controls
+    keep their left-to-right order in RTL locales.
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/player_control"
+    android:layout_width="match_parent"
+    android:layout_height="@dimen/audioplayer_playercontrols_length_big"
+    android:clipChildren="false"
+    android:gravity="center_vertical"
+    android:layoutDirection="ltr"
+    android:orientation="horizontal">
+
+    <FrameLayout
+        android:layout_width="@dimen/audioplayer_playercontrols_length"
+        android:layout_height="match_parent"
+        android:layout_weight="1">
+
+        <androidx.appcompat.widget.AppCompatImageButton
+            android:id="@+id/butPrev"
+            android:layout_width="@dimen/audioplayer_playercontrols_length"
+            android:layout_height="@dimen/audioplayer_playercontrols_length"
+            android:layout_gravity="center"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/previous_episode_label"
+            android:foreground="?roundSelector"
+            android:scaleType="fitCenter"
+            app:srcCompat="@drawable/ic_skip_previous_24dp"
+            tools:srcCompat="@drawable/ic_skip_previous_24dp" />
+    </FrameLayout>
+
+    <FrameLayout
+        android:id="@+id/butRev_l"
+        android:layout_width="@dimen/audioplayer_playercontrols_length"
+        android:layout_height="match_parent"
+        android:layout_weight="1">
+
+        <androidx.appcompat.widget.AppCompatImageButton
+            android:id="@+id/butRev"
+            android:layout_width="@dimen/audioplayer_playercontrols_length"
+            android:layout_height="@dimen/audioplayer_playercontrols_length"
+            android:layout_gravity="center"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/rewind_label"
+            android:foreground="?roundSelector"
+            android:padding="6dp"
+            android:scaleType="fitCenter"
+            app:srcCompat="@drawable/mini_player_skip_back"
+            tools:srcCompat="@drawable/mini_player_skip_back" />
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/txtvRev"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:clickable="false"
+            android:gravity="center"
+            android:paddingTop="8dp"
+            android:text="30"
+            android:textColor="?android:attr/textColorSecondary"
+            android:textSize="11sp" />
+    </FrameLayout>
+
+    <FrameLayout
+        android:layout_width="@dimen/audioplayer_playercontrols_length_m"
+        android:layout_height="match_parent"
+        android:layout_weight="1">
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/playPauseButton"
+            style="@style/Widget.MaterialComponents.FloatingActionButton"
+            android:layout_width="@dimen/audioplayer_playercontrols_length_m"
+            android:layout_height="@dimen/audioplayer_playercontrols_length_m"
+            android:layout_gravity="center"
+            android:clickable="false"
+            app:elevation="0dp" />
+
+        <allen.town.podcast.view.PlayButton
+            android:id="@+id/butPlay"
+            android:layout_width="@dimen/audioplayer_playercontrols_length_m"
+            android:layout_height="@dimen/audioplayer_playercontrols_length_m"
+            android:layout_gravity="center"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/pause_label"
+            android:padding="8dp"
+            android:scaleType="fitCenter"
+            app:srcCompat="@drawable/ic_play_48dp"
+            tools:srcCompat="@drawable/ic_play_48dp" />
+
+        <allen.town.podcast.common.views.AccentProgressBar
+            android:id="@+id/progLoading"
+            android:layout_width="@dimen/audioplayer_playercontrols_length_big"
+            android:layout_height="@dimen/audioplayer_playercontrols_length_big"
+            android:layout_gravity="center"
+            android:visibility="gone"
+            tools:visibility="visible" />
+    </FrameLayout>
+
+    <FrameLayout
+        android:id="@+id/butFF_l"
+        android:layout_width="@dimen/audioplayer_playercontrols_length"
+        android:layout_height="match_parent"
+        android:layout_weight="1">
+
+        <androidx.appcompat.widget.AppCompatImageButton
+            android:id="@+id/butFF"
+            android:layout_width="@dimen/audioplayer_playercontrols_length"
+            android:layout_height="@dimen/audioplayer_playercontrols_length"
+            android:layout_gravity="center"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/fast_forward_label"
+            android:foreground="?roundSelector"
+            android:padding="6dp"
+            android:scaleType="fitCenter"
+            app:srcCompat="@drawable/mini_player_skip_forward"
+            tools:srcCompat="@drawable/mini_player_skip_forward" />
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/txtvFF"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:clickable="false"
+            android:gravity="center"
+            android:paddingTop="8dp"
+            android:text="30"
+            android:textColor="?android:attr/textColorSecondary"
+            android:textSize="11sp" />
+    </FrameLayout>
+
+    <FrameLayout
+        android:layout_width="@dimen/audioplayer_playercontrols_length"
+        android:layout_height="match_parent"
+        android:layout_weight="1">
+
+        <androidx.appcompat.widget.AppCompatImageButton
+            android:id="@+id/butSkip"
+            android:layout_width="@dimen/audioplayer_playercontrols_length"
+            android:layout_height="@dimen/audioplayer_playercontrols_length"
+            android:layout_gravity="center"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/skip_episode_label"
+            android:foreground="?roundSelector"
+            android:scaleType="fitCenter"
+            app:srcCompat="@drawable/ic_skip_24dp"
+            tools:srcCompat="@drawable/ic_skip_24dp" />
+    </FrameLayout>
+
+</LinearLayout>

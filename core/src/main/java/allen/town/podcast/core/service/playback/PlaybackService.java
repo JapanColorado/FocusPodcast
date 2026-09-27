@@ -18,6 +18,7 @@ import android.webkit.URLUtil;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.media.MediaBrowserServiceCompat;
 import androidx.preference.PreferenceManager;
 
@@ -63,6 +64,7 @@ import allen.town.podcast.playback.base.PlaybackServiceMediaPlayer;
 import allen.town.podcast.playback.base.PlayerStatus;
 import allen.town.podcast.ui.startintent.MainActivityStarter;
 import allen.town.podcast.ui.startintent.VideoPlayerActivityStarter;
+import io.reactivex.Maybe;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
@@ -456,7 +458,7 @@ public class PlaybackService extends MediaBrowserServiceCompat {
                     // Handle remapped button as notification button which is not remapped again.
                     return handleKeycode(Prefs.getHardwarePreviousButton(), true);
                 } else if (getStatus() == PlayerStatus.PLAYING || getStatus() == PlayerStatus.PAUSED) {
-                    mediaPlayer.seekTo(0);
+                    skipToPrevious();
                     return true;
                 }
                 return false;
@@ -828,6 +830,38 @@ public class PlaybackService extends MediaBrowserServiceCompat {
     public void seekTo(final int t) {
         mediaPlayer.seekTo(t);
         EventBus.getDefault().post(new PlaybackPositionEvent(t, getDuration()));
+    }
+
+    /**
+     * Music-player style "previous" (see {@link PreviousEpisodePolicy}): restarts the episode, or
+     * within its first seconds starts the most recently played other episode from its saved
+     * position. That episode goes through {@link PlaybackServiceStarter} like a play tap anywhere
+     * else, so history, sync and the queue behave as usual.
+     */
+    public void skipToPrevious() {
+        int position = getCurrentPosition();
+        Playable current = getPlayable();
+        long currentMediaId = current instanceof FeedMedia ? ((FeedMedia) current).getId() : 0;
+        serviceDisposables.add(Maybe.fromCallable(() -> PreviousEpisodePolicy.pickPrevious(
+                        DBReader.getPlaybackHistory(0, PreviousEpisodePolicy.HISTORY_LOOKUP_LIMIT),
+                        currentMediaId))
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(previous -> skipToPrevious(position, previous),
+                        error -> {
+                            Log.e(TAG, "could not read the playback history", error);
+                            skipToPrevious(position, null);
+                        },
+                        () -> skipToPrevious(position, null)));
+    }
+
+    private void skipToPrevious(int position, @Nullable FeedMedia previous) {
+        PreviousEpisodePolicy.Action action = PreviousEpisodePolicy.decide(position, previous != null);
+        if (action == PreviousEpisodePolicy.Action.PLAY_PREVIOUS && previous != null) {
+            new PlaybackServiceStarter(this, previous).callEvenIfRunning(true).start();
+        } else {
+            seekTo(0);
+        }
     }
 
     void seekDelta(final int d) {

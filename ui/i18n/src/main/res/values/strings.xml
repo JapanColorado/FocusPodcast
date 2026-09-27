@@ -240,6 +240,7 @@
     <string name="remove_from_favorite_label">Remove from Favorites</string>
     <string name="visit_website_label">Visit Website</string>
     <string name="skip_episode_label">Skip episode</string>
+    <string name="previous_episode_label">Previous episode</string>
     <string name="reset_position">Reset Playback Position</string>
     <string name="removed_item">Removed</string>
     <string name="no_items_selected">No items selected</string>

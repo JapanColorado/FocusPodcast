@@ -162,6 +162,7 @@
   <string name="remove_from_favorite_label">お気に入りから削除</string>
   <string name="visit_website_label">Webサイトを訪問</string>
   <string name="skip_episode_label">エピソードをスキップ</string>
+  <string name="previous_episode_label">前のエピソード</string>
   <string name="reset_position">再生位置をリセット</string>
   <string name="removed_item">アイテムを削除しました</string>
   <!--Download messages and labels-->

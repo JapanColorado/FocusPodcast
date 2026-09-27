@@ -39,24 +39,37 @@
         android:backgroundTint="@color/semi_transparent"
         app:tint="@color/md_white_1000"
         android:padding="8dp"
-        app:layout_constraintEnd_toStartOf="@id/songFavourite"
+        app:layout_constraintEnd_toStartOf="@id/butSleepTimer"
         app:layout_constraintStart_toEndOf="@id/close"
         app:layout_constraintTop_toBottomOf="@id/status_bar"
         app:srcCompat="@drawable/ic_car" />
 
-    <androidx.appcompat.widget.AppCompatImageView
-        android:id="@+id/songFavourite"
-        android:importantForAccessibility="no"
-        android:visibility="invisible"
+    <!-- The sleep timer button; AudioPlayerFragment draws the moon icon or the time left. -->
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/butSleepTimer"
         android:layout_width="52dp"
         android:layout_height="52dp"
         android:layout_margin="16dp"
         android:background="@drawable/color_circle_gradient"
         android:backgroundTint="@color/semi_transparent"
-        android:padding="8dp"
+        android:clickable="true"
+        android:contentDescription="@string/sleep_timer_label"
+        android:focusable="true"
+        android:foreground="?roundSelector"
+        android:gravity="center"
+        android:maxLines="1"
+        android:paddingStart="4dp"
+        android:paddingTop="8dp"
+        android:paddingEnd="4dp"
+        android:paddingBottom="8dp"
+        android:textColor="@color/md_white_1000"
+        app:autoSizeMaxTextSize="16sp"
+        app:autoSizeMinTextSize="9sp"
+        app:autoSizeStepGranularity="1sp"
+        app:autoSizeTextType="uniform"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/status_bar"
-        app:srcCompat="@drawable/ic_star_border" />
+        tools:text="12:34" />
 
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/colorBackground"
@@ -304,20 +317,41 @@
                     android:textSize="11sp" />
             </RelativeLayout>
         </RelativeLayout>
-        <androidx.appcompat.widget.AppCompatImageButton
-            android:id="@+id/butSkip"
-            android:layout_width="86dp"
-            android:layout_height="86dp"
+        <!-- Previous and next episode, centred as a pair under the play button. -->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
-            android:layout_toEndOf="@id/butFF_l"
-            android:layout_toRightOf="@id/butFF_l"
-            android:foreground="?roundSelector"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:contentDescription="@string/skip_episode_label"
-            android:tint="@color/md_white_1000"
-            android:scaleType="centerCrop"
-            app:srcCompat="@drawable/ic_skip_24dp"
-            tools:srcCompat="@drawable/ic_skip_24dp" />
+            android:orientation="horizontal">
+
+            <androidx.appcompat.widget.AppCompatImageButton
+                android:id="@+id/butPrev"
+                android:layout_width="86dp"
+                android:layout_height="86dp"
+                android:layout_marginEnd="24dp"
+                android:layout_marginRight="24dp"
+                android:foreground="?roundSelector"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="@string/previous_episode_label"
+                android:tint="@color/md_white_1000"
+                android:scaleType="centerCrop"
+                app:srcCompat="@drawable/ic_skip_previous_24dp"
+                tools:srcCompat="@drawable/ic_skip_previous_24dp" />
+
+            <androidx.appcompat.widget.AppCompatImageButton
+                android:id="@+id/butSkip"
+                android:layout_width="86dp"
+                android:layout_height="86dp"
+                android:layout_marginStart="24dp"
+                android:layout_marginLeft="24dp"
+                android:foreground="?roundSelector"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="@string/skip_episode_label"
+                android:tint="@color/md_white_1000"
+                android:scaleType="centerCrop"
+                app:srcCompat="@drawable/ic_skip_24dp"
+                tools:srcCompat="@drawable/ic_skip_24dp" />
+        </LinearLayout>
     </LinearLayout>
 
 
