@@ -24,6 +24,13 @@
         android:title="@string/playback_pref" />
 
     <allen.town.podcast.common.common.prefs.supportv7.ATEPreference
+        android:icon="@drawable/ic_skip_24dp"
+        android:key="pref_ad_skip"
+        android:layout="@layout/list_item_view_no_title_main"
+        android:summary="@string/pref_ad_skip_sum"
+        android:title="@string/pref_ad_skip_category" />
+
+    <allen.town.podcast.common.common.prefs.supportv7.ATEPreference
         android:icon="@drawable/ic_podcast"
         android:key="pref_subscriptions"
         android:layout="@layout/list_item_view_no_title_main"

@@ -127,6 +127,7 @@ enum class SettingsScreen(
 ) {
     APPEARANCE(R.xml.pref_appearance, R.string.appearance, null, { AppearancePrefFragment() }),
     PLAYBACK(R.xml.pref_playback, R.string.playback_pref, null, { PlaybackPrefFragment() }),
+    AD_SKIP(R.xml.pref_ad_skip, R.string.pref_ad_skip_category, null, { AdSkipPrefFragment() }),
     SUBSCRIPTIONS(R.xml.pref_subscriptions, R.string.pref_subscriptions_updates_title, null, { SubscriptionsPrefFragment() }),
     NETWORK(R.xml.pref_network, R.string.network_pref, null, { NetworkPrefFragment() }),
     AUTO_DOWNLOAD(R.xml.pref_auto_download, R.string.pref_automatic_download_title, NETWORK, { AutoDownloadPrefFragment() }),

@@ -856,4 +856,6 @@
   <string name="pref_layout_navigation_category">布局与导航</string>
   <string name="pref_episode_lists_category">单集列表</string>
   <string name="pref_appearance_sum">主题、颜色、布局、播放界面、滑动操作</string>
+  <string name="pref_ad_skip_category">跳过广告</string>
+  <string name="pref_ad_skip_sum">检测并跳过已下载单集中的广告</string>
 </resources>

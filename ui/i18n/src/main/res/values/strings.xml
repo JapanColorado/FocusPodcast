@@ -963,4 +963,5 @@
     <string name="pref_layout_navigation_category">Layout &amp; navigation</string>
     <string name="pref_episode_lists_category">Episode lists</string>
     <string name="pref_appearance_sum">Theme, colors, layout, player screen, swipe actions</string>
+    <string name="pref_ad_skip_sum">Detect and skip ads in downloaded episodes</string>
 </resources>

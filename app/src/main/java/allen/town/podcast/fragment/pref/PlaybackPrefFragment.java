@@ -15,7 +15,6 @@ import allen.town.podcast.activity.SettingsActivity;
 import allen.town.podcast.core.pref.Prefs;
 import allen.town.podcast.dialog.SkipPrefDialog;
 import allen.town.podcast.dialog.PlaySpeedDialog;
-import allen.town.podcast.event.settings.AdSkipChangedEvent;
 import allen.town.podcast.event.settings.AudioEffectsChangedEvent;
 
 import org.greenrobot.eventbus.EventBus;
@@ -33,7 +32,6 @@ public class PlaybackPrefFragment extends AbsSettingsFragment implements SharedP
 
         setupPlaybackScreen();
         buildSmartMarkAsPlayedPreference();
-        buildAdSkipSensitivityPreference();
     }
 
     @Override
@@ -93,33 +91,6 @@ public class PlaybackPrefFragment extends AbsSettingsFragment implements SharedP
         });
     }
 
-    /**
-     * Mirrors {@link #buildEnqueueLocationPreference()}: the list preference shows the chosen
-     * entry in its summary, both on open and after every change.
-     */
-    private void buildAdSkipSensitivityPreference() {
-        final Resources res = requireActivity().getResources();
-        final Map<String, String> options = new ArrayMap<>();
-        {
-            String[] keys = res.getStringArray(R.array.ad_skip_sensitivity_values);
-            String[] values = res.getStringArray(R.array.ad_skip_sensitivity_options);
-            for (int i = 0; i < keys.length; i++) {
-                options.put(keys[i], values[i]);
-            }
-        }
-
-        ListPreference pref = requirePreference(Prefs.PREF_AD_SKIP_SENSITIVITY);
-        pref.setSummary(res.getString(R.string.pref_ad_skip_sensitivity_sum, options.get(pref.getValue())));
-        pref.setOnPreferenceChangeListener((preference, newValue) -> {
-            if (!(newValue instanceof String)) {
-                return false;
-            }
-            pref.setSummary(res.getString(R.string.pref_ad_skip_sensitivity_sum,
-                    options.get((String) newValue)));
-            return true;
-        });
-    }
-
     @NonNull
     private <T extends Preference> T requirePreference(@NonNull CharSequence key) {
         // Possibly put it to a common method in abstract base class
@@ -165,13 +136,6 @@ public class PlaybackPrefFragment extends AbsSettingsFragment implements SharedP
                 || Prefs.PREF_AUDIO_LOUDNESS.equals(key)) {
             // The global default effects changed; a playing podcast without its own follows them.
             EventBus.getDefault().post(AudioEffectsChangedEvent.global());
-        }
-        if (Prefs.PREF_AD_SKIP_ENABLED.equals(key)
-                || Prefs.PREF_AD_SKIP_SENSITIVITY.equals(key)
-                || Prefs.PREF_AD_SKIP_ANALYZE_ON_DOWNLOAD.equals(key)
-                || Prefs.PREF_AD_SKIP_SHOW_SNACKBAR.equals(key)) {
-            // 0 means "the global settings changed", not one feed's switch
-            EventBus.getDefault().post(new AdSkipChangedEvent(0));
         }
     }
 }

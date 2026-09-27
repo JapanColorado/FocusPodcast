@@ -536,4 +536,6 @@
   <string name="pref_layout_navigation_category">レイアウトとナビゲーション</string>
   <string name="pref_episode_lists_category">エピソードリスト</string>
   <string name="pref_appearance_sum">テーマ、色、レイアウト、再生画面、スワイプ操作</string>
+  <string name="pref_ad_skip_category">広告スキップ</string>
+  <string name="pref_ad_skip_sum">ダウンロード済みエピソードの広告を検出してスキップ</string>
 </resources>
