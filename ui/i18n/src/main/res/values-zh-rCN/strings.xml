@@ -848,4 +848,7 @@
   <plurals name="feed_filter_hidden_count">
     <item quantity="other">已隐藏 %d 个</item>
   </plurals>
+  <string name="pref_playback_notification_category">播放通知</string>
+  <string name="pref_system_notification_settings_title">系统通知设置</string>
+  <string name="pref_system_notification_settings_sum">选择 FocusPodcast 显示哪些类型的通知</string>
 </resources>

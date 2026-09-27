@@ -955,4 +955,7 @@
         <item quantity="one">%d hidden</item>
         <item quantity="other">%d hidden</item>
     </plurals>
+    <string name="pref_playback_notification_category">Playback notification</string>
+    <string name="pref_system_notification_settings_title">System notification settings</string>
+    <string name="pref_system_notification_settings_sum">Choose which kinds of notifications FocusPodcast shows</string>
 </resources>

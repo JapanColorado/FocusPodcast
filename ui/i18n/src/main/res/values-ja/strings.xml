@@ -528,4 +528,7 @@
   <plurals name="feed_filter_hidden_count">
     <item quantity="other">%d 件を非表示</item>
   </plurals>
+  <string name="pref_playback_notification_category">再生通知</string>
+  <string name="pref_system_notification_settings_title">システムの通知設定</string>
+  <string name="pref_system_notification_settings_sum">FocusPodcast が表示する通知の種類を選択します</string>
 </resources>

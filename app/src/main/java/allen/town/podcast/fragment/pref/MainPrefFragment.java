@@ -77,7 +77,7 @@ public class MainPrefFragment extends AbsSettingsFragment {
             return true;
         });
         findPreference(PREF_NOTIFICATION).setOnPreferenceClickListener(preference -> {
-            ((SettingsActivity) getActivity()).openScreen(R.xml.pref_notifications_under26);
+            ((SettingsActivity) getActivity()).openScreen(R.xml.pref_notifications);
             return true;
         });
         findPreference(PREF_ABOUT).setOnPreferenceClickListener(

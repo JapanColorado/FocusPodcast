@@ -4,10 +4,7 @@ import allen.town.podcast.common.views.AccentMaterialDialog
 import allen.town.podcast.R
 import allen.town.podcast.databinding.SettingsActivityBinding
 import allen.town.podcast.fragment.pref.*
-import android.content.Intent
-import android.os.Build
 import android.os.Bundle
-import android.provider.Settings
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import androidx.annotation.StringRes
@@ -56,12 +53,7 @@ open class SettingsActivity : SimpleToolbarActivity(), SearchPreferenceResultLis
 
     fun openScreen(screen: Int): PreferenceFragmentCompat? {
         val fragment = SettingsScreen.fromXml(screen)?.factory?.invoke()
-        if (screen == R.xml.pref_notifications_under26 && Build.VERSION.SDK_INT >= 26) {
-            val intent = Intent()
-            intent.action = Settings.ACTION_APP_NOTIFICATION_SETTINGS
-            intent.putExtra(Settings.EXTRA_APP_PACKAGE, packageName)
-            startActivity(intent)
-        } else if (fragment != null) {
+        if (fragment != null) {
             supportFragmentManager.beginTransaction().setCustomAnimations(
                     R.anim.retro_fragment_open_enter,
             R.anim.retro_fragment_open_exit,
@@ -100,8 +92,6 @@ open class SettingsActivity : SimpleToolbarActivity(), SearchPreferenceResultLis
             builder.setMessage(R.string.pref_feed_settings_dialog_msg)
             builder.setPositiveButton(android.R.string.ok, null)
             builder.show()
-        } else if (screen == R.xml.pref_notifications_under26) {
-            openScreen(screen)
         } else {
             val fragment = openScreen(result.resourceFile)
             result.highlight(fragment)
@@ -145,7 +135,7 @@ enum class SettingsScreen(
     STORAGE(R.xml.pref_storage, R.string.storage_pref, null, { StoragePrefFragment() }),
     IMPORT_EXPORT(R.xml.pref_import_export, R.string.import_export_pref, STORAGE, { ImportExportPreferencesFragment() }),
     SYNC(R.xml.pref_sync, R.string.synchronization_pref, null, { SyncPrefFragment() }),
-    NOTIFICATIONS(R.xml.pref_notifications_under26, R.string.notification_pref_fragment, null, { NotificationPrefFragment() }),
+    NOTIFICATIONS(R.xml.pref_notifications, R.string.notification_pref_fragment, null, { NotificationPrefFragment() }),
     OTHERS(R.xml.pref_others, R.string.others, null, { OthersFragment() }),
     FEED_SETTINGS(R.xml.feed_settings, R.string.feed_settings_label, null, null),
     AUDIO_EFFECT(R.xml.pref_audio_effect, R.string.audio_effects, FEED_SETTINGS, null);
