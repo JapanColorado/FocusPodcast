@@ -13,6 +13,7 @@ import allen.town.podcast.common.util.LogUtils;
 import allen.town.podcast.BuildConfig;
 import allen.town.podcast.R;
 import allen.town.podcast.activity.SettingsActivity;
+import allen.town.podcast.activity.SettingsScreen;
 import allen.town.podcast.core.util.IntentUtils;
 
 /**
@@ -111,40 +112,7 @@ public class MainPrefFragment extends AbsSettingsFragment {
         config.setFragmentContainerViewId(R.id.settingsContainer);
         config.setBreadcrumbsEnabled(true);
 
-        config.index(R.xml.pref_user_interface)
-                .addBreadcrumb(SettingsActivity.getTitleOfPage(R.xml.pref_user_interface));
-        config.index(R.xml.pref_general)
-                .addBreadcrumb(SettingsActivity.getTitleOfPage(R.xml.pref_general));
-        config.index(R.xml.pref_theme)
-                .addBreadcrumb(SettingsActivity.getTitleOfPage(R.xml.pref_user_interface))
-                .addBreadcrumb(SettingsActivity.getTitleOfPage(R.xml.pref_theme));
-        config.index(R.xml.pref_others)
-                .addBreadcrumb(SettingsActivity.getTitleOfPage(R.xml.pref_others));
-        config.index(R.xml.pref_playback)
-                .addBreadcrumb(SettingsActivity.getTitleOfPage(R.xml.pref_playback));
-        config.index(R.xml.pref_network)
-                .addBreadcrumb(SettingsActivity.getTitleOfPage(R.xml.pref_network));
-        config.index(R.xml.pref_storage)
-                .addBreadcrumb(SettingsActivity.getTitleOfPage(R.xml.pref_storage));
-        config.index(R.xml.pref_import_export)
-                .addBreadcrumb(SettingsActivity.getTitleOfPage(R.xml.pref_storage))
-                .addBreadcrumb(SettingsActivity.getTitleOfPage(R.xml.pref_import_export));
-        config.index(R.xml.pref_auto_download)
-                .addBreadcrumb(SettingsActivity.getTitleOfPage(R.xml.pref_network))
-                .addBreadcrumb(R.string.automation)
-                .addBreadcrumb(SettingsActivity.getTitleOfPage(R.xml.pref_auto_download));
-        config.index(R.xml.pref_sync)
-                .addBreadcrumb(SettingsActivity.getTitleOfPage(R.xml.pref_sync));
-        config.index(R.xml.pref_notifications_under26)
-                .addBreadcrumb(SettingsActivity.getTitleOfPage(R.xml.pref_notifications_under26));
-        config.index(R.xml.feed_settings)
-                .addBreadcrumb(SettingsActivity.getTitleOfPage(R.xml.feed_settings));
-        config.index(R.xml.pref_audio_effect)
-                .addBreadcrumb(SettingsActivity.getTitleOfPage(R.xml.feed_settings))
-                .addBreadcrumb(SettingsActivity.getTitleOfPage(R.xml.pref_audio_effect));
-        config.index(R.xml.pref_swipe)
-                .addBreadcrumb(SettingsActivity.getTitleOfPage(R.xml.pref_general))
-                .addBreadcrumb(SettingsActivity.getTitleOfPage(R.xml.pref_swipe));
+        SettingsScreen.indexAll(config);
     }
 
     @Override

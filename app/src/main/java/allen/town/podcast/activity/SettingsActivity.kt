@@ -10,15 +10,17 @@ import android.os.Bundle
 import android.provider.Settings
 import android.view.View
 import android.view.inputmethod.InputMethodManager
+import androidx.annotation.StringRes
+import androidx.annotation.XmlRes
 import androidx.preference.PreferenceFragmentCompat
 import allen.town.podcast.common.extensions.applyToolbar
-import allen.town.podcast.fragment.pref.ThemeSettingsFragment
+import allen.town.podcast.searchpreference.SearchConfiguration
 import allen.town.podcast.searchpreference.SearchPreferenceResult
 import allen.town.podcast.searchpreference.SearchPreferenceResultListener
 
 /**
- * PreferenceActivity for API 11+. In order to change the behavior of the preference UI, see
- * PreferenceController.
+ * Hosts the settings screens. Which fragment shows which preference XML, the page titles and the
+ * search breadcrumbs all come from [SettingsScreen].
  */
 open class SettingsActivity : SimpleToolbarActivity(), SearchPreferenceResultListener {
     lateinit var binding: SettingsActivityBinding
@@ -34,8 +36,8 @@ open class SettingsActivity : SimpleToolbarActivity(), SearchPreferenceResultLis
                     MainPrefFragment(), FRAGMENT_TAG)
                 .commit()
         }
-        val intent = intent
-        if (intent.getBooleanExtra(OPEN_AUTO_DOWNLOAD_SETTINGS, false)) {
+        // Only on a fresh start: after a recreate (theme, language) the back stack is restored.
+        if (savedInstanceState == null && intent.getBooleanExtra(OPEN_AUTO_DOWNLOAD_SETTINGS, false)) {
             openScreen(R.xml.pref_auto_download)
         }
     }
@@ -52,44 +54,8 @@ open class SettingsActivity : SimpleToolbarActivity(), SearchPreferenceResultLis
         binding.subTitle.text = title
     }
 
-    private fun getPreferenceScreen(screen: Int): PreferenceFragmentCompat? {
-        var prefFragment: PreferenceFragmentCompat? = null
-        if (screen == R.xml.pref_user_interface) {
-            prefFragment =
-                UserInterfacePrefFragment()
-        } else if (screen == R.xml.pref_network) {
-            prefFragment = NetworkPrefFragment()
-        } else if (screen == R.xml.pref_storage) {
-            prefFragment = StoragePrefFragment()
-        } else if (screen == R.xml.pref_import_export) {
-            prefFragment = ImportExportPreferencesFragment()
-        } else if (screen == R.xml.pref_auto_download) {
-            prefFragment =
-                AutoDownloadPrefFragment()
-        } else if (screen == R.xml.pref_sync) {
-            prefFragment =
-                SyncPrefFragment()
-        } else if (screen == R.xml.pref_playback) {
-            prefFragment =
-                PlaybackPrefFragment()
-        } else if (screen == R.xml.pref_notifications_under26) {
-            prefFragment =
-                NotificationPrefFragment()
-        } else if (screen == R.xml.pref_swipe) {
-            prefFragment = SwipePrefFragment()
-        } else if (screen == R.xml.pref_theme) {
-            prefFragment = ThemeSettingsFragment()
-        } else if (screen == R.xml.pref_others) {
-            prefFragment = OthersFragment()
-        } else if (screen == R.xml.pref_general) {
-            prefFragment = GeneralPrefFragment()
-        }
-
-        return prefFragment
-    }
-
     fun openScreen(screen: Int): PreferenceFragmentCompat? {
-        val fragment = getPreferenceScreen(screen)
+        val fragment = SettingsScreen.fromXml(screen)?.factory?.invoke()
         if (screen == R.xml.pref_notifications_under26 && Build.VERSION.SDK_INT >= 26) {
             val intent = Intent()
             intent.action = Settings.ACTION_APP_NOTIFICATION_SETTINGS
@@ -124,7 +90,8 @@ open class SettingsActivity : SimpleToolbarActivity(), SearchPreferenceResultLis
 
     override fun onSearchResultClicked(result: SearchPreferenceResult) {
         val screen = result.resourceFile
-        if (screen == R.xml.feed_settings || screen == R.xml.pref_audio_effect) {
+        if (SettingsScreen.fromXml(screen)?.factory == null) {
+            // Per-podcast settings are indexed so users can find them, but live on each podcast.
             val builder = AccentMaterialDialog(
                 this,
                 R.style.MaterialAlertDialogTheme
@@ -146,41 +113,58 @@ open class SettingsActivity : SimpleToolbarActivity(), SearchPreferenceResultLis
         const val OPEN_AUTO_DOWNLOAD_SETTINGS = "OpenAutoDownloadSettings"
 
         @JvmStatic
-        fun getTitleOfPage(preferences: Int): Int {
-            if (preferences == R.xml.pref_network) {
-                return R.string.network_pref
-            } else if (preferences == R.xml.pref_auto_download) {
-                return R.string.pref_automatic_download_title
-            } else if (preferences == R.xml.pref_playback) {
-                return R.string.playback_pref
-            } else if (preferences == R.xml.pref_storage) {
-                return R.string.storage_pref
-            } else if (preferences == R.xml.pref_import_export) {
-                return R.string.import_export_pref
-            } else if (preferences == R.xml.pref_user_interface) {
-                return R.string.user_interface_label
-            } else if (preferences == R.xml.pref_sync) {
-                return R.string.synchronization_pref
-            } else if (preferences == R.xml.pref_notifications_under26) {
-                return R.string.notification_pref_fragment
-            } else if (preferences == R.xml.feed_settings) {
-                return R.string.feed_settings_label
-            } else if (preferences == R.xml.pref_swipe) {
-                return R.string.swipeactions_label
-            } else if (preferences == R.xml.pref_others) {
-                return R.string.others
-            } else if (preferences == R.xml.pref_theme) {
-                return R.string.pref_set_theme_title
-            } else if (preferences == R.xml.pref_audio_effect) {
-                return R.string.audio_effects
-            } else if (preferences == R.xml.pref_general) {
-                return R.string.pref_general_title
-            }
-            return R.string.settings_label
-        }
+        fun getTitleOfPage(preferences: Int): Int =
+            SettingsScreen.fromXml(preferences)?.titleRes ?: R.string.settings_label
     }
     override fun finish() {
         super.finish()
         overridePendingTransition(R.anim.anim_activity_stay, R.anim.retro_fragment_close_exit)
+    }
+}
+
+/**
+ * Every preference XML the settings search indexes. Each one is shown by exactly one fragment
+ * ([factory]), and no key may appear in two of them, because a search hit opens the fragment for
+ * its XML and highlights the key there. [parent] is the screen it is reached from, which gives
+ * the search breadcrumbs. A null [factory] marks XMLs that are indexed but shown elsewhere (the
+ * per-podcast settings); order matters only in that a parent must be declared before its children.
+ */
+enum class SettingsScreen(
+    @XmlRes val xml: Int,
+    @StringRes val titleRes: Int,
+    val parent: SettingsScreen?,
+    val factory: (() -> PreferenceFragmentCompat)?,
+) {
+    USER_INTERFACE(R.xml.pref_user_interface, R.string.user_interface_label, null, { UserInterfacePrefFragment() }),
+    THEME(R.xml.pref_theme, R.string.pref_set_theme_title, USER_INTERFACE, { ThemeSettingsFragment() }),
+    GENERAL(R.xml.pref_general, R.string.pref_general_title, null, { GeneralPrefFragment() }),
+    SWIPE(R.xml.pref_swipe, R.string.swipeactions_label, GENERAL, { SwipePrefFragment() }),
+    PLAYBACK(R.xml.pref_playback, R.string.playback_pref, null, { PlaybackPrefFragment() }),
+    NETWORK(R.xml.pref_network, R.string.network_pref, null, { NetworkPrefFragment() }),
+    AUTO_DOWNLOAD(R.xml.pref_auto_download, R.string.pref_automatic_download_title, NETWORK, { AutoDownloadPrefFragment() }),
+    STORAGE(R.xml.pref_storage, R.string.storage_pref, null, { StoragePrefFragment() }),
+    IMPORT_EXPORT(R.xml.pref_import_export, R.string.import_export_pref, STORAGE, { ImportExportPreferencesFragment() }),
+    SYNC(R.xml.pref_sync, R.string.synchronization_pref, null, { SyncPrefFragment() }),
+    NOTIFICATIONS(R.xml.pref_notifications_under26, R.string.notification_pref_fragment, null, { NotificationPrefFragment() }),
+    OTHERS(R.xml.pref_others, R.string.others, null, { OthersFragment() }),
+    FEED_SETTINGS(R.xml.feed_settings, R.string.feed_settings_label, null, null),
+    AUDIO_EFFECT(R.xml.pref_audio_effect, R.string.audio_effects, FEED_SETTINGS, null);
+
+    /** Page titles from the top-level entry down to this screen. */
+    val breadcrumbs: List<Int>
+        get() = (parent?.breadcrumbs ?: emptyList()) + titleRes
+
+    companion object {
+        @JvmStatic
+        fun fromXml(@XmlRes xml: Int): SettingsScreen? = values().firstOrNull { it.xml == xml }
+
+        /** Adds every screen to the settings search, with its breadcrumb trail. */
+        @JvmStatic
+        fun indexAll(config: SearchConfiguration) {
+            for (screen in values()) {
+                val item = config.index(screen.xml)
+                screen.breadcrumbs.forEach { item.addBreadcrumb(it) }
+            }
+        }
     }
 }
