@@ -227,6 +227,9 @@ class FeedDao extends Dao {
         // delete download log entries for feed
         db.delete(TABLE_NAME_DOWNLOAD_LOG, KEY_FEEDFILE + "=? AND " + KEY_FEEDFILETYPE + "=?",
                 new String[]{String.valueOf(feed.getId()), String.valueOf(Feed.FEEDFILETYPE_FEED)});
+        // and the warnings the user dismissed for it
+        db.delete(DbSchema.TABLE_NAME_DISMISSED_FEED_WARNINGS, KEY_FEED + "=?",
+                new String[]{String.valueOf(feed.getId())});
 
         db.delete(TABLE_NAME_FEEDS, KEY_ID + "=?",
                 new String[]{String.valueOf(feed.getId())});
@@ -257,6 +260,9 @@ class FeedDao extends Dao {
                         + KEY_ID + " not in (" + " select " + KEY_FEED + " from " + TABLE_NAME_FAVORITES + ") AND "
                         + KEY_ID + " not in (" + " select " + KEY_FEED + " from " + TABLE_NAME_QUEUE + "))"
                 , new String[]{"0"});
+        // the removed feeds' dismissed warnings go with them
+        db.delete(DbSchema.TABLE_NAME_DISMISSED_FEED_WARNINGS,
+                KEY_FEED + " NOT IN (SELECT " + KEY_ID + " FROM " + TABLE_NAME_FEEDS + ")", null);
     }
 
     /**

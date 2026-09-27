@@ -29,6 +29,16 @@ class DBUpgrade {
         if (oldVersion < 5) {
             upgradeFeedAdSkipToOverride(db);
         }
+        if (oldVersion < 6) {
+            // Permanently dismissable feed warnings: the table of dismissals and the key that
+            // identifies a warning in the download log. Rows logged before this step keep a NULL
+            // key; the next refresh that reports the same warning replaces them by title.
+            db.execSQL(DbSchema.CREATE_TABLE_DISMISSED_FEED_WARNINGS);
+            if (!hasColumn(db, DbSchema.TABLE_NAME_DOWNLOAD_LOG, DbSchema.KEY_WARNING_KEY)) {
+                db.execSQL("ALTER TABLE " + DbSchema.TABLE_NAME_DOWNLOAD_LOG + " ADD COLUMN "
+                        + DbSchema.KEY_WARNING_KEY + " TEXT");
+            }
+        }
     }
 
     /**

@@ -800,4 +800,18 @@
   <string name="pref_about_support_sum">文件、意見回饋、更新日誌、錯誤回報</string>
   <string name="pref_playback_sum">快轉倒轉間隔、播放速度、音效、中斷、播放清單</string>
   <string name="pref_notifications_sum">播放通知以及顯示哪些通知</string>
+  <string name="downloads_activity_label">動態</string>
+  <string name="downloads_section_in_progress">進行中 (%1$d)</string>
+  <string name="downloads_section_problems">問題 (%1$d)</string>
+  <string name="clear_problems_label">清除問題</string>
+  <string name="delete_played_label">刪除已播放</string>
+  <string name="delete_played_confirm_msg">收藏的單集和播放器中的單集會被保留。</string>
+  <string name="warning_dont_show_again">不再顯示</string>
+  <string name="warning_dismissed">此播客將不再顯示此警告</string>
+  <string name="reset_dismissed_warnings_title">重設已忽略的警告 (%1$d)</string>
+  <string name="reset_dismissed_warnings_sum">從下次重新整理開始，重新顯示你為此播客隱藏的警告</string>
+  <string name="reset_dismissed_warnings_done">已忽略的警告將在下次重新整理後重新顯示</string>
+  <plurals name="delete_played_confirm">
+    <item quantity="other">刪除 %1$d 個已播放的單集 (%2$s)？</item>
+  </plurals>
 </resources>

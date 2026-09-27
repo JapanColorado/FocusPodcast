@@ -24,6 +24,8 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 
+import allen.town.podcast.model.download.DownloadError;
+import allen.town.podcast.model.download.DownloadStatus;
 import allen.town.podcast.model.feed.Feed;
 import allen.town.podcast.model.feed.FeedItem;
 import allen.town.podcast.model.feed.FeedFilter;
@@ -31,6 +33,7 @@ import allen.town.podcast.model.feed.FeedItemFilter;
 import allen.town.podcast.model.feed.FeedMedia;
 import allen.town.podcast.model.feed.FeedPreferences;
 import allen.town.podcast.model.feed.VolumeAdaptionSetting;
+import allen.town.podcast.storage.db.mapper.DownloadStatusCursorMapper;
 import allen.town.podcast.storage.db.mapper.FeedCursorMapper;
 import allen.town.podcast.storage.db.mapper.FeedItemCursorMapper;
 import allen.town.podcast.storage.db.mapper.FeedMediaCursorMapper;
@@ -44,8 +47,8 @@ import allen.town.podcast.storage.db.mapper.FeedMediaCursorMapper;
  * code can construct is therefore the current one, so the upgrade tests build a current schema,
  * stamp an older {@code user_version} onto it and assert that reopening runs {@code onUpgrade}
  * without error, leaves the rows intact and lands on {@link Db#VERSION}. That is what makes every
- * statement in {@link DBUpgrade} re-runnable against objects that already exist; the 3 -&gt; 4 and
- * 4 -&gt; 5 steps are additionally exercised directly against a database rebuilt in the old layout.</p>
+ * statement in {@link DBUpgrade} re-runnable against objects that already exist; the 3 -&gt; 4,
+ * 4 -&gt; 5 and 5 -&gt; 6 steps are additionally exercised directly against a database rebuilt in the old layout.</p>
  */
 @RunWith(RobolectricTestRunner.class)
 public class DbTest {
@@ -67,8 +70,8 @@ public class DbTest {
     // ---------------------------------------------------------------- schema
 
     @Test
-    public void freshDatabaseIsAtSchemaVersion5() {
-        assertEquals(5, Db.VERSION);
+    public void freshDatabaseIsAtSchemaVersion6() {
+        assertEquals(6, Db.VERSION);
         assertEquals(Db.VERSION, Db.getInstance().getDb().getVersion());
     }
 
@@ -83,7 +86,10 @@ public class DbTest {
                 Db.TABLE_NAME_QUEUE,
                 Db.TABLE_NAME_SIMPLECHAPTERS,
                 Db.TABLE_NAME_FAVORITES,
-                Db.TABLE_NAME_AD_SEGMENTS)));
+                Db.TABLE_NAME_AD_SEGMENTS,
+                Db.TABLE_NAME_DISMISSED_FEED_WARNINGS)));
+        assertTrue(columnNames(Db.getInstance().getDb(), Db.TABLE_NAME_DOWNLOAD_LOG)
+                .contains(Db.KEY_WARNING_KEY));
     }
 
     @Test
@@ -125,6 +131,38 @@ public class DbTest {
     @Test
     public void upgradeFromVersion4ReachesTheCurrentVersionAndKeepsRows() {
         assertUpgradePreservesRows(4);
+    }
+
+    @Test
+    public void upgradeFromVersion5ReachesTheCurrentVersionAndKeepsRows() {
+        assertUpgradePreservesRows(5);
+    }
+
+    /**
+     * The real 5 -&gt; 6 step: rebuild the download log without the warning key, drop the
+     * dismissals table, run the ladder and check both come back with the old log rows intact.
+     */
+    @Test
+    public void upgradeFromVersion5AddsTheDismissedWarningsTableAndKeyColumn() {
+        SQLiteDatabase db = Db.getInstance().getDb();
+        db.execSQL("DROP TABLE " + Db.TABLE_NAME_DISMISSED_FEED_WARNINGS);
+        String current = "," + Db.KEY_WARNING_KEY + " TEXT)";
+        assertTrue(DbSchema.CREATE_TABLE_DOWNLOAD_LOG.endsWith(current));
+        db.execSQL("DROP TABLE " + Db.TABLE_NAME_DOWNLOAD_LOG);
+        db.execSQL(DbSchema.CREATE_TABLE_DOWNLOAD_LOG.replace(current, ")"));
+        db.execSQL("INSERT INTO " + Db.TABLE_NAME_DOWNLOAD_LOG + " (" + Db.KEY_FEEDFILE + ", "
+                + Db.KEY_DOWNLOADSTATUS_TITLE + ") VALUES (1, 'Old row')");
+        assertFalse(columnNames(db, Db.TABLE_NAME_DOWNLOAD_LOG).contains(Db.KEY_WARNING_KEY));
+
+        DBUpgrade.upgrade(db, 5, Db.VERSION);
+
+        assertTrue(tableNames(db).contains(Db.TABLE_NAME_DISMISSED_FEED_WARNINGS));
+        assertTrue(columnNames(db, Db.TABLE_NAME_DOWNLOAD_LOG).contains(Db.KEY_WARNING_KEY));
+        assertEquals(1, rowCount(db, Db.TABLE_NAME_DOWNLOAD_LOG));
+
+        // Running it again must not fail on the objects it just created.
+        DBUpgrade.upgrade(db, 5, Db.VERSION);
+        assertEquals(1, rowCount(db, Db.TABLE_NAME_DOWNLOAD_LOG));
     }
 
     /**
@@ -201,6 +239,117 @@ public class DbTest {
         feed.getPreferences().setAdSkipOverride(null);
         db.setFeedPreferences(feed.getPreferences());
         assertEquals(null, mappedAdSkipOverrideOf(feed.getId()));
+    }
+
+    // ------------------------------------------------------ feed warnings
+
+    @Test
+    public void dismissedWarningIsDroppedWhenWrittenAgain() {
+        Db db = Db.getInstance();
+        Feed feed = newFeed("Warned");
+        db.setCompleteFeed(feed);
+
+        db.setDownloadStatus(duplicateWarning(feed, "Episode", "dup2:a|b"));
+        assertEquals(1, rowCount(db.getDb(), Db.TABLE_NAME_DOWNLOAD_LOG));
+
+        db.dismissFeedWarning(feed.getId(), DownloadError.ERROR_PARSER_EXCEPTION_DUPLICATE.getCode(),
+                "dup2:a|b", "Episode");
+        assertEquals("dismissing removes the logged row", 0, rowCount(db.getDb(), Db.TABLE_NAME_DOWNLOAD_LOG));
+        assertEquals(1, db.getDismissedFeedWarningCount(feed.getId()));
+
+        assertEquals(0, db.setDownloadStatus(duplicateWarning(feed, "Episode", "dup2:a|b")));
+        assertEquals(0, rowCount(db.getDb(), Db.TABLE_NAME_DOWNLOAD_LOG));
+
+        // dismissing twice keeps one row
+        db.dismissFeedWarning(feed.getId(), DownloadError.ERROR_PARSER_EXCEPTION_DUPLICATE.getCode(),
+                "dup2:a|b", "Episode");
+        assertEquals(1, db.getDismissedFeedWarningCount(feed.getId()));
+    }
+
+    @Test
+    public void anotherWarningOfTheSameFeedStillShows() {
+        Db db = Db.getInstance();
+        Feed feed = newFeed("Warned");
+        db.setCompleteFeed(feed);
+        db.dismissFeedWarning(feed.getId(), DownloadError.ERROR_PARSER_EXCEPTION_DUPLICATE.getCode(),
+                "dup2:a|b", "Episode");
+
+        db.setDownloadStatus(duplicateWarning(feed, "Episode", "dup2:a|c"));
+
+        assertEquals(1, rowCount(db.getDb(), Db.TABLE_NAME_DOWNLOAD_LOG));
+    }
+
+    @Test
+    public void repeatedWarningReplacesItsRow() {
+        Db db = Db.getInstance();
+        Feed feed = newFeed("Warned");
+        db.setCompleteFeed(feed);
+
+        db.setDownloadStatus(duplicateWarning(feed, "Old title", "idchg:5"));
+        db.setDownloadStatus(duplicateWarning(feed, "Retitled by the host", "idchg:5"));
+
+        assertEquals(1, rowCount(db.getDb(), Db.TABLE_NAME_DOWNLOAD_LOG));
+        try (Cursor cursor = db.getDownloadLogCursor(10)) {
+            assertTrue(cursor.moveToFirst());
+            DownloadStatus status = DownloadStatusCursorMapper.convert(cursor);
+            assertEquals("Retitled by the host", status.getTitle());
+            assertEquals("idchg:5", status.getWarningKey());
+        }
+    }
+
+    @Test
+    public void legacyRowWithoutAKeyIsReplacedByTitle() {
+        Db db = Db.getInstance();
+        Feed feed = newFeed("Warned");
+        db.setCompleteFeed(feed);
+        // a row logged before version 6
+        db.setDownloadStatus(duplicateWarning(feed, "Episode", null));
+
+        db.setDownloadStatus(duplicateWarning(feed, "Episode", "dup2:a|b"));
+
+        assertEquals(1, rowCount(db.getDb(), Db.TABLE_NAME_DOWNLOAD_LOG));
+        try (Cursor cursor = db.getDownloadLogCursor(10)) {
+            assertTrue(cursor.moveToFirst());
+            assertEquals("dup2:a|b", DownloadStatusCursorMapper.convert(cursor).getWarningKey());
+        }
+    }
+
+    @Test
+    public void removingAFeedForgetsItsDismissals() {
+        Db db = Db.getInstance();
+        Feed feed = newFeed("Warned");
+        db.setCompleteFeed(feed);
+        db.dismissFeedWarning(feed.getId(), DownloadError.ERROR_PARSER_EXCEPTION_DUPLICATE.getCode(),
+                "dup2:a|b", "Episode");
+
+        db.removeFeed(feed);
+
+        assertEquals(0, rowCount(db.getDb(), Db.TABLE_NAME_DISMISSED_FEED_WARNINGS));
+    }
+
+    @Test
+    public void cleaningUpUnsubscribedFeedsForgetsTheirDismissals() {
+        Db db = Db.getInstance();
+        Feed kept = newFeed("Kept");
+        kept.setSubscribed(true);
+        Feed dropped = newFeed("Dropped");
+        dropped.setDownload_url("https://example.com/dropped.xml");
+        db.setCompleteFeed(kept, dropped);
+        int reason = DownloadError.ERROR_PARSER_EXCEPTION_DUPLICATE.getCode();
+        db.dismissFeedWarning(kept.getId(), reason, "dup2:a|b", "Episode");
+        db.dismissFeedWarning(dropped.getId(), reason, "dup2:a|b", "Episode");
+
+        db.removeFeedsNotSubAndNotInPlaylistAndFav();
+
+        assertEquals(1, db.getDismissedFeedWarningCount(kept.getId()));
+        assertEquals(0, db.getDismissedFeedWarningCount(dropped.getId()));
+    }
+
+    private static DownloadStatus duplicateWarning(Feed feed, String title, String key) {
+        DownloadStatus status = new DownloadStatus(feed, title,
+                DownloadError.ERROR_PARSER_EXCEPTION_DUPLICATE, false, "details", false);
+        status.setWarningKey(key);
+        return status;
     }
 
     /** Replaces the feeds table with the current layout minus the override column. */

@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The completed downloads list with a summary row above it. The header is a plain view outside
+     the RecyclerView so that adapter positions (and multi-select) stay those of the episodes. -->
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:id="@+id/downloadsSummaryHeader"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:gravity="center_vertical"
+        android:minHeight="48dp"
+        android:orientation="horizontal"
+        android:paddingStart="16dp"
+        android:paddingEnd="8dp"
+        android:visibility="gone"
+        tools:visibility="visible">
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/downloadsSummaryText"
+            style="@style/FocusPodcast.TextView.ListItemSecondaryTitle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:ellipsize="end"
+            android:maxLines="1"
+            tools:text="12 episodes · 1.4 GB" />
+
+        <allen.town.podcast.common.views.AccentMaterialTextButton
+            android:id="@+id/deletePlayedButton"
+            style="@style/Widget.Material3.Button.TextButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/delete_played_label"
+            android:visibility="gone"
+            tools:visibility="visible" />
+    </LinearLayout>
+
+    <allen.town.podcast.view.StorePositionRecyclerView
+        android:id="@+id/recyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/downloadsSummaryHeader"
+        android:paddingHorizontal="@dimen/additional_horizontal_spacing" />
+
+</RelativeLayout>

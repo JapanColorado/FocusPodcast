@@ -8,6 +8,7 @@ import static allen.town.podcast.storage.db.DbSchema.KEY_ID;
 import static allen.town.podcast.storage.db.DbSchema.KEY_REASON;
 import static allen.town.podcast.storage.db.DbSchema.KEY_REASON_DETAILED;
 import static allen.town.podcast.storage.db.DbSchema.KEY_SUCCESSFUL;
+import static allen.town.podcast.storage.db.DbSchema.KEY_WARNING_KEY;
 import static allen.town.podcast.storage.db.DbSchema.SELECT_FEED_ITEMS_AND_MEDIA_AND_DOWNLOADLOG;
 import static allen.town.podcast.storage.db.DbSchema.TABLE_NAME_DOWNLOAD_LOG;
 
@@ -23,12 +24,16 @@ import allen.town.podcast.model.download.DownloadStatus;
  * Owns every statement against the {@code download_log} table: recording a download status (a
  * successful download deletes its row, because only running and failed downloads interest the user,
  * and a repeated duplicate-episode warning replaces its previous row instead of accumulating), and
- * the cursors that read the log back for one feed file or as a limited recent list.
+ * the cursors that read the log back for one feed file or as a limited recent list. A warning the
+ * user dismissed for good (see {@link DismissedWarningDao}) is not stored at all.
  */
 class DownloadLogDao extends Dao {
 
-    DownloadLogDao(SQLiteDatabase db) {
+    private final DismissedWarningDao dismissedWarningDao;
+
+    DownloadLogDao(SQLiteDatabase db, DismissedWarningDao dismissedWarningDao) {
         super(db);
+        this.dismissedWarningDao = dismissedWarningDao;
     }
 
     /**
@@ -46,15 +51,34 @@ class DownloadLogDao extends Dao {
                     new String[]{String.valueOf(status.getId())});
             return status.getId();
         }
+        final String warningKey = status.getWarningKey();
+        final int reasonCode = status.getReason().getCode();
+        if (warningKey != null
+                && dismissedWarningDao.isDismissed(status.getFeedfileId(), reasonCode, warningKey)) {
+            // The user chose never to see this warning again. Drop any row that slipped in
+            // before the dismissal instead of storing the new report.
+            dismissedWarningDao.deleteLogRows(status.getFeedfileId(), reasonCode, warningKey);
+            return 0;
+        }
         if (status.getReason() == DownloadError.ERROR_PARSER_EXCEPTION_DUPLICATE
                 && status.getId() == 0) {
             // A duplicate-episode warning is re-reported on every refresh for as long as the
-            // podcast host keeps the duplicate in the feed. Keep a single row per episode and
-            // let it move to the top instead of accumulating one entry per refresh.
-            db.delete(TABLE_NAME_DOWNLOAD_LOG,
-                    KEY_FEEDFILE + "=? AND " + KEY_FEEDFILETYPE + "=? AND " + KEY_REASON + "=? AND " + KEY_DOWNLOADSTATUS_TITLE + "=?",
-                    new String[]{String.valueOf(status.getFeedfileId()), String.valueOf(status.getFeedfileType()),
-                            String.valueOf(status.getReason().getCode()), String.valueOf(status.getTitle())});
+            // podcast host keeps the duplicate in the feed. Keep a single row per warning and
+            // let it move to the top instead of accumulating one entry per refresh. Rows logged
+            // before the warning key existed are matched by title instead.
+            String where = KEY_FEEDFILE + "=? AND " + KEY_FEEDFILETYPE + "=? AND " + KEY_REASON + "=? AND ";
+            String[] args;
+            if (warningKey != null) {
+                where += "(" + KEY_WARNING_KEY + "=? OR (" + KEY_WARNING_KEY + " IS NULL AND "
+                        + KEY_DOWNLOADSTATUS_TITLE + "=?))";
+                args = new String[]{String.valueOf(status.getFeedfileId()), String.valueOf(status.getFeedfileType()),
+                        String.valueOf(reasonCode), warningKey, String.valueOf(status.getTitle())};
+            } else {
+                where += KEY_DOWNLOADSTATUS_TITLE + "=?";
+                args = new String[]{String.valueOf(status.getFeedfileId()), String.valueOf(status.getFeedfileType()),
+                        String.valueOf(reasonCode), String.valueOf(status.getTitle())};
+            }
+            db.delete(TABLE_NAME_DOWNLOAD_LOG, where, args);
         }
         ContentValues values = new ContentValues();
         values.put(KEY_FEEDFILE, status.getFeedfileId());
@@ -64,6 +88,7 @@ class DownloadLogDao extends Dao {
         values.put(KEY_COMPLETION_DATE, status.getCompletionDate().getTime());
         values.put(KEY_REASON_DETAILED, status.getReasonDetailed());
         values.put(KEY_DOWNLOADSTATUS_TITLE, status.getTitle());
+        values.put(KEY_WARNING_KEY, warningKey);
         if (status.getId() == 0) {
             status.setId(db.insert(TABLE_NAME_DOWNLOAD_LOG, null, values));
         } else {

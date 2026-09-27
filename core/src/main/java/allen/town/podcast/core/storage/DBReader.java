@@ -553,6 +553,19 @@ public final class DBReader {
     }
 
     /**
+     * The number of warnings the user chose never to see again for one feed.
+     */
+    public static int getDismissedFeedWarningCount(long feedId) {
+        Db adapter = Db.getInstance();
+        adapter.open();
+        try {
+            return adapter.getDismissedFeedWarningCount(feedId);
+        } finally {
+            adapter.close();
+        }
+    }
+
+    /**
      * Loads the download log for a particular feed from the database.
      *
      * @param feedId Feed id for which the download log is loaded

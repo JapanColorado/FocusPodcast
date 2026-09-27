@@ -14,6 +14,9 @@
 
     <!-- View types -->
     <item name="view_type_episode_item" type="id"/>
+    <item name="view_type_download_running" type="id"/>
+    <item name="view_type_download_status" type="id"/>
+    <item name="view_type_download_section_header" type="id"/>
 
     <!-- Notifications need unique IDs to update/cancel them -->
     <item name="notification_gpodnet_sync_error" type="id"/>

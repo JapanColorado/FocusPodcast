@@ -112,6 +112,38 @@ public class DBWriter {
         });
     }
 
+    /**
+     * Deletes the downloaded files of every played episode that {@link PlayedDownloadSelector}
+     * allows: favourites, local folder files and the episode loaded in the player are kept. Runs as
+     * one task on the database executor, so the candidates are read from the current state.
+     *
+     * @return the number of episodes whose file was deleted
+     */
+    @NonNull
+    public static Future<Integer> deletePlayedDownloads(@NonNull final Context context) {
+        return dbExec.submit(() -> {
+            List<FeedItem> candidates = PlayedDownloadSelector.select(DBReader.getDownloadedItems(),
+                    PlaybackPreferences.getCurrentlyPlayingFeedMediaId());
+            List<Long> dequeue = new ArrayList<>();
+            int deleted = 0;
+            for (FeedItem item : candidates) {
+                FeedMedia media = item.getMedia();
+                if (media != null && deleteFeedMediaSynchronous(context, media)) {
+                    deleted++;
+                    dequeue.add(item.getId());
+                }
+            }
+            if (!dequeue.isEmpty() && Prefs.shouldDeleteRemoveFromQueue()) {
+                long[] ids = new long[dequeue.size()];
+                for (int i = 0; i < ids.length; i++) {
+                    ids[i] = dequeue.get(i);
+                }
+                removeQueueItemSynchronous(context, false, ids);
+            }
+            return deleted;
+        });
+    }
+
     private static boolean deleteFeedMediaSynchronous(
             @NonNull Context context, @NonNull FeedMedia media) {
         Log.d(TAG, String.format(Locale.US, "requested to delete FeedMedia %d, %s, %s",
@@ -331,6 +363,62 @@ public class DBWriter {
             EventBus.getDefault().post(DownloadLogEvent.listUpdated());
         });
 
+    }
+
+    /**
+     * Never logs this feed warning again and removes it from the log. Only a warning that carries a
+     * key (see {@link FeedWarningKeys}) can be dismissed; real failures are ignored here.
+     */
+    @NonNull
+    public static Future<?> dismissFeedWarning(@NonNull final DownloadStatus status) {
+        return dbExec.submit(() -> {
+            String key = status.getWarningKey();
+            if (key == null || status.getFeedfileType() != Feed.FEEDFILETYPE_FEED) {
+                Log.w(TAG, "Refusing to dismiss a download status without a warning key: " + status);
+                return;
+            }
+            Db adapter = Db.getInstance();
+            adapter.open();
+            adapter.dismissFeedWarning(status.getFeedfileId(), status.getReason().getCode(), key,
+                    status.getTitle());
+            adapter.close();
+            EventBus.getDefault().post(DownloadLogEvent.listUpdated());
+        });
+    }
+
+    /**
+     * Undoes {@link #dismissFeedWarning}: forgets the dismissal and puts the log row back.
+     */
+    @NonNull
+    public static Future<?> undoDismissFeedWarning(@NonNull final DownloadStatus status) {
+        return dbExec.submit(() -> {
+            String key = status.getWarningKey();
+            if (key == null) {
+                return;
+            }
+            Db adapter = Db.getInstance();
+            adapter.open();
+            adapter.undismissFeedWarning(status.getFeedfileId(), status.getReason().getCode(), key);
+            // the row was deleted by the dismissal; insert it again as a new row
+            status.setId(0);
+            adapter.setDownloadStatus(status);
+            adapter.close();
+            EventBus.getDefault().post(DownloadLogEvent.listUpdated());
+        });
+    }
+
+    /**
+     * Lets every warning dismissed for this feed show up again from its next refresh.
+     */
+    @NonNull
+    public static Future<?> resetDismissedWarnings(final long feedId) {
+        return dbExec.submit(() -> {
+            Db adapter = Db.getInstance();
+            adapter.open();
+            adapter.resetDismissedFeedWarnings(feedId);
+            adapter.close();
+            EventBus.getDefault().post(DownloadLogEvent.listUpdated());
+        });
     }
 
     /**

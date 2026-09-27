@@ -502,13 +502,16 @@ public final class DBTasks {
                 FeedItem possibleDuplicate = searchFeedItemGuessDuplicate(newFeed.getItems(), item);
                 if (!newFeed.isLocalFeed() && possibleDuplicate != null && item != possibleDuplicate) {
                     // Canonical episode is the first one returned (usually oldest)
-                    DBWriter.addDownloadStatus(new DownloadStatus(savedFeed,
+                    DownloadStatus warning = new DownloadStatus(savedFeed,
                             item.getTitle(), DownloadError.ERROR_PARSER_EXCEPTION_DUPLICATE, false,
                             "The podcast host appears to have added the same episode twice. "
-                                    + "still refreshed the feed and attempted to repair it."
+                                    + "The app still refreshed the feed and attempted to repair it."
                                     + "\n\nOriginal episode:\n" + duplicateEpisodeDetails(item)
                                     + "\n\nSecond episode that is also in the feed:\n"
-                                    + duplicateEpisodeDetails(possibleDuplicate), false));
+                                    + duplicateEpisodeDetails(possibleDuplicate), false);
+                    warning.setWarningKey(FeedWarningKeys.duplicateEpisodes(
+                            item.getIdentifyingValue(), possibleDuplicate.getIdentifyingValue()));
+                    DBWriter.addDownloadStatus(warning);
                     continue;
                 }
 
@@ -517,13 +520,15 @@ public final class DBTasks {
                     oldItem = searchFeedItemGuessDuplicate(savedFeed.getItems(), item);
                     if (oldItem != null) {
                         Log.d(TAG, "Repaired duplicate: " + oldItem + ", " + item);
-                        DBWriter.addDownloadStatus(new DownloadStatus(savedFeed,
+                        DownloadStatus warning = new DownloadStatus(savedFeed,
                                 item.getTitle(), DownloadError.ERROR_PARSER_EXCEPTION_DUPLICATE, false,
                                 "The podcast host changed the ID of an existing episode instead of just "
-                                        + "updating the episode itself. still refreshed the feed and "
+                                        + "updating the episode itself. The app still refreshed the feed and "
                                         + "attempted to repair it."
                                         + "\n\nOriginal episode:\n" + duplicateEpisodeDetails(oldItem)
-                                        + "\n\nNow the feed contains:\n" + duplicateEpisodeDetails(item), false));
+                                        + "\n\nNow the feed contains:\n" + duplicateEpisodeDetails(item), false);
+                        warning.setWarningKey(FeedWarningKeys.changedEpisodeId(oldItem.getId()));
+                        DBWriter.addDownloadStatus(warning);
                         oldItem.setItemIdentifier(item.getItemIdentifier());
 
                         if (oldItem.isPlayed() && oldItem.getMedia() != null) {

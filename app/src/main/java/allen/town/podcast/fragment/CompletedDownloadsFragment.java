@@ -1,6 +1,9 @@
 package allen.town.podcast.fragment;
 
+import android.app.Activity;
+import android.content.Context;
 import android.os.Bundle;
+import android.text.format.Formatter;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
@@ -8,6 +11,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -21,6 +26,7 @@ import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,8 +37,11 @@ import allen.town.podcast.adapter.EpisodeItemListAdapter;
 import allen.town.podcast.adapter.MultiSelectAdapter;
 import allen.town.podcast.core.event.DownloadEvent;
 import allen.town.podcast.core.event.DownloadLogEvent;
+import allen.town.podcast.core.pref.PlaybackPreferences;
 import allen.town.podcast.core.service.download.DownloadService;
 import allen.town.podcast.core.storage.DBReader;
+import allen.town.podcast.core.storage.DBWriter;
+import allen.town.podcast.core.storage.PlayedDownloadSelector;
 import allen.town.podcast.core.util.FeedItemUtil;
 import allen.town.podcast.core.util.download.AutoUpdateManager;
 import allen.town.podcast.core.util.menuhandler.MenuItemUtils;
@@ -43,12 +52,16 @@ import allen.town.podcast.event.playback.PlaybackPositionEvent;
 import allen.town.podcast.fragment.actions.EpisodeMultiSelectActionHandler;
 import allen.town.podcast.menuprocess.FeedItemMenuProcess;
 import allen.town.podcast.model.feed.FeedItem;
+import allen.town.podcast.model.feed.FeedMedia;
+import allen.town.podcast.common.util.TopSnackbarUtil;
+import allen.town.podcast.common.views.AccentMaterialDialog;
 import allen.town.podcast.ui.common.PagedToolbarFragment;
 import allen.town.podcast.util.SkeletonRecyclerDelay;
 import allen.town.podcast.view.EmptyViewHandler;
 import allen.town.podcast.viewholder.EpisodeItemViewHolder;
 import allen.town.podcast.theme.util.scroll.ThemedFastScroller;
 import io.reactivex.Observable;
+import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
@@ -71,11 +84,25 @@ public class CompletedDownloadsFragment extends Fragment implements DoubleClickB
     private Skeleton skeleton;
     private SkeletonRecyclerDelay skeletonRecyclerDelay;
 
+    private View summaryHeader;
+    private TextView summaryText;
+    private View deletePlayedButton;
+    private Disposable summaryDisposable;
+    private Disposable deletePlayedDisposable;
+    /** What the header shows; null until the first load finished. */
+    @Nullable
+    private DownloadsSummary summary;
+
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-        View root = inflater.inflate(R.layout.simple_list_fragment, container, false);
+        View root = inflater.inflate(R.layout.completed_downloads_fragment, container, false);
+
+        summaryHeader = root.findViewById(R.id.downloadsSummaryHeader);
+        summaryText = root.findViewById(R.id.downloadsSummaryText);
+        deletePlayedButton = root.findViewById(R.id.deletePlayedButton);
+        deletePlayedButton.setOnClickListener(v -> confirmDeletePlayed());
 
         recyclerView = root.findViewById(R.id.recyclerView);
         recyclerView.setRecycledViewPool(((MainActivity) getActivity()).getRecycledViewPool());
@@ -105,6 +132,12 @@ public class CompletedDownloadsFragment extends Fragment implements DoubleClickB
     @Override
     public void onDestroyView() {
         EventBus.getDefault().unregister(this);
+        if (summaryDisposable != null) {
+            summaryDisposable.dispose();
+        }
+        if (deletePlayedDisposable != null) {
+            deletePlayedDisposable.dispose();
+        }
         adapter.endSelectMode();
         super.onDestroyView();
     }
@@ -177,10 +210,12 @@ public class CompletedDownloadsFragment extends Fragment implements DoubleClickB
             loadItems();
             return;
         }
+        boolean changed = false;
         for (int i = 0, size = event.items.size(); i < size; i++) {
             FeedItem item = event.items.get(i);
             int pos = FeedItemUtil.indexOfItemWithId(items, item.getId());
             if (pos >= 0) {
+                changed = true;
                 items.remove(pos);
                 if (item.getMedia().isDownloaded()) {
                     items.add(pos, item);
@@ -189,6 +224,9 @@ public class CompletedDownloadsFragment extends Fragment implements DoubleClickB
                     adapter.notifyItemRemoved(pos);
                 }
             }
+        }
+        if (changed) {
+            refreshSummary();
         }
     }
 
@@ -227,17 +265,135 @@ public class CompletedDownloadsFragment extends Fragment implements DoubleClickB
         emptyView.hide();
         // The missing-file sweep runs once per process in MainActivity (and after a storage
         // folder change); loadItems() fires on every player status event, far too often for it.
-        disposable = Observable.fromCallable(DBReader::getDownloadedItems)
+        disposable = Observable.fromCallable(() -> {
+                    List<FeedItem> result = DBReader.getDownloadedItems();
+                    return new LoadResult(result, DownloadsSummary.of(result));
+                })
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(result -> {
+                .subscribe(loaded -> {
+                    List<FeedItem> result = loaded.items;
                     items = result;
+                    showSummary(loaded.summary);
                     adapter.updateItems(result);
                     ((PagedToolbarFragment) getParentFragment()).invalidateOptionsMenuIfActive(this);
                     if(skeleton.isSkeleton()) {
                         skeletonRecyclerDelay.showOriginal();
                     }
                 }, error -> Log.e(TAG, Log.getStackTraceString(error)));
+    }
+
+    /** Recomputes the header from the list as it is now, after rows changed in place. */
+    private void refreshSummary() {
+        if (summaryDisposable != null) {
+            summaryDisposable.dispose();
+        }
+        List<FeedItem> snapshot = new ArrayList<>(items);
+        summaryDisposable = Single.fromCallable(() -> DownloadsSummary.of(snapshot))
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(this::showSummary, error -> Log.e(TAG, Log.getStackTraceString(error)));
+    }
+
+    private void showSummary(@NonNull DownloadsSummary newSummary) {
+        summary = newSummary;
+        if (newSummary.count == 0) {
+            summaryHeader.setVisibility(View.GONE);
+            return;
+        }
+        summaryHeader.setVisibility(View.VISIBLE);
+        summaryText.setText(getResources().getQuantityString(R.plurals.num_episodes,
+                newSummary.count, newSummary.count)
+                + " · " + Formatter.formatShortFileSize(requireContext(), newSummary.bytes));
+        deletePlayedButton.setVisibility(newSummary.playedCount > 0 ? View.VISIBLE : View.GONE);
+    }
+
+    private void confirmDeletePlayed() {
+        DownloadsSummary current = summary;
+        if (current == null || current.playedCount == 0) {
+            return;
+        }
+        new AccentMaterialDialog(requireContext(), R.style.MaterialAlertDialogTheme)
+                .setTitle(getResources().getQuantityString(R.plurals.delete_played_confirm,
+                        current.playedCount, current.playedCount,
+                        Formatter.formatShortFileSize(requireContext(), current.playedBytes)))
+                .setMessage(R.string.delete_played_confirm_msg)
+                .setPositiveButton(R.string.delete_label, (dialog, which) -> deletePlayed())
+                .setNegativeButton(R.string.cancel_label, null)
+                .show();
+    }
+
+    private void deletePlayed() {
+        if (deletePlayedDisposable != null) {
+            deletePlayedDisposable.dispose();
+        }
+        Context appContext = requireContext().getApplicationContext();
+        Activity activity = requireActivity();
+        deletePlayedDisposable = Single.fromCallable(() -> DBWriter.deletePlayedDownloads(appContext).get())
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(deleted -> {
+                    TopSnackbarUtil.showSnack(activity, activity.getResources().getQuantityString(
+                            R.plurals.deleted_multi_episode_batch_label, deleted, deleted),
+                            Toast.LENGTH_SHORT);
+                    loadItems();
+                }, error -> Log.e(TAG, Log.getStackTraceString(error)));
+    }
+
+    /** The list together with the header computed from it on the same background thread. */
+    private static final class LoadResult {
+        final List<FeedItem> items;
+        final DownloadsSummary summary;
+
+        LoadResult(List<FeedItem> items, DownloadsSummary summary) {
+            this.items = items;
+            this.summary = summary;
+        }
+    }
+
+    /**
+     * The numbers in the header: all downloads, and the played ones "Delete played" would remove.
+     * Sizes come from the database; when a size was never recorded the file itself is measured,
+     * so this must run off the main thread. Local folder files are not the app's storage and are
+     * not counted in the size.
+     */
+    private static final class DownloadsSummary {
+        final int count;
+        final long bytes;
+        final int playedCount;
+        final long playedBytes;
+
+        private DownloadsSummary(int count, long bytes, int playedCount, long playedBytes) {
+            this.count = count;
+            this.bytes = bytes;
+            this.playedCount = playedCount;
+            this.playedBytes = playedBytes;
+        }
+
+        static DownloadsSummary of(List<FeedItem> items) {
+            long bytes = 0;
+            for (FeedItem item : items) {
+                bytes += sizeOf(item.getMedia());
+            }
+            List<FeedItem> played = PlayedDownloadSelector.select(items,
+                    PlaybackPreferences.getCurrentlyPlayingFeedMediaId());
+            long playedBytes = 0;
+            for (FeedItem item : played) {
+                playedBytes += sizeOf(item.getMedia());
+            }
+            return new DownloadsSummary(items.size(), bytes, played.size(), playedBytes);
+        }
+
+        private static long sizeOf(@Nullable FeedMedia media) {
+            if (media == null || media.isContentUri()) {
+                return 0;
+            }
+            if (media.getSize() > 0) {
+                return media.getSize();
+            }
+            String path = media.getFile_url();
+            return path != null ? new File(path).length() : 0;
+        }
     }
 
     @Override

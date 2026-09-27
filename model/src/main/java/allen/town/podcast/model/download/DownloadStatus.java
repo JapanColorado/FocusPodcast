@@ -1,6 +1,7 @@
 package allen.town.podcast.model.download;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import java.util.Date;
 
@@ -43,6 +44,13 @@ public class DownloadStatus {
     private String reasonDetailed;
     private boolean successful;
     private final Date completionDate;
+    /**
+     * Identifies a non-fatal feed warning (for example a duplicate episode) so that the user can
+     * dismiss it for good. Null for every real failure: only a status carrying a key can be
+     * dismissed.
+     */
+    @Nullable
+    private String warningKey;
     // ------------------------------------ NOT STORED IN DB
     private boolean done;
     private boolean cancelled;
@@ -80,7 +88,7 @@ public class DownloadStatus {
                 + ", successful=" + successful + ", completionDate="
                 + completionDate + ", feedfileId=" + feedfileId
                 + ", feedfileType=" + feedfileType + ", done=" + done
-                + ", cancelled=" + cancelled + "]";
+                + ", cancelled=" + cancelled + ", warningKey=" + warningKey + "]";
     }
 
     public long getId() {
@@ -117,6 +125,15 @@ public class DownloadStatus {
 
     public int getFeedfileType() {
         return feedfileType;
+    }
+
+    @Nullable
+    public String getWarningKey() {
+        return warningKey;
+    }
+
+    public void setWarningKey(@Nullable String warningKey) {
+        this.warningKey = warningKey;
     }
 
     public boolean isInitiatedByUser() {

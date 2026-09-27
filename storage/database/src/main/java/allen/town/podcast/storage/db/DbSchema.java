@@ -12,7 +12,7 @@ import static allen.town.podcast.model.feed.FeedPreferences.SPEED_USE_GLOBAL;
 final class DbSchema {
 
     public static final String DATABASE_NAME = "focusPodcastApp.db";
-    public static final int VERSION = 5;
+    public static final int VERSION = 6;
 
     /**
      * Maximum number of arguments for IN-operator.
@@ -101,6 +101,13 @@ final class DbSchema {
     public static final String KEY_AD_SOURCE = "source";
     public static final String KEY_AD_CONFIDENCE = "confidence";
     public static final String KEY_AD_ENABLED = "enabled";
+    /**
+     * Identifies one non-fatal feed warning independently of its episode title, so that it can be
+     * de-duplicated across refreshes and dismissed for good. NULL for real failures, which can
+     * never be dismissed, and for rows written before version 6.
+     */
+    public static final String KEY_WARNING_KEY = "warning_key";
+    public static final String KEY_DISMISSED_AT = "dismissed_at";
 
     // Table names
     public static final String TABLE_NAME_FEEDS = "feeds";
@@ -111,6 +118,7 @@ final class DbSchema {
     public static final String TABLE_NAME_SIMPLECHAPTERS = "chapters";
     public static final String TABLE_NAME_FAVORITES = "favorites";
     public static final String TABLE_NAME_AD_SEGMENTS = "ad_segments";
+    public static final String TABLE_NAME_DISMISSED_FEED_WARNINGS = "dismissed_feed_warnings";
 
     // SQL Statements for creating new tables
     static final String TABLE_PRIMARY_KEY = KEY_ID
@@ -177,7 +185,8 @@ final class DbSchema {
             + " INTEGER," + KEY_FEEDFILETYPE + " INTEGER," + KEY_REASON
             + " INTEGER," + KEY_SUCCESSFUL + " INTEGER," + KEY_COMPLETION_DATE
             + " INTEGER," + KEY_DOWNLOADSTATUS_TITLE + " TEXT,"
-            + KEY_REASON_DETAILED + " TEXT)";
+            + KEY_REASON_DETAILED + " TEXT,"
+            + KEY_WARNING_KEY + " TEXT)";
 
     static final String CREATE_TABLE_QUEUE = "CREATE TABLE "
             + TABLE_NAME_QUEUE + "(" + KEY_ID + " INTEGER PRIMARY KEY,"
@@ -198,6 +207,18 @@ final class DbSchema {
             + KEY_AD_END_MS + " INTEGER," + KEY_AD_SOURCE + " INTEGER,"
             + KEY_AD_CONFIDENCE + " REAL,"
             + KEY_AD_ENABLED + " INTEGER DEFAULT 1)";
+
+    /**
+     * One row per feed warning the user chose never to see again ("Don't show again" in the
+     * download log). A new download-log row whose feed, reason and warning key match a row here is
+     * dropped instead of stored.
+     */
+    static final String CREATE_TABLE_DISMISSED_FEED_WARNINGS = "CREATE TABLE IF NOT EXISTS "
+            + TABLE_NAME_DISMISSED_FEED_WARNINGS + " (" + TABLE_PRIMARY_KEY
+            + KEY_FEED + " INTEGER," + KEY_REASON + " INTEGER,"
+            + KEY_WARNING_KEY + " TEXT," + KEY_TITLE + " TEXT,"
+            + KEY_DISMISSED_AT + " INTEGER,"
+            + "UNIQUE(" + KEY_FEED + "," + KEY_REASON + "," + KEY_WARNING_KEY + "))";
 
     // SQL Statements for creating indexes
     static final String CREATE_INDEX_FEEDITEMS_FEED = "CREATE INDEX "
@@ -289,7 +310,8 @@ final class DbSchema {
             TABLE_NAME_QUEUE,
             TABLE_NAME_SIMPLECHAPTERS,
             TABLE_NAME_FAVORITES,
-            TABLE_NAME_AD_SEGMENTS
+            TABLE_NAME_AD_SEGMENTS,
+            TABLE_NAME_DISMISSED_FEED_WARNINGS
     };
 
     public static final String SELECT_KEY_ITEM_ID = "item_id";

@@ -54,7 +54,7 @@ class DownloadPagerFragment constructor() : PagedToolbarFragment() {
             TabConfigurationStrategy({ tab: TabLayout.Tab, position: Int ->
                 when (position) {
                     POS_COMPLETED -> tab.setText(R.string.downloads_completed_label)
-                    POS_LOG -> tab.setText(R.string.notification_channel_downloading)
+                    POS_LOG -> tab.setText(R.string.downloads_activity_label)
                     else -> {}
                 }
             })

@@ -2,6 +2,7 @@ package allen.town.podcast.fragment
 
 import allen.town.podcast.common.common.prefs.supportv7.ATESwitchPreference
 import allen.town.podcast.common.views.AccentMaterialDialog
+import allen.town.podcast.common.util.TopSnackbarUtil.showSnack
 import allen.town.podcast.R
 import allen.town.podcast.core.feed.util.AdSkipUtils
 import allen.town.podcast.core.feed.util.PlaybackSpeedUtils
@@ -33,6 +34,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.CompoundButton
+import android.widget.Toast
 import androidx.annotation.StringRes
 import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
@@ -44,6 +46,7 @@ import io.reactivex.Completable
 import io.reactivex.Maybe
 import io.reactivex.MaybeEmitter
 import io.reactivex.MaybeOnSubscribe
+import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
@@ -187,6 +190,7 @@ class FeedSettingsFragment : Fragment() {
                     updateVolumeReductionValue()
                     updateAutoDownloadEnabled()
                     setupAudioEffectPreference(loadedPreferences, loadedFeed)
+                    setupResetDismissedWarningsPreference(loadedFeed.id)
                     if (loadedFeed.isLocalFeed) {
                         requirePreference<Preference>(PREF_AUTHENTICATION).isVisible = false
                         requirePreference<Preference>(PREF_AUTO_DELETE).isVisible = false
@@ -260,6 +264,47 @@ class FeedSettingsFragment : Fragment() {
                     updateFeedAdSkipSummary(pref, feedPreferences.adSkipOverride)
                     false
                 }
+        }
+
+        /**
+         * "Reset dismissed warnings (n)": only shown while the user has hidden at least one
+         * duplicate-episode warning of this podcast in the download log.
+         */
+        private fun setupResetDismissedWarningsPreference(feedId: Long) {
+            val pref = requirePreference<Preference>(PREF_RESET_DISMISSED_WARNINGS)
+            pref.onPreferenceClickListener = Preference.OnPreferenceClickListener {
+                val activity = requireActivity()
+                val reset = DBWriter.resetDismissedWarnings(feedId)
+                preferenceWrites.add(
+                    Completable.fromAction { reset.get() }
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe({
+                            showSnack(activity, R.string.reset_dismissed_warnings_done, Toast.LENGTH_SHORT)
+                            loadDismissedWarningCount(feedId)
+                        }, { error: Throwable ->
+                            Log.e(TAG, "resetting the dismissed warnings failed", error)
+                        })
+                )
+                true
+            }
+            loadDismissedWarningCount(feedId)
+        }
+
+        private fun loadDismissedWarningCount(feedId: Long) {
+            preferenceWrites.add(
+                Single.fromCallable { DBReader.getDismissedFeedWarningCount(feedId) }
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe({ count: Int ->
+                        val pref = findPreference<Preference>(PREF_RESET_DISMISSED_WARNINGS)
+                            ?: return@subscribe
+                        pref.title = getString(R.string.reset_dismissed_warnings_title, count)
+                        pref.isVisible = count > 0
+                    }, { error: Throwable ->
+                        Log.e(TAG, "reading the dismissed warning count failed", error)
+                    })
+            )
         }
 
         /** Selects the stored choice and spells out the effective state in the summary. */
@@ -566,6 +611,7 @@ class FeedSettingsFragment : Fragment() {
             private const val PREF_KEEP_UPDATED = "keepUpdated"
             private const val PREF_AUTO_DOWNLOAD = "autoDownload"
             private const val PREF_EPISODE_NOTIFICATION = "episodeNotification"
+            private const val PREF_RESET_DISMISSED_WARNINGS = "resetDismissedWarnings"
             fun newInstance(feedId: Long): FeedSettingsPreferenceFragment {
                 val fragment = FeedSettingsPreferenceFragment()
                 val arguments = Bundle()

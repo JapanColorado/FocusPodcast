@@ -105,5 +105,12 @@
             android:summary="@string/authentication_descr"
             android:title="@string/authentication_label"
             app:icon="@drawable/ic_key" />
+        <allen.town.podcast.common.common.prefs.supportv7.ATEPreference
+            android:key="resetDismissedWarnings"
+            android:layout="@layout/list_item_view_no_title"
+            android:summary="@string/reset_dismissed_warnings_sum"
+            android:title="@string/reset_dismissed_warnings_title"
+            android:visible="false"
+            app:icon="@drawable/ic_round_error_outline_24" />
     </allen.town.podcast.common.common.prefs.supportv7.ATEPreferenceCategory>
 </androidx.preference.PreferenceScreen>

@@ -11,6 +11,8 @@ import allen.town.podcast.core.storage.DBReader
 import allen.town.podcast.core.storage.DBTasks
 import allen.town.podcast.core.storage.DBWriter
 import allen.town.podcast.core.util.DownloadErrorLabel
+import allen.town.podcast.core.util.download.DownloadLogSections
+import allen.town.podcast.dialog.DownloadStatusDetailsDialog
 import allen.town.podcast.model.download.DownloadError
 import allen.town.podcast.model.download.DownloadStatus
 import allen.town.podcast.model.feed.Feed
@@ -22,37 +24,54 @@ import android.text.format.Formatter
 import android.util.Log
 import io.reactivex.Completable
 import io.reactivex.schedulers.Schedulers
+import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import allen.town.podcast.theme.ThemeStore.Companion.accentColor
 
 /**
- * Displays a list of DownloadStatus entries.
+ * The downloads "Activity" list: an "In progress" section with the running downloads, then a
+ * "Problems" section with the download log (which only keeps failures and warnings). Row
+ * positions are mapped by [DownloadLogSections]; never compute offsets by hand here.
  */
 class DownloadLogAdapter(private val context: Activity) :
-    RecyclerView.Adapter<DownloadLogViewHolder>() {
+    RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     private var downloadLog: List<DownloadStatus> = ArrayList()
     private var runningDownloads: List<Downloader> = ArrayList()
+    private var sections = DownloadLogSections(0, 0)
+
     fun setDownloadLog(downloadLog: List<DownloadStatus>) {
         this.downloadLog = downloadLog
+        sections = DownloadLogSections(runningDownloads.size, downloadLog.size)
         notifyDataSetChanged()
     }
 
     fun setRunningDownloads(runningDownloads: List<Downloader>) {
         val sameRows = runningDownloads.size == this.runningDownloads.size
         this.runningDownloads = runningDownloads
-        if (sameRows) {
+        sections = DownloadLogSections(runningDownloads.size, downloadLog.size)
+        val first = sections.firstRunningPosition()
+        if (sameRows && first >= 0) {
             // progress tick: only the running rows changed
-            notifyItemRangeChanged(0, runningDownloads.size)
-        } else {
+            notifyItemRangeChanged(first, runningDownloads.size)
+        } else if (!sameRows) {
             notifyDataSetChanged()
         }
     }
 
-    private fun bind(holder: DownloadLogViewHolder, status: DownloadStatus, position: Int) {
+    private class SectionHeaderViewHolder(parent: ViewGroup) : RecyclerView.ViewHolder(
+        LayoutInflater.from(parent.context).inflate(R.layout.downloadlog_section_header, parent, false)
+    ) {
+        val title: TextView = itemView as TextView
+    }
+
+    private fun bind(holder: DownloadLogViewHolder, status: DownloadStatus, logIndex: Int) {
+        // The row body opens the details; the round button keeps its own action (retry).
+        holder.itemView.setOnClickListener { DownloadStatusDetailsDialog.show(context, status) }
         var statusText: String? = ""
         if (status.feedfileType == Feed.FEEDFILETYPE_FEED) {
             statusText += context.getString(R.string.download_type_feed)
@@ -91,7 +110,7 @@ class DownloadLogAdapter(private val context: Activity) :
             // so a retry button would only re-report the same warning.
             val isDuplicateWarning = status.reason == DownloadError.ERROR_PARSER_EXCEPTION_DUPLICATE
             if (isDuplicateWarning || newerWasSuccessful(
-                    position - runningDownloads.size,
+                    logIndex,
                     status.feedfileType, status.feedfileId
                 ) || status.feedfileId.toInt() == 0
             ) {
@@ -149,6 +168,8 @@ class DownloadLogAdapter(private val context: Activity) :
 
     @SuppressLint("CheckResult") // fire-and-forget: app-scoped DB work with its own onError; nothing to dispose
     private fun bind(holder: DownloadLogViewHolder, downloader: Downloader) {
+        holder.itemView.setOnClickListener(null)
+        holder.itemView.isClickable = false
         val request = downloader.downloadRequest
         holder.title.text = request.title
         holder.secondaryActionButton.setPlayPauseDrawable(
@@ -222,34 +243,53 @@ class DownloadLogAdapter(private val context: Activity) :
         return false
     }
 
+    /** The running download, the log entry, or null for a header or a stale position. */
     fun getItem(position: Int): Any? {
-        if (position < runningDownloads.size) {
-            return runningDownloads[position]
-        } else if (position - runningDownloads.size < downloadLog.size) {
-            return downloadLog[position - runningDownloads.size]
+        val runningIndex = sections.toRunningIndex(position)
+        if (runningIndex in runningDownloads.indices) {
+            return runningDownloads[runningIndex]
+        }
+        val logIndex = sections.toLogIndex(position)
+        if (logIndex in downloadLog.indices) {
+            return downloadLog[logIndex]
         }
         return null
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DownloadLogViewHolder {
-        return DownloadLogViewHolder(context, parent)
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
+        return if (viewType == R.id.view_type_download_section_header) {
+            SectionHeaderViewHolder(parent)
+        } else {
+            DownloadLogViewHolder(context, parent)
+        }
     }
 
+    // The view types are resource ids because the recycled view pool is shared with other lists.
     override fun getItemViewType(position: Int): Int {
-        val item = getItem(position)
-        return if (item is DownloadStatus) {
-            VIEW_TYPE_STATUS
-        } else VIEW_TYPE_DOWNLOADER
+        return when (sections.getRowType(position)) {
+            DownloadLogSections.ROW_RUNNING_HEADER,
+            DownloadLogSections.ROW_LOG_HEADER -> R.id.view_type_download_section_header
+            DownloadLogSections.ROW_RUNNING -> R.id.view_type_download_running
+            else -> R.id.view_type_download_status
+        }
     }
 
-    override fun onBindViewHolder(holder: DownloadLogViewHolder, position: Int) {
-        val item = getItem(position)
-        holder.secondaryActionButton.setAccentDefaultTheme()
-        // A stale position after the log changed has no row to show; leave the holder as it is.
-        when (item) {
-            is DownloadStatus -> bind(holder, item, position)
-            is Downloader -> bind(holder, item)
-            else -> return
+    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+        when (sections.getRowType(position)) {
+            DownloadLogSections.ROW_RUNNING_HEADER -> (holder as? SectionHeaderViewHolder)?.title?.text =
+                context.getString(R.string.downloads_section_in_progress, sections.runningCount)
+            DownloadLogSections.ROW_LOG_HEADER -> (holder as? SectionHeaderViewHolder)?.title?.text =
+                context.getString(R.string.downloads_section_problems, sections.logCount)
+            else -> {
+                val rowHolder = holder as? DownloadLogViewHolder ?: return
+                rowHolder.secondaryActionButton.setAccentDefaultTheme()
+                // A stale position after the log changed has no row to show; leave the holder as it is.
+                when (val item = getItem(position)) {
+                    is DownloadStatus -> bind(rowHolder, item, sections.toLogIndex(position))
+                    is Downloader -> bind(rowHolder, item)
+                    else -> return
+                }
+            }
         }
     }
 
@@ -258,12 +298,10 @@ class DownloadLogAdapter(private val context: Activity) :
     }
 
     override fun getItemCount(): Int {
-        return downloadLog.size + runningDownloads.size
+        return sections.itemCount
     }
 
     companion object {
         private const val TAG = "DownloadLogAdapter"
-        const val VIEW_TYPE_DOWNLOADER = 1
-        private const val VIEW_TYPE_STATUS = 2
     }
 }

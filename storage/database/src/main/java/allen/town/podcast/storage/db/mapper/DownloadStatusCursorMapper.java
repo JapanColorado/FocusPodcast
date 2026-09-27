@@ -25,11 +25,16 @@ public abstract class DownloadStatusCursorMapper {
         int indexReason = cursor.getColumnIndex(Db.KEY_REASON);
         int indexCompletionDate = cursor.getColumnIndex(Db.KEY_COMPLETION_DATE);
         int indexReasonDetailed = cursor.getColumnIndex(Db.KEY_REASON_DETAILED);
+        int indexWarningKey = cursor.getColumnIndex(Db.KEY_WARNING_KEY);
 
-        return new DownloadStatus(cursor.getLong(indexId), cursor.getString(indexTitle), cursor.getLong(indexFeedFile),
+        DownloadStatus status = new DownloadStatus(cursor.getLong(indexId), cursor.getString(indexTitle), cursor.getLong(indexFeedFile),
                 cursor.getInt(indexFileFileType), cursor.getInt(indexSuccessful) > 0, false, true,
                 DownloadError.fromCode(cursor.getInt(indexReason)),
                 new Date(cursor.getLong(indexCompletionDate)),
                 cursor.getString(indexReasonDetailed), false);
+        if (indexWarningKey >= 0) {
+            status.setWarningKey(cursor.getString(indexWarningKey));
+        }
+        return status;
     }
 }

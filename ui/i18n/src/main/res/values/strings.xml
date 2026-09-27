@@ -956,4 +956,19 @@
     <string name="pref_about_support_sum">Documentation, feedback, changelog, bug reports</string>
     <string name="pref_playback_sum">Skip intervals, speed, audio effects, interruptions, playlist</string>
     <string name="pref_notifications_sum">Playback notification and which notifications are shown</string>
+    <string name="downloads_activity_label">Activity</string>
+    <string name="downloads_section_in_progress">In progress (%1$d)</string>
+    <string name="downloads_section_problems">Problems (%1$d)</string>
+    <string name="clear_problems_label">Clear problems</string>
+    <string name="delete_played_label">Delete played</string>
+    <string name="delete_played_confirm_msg">Favorite episodes and the episode in the player are kept.</string>
+    <string name="warning_dont_show_again">Don\'t show again</string>
+    <string name="warning_dismissed">This warning won\'t be shown again for this podcast</string>
+    <string name="reset_dismissed_warnings_title">Reset dismissed warnings (%1$d)</string>
+    <string name="reset_dismissed_warnings_sum">Show the warnings you hid for this podcast again, starting with its next refresh</string>
+    <string name="reset_dismissed_warnings_done">Dismissed warnings will show again after the next refresh</string>
+    <plurals name="delete_played_confirm">
+        <item quantity="one">Delete %1$d played episode (%2$s)?</item>
+        <item quantity="other">Delete %1$d played episodes (%2$s)?</item>
+    </plurals>
 </resources>

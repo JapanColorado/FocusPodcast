@@ -538,4 +538,18 @@
   <string name="pref_about_support_sum">ドキュメント、フィードバック、更新履歴、バグ報告</string>
   <string name="pref_playback_sum">スキップ間隔、再生速度、音声エフェクト、中断、プレイリスト</string>
   <string name="pref_notifications_sum">再生通知と表示する通知の種類</string>
+  <string name="downloads_activity_label">アクティビティ</string>
+  <string name="downloads_section_in_progress">進行中 (%1$d)</string>
+  <string name="downloads_section_problems">問題 (%1$d)</string>
+  <string name="clear_problems_label">問題を消去</string>
+  <string name="delete_played_label">再生済みを削除</string>
+  <string name="delete_played_confirm_msg">お気に入りのエピソードとプレーヤーのエピソードは残ります。</string>
+  <string name="warning_dont_show_again">今後表示しない</string>
+  <string name="warning_dismissed">このポッドキャストではこの警告を今後表示しません</string>
+  <string name="reset_dismissed_warnings_title">非表示にした警告をリセット (%1$d)</string>
+  <string name="reset_dismissed_warnings_sum">このポッドキャストで非表示にした警告を次回の更新から再び表示します</string>
+  <string name="reset_dismissed_warnings_done">非表示にした警告は次回の更新後に再び表示されます</string>
+  <plurals name="delete_played_confirm">
+    <item quantity="other">再生済みのエピソード %1$d 件を削除しますか？(%2$s)</item>
+  </plurals>
 </resources>

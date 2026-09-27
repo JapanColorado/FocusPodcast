@@ -59,7 +59,7 @@ Dependency direction (top depends on bottom):
 - **app** — Activities/fragments/adapters, `MyApp` Application. Depends on core and nearly everything else.
 - **core** — the workhorse: `DBReader`/`DBWriter`/`DBTasks`, `PlaybackService` + `LocalPSMP` + `ExoPlayerWrapper`, `DownloadService`, `FeedUpdateWorker`, `SyncService`, `Prefs`, widgets, Glide setup, backup/OPML.
 - **playback/base** — abstract `PlaybackServiceMediaPlayer`, `PlayerStatus`.
-- **storage/database** — raw SQLite `Db.java` (package `allen.town.podcast.storage.db`, `focusPodcastApp.db`, `VERSION = 5`, renumbered from AntennaPod), `DBUpgrade.java` hand-written ALTER ladder, `mapper/*CursorMapper`. No Room.
+- **storage/database** — raw SQLite `Db.java` (package `allen.town.podcast.storage.db`, `focusPodcastApp.db`, `VERSION = 6`, renumbered from AntennaPod), `DBUpgrade.java` hand-written ALTER ladder, `mapper/*CursorMapper`. No Room.
 - **parser/feed** (RSS/Atom), **parser/media** (ID3/Vorbis chapters), **net/ssl**, **net/sync/model** + **net/sync/gpoddernet**
 - **event** — EventBus payload classes only. **model** — POJOs (`Feed`, `FeedItem`, `FeedMedia`, ...).
 - **ui/common** (shared views), **ui/app-start-intent** (typed Intent builders so lower modules can launch app Activities without depending on `app`), **ui/i18n** and **ui/png-icons** (resources only).
@@ -69,7 +69,7 @@ Dependency direction (top depends on bottom):
 
 The seven classes that used to exceed ~1,000 lines were split by pure extraction; every public API stayed on the original class, so callers did not change. When touching one of these, look for the logic in its helpers first:
 
-- `storage/db/Db.java` — `DbSchema` (column constants and CREATE statements), a `Dao` base class with the shared transaction wrapper, and per-table `FeedDao`, `FeedItemDao`, `FeedMediaDao`, `QueueDao`, `FavoritesDao`, `DownloadLogDao`, `AdSegmentDao`. `Db` delegates to them.
+- `storage/db/Db.java` — `DbSchema` (column constants and CREATE statements), a `Dao` base class with the shared transaction wrapper, and per-table `FeedDao`, `FeedItemDao`, `FeedMediaDao`, `QueueDao`, `FavoritesDao`, `DownloadLogDao`, `DismissedWarningDao`, `AdSegmentDao`. `Db` delegates to them.
 - `core/service/playback/PlaybackService.java` — `PlaybackServiceMediaSession`, `PlaybackServiceMediaBrowser`, `PlaybackServiceNotificationUpdater`, `PlaybackServiceReceivers`, `PlaybackServicePlayerCallback`, `PlaybackServiceAutoSkipper`, `PlaybackServiceAdSkipper`.
 - `core/service/playback/LocalPSMP.java` — `LocalPSMPAudioFocus`, `LocalPSMPAudioEffects`, `LocalPSMPPlayerFactory`, `LocalPSMPSeeker`, `LocalPSMPPlaybackEnder`, plus `PlayerLock` and `PlayerExecutor`.
 - `core/pref/Prefs.kt` — `PrefsStore` plus the `PlaybackPrefs`, `DownloadPrefs`, `UiPrefs`, `NetworkPrefs` and `SyncPrefs` objects. `Prefs` remains the single facade for both Java and Kotlin callers; add new preferences to the matching group object and expose them through `Prefs`.

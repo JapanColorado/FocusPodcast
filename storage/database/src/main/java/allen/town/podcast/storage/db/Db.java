@@ -41,7 +41,7 @@ import allen.town.podcast.model.feed.SortOrder;
  * re-exports the column and table names that other modules refer to as {@code Db.KEY_*} and
  * {@code Db.TABLE_NAME_*}. The statements themselves live in the per-table helpers of this package
  * ({@link FeedDao}, {@link FeedItemDao}, {@link FeedMediaDao}, {@link QueueDao},
- * {@link FavoritesDao}, {@link DownloadLogDao}, {@link AdSegmentDao}); every method below delegates
+ * {@link FavoritesDao}, {@link DownloadLogDao}, {@link DismissedWarningDao}, {@link AdSegmentDao}); every method below delegates
  * to one of them,
  * except the two writes that span several tables and therefore keep their transaction here.</p>
  */
@@ -124,6 +124,7 @@ public class Db {
     public static final String KEY_AD_SOURCE = DbSchema.KEY_AD_SOURCE;
     public static final String KEY_AD_CONFIDENCE = DbSchema.KEY_AD_CONFIDENCE;
     public static final String KEY_AD_ENABLED = DbSchema.KEY_AD_ENABLED;
+    public static final String KEY_WARNING_KEY = DbSchema.KEY_WARNING_KEY;
 
     // Table names
     public static final String TABLE_NAME_FEEDS = DbSchema.TABLE_NAME_FEEDS;
@@ -134,6 +135,7 @@ public class Db {
     public static final String TABLE_NAME_SIMPLECHAPTERS = DbSchema.TABLE_NAME_SIMPLECHAPTERS;
     public static final String TABLE_NAME_FAVORITES = DbSchema.TABLE_NAME_FAVORITES;
     public static final String TABLE_NAME_AD_SEGMENTS = DbSchema.TABLE_NAME_AD_SEGMENTS;
+    public static final String TABLE_NAME_DISMISSED_FEED_WARNINGS = DbSchema.TABLE_NAME_DISMISSED_FEED_WARNINGS;
 
     public static final String SELECT_KEY_ITEM_ID = DbSchema.SELECT_KEY_ITEM_ID;
     public static final String SELECT_KEY_MEDIA_ID = DbSchema.SELECT_KEY_MEDIA_ID;
@@ -149,6 +151,7 @@ public class Db {
     private final QueueDao queueDao;
     private final FavoritesDao favoritesDao;
     private final DownloadLogDao downloadLogDao;
+    private final DismissedWarningDao dismissedWarningDao;
     private final AdSegmentDao adSegmentDao;
 
     public static void init(Context context) {
@@ -178,7 +181,8 @@ public class Db {
         itemDao = new FeedItemDao(db, feedDao, mediaDao, adSegmentDao);
         queueDao = new QueueDao(db);
         favoritesDao = new FavoritesDao(db);
-        downloadLogDao = new DownloadLogDao(db);
+        dismissedWarningDao = new DismissedWarningDao(db);
+        downloadLogDao = new DownloadLogDao(db, dismissedWarningDao);
     }
 
     public SQLiteDatabase getDb() {
@@ -767,6 +771,33 @@ public class Db {
         return downloadLogDao.getFeedIdFromDownloadLogCursor(limit);
     }
 
+    // ---------------------------------------------------------------------------------------
+    // Dismissed feed warnings
+    // ---------------------------------------------------------------------------------------
+
+    /**
+     * Stops one feed warning from being logged again and removes its current log rows.
+     */
+    public void dismissFeedWarning(final long feedId, final int reasonCode,
+                                   @NonNull final String warningKey, final String title) {
+        dismissedWarningDao.dismiss(feedId, reasonCode, warningKey, title);
+    }
+
+    /** Takes back a dismissal made by {@link #dismissFeedWarning}. */
+    public void undismissFeedWarning(final long feedId, final int reasonCode,
+                                     @NonNull final String warningKey) {
+        dismissedWarningDao.undismiss(feedId, reasonCode, warningKey);
+    }
+
+    public int getDismissedFeedWarningCount(final long feedId) {
+        return dismissedWarningDao.countForFeed(feedId);
+    }
+
+    /** Lets every dismissed warning of one feed be logged again. */
+    public void resetDismissedFeedWarnings(final long feedId) {
+        dismissedWarningDao.deleteForFeed(feedId);
+    }
+
     /**
      * Called when a database corruption happens.
      */
@@ -815,6 +846,7 @@ public class Db {
             db.execSQL(DbSchema.CREATE_TABLE_SIMPLECHAPTERS);
             db.execSQL(DbSchema.CREATE_TABLE_FAVORITES);
             db.execSQL(DbSchema.CREATE_TABLE_AD_SEGMENTS);
+            db.execSQL(DbSchema.CREATE_TABLE_DISMISSED_FEED_WARNINGS);
             db.execSQL(DbSchema.CREATE_TABLE_FEEDS);
 
             db.execSQL(DbSchema.CREATE_INDEX_FEEDITEMS_PUBDATE);
