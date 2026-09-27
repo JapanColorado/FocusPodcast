@@ -21,7 +21,7 @@ import allen.town.podcast.core.util.IntentUtils;
  */
 public class MainPrefFragment extends AbsSettingsFragment {
 
-    private static final String PREF_SCREEN_USER_INTERFACE = "pref_interface";
+    private static final String PREF_SCREEN_APPEARANCE = "pref_appearance";
     private static final String PREF_SCREEN_PLAYBACK = "pref_playback";
     private static final String PREF_SCREEN_NETWORK = "pref_netword";
     private static final String PREF_SCREEN_SUBSCRIPTIONS = "pref_subscriptions";
@@ -33,7 +33,6 @@ public class MainPrefFragment extends AbsSettingsFragment {
     private static final String PREF_ABOUT = "pref_about";
     private static final String PREF_NOTIFICATION = "notifications";
     private static final String PREF_OTHER = "others";
-    private static final String PREF_GENERAL = "pref_general";
 
 
     @Override
@@ -50,13 +49,8 @@ public class MainPrefFragment extends AbsSettingsFragment {
     }
 
     private void setupMainScreen() {
-        findPreference(PREF_SCREEN_USER_INTERFACE).setOnPreferenceClickListener(preference -> {
-            ((SettingsActivity) getActivity()).openScreen(R.xml.pref_user_interface);
-            return true;
-        });
-
-        findPreference(PREF_GENERAL).setOnPreferenceClickListener(preference -> {
-            ((SettingsActivity) getActivity()).openScreen(R.xml.pref_general);
+        findPreference(PREF_SCREEN_APPEARANCE).setOnPreferenceClickListener(preference -> {
+            ((SettingsActivity) getActivity()).openScreen(R.xml.pref_appearance);
             return true;
         });
 

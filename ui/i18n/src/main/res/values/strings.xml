@@ -960,4 +960,7 @@
     <string name="pref_system_notification_settings_sum">Choose which kinds of notifications FocusPodcast shows</string>
     <string name="pref_subscriptions_updates_title">Subscriptions &amp; updates</string>
     <string name="pref_subscriptions_updates_sum">Podcast search, refresh schedule, subscription list</string>
+    <string name="pref_layout_navigation_category">Layout &amp; navigation</string>
+    <string name="pref_episode_lists_category">Episode lists</string>
+    <string name="pref_appearance_sum">Theme, colors, layout, player screen, swipe actions</string>
 </resources>

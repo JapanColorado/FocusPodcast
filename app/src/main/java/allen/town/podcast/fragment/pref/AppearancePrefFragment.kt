@@ -19,6 +19,7 @@ import allen.town.podcast.theme.constants.ThemeConstants.BLACK_THEME
 import allen.town.podcast.theme.constants.ThemeConstants.CUSTOM_LAUNCHER
 import allen.town.podcast.theme.constants.ThemeConstants.DESATURATED_COLOR
 import allen.town.podcast.theme.constants.ThemeConstants.GENERAL_THEME
+import allen.town.podcast.theme.constants.ThemeConstants.LANGUAGE_NAME
 import allen.town.podcast.theme.constants.ThemeConstants.MATERIAL_YOU
 import allen.town.podcast.theme.constants.ThemeConstants.SHOULD_COLOR_APP_SHORTCUTS
 import allen.town.podcast.theme.constants.ThemeConstants.WALLPAPER_ACCENT
@@ -27,8 +28,11 @@ import allen.town.podcast.common.util.BasePreferenceUtil
 import allen.town.podcast.common.util.PackageUtils
 import android.annotation.SuppressLint
 import android.app.Application
+import android.content.SharedPreferences
 import android.os.Bundle
+import androidx.preference.ListPreference
 import androidx.preference.Preference
+import androidx.preference.PreferenceManager
 import androidx.preference.TwoStatePreference
 import allen.town.podcast.theme.ACCENT_COLORS
 import allen.town.podcast.theme.ACCENT_COLORS_SUB
@@ -41,16 +45,117 @@ import allen.town.podcast.theme.shortcut.DynamicShortcutManager
 import allen.town.podcast.common.extensions.materialDialog
 import com.afollestad.materialdialogs.color.colorChooser
 import com.google.android.material.color.DynamicColors
+import allen.town.podcast.BuildConfig
 import allen.town.podcast.MyApp
 import allen.town.podcast.R
 import allen.town.podcast.activity.SettingsActivity
 import allen.town.podcast.appshortcuts.ShortcutsDefaultList
+import allen.town.podcast.core.playback.NowPlayingScreen
+import allen.town.podcast.core.pref.Prefs
+import allen.town.podcast.dialog.SwipeActionsDialog
+import allen.town.podcast.event.PlayerStatusEvent
+import allen.town.podcast.event.UnreadItemsUpdateEvent
+import allen.town.podcast.fragment.EpisodesFragment
+import allen.town.podcast.fragment.FavoriteEpisodesFragment
+import allen.town.podcast.fragment.FeedItemlistFragment
+import allen.town.podcast.fragment.PlaylistFragment
+import allen.town.podcast.pref.AppLanguage
+import org.greenrobot.eventbus.EventBus
 
 /**
- * @author Hemanth S (h4h13).
+ * Everything about how the app looks: theme and colors, layout and navigation, episode lists,
+ * the now-playing and lock screens, and the list swipe actions.
  */
+class AppearancePrefFragment : AbsSettingsFragment(),
+    SharedPreferences.OnSharedPreferenceChangeListener {
 
-class ThemeSettingsFragment : AbsSettingsFragment() {
+    override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
+        addPreferencesFromResource(R.xml.pref_appearance)
+        setupLayoutPreferences()
+        setupNowPlayingPreferences()
+        setupSwipeActions()
+    }
+
+    override fun onStart() {
+        super.onStart()
+        (requireActivity() as SettingsActivity).setTitle(R.string.appearance)
+        PreferenceManager.getDefaultSharedPreferences(requireContext())
+            .registerOnSharedPreferenceChangeListener(this)
+    }
+
+    override fun onStop() {
+        super.onStop()
+        PreferenceManager.getDefaultSharedPreferences(requireContext())
+            .unregisterOnSharedPreferenceChangeListener(this)
+    }
+
+    override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
+        if (Prefs.NOW_PLAYING_SCREEN_ID == key) {
+            updateAdaptiveColorEnabled()
+        }
+    }
+
+    /** Preferences declared in `pref_appearance.xml`; a missing key is a programming error. */
+    private fun requirePreference(key: String): Preference =
+        checkNotNull(findPreference(key)) { "missing preference $key in pref_appearance.xml" }
+
+    private fun setupLayoutPreferences() {
+        //show remaining time or total duration on the player screen
+        requirePreference(Prefs.PREF_SHOW_TIME_LEFT).onPreferenceChangeListener =
+            Preference.OnPreferenceChangeListener { _, newValue ->
+                Prefs.setShowRemainTimeSetting(newValue as Boolean?)
+                EventBus.getDefault().post(UnreadItemsUpdateEvent())
+                EventBus.getDefault().post(PlayerStatusEvent())
+                true
+            }
+        // Not persisted: the per-app locale is the source of truth, and it can also be changed in
+        // the system's app language settings. AppCompat recreates the activities on a change.
+        val language = requirePreference(LANGUAGE_NAME) as ListPreference
+        language.value = AppLanguage.currentCode(language.entryValues)
+        language.onPreferenceChangeListener =
+            Preference.OnPreferenceChangeListener { _, newValue ->
+                AppLanguage.apply(newValue.toString())
+                true
+            }
+        requirePreference(Prefs.PREF_HOME_PAGE).onPreferenceChangeListener =
+            Preference.OnPreferenceChangeListener { _, _ ->
+                restartActivity()
+                true
+            }
+    }
+
+    private fun setupNowPlayingPreferences() {
+        //lock screen backgrounds are not supported from Android 11 on
+        requirePreference(Prefs.PREF_LOCKSCREEN_BACKGROUND).isVisible =
+            BuildConfig.DEBUG || !VersionUtils.hasR()
+        updateAdaptiveColorEnabled()
+    }
+
+    /** Only the now-playing screens that tint themselves from the cover can color the app. */
+    private fun updateAdaptiveColorEnabled() {
+        requirePreference(Prefs.PREF_ADAPTIVE_COLOR_APP).isEnabled =
+            Prefs.nowPlayingScreen in ADAPTIVE_COLOR_SCREENS
+    }
+
+    private fun setupSwipeActions() {
+        bindSwipeActions(PREF_SWIPE_FEED, FeedItemlistFragment.TAG)
+        bindSwipeActions(PREF_SWIPE_QUEUE, PlaylistFragment.TAG)
+        bindSwipeActions(PREF_SWIPE_EPISODES, EpisodesFragment.TAG)
+        bindSwipeActions(PREF_SWIPE_FAVORITE, FavoriteEpisodesFragment.TAG)
+    }
+
+    private fun bindSwipeActions(key: String, listTag: String) {
+        requirePreference(key).onPreferenceClickListener = Preference.OnPreferenceClickListener {
+            SwipeActionsDialog(requireContext(), listTag).show(object : SwipeActionsDialog.Callback {
+                override fun onCall() {
+                    // the lists read the swipe actions when they are shown
+                }
+            })
+            true
+        }
+    }
+
+    /** Theme and color wiring; runs from [onViewCreated] through the base class. */
     @SuppressLint("CheckResult")
     override fun invalidateSettings() {
         val generalTheme: Preference? = findPreference(GENERAL_THEME)
@@ -170,12 +275,12 @@ class ThemeSettingsFragment : AbsSettingsFragment() {
         }
     }
 
-    override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
-        addPreferencesFromResource(R.xml.pref_theme)
-    }
-
-    override fun onStart() {
-        super.onStart()
-        (activity as SettingsActivity).setTitle(R.string.pref_set_theme_title)
+    companion object {
+        private const val PREF_SWIPE_FEED = "prefSwipeFeed"
+        private const val PREF_SWIPE_QUEUE = "prefSwipeQueue"
+        private const val PREF_SWIPE_EPISODES = "pref_swipe_episodes"
+        private const val PREF_SWIPE_FAVORITE = "pref_swipe_favorite"
+        private val ADAPTIVE_COLOR_SCREENS =
+            listOf(NowPlayingScreen.Normal, NowPlayingScreen.Adaptive, NowPlayingScreen.Circle)
     }
 }

@@ -1,7 +1,5 @@
 package allen.town.podcast.fragment.pref;
 
-import static allen.town.podcast.core.pref.Prefs.PREF_FULL_LOCK_SCREEN;
-
 import android.app.Activity;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
@@ -12,12 +10,8 @@ import androidx.preference.ListPreference;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceManager;
 
-import allen.town.podcast.theme.util.VersionUtils;
-import allen.town.podcast.BuildConfig;
-import allen.town.podcast.MyApp;
 import allen.town.podcast.R;
 import allen.town.podcast.activity.SettingsActivity;
-import allen.town.podcast.core.playback.NowPlayingScreen;
 import allen.town.podcast.core.pref.Prefs;
 import allen.town.podcast.dialog.SkipPrefDialog;
 import allen.town.podcast.dialog.PlaySpeedDialog;
@@ -26,7 +20,6 @@ import allen.town.podcast.event.settings.AudioEffectsChangedEvent;
 
 import org.greenrobot.eventbus.EventBus;
 
-import java.util.ArrayList;
 import java.util.Map;
 
 public class PlaybackPrefFragment extends AbsSettingsFragment implements SharedPreferences.OnSharedPreferenceChangeListener {
@@ -73,22 +66,7 @@ public class PlaybackPrefFragment extends AbsSettingsFragment implements SharedP
             return true;
         });
 
-
-        //lock screen backgrounds are not supported from Android 11 on
-        findPreference(Prefs.PREF_LOCKSCREEN_BACKGROUND)
-                .setVisible(BuildConfig.DEBUG || !VersionUtils.hasR());
-
-        updateAdapterColor();
         buildEnqueueLocationPreference();
-    }
-
-    void updateAdapterColor(){
-        ArrayList nowPlayingScreenList = new ArrayList<NowPlayingScreen>() {{
-            add(NowPlayingScreen.Normal);
-            add(NowPlayingScreen.Adaptive);
-            add(NowPlayingScreen.Circle);
-        }};
-        findPreference(Prefs.PREF_ADAPTIVE_COLOR_APP).setEnabled(nowPlayingScreenList.contains(Prefs.getNowPlayingScreen()));
     }
 
     private void buildEnqueueLocationPreference() {
@@ -182,9 +160,6 @@ public class PlaybackPrefFragment extends AbsSettingsFragment implements SharedP
 
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-        if(Prefs.NOW_PLAYING_SCREEN_ID.equals(key)){
-            updateAdapterColor();
-        }
         if (Prefs.PREF_PLAYBACK_SKIP_SILENCE.equals(key)
                 || Prefs.PREF_STEREO_TO_MONO.equals(key)
                 || Prefs.PREF_AUDIO_LOUDNESS.equals(key)) {

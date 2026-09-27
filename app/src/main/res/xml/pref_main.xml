@@ -11,17 +11,10 @@
 
     <allen.town.podcast.common.common.prefs.supportv7.ATEPreference
         android:icon="@drawable/ic_appearance"
-        android:key="pref_interface"
+        android:key="pref_appearance"
         android:layout="@layout/list_item_view_no_title_main"
-        android:summary="@string/user_interface_sum"
-        android:title="@string/user_interface_label" />
-
-    <allen.town.podcast.common.common.prefs.supportv7.ATEPreference
-        android:icon="@drawable/ic_homepage"
-        android:key="pref_general"
-        android:layout="@layout/list_item_view_no_title_main"
-        android:summary="@string/pref_general_sum"
-        android:title="@string/pref_general_title" />
+        android:summary="@string/pref_appearance_sum"
+        android:title="@string/appearance" />
 
     <allen.town.podcast.common.common.prefs.supportv7.ATEPreference
         android:icon="@drawable/ic_sound_waves"

@@ -533,4 +533,7 @@
   <string name="pref_system_notification_settings_sum">FocusPodcast が表示する通知の種類を選択します</string>
   <string name="pref_subscriptions_updates_title">購読と更新</string>
   <string name="pref_subscriptions_updates_sum">ポッドキャスト検索、更新スケジュール、購読リスト</string>
+  <string name="pref_layout_navigation_category">レイアウトとナビゲーション</string>
+  <string name="pref_episode_lists_category">エピソードリスト</string>
+  <string name="pref_appearance_sum">テーマ、色、レイアウト、再生画面、スワイプ操作</string>
 </resources>

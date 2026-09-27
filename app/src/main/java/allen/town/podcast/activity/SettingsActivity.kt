@@ -125,10 +125,7 @@ enum class SettingsScreen(
     val parent: SettingsScreen?,
     val factory: (() -> PreferenceFragmentCompat)?,
 ) {
-    USER_INTERFACE(R.xml.pref_user_interface, R.string.user_interface_label, null, { UserInterfacePrefFragment() }),
-    THEME(R.xml.pref_theme, R.string.pref_set_theme_title, USER_INTERFACE, { ThemeSettingsFragment() }),
-    GENERAL(R.xml.pref_general, R.string.pref_general_title, null, { GeneralPrefFragment() }),
-    SWIPE(R.xml.pref_swipe, R.string.swipeactions_label, GENERAL, { SwipePrefFragment() }),
+    APPEARANCE(R.xml.pref_appearance, R.string.appearance, null, { AppearancePrefFragment() }),
     PLAYBACK(R.xml.pref_playback, R.string.playback_pref, null, { PlaybackPrefFragment() }),
     SUBSCRIPTIONS(R.xml.pref_subscriptions, R.string.pref_subscriptions_updates_title, null, { SubscriptionsPrefFragment() }),
     NETWORK(R.xml.pref_network, R.string.network_pref, null, { NetworkPrefFragment() }),

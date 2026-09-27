@@ -1,0 +1,252 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:search="http://schemas.android.com/apk/allen.town.podcast.searchpreference">
+
+    <allen.town.podcast.common.common.prefs.supportv7.ATEPreferenceCategory
+        android:layout="@layout/preference_category_title"
+        android:title="@string/pref_header_general">
+        <allen.town.podcast.common.common.prefs.supportv7.ATEListPreference
+            android:defaultValue="auto"
+            android:entries="@array/theme_options"
+            android:entryValues="@array/theme_values"
+            android:key="general_theme"
+            android:layout="@layout/list_item_view"
+            android:negativeButtonText="@null"
+            android:positiveButtonText="@null"
+            android:title="@string/pref_set_theme_title"
+            app:icon="@drawable/ic_color_lens" />
+        <allen.town.podcast.common.common.prefs.supportv7.ATESwitchPreference
+            android:key="black_theme"
+            android:layout="@layout/list_item_view_switch_no_title"
+            android:title="@string/pref_theme_title_trueblack" />
+        <allen.town.podcast.common.common.prefs.supportv7.ATESwitchPreference
+            android:defaultValue="@bool/md3_enabled"
+            android:disableDependentsState="true"
+            android:key="material_you"
+            android:layout="@layout/list_item_view_switch_no_title"
+            android:title="@string/pref_title_md3"
+            app:isPreferenceVisible="@bool/md3_available" />
+        <allen.town.podcast.common.common.prefs.supportv7.ATEPreference
+            android:layout="@layout/list_item_view"
+            android:key="custom_launcher_key"
+            android:summary="@string/pref_custom_launcher_summary"
+            android:title="@string/pref_custom_launcher_title"/>
+    </allen.town.podcast.common.common.prefs.supportv7.ATEPreferenceCategory>
+
+    <allen.town.podcast.common.common.prefs.supportv7.ATEPreferenceCategory
+        android:key="category_color"
+        android:layout="@layout/preference_category_title"
+        android:title="@string/colors">
+        <allen.town.podcast.common.common.prefs.supportv7.ATESwitchPreference
+            android:defaultValue="@bool/wallpaper_accent_enabled"
+            android:key="wallpaper_accent"
+            android:layout="@layout/list_item_view_switch"
+            android:dependency="material_you"
+            android:summary="@string/pref_summary_wallpaper_accent"
+            android:title="@string/pref_title_wallpaper_accent"
+            app:isPreferenceVisible="@bool/wallpaper_accent_visible" />
+        <allen.town.podcast.common.common.prefs.supportv7.ATEColorPreference
+            android:dependency="material_you"
+            android:key="accent_color"
+            android:layout="@layout/list_item_color_view"
+            android:persistent="false"
+            android:summary="@string/accent_color_desc"
+            android:title="@string/accent_color"
+            app:icon="@drawable/ic_colorize" />
+        <allen.town.podcast.common.common.prefs.supportv7.ATESwitchPreference
+            android:defaultValue="false"
+            android:dependency="material_you"
+            android:key="desaturated_color"
+            android:layout="@layout/list_item_view_switch"
+            android:summary="@string/pref_summary_desaturated_color"
+            android:title="@string/pref_title_desaturated_color" />
+        <allen.town.podcast.common.common.prefs.supportv7.ATESwitchPreference
+            android:defaultValue="false"
+            android:dependency="material_you"
+            android:key="should_color_app_shortcuts"
+            android:layout="@layout/list_item_view_switch"
+            android:summary="@string/pref_summary_colored_app_shortcuts"
+            android:title="@string/pref_title_app_shortcuts" />
+    </allen.town.podcast.common.common.prefs.supportv7.ATEPreferenceCategory>
+
+    <allen.town.podcast.common.common.prefs.supportv7.ATEPreferenceCategory
+        android:layout="@layout/preference_category_title"
+        android:title="@string/pref_layout_navigation_category">
+        <allen.town.podcast.common.common.prefs.supportv7.ATEListPreference
+            android:defaultValue="0"
+            android:entries="@array/home_page_options"
+            android:entryValues="@array/home_page_values"
+            android:key="pref_homepage"
+            android:layout="@layout/list_item_view"
+            android:summary="@string/pref_homepage_sum"
+            android:title="@string/pref_homepage_title"
+            app:icon="@drawable/ic_round_home_24" />
+        <allen.town.podcast.pref.LibraryPreference
+            android:key="library_categories"
+            android:layout="@layout/list_item_view"
+            android:summary="@string/pref_nav_drawer_items_sum"
+            android:title="@string/pref_nav_drawer_items_title"
+            app:icon="@drawable/ic_round_menu_24" />
+        <allen.town.podcast.common.common.prefs.supportv7.ATEListPreference
+            android:defaultValue="1"
+            android:entries="@array/pref_appbar_mode_titles"
+            android:entryValues="@array/pref_appbar_mode_values"
+            android:key="appbar_mode"
+            android:layout="@layout/list_item_view"
+            android:negativeButtonText="@null"
+            android:positiveButtonText="@null"
+            android:title="@string/pref_title_appbar_mode" />
+        <allen.town.podcast.common.common.prefs.supportv7.ATESwitchPreference
+            android:defaultValue="false"
+            android:key="toggle_full_screen"
+            android:layout="@layout/list_item_view_switch"
+            android:summary="@string/pref_summary_toggle_full_screen"
+            android:title="@string/pref_title_toggle_full_screen"
+            app:icon="@drawable/ic_cellphone" />
+        <allen.town.podcast.common.common.prefs.supportv7.ATESwitchPreference
+            android:defaultValue="true"
+            android:enabled="true"
+            android:key="prefColumnDisplayInLandscape"
+            android:layout="@layout/list_item_view_switch"
+            android:summary="@string/pref_column_display_in_landscape_sum"
+            android:title="@string/pref_column_display_in_landscape_title"
+            app:icon="@drawable/ic_column_land" />
+        <allen.town.podcast.common.common.prefs.supportv7.ATEListPreference
+            android:layout="@layout/list_item_view"
+            android:entryValues="@array/back_button_behavior_values"
+            android:entries="@array/back_button_behavior_options"
+            android:key="pref_backbutton_behavior"
+            app:icon="@drawable/ic_keyboard_backspace_black"
+            android:title="@string/pref_back_button_behavior_title"
+            android:summary="@string/pref_back_button_behavior_sum"
+            android:defaultValue="default" />
+        <allen.town.podcast.common.common.prefs.supportv7.ATEListPreference
+            android:defaultValue="auto"
+            android:entries="@array/pref_language_names"
+            android:entryValues="@array/pref_language_codes"
+            android:key="language_name"
+            android:layout="@layout/list_item_view"
+            android:negativeButtonText="@null"
+            android:persistent="false"
+            android:positiveButtonText="@null"
+            android:title="@string/pref_language_name"
+            app:icon="@drawable/ic_language" />
+    </allen.town.podcast.common.common.prefs.supportv7.ATEPreferenceCategory>
+
+    <allen.town.podcast.common.common.prefs.supportv7.ATEPreferenceCategory
+        android:layout="@layout/preference_category_title"
+        android:title="@string/pref_episode_lists_category">
+        <allen.town.podcast.common.common.prefs.supportv7.ATESwitchPreference
+            android:defaultValue="true"
+            android:enabled="true"
+            android:key="pref_use_episode_cover"
+            android:layout="@layout/list_item_view_switch"
+            android:summary="@string/pref_episode_cover_summary"
+            android:title="@string/pref_episode_cover_title" />
+        <allen.town.podcast.common.common.prefs.supportv7.ATESwitchPreference
+            android:defaultValue="true"
+            android:enabled="true"
+            android:key="pref_show_episode_cover_in_feed"
+            android:layout="@layout/list_item_view_switch"
+            android:summary="@string/pref_show_episode_cover_in_feed_summary"
+            android:title="@string/pref_show_episode_cover_in_feed_title" />
+        <allen.town.podcast.common.common.prefs.supportv7.ATESwitchPreference
+            android:defaultValue="false"
+            android:enabled="true"
+            android:key="pref_show_left_time"
+            android:layout="@layout/list_item_view_switch"
+            android:summary="@string/pref_show_remain_time_summary"
+            android:title="@string/pref_show_remain_time_title" />
+    </allen.town.podcast.common.common.prefs.supportv7.ATEPreferenceCategory>
+
+    <allen.town.podcast.common.common.prefs.supportv7.ATEPreferenceCategory
+        android:layout="@layout/preference_category_title"
+        android:title="@string/pref_audio_play_custom_title">
+        <allen.town.podcast.pref.NowPlayingScreenPreference
+            android:key="now_playing_screen_id"
+            android:layout="@layout/list_item_view_no_title"
+            android:title="@string/pref_title_now_playing_screen_appearance"
+            android:icon="@drawable/ic_play_24dp" />
+        <allen.town.podcast.common.common.prefs.supportv7.ATESwitchPreference
+            android:layout="@layout/list_item_view_switch"
+            android:defaultValue="false"
+            android:enabled="true"
+            android:key="toggle_add_controls"
+            android:summary="@string/pref_summary_extra_controls"
+            android:title="@string/pref_title_extra_controls"/>
+        <allen.town.podcast.common.common.prefs.supportv7.ATESwitchPreference
+            android:defaultValue="true"
+            android:key="pref_adaptive_color_app"
+            android:layout="@layout/list_item_view_switch"
+            android:summary="@string/pref_summary_colored_app"
+            android:title="@string/pref_title_colored_app" />
+        <allen.town.podcast.common.common.prefs.supportv7.ATESeekBarPreference
+            android:defaultValue="12"
+            android:key="new_blur_amount"
+            android:layout="@layout/list_item_view_seekbar"
+            android:max="25"
+            android:summary="@string/pref_blur_amount_summary"
+            android:title="@string/pref_blur_amount_title"
+            app:ateKey_pref_unit="px"
+            app:icon="@drawable/ic_blur_on"
+            app:showSeekBarValue="true" />
+        <allen.town.podcast.common.common.prefs.supportv7.ATESwitchPreference
+            android:layout="@layout/list_item_view_switch_no_title"
+            android:defaultValue="false"
+            app:isPreferenceVisible="false"
+            android:key="circle_play_button"
+            android:title="@string/pref_title_circle_button"
+            search:ignore="true" />
+        <allen.town.podcast.common.common.prefs.supportv7.ATESwitchPreference
+            android:layout="@layout/list_item_view_switch"
+            android:defaultValue="false"
+            android:key="pre_show_snow_fall"
+            android:summary="@string/pref_snow_fall_sum"
+            android:title="@string/pref_snow_fall_title"/>
+    </allen.town.podcast.common.common.prefs.supportv7.ATEPreferenceCategory>
+
+    <allen.town.podcast.common.common.prefs.supportv7.ATEPreferenceCategory
+        android:layout="@layout/preference_category_title"
+        android:title="@string/pref_header_lockscreen">
+        <allen.town.podcast.common.common.prefs.supportv7.ATESwitchPreference
+            android:layout="@layout/list_item_view_switch"
+            android:defaultValue="true"
+            android:enabled="true"
+            android:key="pref_lock_screen_backgound"
+            android:summary="@string/pref_lockscreen_background_sum"
+            android:title="@string/pref_lockscreen_background_title"
+            search:ignore="true" />
+        <allen.town.podcast.common.common.prefs.supportv7.ATESwitchPreference
+            android:defaultValue="false"
+            android:key="pref_full_lock_screen"
+            android:layout="@layout/list_item_view_switch"
+            android:summary="@string/pref_summary_lock_screen"
+            android:title="@string/pref_title_lock_screen" />
+    </allen.town.podcast.common.common.prefs.supportv7.ATEPreferenceCategory>
+
+    <allen.town.podcast.common.common.prefs.supportv7.ATEPreferenceCategory
+        android:layout="@layout/preference_category_title"
+        android:title="@string/swipeactions_label">
+        <allen.town.podcast.common.common.prefs.supportv7.ATEPreference
+            android:layout="@layout/list_item_view_no_title"
+            android:icon="@drawable/ic_podcast"
+            android:key="prefSwipeFeed"
+            android:title="@string/feeds_label"/>
+        <allen.town.podcast.common.common.prefs.supportv7.ATEPreference
+            android:layout="@layout/list_item_view_no_title"
+            android:icon="@drawable/ic_playlist"
+            android:key="prefSwipeQueue"
+            android:title="@string/playlist_label"/>
+        <allen.town.podcast.common.common.prefs.supportv7.ATEPreference
+            android:layout="@layout/list_item_view_no_title"
+            android:icon="@drawable/ic_episodes"
+            android:key="pref_swipe_episodes"
+            android:title="@string/episodes_label"/>
+        <allen.town.podcast.common.common.prefs.supportv7.ATEPreference
+            android:layout="@layout/list_item_view_no_title"
+            android:icon="@drawable/ic_star"
+            android:key="pref_swipe_favorite"
+            android:title="@string/favorite_episodes_label"/>
+    </allen.town.podcast.common.common.prefs.supportv7.ATEPreferenceCategory>
+</PreferenceScreen>

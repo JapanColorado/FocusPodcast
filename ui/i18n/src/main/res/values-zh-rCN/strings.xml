@@ -853,4 +853,7 @@
   <string name="pref_system_notification_settings_sum">选择 FocusPodcast 显示哪些类型的通知</string>
   <string name="pref_subscriptions_updates_title">订阅与更新</string>
   <string name="pref_subscriptions_updates_sum">播客搜索、刷新计划、订阅列表</string>
+  <string name="pref_layout_navigation_category">布局与导航</string>
+  <string name="pref_episode_lists_category">单集列表</string>
+  <string name="pref_appearance_sum">主题、颜色、布局、播放界面、滑动操作</string>
 </resources>
