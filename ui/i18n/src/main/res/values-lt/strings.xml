@@ -28,7 +28,6 @@
   <string name="app_action_not_found">„%1$s“ nerasta</string>
   <!--SwipeActions-->
   <string name="swipeactions_label">Perbraukimo veiksmai</string>
-  <string name="swipeactions_summary">Pasirinkite, kas įvyks pirštu perbraukus per ekraną epizodų sąraše</string>
   <string name="swipe_right">Perbraukus dešinėn</string>
   <string name="swipe_left">Perbraukus kairėn</string>
   <string name="enable_swipeactions">Įjungti perbraukimo veiksmus šiam ekranui</string>
@@ -330,8 +329,6 @@
     <string name="no_fav_episodes_head_label">Mėgstamų epizodų nėra</string>
   <string name="no_subscriptions_head_label">Prenumeratų nėra</string>
     <!--Preferences-->
-  <string name="storage_pref">Laikmena</string>
-  <string name="synchronization_pref">Sinchronizavimas</string>
   <string name="automation">Automatizacija</string>
     <string name="import_export_pref">Importas/Eksportas</string>
   <string name="import_export_search_keywords">atsarginės kopijos, atkūrimas</string>
@@ -366,7 +363,6 @@
   <string name="pref_favorite_keeps_episodes_sum">Palikti epizodus, kurie yra pažymėti kaip mėgstami</string>
   <string name="pref_favorite_keeps_episodes_title">Palikti mėgstamus epizodus</string>
   <string name="playback_pref">Atkūrimas</string>
-  <string name="network_pref">Tinklas</string>
   <string name="feed_refresh_title">Tinklalaidžių atnaujinimas</string>
   <string name="feed_refresh_sum">Nurodykite intervalą ar tikslų laiką, kada bus automatiškai ieškoma naujų epizodų</string>
   <string name="feed_refresh_interval">Intervalas</string>
@@ -390,13 +386,11 @@
   <string name="pref_mobileUpdate_auto_download">Automatinis atsiuntimas</string>
   <string name="pref_mobileUpdate_episode_download">Epizodų atsiuntimas</string>
   <string name="pref_mobileUpdate_streaming">Klausymasis tiesiogiai</string>
-  <string name="user_interface_label">Vartotojo sąsaja</string>
   <string name="pref_set_theme_title">Pasirinkti temą</string>
   <string name="pref_nav_drawer_items_title">Nustatyti naršymo stalčiaus elementus</string>
   <string name="pref_nav_drawer_items_sum">Keisti naršymo stalčiuje rodomus elementus.</string>
   <string name="pref_nav_drawer_feed_order_title">Nustatyti prenumeratų tvarką</string>
   <string name="pref_nav_drawer_feed_order_sum">Keiskite prenumeratų tvarką</string>
-  <string name="pref_set_theme_sum">Keisti FocusPodcast išvaizdą.</string>
   <string name="pref_automatic_download_title">Automatinis atsiuntimas</string>
   <string name="pref_automatic_download_on_battery_title">Atsiuntimas ne įkrovimo metu</string>
   <string name="pref_automatic_download_on_battery_sum">Leisti automatinį atsiuntimą kai baterija nėra įkraunama</string>
@@ -467,7 +461,6 @@
   <string name="pref_enqueue_downloaded_title">Atsiuntimus pridėti į eilę</string>
   <string name="pref_enqueue_downloaded_summary">Parsiuntus epizodus, pridėti juos į eilę</string>
     <string name="pref_skip_silence_title">Praleisti tylą</string>
-  <string name="behavior">Elgsena</string>
   <string name="pref_back_button_behavior_title">Grįžimo mygtuko elgsena</string>
   <string name="pref_back_button_behavior_sum">Keisti grįžimo mygtuko elgseną.</string>
   <string name="back_button_default">Numatytoji</string>
@@ -509,9 +502,6 @@
   <string name="sync_status_success">Sinchronizavimas sėkmingas</string>
   <string name="sync_status_error">Sinchronizavimas nepavyko</string>
   <!--import and export-->
-  <string name="import_export_summary">Perkelti prenumeratas ir eilę į kitą įrenginį</string>
-  <string name="database">Duomenų bazė</string>
-  <string name="opml">OPML</string>
   <string name="opml_export_summary">Perkelti prenumeratas į kitą tinklalaidžių programėlę</string>
   <string name="opml_import_summary">Importuoti prenumeratas iš kitos tinklalaidžių programėlės</string>
   <string name="database_export_summary">Perkelti prenumeratas, perklausytus epizodus ir eilę į „FocusPodcast“ kitame įrenginyje</string>

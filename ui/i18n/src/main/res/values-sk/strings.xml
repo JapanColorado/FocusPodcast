@@ -28,7 +28,6 @@
   <string name="app_action_not_found">„%1$s“ nebol nájdený</string>
   <!--SwipeActions-->
   <string name="swipeactions_label">Potiahnutia</string>
-  <string name="swipeactions_summary">Zvoľte akcie po potiahnutí epizódy v zozname</string>
   <string name="swipe_right">Potiahnutie doprava</string>
   <string name="swipe_left">Potiahnutie doľava</string>
   <string name="enable_swipeactions">Povoliť potiahnutia pre túto obrazovku</string>
@@ -330,8 +329,6 @@
     <string name="no_fav_episodes_head_label">Žiadne obľúbené epizódy</string>
   <string name="no_subscriptions_head_label">Žiadne odbery</string>
     <!--Preferences-->
-  <string name="storage_pref">Úložisko</string>
-  <string name="synchronization_pref">Synchronizácia</string>
   <string name="automation">Automatizácia</string>
     <string name="import_export_pref">Import/Export</string>
   <string name="import_export_search_keywords">zálohovanie, obnovenie</string>
@@ -366,7 +363,6 @@
   <string name="pref_favorite_keeps_episodes_sum">Ponechať epizódy ktoré sú označené ako obľúbené</string>
   <string name="pref_favorite_keeps_episodes_title">Ponechať obľúbené epizódy</string>
   <string name="playback_pref">Prehrávanie</string>
-  <string name="network_pref">Sieť</string>
   <string name="feed_refresh_title">Aktualizovať podcasty</string>
   <string name="feed_refresh_sum">Zvoliť interval alebo čas pre automatické hľadanie nových epizód</string>
   <string name="feed_refresh_interval">Interval</string>
@@ -390,13 +386,11 @@
   <string name="pref_mobileUpdate_auto_download">Automatické sťahovanie</string>
   <string name="pref_mobileUpdate_episode_download">Stiahnutie epizódy</string>
   <string name="pref_mobileUpdate_streaming">Streamovanie</string>
-  <string name="user_interface_label">Používateľské rozhranie</string>
   <string name="pref_set_theme_title">Vybrať motív</string>
   <string name="pref_nav_drawer_items_title">Zmeniť navigačný panel</string>
   <string name="pref_nav_drawer_items_sum">Upraviť zobrazenie položiek v navigačnom paneli.</string>
   <string name="pref_nav_drawer_feed_order_title">Nastaviť poradie odberov</string>
   <string name="pref_nav_drawer_feed_order_sum">Upraviť poradie vašich odberov</string>
-  <string name="pref_set_theme_sum">Zmeniť vzhľad FocusPodcast.</string>
   <string name="pref_automatic_download_title">Automatické sťahovanie</string>
   <string name="pref_automatic_download_on_battery_title">Sťahovať keď neprebieha nabíjanie</string>
   <string name="pref_automatic_download_on_battery_sum">Povoliť automatické sťahovanie aj keď nie je batéria nabíjaná</string>
@@ -467,7 +461,6 @@
   <string name="pref_enqueue_downloaded_title">Zaradiť stiahnuté</string>
   <string name="pref_enqueue_downloaded_summary">Pridať stiahnuté epizódy do poradia</string>
     <string name="pref_skip_silence_title">Preskočiť ticho vo zvuku</string>
-  <string name="behavior">Chovanie</string>
   <string name="pref_back_button_behavior_title">Chovanie tlačidla späť</string>
   <string name="pref_back_button_behavior_sum">Zmeniť chovanie tlačidla späť.</string>
   <string name="back_button_default">Štandardné</string>
@@ -509,9 +502,6 @@
   <string name="sync_status_success">Synchronizácia bola úspešná</string>
   <string name="sync_status_error">Synchronizácia zlyhala</string>
   <!--import and export-->
-  <string name="import_export_summary">Presunúť odbery a poradie na iné zariadenie</string>
-  <string name="database">Databáza</string>
-  <string name="opml">OPML</string>
   <string name="opml_export_summary">Preniesť svoje odbery do inej podcastovej aplikácie</string>
   <string name="opml_import_summary">Importovať svoje odbery z inej podcastovej aplikácie</string>
   <string name="database_export_summary">Preniesť odbery, počúvané epizódy a poradie do FocusPodcastu v inom zariadení</string>

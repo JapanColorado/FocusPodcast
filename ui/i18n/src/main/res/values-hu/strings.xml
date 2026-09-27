@@ -28,7 +28,6 @@
   <string name="app_action_not_found">A(z) „%1$s” nem található</string>
   <!--SwipeActions-->
   <string name="swipeactions_label">Seprési műveletek</string>
-  <string name="swipeactions_summary">Válasszon, hogy mi történjen ha elcsúsztat egy epizódot a listában</string>
   <string name="swipe_right">Húzás jobbra</string>
   <string name="swipe_left">Húzás balra</string>
   <string name="enable_swipeactions">Húzási műveletek engedélyezése ezen a képernyőn</string>
@@ -301,8 +300,6 @@
     <string name="no_fav_episodes_head_label">Nincsenek kedvenc epizódok</string>
   <string name="no_subscriptions_head_label">Nincsenek feliratkozások</string>
     <!--Preferences-->
-  <string name="storage_pref">Tároló</string>
-  <string name="synchronization_pref">Szinkronizálás</string>
   <string name="automation">Automatizálás</string>
     <string name="import_export_pref">Importálás/exportálás</string>
   <string name="import_export_search_keywords">biztonsági mentés, helyreállítás</string>
@@ -337,7 +334,6 @@
   <string name="pref_favorite_keeps_episodes_sum">Epizódok megtartása, ha kedvencnek vannak jelölve</string>
   <string name="pref_favorite_keeps_episodes_title">Kedvenc epizódok megtartása</string>
   <string name="playback_pref">Lejátszás</string>
-  <string name="network_pref">Hálózat</string>
   <string name="feed_refresh_title">Podcastok frissítése</string>
   <string name="feed_refresh_sum">Adjon meg egy intervallumot vagy egy adott időpontot az új epizódok automatikus kereséséhez</string>
   <string name="feed_refresh_interval">Intervallum</string>
@@ -359,13 +355,11 @@
   <string name="pref_mobileUpdate_auto_download">Automatikus letöltés</string>
   <string name="pref_mobileUpdate_episode_download">Epizódletöltés</string>
   <string name="pref_mobileUpdate_streaming">Közvetítés</string>
-  <string name="user_interface_label">Felhasználói felület</string>
   <string name="pref_set_theme_title">Téma kiválasztása</string>
   <string name="pref_nav_drawer_items_title">Navigációs fiók elemeinek beállítása</string>
   <string name="pref_nav_drawer_items_sum">A navigációs fiókban megjelenő elemek módosítása.</string>
   <string name="pref_nav_drawer_feed_order_title">Feliratkozási sorrend beállítása</string>
   <string name="pref_nav_drawer_feed_order_sum">A feliratkozásai sorrendjének módosítása</string>
-  <string name="pref_set_theme_sum">FocusPodcast kinézetének módosítása.</string>
   <string name="pref_automatic_download_title">Automatikus letöltés</string>
   <string name="pref_automatic_download_on_battery_title">Letöltés, ha nincs akkumulátortöltés</string>
   <string name="pref_automatic_download_on_battery_sum">Automatikus letöltés engedélyezése, ha az akkumulátor nem töltődik</string>
@@ -430,7 +424,6 @@
   <string name="pref_enqueue_downloaded_title">Letöltött elemek sorbaállítása</string>
   <string name="pref_enqueue_downloaded_summary">Letöltött epizódok sorhoz adása</string>
     <string name="pref_skip_silence_title">Csend kihagyása a hangokban</string>
-  <string name="behavior">Viselkedés</string>
   <string name="pref_back_button_behavior_title">Vissza gomb viselkedése</string>
   <string name="pref_back_button_behavior_sum">A vissza gomb viselkedésének módosítása</string>
   <string name="back_button_default">Alapértelmezett</string>
@@ -471,9 +464,6 @@
   <string name="sync_status_success">Szinkronizálás sikeres</string>
   <string name="sync_status_error">Szinkronizálás sikertelen</string>
   <!--import and export-->
-  <string name="import_export_summary">Feliratkozások áthelyezése, és sorbaállítás egy másik eszközön</string>
-  <string name="database">Adatbázis</string>
-  <string name="opml">OPML</string>
   <string name="opml_export_summary">A feliratkozásai átküldése egy másik podcast alkalmazásnak</string>
   <string name="opml_import_summary">Feliratkozások importálása egy másik podcast alkalmazásból</string>
   <string name="database_export_summary">Feliratkozások, meghallgatott epizódok és a lejátszási sor átküldése egy másik eszközök lévő FocusPodcastnak</string>

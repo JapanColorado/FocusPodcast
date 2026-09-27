@@ -28,7 +28,6 @@
   <string name="app_action_not_found">«%1$s» не знайдено</string>
   <!--SwipeActions-->
   <string name="swipeactions_label">Дії проведення пальцями</string>
-  <string name="swipeactions_summary">Оберіть, що відбуватиметься під час прокручування епізоду зі списку</string>
   <string name="swipe_right">Проведіть вправо</string>
   <string name="swipe_left">Проведіть вліво</string>
   <string name="enable_swipeactions">Дозволити дії ковзанням для цього екрана</string>
@@ -319,8 +318,6 @@
     <string name="no_fav_episodes_head_label">Немає улюблених епізодів</string>
   <string name="no_subscriptions_head_label">Немає підписок</string>
     <!--Preferences-->
-  <string name="storage_pref">Зберігання</string>
-  <string name="synchronization_pref">Синхронізація</string>
   <string name="automation">Автоматизація</string>
     <string name="import_export_pref">Імпорт/Експорт</string>
   <string name="import_export_search_keywords">резервувати, відновити</string>
@@ -355,7 +352,6 @@
   <string name="pref_favorite_keeps_episodes_sum">Зберігати епізоди що помічені як улюблені</string>
   <string name="pref_favorite_keeps_episodes_title">Зберігати улюблені епізоди</string>
   <string name="playback_pref">Відтворення</string>
-  <string name="network_pref">Мережа</string>
   <string name="feed_refresh_title">Оновити подкасти</string>
   <string name="feed_refresh_sum">Вкажіть інтервал або певний час для автоматичного пошуку нових епізодів</string>
   <string name="feed_refresh_interval">Інтервал</string>
@@ -379,13 +375,11 @@
   <string name="pref_mobileUpdate_auto_download">Автозавантаження</string>
   <string name="pref_mobileUpdate_episode_download">Завантаження епізоду</string>
   <string name="pref_mobileUpdate_streaming">Потокове передавання</string>
-  <string name="user_interface_label">Вигляд</string>
   <string name="pref_set_theme_title">Обрати тему</string>
   <string name="pref_nav_drawer_items_title">Налаштувати зміст меню навігації</string>
   <string name="pref_nav_drawer_items_sum">Вибрати елементи які мають бути у меню навігації</string>
   <string name="pref_nav_drawer_feed_order_title">Встановити порядок підписок</string>
   <string name="pref_nav_drawer_feed_order_sum">Змінити порядок ваших підписок</string>
-  <string name="pref_set_theme_sum">Змінити вигляд FocusPodcast</string>
   <string name="pref_automatic_download_title">Автозавантаження</string>
   <string name="pref_automatic_download_on_battery_title">Завантаження без зарядного пристрою</string>
   <string name="pref_automatic_download_on_battery_sum">Дозволити автозавантаження коли зарядний пристрій не підключений</string>
@@ -445,7 +439,6 @@
   <string name="pref_enqueue_downloaded_title">Додати завантаження до черги</string>
   <string name="pref_enqueue_downloaded_summary">Додавати завантажені епізоди до черги</string>
     <string name="pref_skip_silence_title">Пропуск тиші</string>
-  <string name="behavior">Поведінка</string>
   <string name="pref_back_button_behavior_title">Поведінка кнопки \"Назад\"</string>
   <string name="pref_back_button_behavior_sum">Зміна поведінки кнопки \"Назад\".</string>
   <string name="back_button_default">За замовчуванням</string>
@@ -485,9 +478,6 @@
   <string name="sync_status_success">Синхронізацію виконано</string>
   <string name="sync_status_error">Помилка синхронізації</string>
   <!--import and export-->
-  <string name="import_export_summary">Переміщення підписок і черги на інший пристрій</string>
-  <string name="database">База даних</string>
-  <string name="opml">OPML</string>
   <string name="opml_export_summary">Перенесіть свої підписки на інший додаток для подкастів</string>
   <string name="opml_import_summary">Імпортуйте свої підписки з іншого додатка для подкастів</string>
   <string name="database_export_summary">Перенесіть підписки, прослухані епізоди та чергу на FocusPodcast в іншому пристрої</string>

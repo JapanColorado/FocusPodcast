@@ -26,7 +26,6 @@
   <!--Google Assistant-->
   <!--SwipeActions-->
   <string name="swipeactions_label">滑動操作</string>
-  <string name="swipeactions_summary">選擇列表滑動操作的行為</string>
   <string name="enable_swipeactions">啟用此屏幕的滑動操作</string>
   <string name="change_setting">更改</string>
   <string name="swipe_right">右滑</string>
@@ -267,8 +266,6 @@
   <string name="new_episode_notification_enabled">通知已啟用</string>
   <string name="new_episode_notification_disabled">通知已禁用</string>
   <!--Preferences-->
-  <string name="storage_pref">儲存空間</string>
-  <string name="synchronization_pref">同步</string>
   <string name="automation">自動化</string>
     <string name="import_export_pref">匯入/匯出</string>
   <string name="import_export_search_keywords">備份, 還原, backup, restore, export, import, 匯出, 匯入</string>
@@ -322,7 +319,6 @@
   <string name="pref_summary_colored_app">在播放面板上，背景與控制按鈕的顏色將根據的專輯封面顏色而改變</string>
   <string name="pref_summary_colored_app_shortcuts">將重點色調設為應用快捷方式的顏色。每次更改重點色調後，請切換此功能以生效。</string>
   <string name="playback_pref">播放</string>
-  <string name="network_pref">網路</string>
   <string name="pref_followQueue_title">連續播放</string>
   <string name="pref_pauseOnHeadsetDisconnect_title">耳機或藍牙裝置拔除時</string>
   <string name="pref_unpauseOnHeadsetReconnect_title">接上耳機時繼續播放</string>
@@ -334,19 +330,12 @@
   <string name="pref_mobileUpdate_auto_download">自動下載</string>
   <string name="pref_mobileUpdate_episode_download">下載單集</string>
   <string name="pref_mobileUpdate_streaming">串流播放</string>
-  <string name="user_interface_label">介面與外觀</string>
   <string name="pref_general_title">常規</string>
-  <string name="user_interface_sum">主題、外觀、訂閱</string>
-  <string name="pref_general_sum">播客搜索、操作、通知</string>
   <string name="pref_podcast_search_engine_title">選擇播客搜索引擎</string>
   <string name="pref_podcast_search_engine_sum">您可以選擇適合自己的播客搜索引擎，如果選擇了多個，能夠搜索出更多的結果，但是這樣會使搜索時間變長</string>
   <string name="pref_summary_lock_screen">使用自訂鎖定螢幕控制</string>
   <string name="pref_title_lock_screen">全螢幕控制</string>
-  <string name="playback_pref_sum">播放控制和定製播放界面</string>
-  <string name="network_pref_sum">自動更新、自動下載、移動網絡</string>
-  <string name="synchronization_sum">雲備份和恢復</string>
   <string name="pref_header_lockscreen">鎖定螢幕</string>
-  <string name="storage_sum">播客剧集自动删除、與其他播客APP數據同步</string>
   <string name="pref_set_theme_title">選擇主題</string>
   <string name="pref_nav_drawer_items_title">設定抽屜導航欄</string>
   <string name="pref_nav_drawer_items_sum">改變抽屜導航欄的順序和可見性</string>
@@ -354,7 +343,6 @@
   <string name="pref_nav_drawer_feed_order_sum">更改您訂閱頻道的排序方式</string>
   <string name="pref_nav_drawer_episodes_counter_title">單集計數器</string>
   <string name="pref_nav_drawer_episodes_counter_sum">更改單集計數器的計數方式</string>
-  <string name="pref_set_theme_sum">更改 FocusPodcast 的外觀</string>
   <string name="pref_automatic_download_title">自動下載</string>
   <string name="pref_refresh_on_start_title">启動时同步</string>
   <string name="pref_automatic_download_on_battery_title">未充電時下載</string>
@@ -423,7 +411,6 @@
   <string name="pref_skip_silence_title">跳過沒有聲音的部分</string>
   <string name="pref_custom_for_podcast">為此播客自訂</string>
   <string name="pref_custom_for_podcast_sum">關閉時，此播客使用設定中的預設音效。在播放器中變更音效會自動開啟此項</string>
-  <string name="behavior">操作行為</string>
   <string name="pref_back_button_behavior_title">返回鍵行為</string>
   <string name="pref_back_button_behavior_sum">調整按下返回鍵時的行為</string>
   <string name="back_button_default">預設</string>
@@ -472,9 +459,6 @@
   <string name="sync_status_success">同步成功</string>
   <string name="sync_status_error">同步失敗</string>
   <!--import and export-->
-  <string name="import_export_summary">將訂閱及待播清單移到另一台設備</string>
-  <string name="database">資料庫</string>
-  <string name="opml">OPML</string>
   <string name="opml_export_summary">將您的訂閱清單移到另一個 Podcast 軟體</string>
   <string name="opml_import_summary">從其他 Podcast 軟體匯入訂閱清單</string>
   <string name="database_export_summary">將訂閱、聆聽紀錄、待播清單傳送到其他設備上的 FocusPodcast</string>

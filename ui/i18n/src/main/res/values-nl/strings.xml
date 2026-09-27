@@ -28,7 +28,6 @@
   <string name="app_action_not_found">\'%1$s\' is niet aangetroffen</string>
   <!--SwipeActions-->
   <string name="swipeactions_label">Veegacties</string>
-  <string name="swipeactions_summary">Kies de actie die moet worden uitgevoerd door te vegen over een aflevering</string>
   <string name="swipe_right">Naar rechts vegen</string>
   <string name="swipe_left">Naar links vegen</string>
   <string name="enable_swipeactions">Veegacties inschakelen op dit scherm</string>
@@ -302,8 +301,6 @@
     <string name="no_fav_episodes_head_label">Geen favoriete afleveringen</string>
   <string name="no_subscriptions_head_label">Geen abonnementen</string>
     <!--Preferences-->
-  <string name="storage_pref">Opslag</string>
-  <string name="synchronization_pref">Synchronisatie</string>
   <string name="automation">Automatische acties</string>
     <string name="import_export_pref">Importeren/Exporteren</string>
   <string name="import_export_search_keywords">back-up, herstel</string>
@@ -338,7 +335,6 @@
   <string name="pref_favorite_keeps_episodes_sum">Afleveringen bewaren als ze als favoriet gemarkeerd zijn</string>
   <string name="pref_favorite_keeps_episodes_title">Favoriete afleveringen bewaren</string>
   <string name="playback_pref">Afspelen</string>
-  <string name="network_pref">Netwerk</string>
   <string name="feed_refresh_title">Podcasts verversen</string>
   <string name="feed_refresh_sum">Stel een tussenpoos of tijdstip in waarop automatisch nieuwe afleveringen worden opgehaald</string>
   <string name="feed_refresh_interval">Met tussenpozen</string>
@@ -360,13 +356,11 @@
   <string name="pref_mobileUpdate_auto_download">Automatisch downloaden</string>
   <string name="pref_mobileUpdate_episode_download">Hoofdstuk downloaden</string>
   <string name="pref_mobileUpdate_streaming">Streamen</string>
-  <string name="user_interface_label">Uiterlijk</string>
   <string name="pref_set_theme_title">Thema kiezen</string>
   <string name="pref_nav_drawer_items_title">Menu-items kiezen</string>
   <string name="pref_nav_drawer_items_sum">Kies welke items moeten worden getoond in het navigatiemenu.</string>
   <string name="pref_nav_drawer_feed_order_title">Abonnementsvolgorde instellen</string>
   <string name="pref_nav_drawer_feed_order_sum">Stel de volgorde van je abonnementen in</string>
-  <string name="pref_set_theme_sum">Pas het uiterlijk van FocusPodcast aan.</string>
   <string name="pref_automatic_download_title">Automatisch downloaden</string>
   <string name="pref_automatic_download_on_battery_title">Downloaden als niet wordt opgeladen</string>
   <string name="pref_automatic_download_on_battery_sum">Automatisch downloaden toestaan als niet wordt opgeladen</string>
@@ -437,7 +431,6 @@
   <string name="pref_enqueue_downloaded_title">Gedownloade afleveringen in wachtrij</string>
   <string name="pref_enqueue_downloaded_summary">Voeg gedownloade afleveringen toe aan de wachtrij</string>
     <string name="pref_skip_silence_title">Audiostiltes overslaan</string>
-  <string name="behavior">Gedrag</string>
   <string name="pref_back_button_behavior_title">Gedrag van terugknop</string>
   <string name="pref_back_button_behavior_sum">Pas het gedrag van de terugknop aan.</string>
   <string name="back_button_default">Standaard</string>
@@ -479,9 +472,6 @@
   <string name="sync_status_success">Synchronisatie afgerond</string>
   <string name="sync_status_error">Synchronisatie mislukt</string>
   <!--import and export-->
-  <string name="import_export_summary">Abonnementen en wachtrijen naar een ander toestel verplaatsen</string>
-  <string name="database">Database</string>
-  <string name="opml">OPML</string>
   <string name="opml_export_summary">Abonnementen overzetten naar een andere podcast-app</string>
   <string name="opml_import_summary">Abonnementen importeren uit andere podcast-app</string>
   <string name="database_export_summary">Abonnementen, beluisterde afleveringen en wachtrij overzetten naar FocusPodcast op een ander toestel</string>

@@ -27,7 +27,6 @@
   <string name="app_action_not_found">Nun s\'atopó «%1$s»</string>
   <!--SwipeActions-->
   <string name="swipeactions_label">Aiciones al eslizar</string>
-  <string name="swipeactions_summary">Escueyi qué asocede al eslizar un episodiu que tea nuna llista</string>
   <!--Statistics fragment-->
   <!--Download Statistics fragment-->
   <string name="total_size_downloaded_podcasts">El tamañu total d\'episodios nel preséu:</string>
@@ -227,8 +226,6 @@
   <string name="no_fav_episodes_head_label">Nun hai episodios favoritos</string>
   <string name="no_subscriptions_head_label">Nun hai soscripciones</string>
   <!--Preferences-->
-  <string name="storage_pref">Almacenamientu</string>
-  <string name="synchronization_pref">Sincronización</string>
   <string name="automation">Automatización</string>
   <string name="import_export_pref">Importación/Esportación</string>
   <string name="appearance">Aspeutu</string>
@@ -256,7 +253,6 @@
   <string name="pref_skip_keeps_episodes_title">Caltener los episodios saltaos</string>
   <string name="pref_favorite_keeps_episodes_title">Caltener los episodios favoritos</string>
   <string name="playback_pref">Reproducción</string>
-  <string name="network_pref">Rede</string>
   <string name="feed_refresh_interval">Intervalu</string>
   <string name="feed_refresh_time">Tiempu</string>
   <string name="feed_refresh_never">Enxamás</string>
@@ -273,13 +269,11 @@
   <string name="pref_mobileUpdate_images">Portaes</string>
   <string name="pref_mobileUpdate_auto_download">Descarga automática</string>
   <string name="pref_mobileUpdate_episode_download">Descarga d\'episodios</string>
-  <string name="user_interface_label">Interfaz d\'usuariu</string>
   <string name="pref_set_theme_title">Estilu de l\'aplicación</string>
   <string name="pref_nav_drawer_items_title">Elementos del caxón de navegación</string>
   <string name="pref_nav_drawer_items_sum">Camuda los elementos qu\'apaecen nel caxón de navegación.</string>
   <string name="pref_nav_drawer_feed_order_title">Orde de les soscripciones</string>
   <string name="pref_nav_drawer_feed_order_sum">Camuda l\'orde de les soscripciones</string>
-  <string name="pref_set_theme_sum">Camuda l\'aspeutu d\'FocusPodcast.</string>
   <string name="pref_automatic_download_title">Descarga automática</string>
   <string name="pref_automatic_download_on_battery_title">Baxar al nun tar cargando la batería</string>
   <string name="pref_automatic_download_on_battery_sum">Permite la descarga automática cuando la batería nun tea cargando.</string>
@@ -329,7 +323,6 @@
   <string name="pref_no_browser_found">Nun s\'atopó nengún restolador web.</string>
   <string name="pref_enqueue_downloaded_title">Amestar lo baxao a la cola</string>
   <string name="pref_enqueue_downloaded_summary">Amiesta los episodios baxaos a la cola</string>
-  <string name="behavior">Comportamientu</string>
   <string name="pref_back_button_behavior_title">Comportamientu del botón Atrás</string>
   <string name="pref_back_button_behavior_sum">Camuda\'l comportamientu del botón Atrás.</string>
   <string name="back_button_default">El predetermináu</string>
@@ -359,9 +352,6 @@
   <string name="sync_status_subscriptions">Sincronizando les soscripciones…</string>
   <string name="sync_status_success">La sincronización fízose correutamente</string>
   <!--import and export-->
-  <string name="import_export_summary">Movi les soscripciones y la cola a otru preséu</string>
-  <string name="database">Base de datos</string>
-  <string name="opml">OPML</string>
   <string name="opml_export_summary">Tresfier les soscripciones a otra aplicación de podcasts</string>
   <string name="opml_import_summary">Importa les soscripciones d\'otra aplicación de podcasts</string>
   <string name="database_export_summary">Tresfier les soscripciones, los episodios sentíos y la cola al FocusPodcast d\'otru preséu</string>

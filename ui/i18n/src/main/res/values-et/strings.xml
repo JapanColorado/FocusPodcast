@@ -28,7 +28,6 @@
   <string name="app_action_not_found">\"%1$s\" ei leitud</string>
   <!--SwipeActions-->
   <string name="swipeactions_label">Pühkimise tegevused</string>
-  <string name="swipeactions_summary">Vali, mis juhtub kui pühkida nimekirjas saadet</string>
   <string name="swipe_right">Pühi paremale</string>
   <string name="swipe_left">Pühi vasakule</string>
   <string name="enable_swipeactions">Luba sellel ekraanil pühkimise tegevused</string>
@@ -288,8 +287,6 @@
     <string name="no_fav_episodes_head_label">Lemmiksaateid pole</string>
   <string name="no_subscriptions_head_label">Tellimusi pole</string>
     <!--Preferences-->
-  <string name="storage_pref">Salvestusruum</string>
-  <string name="synchronization_pref">Sünkroonimine</string>
   <string name="automation">Automaatika</string>
     <string name="import_export_pref">Import/eksport</string>
   <string name="import_export_search_keywords">varundus, taastamine</string>
@@ -324,7 +321,6 @@
   <string name="pref_favorite_keeps_episodes_sum">Saadete säilitamine, kui need on märgitud lemmikuks</string>
   <string name="pref_favorite_keeps_episodes_title">Säilita lemmikosad</string>
   <string name="playback_pref">Esitamine</string>
-  <string name="network_pref">Võrk</string>
   <string name="feed_refresh_title">Värskenda taskuhäälinguid</string>
   <string name="feed_refresh_interval">Vahemik</string>
   <string name="feed_refresh_time">Aeg</string>
@@ -341,13 +337,11 @@
   <string name="pref_mobileUpdate_auto_download">Automaatne allalaadimine</string>
   <string name="pref_mobileUpdate_episode_download">Saate allalaadimine</string>
   <string name="pref_mobileUpdate_streaming">Voogedastus</string>
-  <string name="user_interface_label">Kasutajaliides</string>
   <string name="pref_set_theme_title">Vali teema</string>
   <string name="pref_nav_drawer_items_title">Määra peamenüü osad</string>
   <string name="pref_nav_drawer_items_sum">Määra, mis osad on peamenüüs.</string>
   <string name="pref_nav_drawer_feed_order_title">Määra tellimuste järjekord</string>
   <string name="pref_nav_drawer_feed_order_sum">Muuda oma tellimuste järjekorda</string>
-  <string name="pref_set_theme_sum">FocusPodcasti välimuse muutmine</string>
   <string name="pref_automatic_download_title">Automaatne allalaadimine</string>
   <string name="pref_automatic_download_on_battery_title">Allalaadimine, kui seade ei lae</string>
   <string name="pref_automatic_download_on_battery_sum">Luba automaatne allalaadimine ka siis, kui seade pole laadimas</string>
@@ -407,7 +401,6 @@
   <string name="pref_enqueue_downloaded_title">Järjekord allalaaditud</string>
   <string name="pref_enqueue_downloaded_summary">Allalaaditud saadete lisamine järjekorda</string>
   <string name="pref_skip_silence_title">Audios vaikuse vahele jätmine</string>
-  <string name="behavior">Käitumine</string>
   <string name="pref_back_button_behavior_title">Tagasi nupu käitumine</string>
   <string name="pref_back_button_behavior_sum">Tagasi nupu käitumine muutmine.</string>
   <string name="back_button_default">Vaikimisi</string>
@@ -444,9 +437,6 @@
   <string name="sync_status_success">Sünkroonimine õnnestus</string>
   <string name="sync_status_error">Sünkroonimine nurjus</string>
   <!--import and export-->
-  <string name="import_export_summary">Tellimuste ja ootejärjekorra liigutamine teise seadmesse</string>
-  <string name="database">Andmebaas</string>
-  <string name="opml">OPML</string>
   <string name="opml_export_summary">Tellimuste liigutamine teise taskuhäälingu äppi</string>
   <string name="opml_import_summary">Tellimuste importimine teisest taskuhäälingu äpist</string>
   <string name="database_export_summary">Tellimuste, kuulatud saadete ja ooterjärjekorra liigutamine FocusPodcasti mõnes teises seadmes</string>

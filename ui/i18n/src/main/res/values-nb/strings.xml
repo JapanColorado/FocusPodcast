@@ -28,7 +28,6 @@
   <string name="app_action_not_found">\"%1$s\" ikke funnet</string>
   <!--SwipeActions-->
   <string name="swipeactions_label">Dra handlinger</string>
-  <string name="swipeactions_summary">Velg hva som skjer når du drar en episode i ei liste</string>
   <string name="swipe_right">Dra til høyre</string>
   <string name="swipe_left">Dra til venstre</string>
   <string name="enable_swipeactions">Slå på dra handlinger for dette skjermet</string>
@@ -273,8 +272,6 @@
     <string name="no_fav_episodes_head_label">Ingen favoritt-episoder</string>
   <string name="no_subscriptions_head_label">Ingen abonnementer</string>
     <!--Preferences-->
-  <string name="storage_pref">Lagring</string>
-  <string name="synchronization_pref">Synkronisering</string>
   <string name="automation">Automasjon</string>
     <string name="import_export_pref">Importer/Eksporter</string>
   <string name="import_export_search_keywords">backup, gjenopprett, lagre</string>
@@ -309,7 +306,6 @@
   <string name="pref_favorite_keeps_episodes_sum">Behold episoder når de er merket som favoritt</string>
   <string name="pref_favorite_keeps_episodes_title">Behold favorittepisoder</string>
   <string name="playback_pref">Avspilling</string>
-  <string name="network_pref">Nettverk</string>
   <string name="feed_refresh_title">Oppdater podkaster</string>
   <string name="feed_refresh_sum">Spesifiser en intervall eller et spesifikt tidspunkt når det skal sjekkes automatisk for nye episoder</string>
   <string name="feed_refresh_interval">Intervall</string>
@@ -327,13 +323,11 @@
   <string name="pref_mobileUpdate_auto_download">Automatisk nedlasting</string>
   <string name="pref_mobileUpdate_episode_download">Nedlasting av episoder</string>
   <string name="pref_mobileUpdate_streaming">Strømming</string>
-  <string name="user_interface_label">Brukergrensesnitt</string>
   <string name="pref_set_theme_title">Velg tema</string>
   <string name="pref_nav_drawer_items_title">Velg elementer i navigasjonsskuffen</string>
   <string name="pref_nav_drawer_items_sum">Endre hvilke elementer som vises i navigeringsfanen.</string>
   <string name="pref_nav_drawer_feed_order_title">Velg rekkefølge på abonnementer</string>
   <string name="pref_nav_drawer_feed_order_sum">Endre rekkefølgen på abonnementene dine</string>
-  <string name="pref_set_theme_sum">Endre utseendet til FocusPodcast</string>
   <string name="pref_automatic_download_title">Automatisk nedlasting</string>
   <string name="pref_automatic_download_on_battery_title">Last ned når enheten ikke lader</string>
   <string name="pref_automatic_download_on_battery_sum">Tillat automatisk nedlasting når enheten ikke står til lading</string>
@@ -393,7 +387,6 @@
   <string name="pref_enqueue_downloaded_title">Legg til nedlastede i køen</string>
   <string name="pref_enqueue_downloaded_summary">Legg til nedlastede episoder i køen</string>
     <string name="pref_skip_silence_title">Hopp over stillhet</string>
-  <string name="behavior">Oppførsel</string>
   <string name="pref_back_button_behavior_title">Tilbake-knappens oppførsel</string>
   <string name="pref_back_button_behavior_sum">Endrer hva tilbake-knappen gjør</string>
   <string name="back_button_default">Standard</string>
@@ -433,9 +426,6 @@
   <string name="sync_status_success">Synkronisering suksessfull</string>
   <string name="sync_status_error">Synkronisering feilet</string>
   <!--import and export-->
-  <string name="import_export_summary">Overfør abonnementer og kø til en anen enhet</string>
-  <string name="database">Database</string>
-  <string name="opml">OPML</string>
   <string name="opml_export_summary">Overfør abonnementene dine til en annen podkast-app</string>
   <string name="opml_import_summary">Importer abonnementene dine fra en annen podkast-app</string>
   <string name="database_export_summary">Overfør abonnementer, avspilte episoder og kø til FocusPodcast på en annen enhet</string>

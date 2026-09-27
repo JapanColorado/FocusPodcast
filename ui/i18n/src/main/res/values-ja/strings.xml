@@ -245,8 +245,6 @@
     <string name="no_fav_episodes_head_label">お気に入りのエピソードはありません</string>
   <string name="no_subscriptions_head_label">購読していません</string>
     <!--Preferences-->
-  <string name="storage_pref">ストレージ</string>
-  <string name="synchronization_pref">同期</string>
   <string name="automation">自動</string>
     <string name="import_export_pref">インポート/エクスポート</string>
   <string name="import_export_search_keywords">バックアップ、復元</string>
@@ -271,7 +269,6 @@
   <string name="pref_favorite_keeps_episodes_sum">エピソードをお気に入りに追加した時に残しておきます</string>
   <string name="pref_favorite_keeps_episodes_title">お気に入りのエピソードを残す</string>
   <string name="playback_pref">再生</string>
-    <string name="network_pref">ネットワーク</string>
   <string name="pref_followQueue_title">連続再生</string>
   <string name="pref_unpauseOnHeadsetReconnect_title">ヘッドフォン再接続</string>
   <string name="pref_unpauseOnBluetoothReconnect_title">Bluetooth再接続</string>
@@ -282,13 +279,11 @@
   <string name="pref_mobileUpdate_auto_download">自動ダウンロード</string>
   <string name="pref_mobileUpdate_episode_download">エピソードのダウンロード</string>
   <string name="pref_mobileUpdate_streaming">ストリーミング</string>
-  <string name="user_interface_label">インターフェース</string>
   <string name="pref_set_theme_title">テーマを選択</string>
   <string name="pref_nav_drawer_items_title">ナビゲーションドロワーを変更</string>
   <string name="pref_nav_drawer_items_sum">ナビゲーションドロワーに表示するアイテムを変更します</string>
   <string name="pref_nav_drawer_feed_order_title">購読注文をセット</string>
   <string name="pref_nav_drawer_feed_order_sum">購読の注文を変更します</string>
-  <string name="pref_set_theme_sum">FocusPodcastの外観を変更します</string>
   <string name="pref_automatic_download_title">自動ダウンロード</string>
   <string name="pref_automatic_download_on_battery_title">充電中以外の時にダウンロード</string>
   <string name="pref_automatic_download_on_battery_sum">バッテリーを充電していない時に自動ダウンロードを許可します</string>
@@ -335,7 +330,6 @@
   <string name="pref_enqueue_downloaded_title">ダウンロードのキューに入れる</string>
   <string name="pref_enqueue_downloaded_summary">ダウンロードしたエピソードをキューに追加します</string>
   <string name="pref_skip_silence_title">音声の無音をスキップ</string>
-  <string name="behavior">動作</string>
   <string name="pref_back_button_behavior_title">戻るボタンの動作</string>
   <string name="pref_back_button_behavior_sum">戻るボタンの動作を変更します</string>
   <string name="back_button_default">デフォルト</string>
@@ -355,9 +349,6 @@
   <string name="no_results_for_query">\"%1$s\" の結果は見つかりませんでした</string>
   <!--Synchronization-->
   <!--import and export-->
-  <string name="import_export_summary">購読とキューを別のデバイスに移動</string>
-  <string name="database">データベース</string>
-  <string name="opml">OPML</string>
   <string name="opml_export_summary">購読を別のポッドキャストアプリに転送する</string>
   <string name="opml_import_summary">別のポッドキャストアプリから購読をインポートする</string>
   <string name="database_export_summary">購読、再生したエピソード、キューを別のデバイスのFocusPodcastに転送する</string>

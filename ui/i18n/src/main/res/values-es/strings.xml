@@ -28,7 +28,6 @@
   <string name="app_action_not_found">No se encontró «%1$s»</string>
   <!--SwipeActions-->
   <string name="swipeactions_label">Gestos de deslizado</string>
-  <string name="swipeactions_summary">Escoger que pasa al deslizar un episodio en una lista</string>
   <string name="swipe_right">Deslizar a la derecha</string>
   <string name="swipe_left">Deslizar a la izquierda</string>
   <string name="enable_swipeactions">Activar gestos de deslizado en esta pantalla</string>
@@ -295,8 +294,6 @@
     <string name="no_fav_episodes_head_label">Sin episodios favoritos</string>
   <string name="no_subscriptions_head_label">No hay suscripciones</string>
   <!--Preferences-->
-  <string name="storage_pref">Almacenamiento</string>
-  <string name="synchronization_pref">Sincronización</string>
   <string name="automation">Automatización</string>
     <string name="import_export_pref">Importar/Exportar</string>
   <string name="import_export_search_keywords">copia de seguridad, restaurar, backup, restore</string>
@@ -331,7 +328,6 @@
   <string name="pref_favorite_keeps_episodes_sum">Conservar los episodios cuando se marcan como favoritos</string>
   <string name="pref_favorite_keeps_episodes_title">Conservar episodios favoritos</string>
   <string name="playback_pref">Reproducción</string>
-  <string name="network_pref">Red</string>
   <string name="feed_refresh_title">Actualizar pódcasts</string>
   <string name="feed_refresh_sum">Especifique un intervalo o un tiempo específico para buscar nuevos episodios automáticamente</string>
   <string name="feed_refresh_interval">Intervalo</string>
@@ -353,13 +349,11 @@
   <string name="pref_mobileUpdate_auto_download">Descarga automática</string>
   <string name="pref_mobileUpdate_episode_download">Descarga de episodio</string>
   <string name="pref_mobileUpdate_streaming">Escuchar en directo</string>
-  <string name="user_interface_label">Interfaz de usuario</string>
   <string name="pref_set_theme_title">Elegir un tema</string>
   <string name="pref_nav_drawer_items_title">Cambiar el cajón de navegación</string>
   <string name="pref_nav_drawer_items_sum">Cambiar los ítems que aparecen en el cajón de navegación</string>
   <string name="pref_nav_drawer_feed_order_title">Ajustar orden de suscripción</string>
   <string name="pref_nav_drawer_feed_order_sum">Cambiar el orden de las suscripciones</string>
-  <string name="pref_set_theme_sum">Cambiar la apariencia de FocusPodcast.</string>
   <string name="pref_automatic_download_title">Descarga automática</string>
   <string name="pref_automatic_download_on_battery_title">Descargar cuando no se está cargando</string>
   <string name="pref_automatic_download_on_battery_sum">Permitir la descarga automática cuando la batería no se esté cargando</string>
@@ -419,7 +413,6 @@
   <string name="pref_enqueue_downloaded_title">Añadir descargados a la cola</string>
   <string name="pref_enqueue_downloaded_summary">Añadir episodios descargados a la cola</string>
   <string name="pref_skip_silence_title">Saltar silencio en audio</string>
-  <string name="behavior">Comportamiento</string>
   <string name="pref_back_button_behavior_title">Comportamiento del botón de retroceso</string>
   <string name="pref_back_button_behavior_sum">Cambiar el comportamiento del botón de retroceso.</string>
   <string name="back_button_default">Predeterminado</string>
@@ -459,9 +452,6 @@
   <string name="sync_status_success">Sincronización exitosa</string>
   <string name="sync_status_error">Error en la sincronización</string>
   <!--import and export-->
-  <string name="import_export_summary">Mover las suscripciones y la cola a otro dispositivo</string>
-  <string name="database">Base de datos</string>
-  <string name="opml">OPML</string>
   <string name="opml_export_summary">Transferir tus suscripciones a otra aplicación de podcast</string>
   <string name="opml_import_summary">Importar tus suscripciones desde otra aplicación de podcast</string>
   <string name="database_export_summary">Transferir suscripciones, episodios escuchados y la cola a FocusPodcast en otro dispositivo</string>

@@ -29,7 +29,6 @@
   <string name="app_action_not_found">\"%1$s\" 未找到</string>
   <!--SwipeActions-->
   <string name="swipeactions_label">滑动操作</string>
-  <string name="swipeactions_summary">选择列表滑动操作的行为</string>
   <string name="swipe_right">右滑</string>
   <string name="swipe_left">左滑</string>
   <string name="enable_swipeactions">启用此屏幕的滑动操作</string>
@@ -300,8 +299,6 @@
   <string name="no_subscriptions_head_label">是时候添加一些播客了</string>
   <string name="no_subscriptions_label">试试底部发现按钮，将喜欢的播客收入囊中</string>
   <!--Preferences-->
-  <string name="storage_pref">存储</string>
-  <string name="synchronization_pref">同步</string>
   <string name="automation">自动化</string>
   <string name="import_export_pref">导入/导出</string>
   <string name="import_export_search_keywords">数据, 备份, 还原, backup, restore</string>
@@ -351,7 +348,6 @@
   <string name="pref_favorite_keeps_episodes_sum">当剧集被收藏时保留它们</string>
   <string name="pref_favorite_keeps_episodes_title">保留收藏的剧集</string>
   <string name="playback_pref">播放</string>
-  <string name="network_pref">网络</string>
   <string name="feed_refresh_title">刷新播客</string>
   <string name="feed_refresh_sum">指定一个间隔或特定的时间来自动刷新播客</string>
   <string name="feed_refresh_interval">间隔</string>
@@ -378,18 +374,11 @@
   <string name="pref_mobileUpdate_auto_download">自动下载</string>
   <string name="pref_mobileUpdate_episode_download">单集下载</string>
   <string name="pref_mobileUpdate_streaming">在线播放</string>
-  <string name="user_interface_label">界面与外观</string>
   <string name="pref_general_title">通用</string>
-  <string name="playback_pref_sum">播放控制和定制播放界面</string>
-  <string name="user_interface_sum">主题、外观、订阅</string>
-  <string name="pref_general_sum">播客搜索、操作、通知</string>
   <string name="pref_podcast_search_engine_title">选择播客搜索引擎</string>
   <string name="pref_podcast_search_engine_sum">您可以选择适合自己的播客搜索引擎，如果选择了多个，能够搜索出更多的结果，但是这样会使搜索时间变长</string>
   <string name="pref_summary_lock_screen">使用自定义锁屏</string>
   <string name="pref_title_lock_screen">全屏控件</string>
-  <string name="network_pref_sum">自动更新、自动下载、移动网络</string>
-  <string name="synchronization_sum">云备份和恢复</string>
-  <string name="storage_sum">播客剧集自动删除、与其他播客APP数据同步</string>
   <string name="pref_set_theme_title">主题选择</string>
   <string name="pref_nav_drawer_items_title">设置抽屉导航栏</string>
   <string name="pref_nav_drawer_items_sum">改变抽屉导航栏的顺序和可见性</string>
@@ -397,10 +386,8 @@
   <string name="pref_nav_drawer_feed_order_sum">改变您的订阅的排序方式</string>
   <string name="pref_nav_drawer_episodes_counter_title">单集计数器</string>
   <string name="pref_nav_drawer_episodes_counter_sum">更改单集计数器的计数方式</string>
-  <string name="pref_set_theme_sum">改变 FocusPodcast 外观</string>
   <string name="pref_automatic_download_title">自动下载</string>
   <string name="pref_refresh_on_start_title">启动时同步</string>
-  <string name="pref_geek">极客</string>
   <string name="pref_mobile_network">移动网络</string>
   <string name="pref_automatic_download_on_battery_title">未充电时下载</string>
   <string name="pref_automatic_download_on_battery_sum">未充电时允许自动下载</string>
@@ -481,7 +468,6 @@
   <string name="pref_skip_silence_title">跳过没有声音的音频</string>
   <string name="pref_custom_for_podcast">为此播客自定义</string>
   <string name="pref_custom_for_podcast_sum">关闭时，此播客使用设置中的默认音效。在播放器中更改音效会自动开启此项</string>
-  <string name="behavior">行为</string>
   <string name="pref_back_button_behavior_title">返回键行为</string>
   <string name="pref_back_button_behavior_sum">改变返回键的行为</string>
   <string name="back_button_default">默认</string>
@@ -528,9 +514,6 @@
   <string name="sync_status_success">成功同步</string>
   <string name="sync_status_error">同步失败</string>
   <!--import and export-->
-  <string name="import_export_summary">导出订阅、播放列表到另一台设备</string>
-  <string name="database">数据库</string>
-  <string name="opml">OPML格式</string>
   <string name="opml_export_summary">将您的订阅转移到另一个播客应用 </string>
   <string name="opml_import_summary">从另一个播客应用导入您的订阅</string>
   <string name="database_export_summary">将订阅、剧集和播放列表转移到另一台设备上的FocusPodcast</string>

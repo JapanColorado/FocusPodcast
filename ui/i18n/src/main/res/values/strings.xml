@@ -36,7 +36,6 @@
 
     <!-- SwipeActions -->
     <string name="swipeactions_label">Swipe Actions</string>
-    <string name="swipeactions_summary">Select list swipe behavior</string>
     <string name="swipe_right">Swipe Right</string>
     <string name="swipe_left">Swipe Left</string>
     <string name="enable_swipeactions">Enable Swipe Actions for this Screen</string>
@@ -348,12 +347,9 @@
     <string name="no_subscriptions_head_label">Time to add some Podcasts</string>
     <string name="no_subscriptions_label">Try the Discover button at the bottom to get your favorite podcasts in your pocket</string>
     <!-- Preferences -->
-    <string name="storage_pref">Storage</string>
-    <string name="synchronization_pref">Synchronization</string>
     <string name="automation">Automation</string>
     <string name="pref_mobile_network">Mobile Network</string>
 
-    <string name="pref_geek">Geek</string>
     <string name="import_export_pref">Import/Export</string>
     <string name="import_export_search_keywords">backup, restore</string>
     <string name="appearance">Appearance</string>
@@ -393,7 +389,6 @@
     <string name="pref_favorite_keeps_episodes_sum">Keep episodes when they are marked favorite</string>
     <string name="pref_favorite_keeps_episodes_title">Keep Favorite Episodes</string>
     <string name="playback_pref">Playback</string>
-    <string name="network_pref">Network</string>
     <string name="feed_refresh_title">Refresh podcasts</string>
     <string name="feed_refresh_sum">Specify an interval or a specific time to automatically refresh the podcast</string>
     <string name="feed_refresh_interval">Interval</string>
@@ -415,19 +410,12 @@
     <string name="pref_mobileUpdate_auto_download">Auto download</string>
     <string name="pref_mobileUpdate_episode_download">Episode download</string>
     <string name="pref_mobileUpdate_streaming">Streaming</string>
-    <string name="user_interface_label">Look and Feel</string>
     <string name="pref_general_title">General</string>
 
     <string name="pref_header_lockscreen">Lockscreen</string>
-    <string name="user_interface_sum">Theme, Appearance, Subscription</string>
-    <string name="pref_general_sum">Podcast Search, Operation, Notification</string>
 
     <string name="pref_summary_lock_screen">Use custom lockscreen controls</string>
     <string name="pref_title_lock_screen">Fullscreen Controls</string>
-    <string name="playback_pref_sum">Playback controls and Custom playback interface</string>
-    <string name="network_pref_sum">Auto update, Auto download, Mobile network</string>
-    <string name="synchronization_sum">Cloud Backup and Recovery</string>
-    <string name="storage_sum">Episode auto delete, Sync data with other podcast apps</string>
     <string name="accent_color">Accent color</string>
     <string name="pref_summary_desaturated_color">As per Material Design guide lines in dark mode colors should be desaturated</string>
     <string name="pref_title_desaturated_color">Desaturated color</string>
@@ -455,7 +443,6 @@
     <string name="pref_homepage_sum">Choose app default home page</string>
     <string name="pref_summary_toggle_full_screen">Immersive mode</string>
     <string name="pref_nav_drawer_episodes_counter_sum">Change the count method of the episodes counter</string>
-    <string name="pref_set_theme_sum">Change the appearance of FocusPodcast</string>
     <string name="pref_automatic_download_title">Automatic Downloads</string>
     <string name="pref_refresh_on_start_title">Sync on launch</string>
     <string name="pref_automatic_download_on_battery_title">Download when not charging</string>
@@ -533,7 +520,6 @@
     <string name="pref_skip_silence_title">Skip Silence in Audio</string>
     <string name="pref_custom_for_podcast">Customize for this podcast</string>
     <string name="pref_custom_for_podcast_sum">When off, this podcast uses the default effects from Settings. Changing an effect in the player turns this on</string>
-    <string name="behavior">Behavior</string>
     <string name="pref_back_button_behavior_title">Back Button Behavior</string>
     <string name="pref_back_button_behavior_sum">Change behavior of the back button</string>
     <string name="back_button_default">Default</string>
@@ -582,9 +568,6 @@
     <string name="sync_status_error">Synchronization failed</string>
 
     <!-- import and export -->
-    <string name="import_export_summary">Move subscriptions and queue to another device</string>
-    <string name="database">Database</string>
-    <string name="opml">OPML</string>
     <string name="opml_export_summary">Transfer your subscriptions to another podcast app</string>
     <string name="opml_import_summary">Import your subscriptions from another podcast app</string>
     <string name="database_export_summary">Transfer subscriptions, listened episodes and queue to FocusPodcast on another device</string>

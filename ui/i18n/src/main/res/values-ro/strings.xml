@@ -28,7 +28,6 @@
   <string name="app_action_not_found">%1$snu a fost găsit</string>
   <!--SwipeActions-->
   <string name="swipeactions_label">Setări gesturi</string>
-  <string name="swipeactions_summary">Alege ce se întâmplă când un episod este tras cu degetul</string>
   <string name="swipe_right">Trage cu degetul spre dreapta</string>
   <string name="swipe_left">Trage cu degetul spre stânga</string>
   <string name="enable_swipeactions">Activați gesturile pentru acest ecran</string>
@@ -316,8 +315,6 @@
     <string name="no_fav_episodes_head_label">Nu există episoade favorite</string>
   <string name="no_subscriptions_head_label">Fără abonamente</string>
     <!--Preferences-->
-  <string name="storage_pref">Stocare</string>
-  <string name="synchronization_pref">Sincronizare</string>
   <string name="automation">Automatizare</string>
   <string name="import_export_pref">Importă/Exportă</string>
   <string name="import_export_search_keywords">copie de siguranță, restaurare copie de siguranță</string>
@@ -352,7 +349,6 @@
   <string name="pref_favorite_keeps_episodes_sum">Păstrează episoadele când sunt marcate ca Favorite</string>
   <string name="pref_favorite_keeps_episodes_title">Păstrează episoadele favorite</string>
   <string name="playback_pref">Ascultare</string>
-  <string name="network_pref">Rețea</string>
   <string name="feed_refresh_title">Reîmprospătează podcasturile</string>
   <string name="feed_refresh_sum">Specifică un anumit interval sau un timp specific pentru a căuta episoade noi automat</string>
   <string name="feed_refresh_interval">Interval</string>
@@ -375,13 +371,11 @@
   <string name="pref_mobileUpdate_auto_download">Descărcare automată</string>
   <string name="pref_mobileUpdate_episode_download">Descarărcare episoade</string>
   <string name="pref_mobileUpdate_streaming">Streaming</string>
-  <string name="user_interface_label">Interfața grafică</string>
   <string name="pref_set_theme_title">Alege temă</string>
   <string name="pref_nav_drawer_items_title">Setează obiectele din sertar</string>
   <string name="pref_nav_drawer_items_sum">Schimbă ce obiecte apar în sertarul de navigare.</string>
   <string name="pref_nav_drawer_feed_order_title">Setează ordinea de abonare</string>
   <string name="pref_nav_drawer_feed_order_sum">Schimbă ordinea abonamentelor</string>
-  <string name="pref_set_theme_sum">Schimbă aspectul FocusPodcast.</string>
   <string name="pref_automatic_download_title">Descărcare automată</string>
   <string name="pref_automatic_download_on_battery_title">Descarcă când nu se incarcă</string>
   <string name="pref_automatic_download_on_battery_sum">Permite descărcările automate când bateria nu se încarcă</string>
@@ -452,7 +446,6 @@
   <string name="pref_enqueue_downloaded_title">Coadă descărcări</string>
   <string name="pref_enqueue_downloaded_summary">Adaugă episoade descărcate la coada de redare</string>
     <string name="pref_skip_silence_title">Sari peste liniște în fișierul audio</string>
-  <string name="behavior">Comportament</string>
   <string name="pref_back_button_behavior_title">Comportamentul butonului \"înapoi\"</string>
   <string name="pref_back_button_behavior_sum">Schimbă comportamentul butonului \"înapoi\"</string>
   <string name="back_button_default">Prestabilit</string>
@@ -494,9 +487,6 @@
   <string name="sync_status_success">Sincronizarea a reușit</string>
   <string name="sync_status_error">Sincronizarea a eșuat</string>
   <!--import and export-->
-  <string name="import_export_summary">Mută abonamentele și coada de redare către alt dispozitiv</string>
-  <string name="database">Bază de date</string>
-  <string name="opml">OPML</string>
   <string name="opml_export_summary">Transferă abonamentele tale către o alta aplicație</string>
   <string name="opml_import_summary">Importă abonamentele tale din altă aplicație de podcasturi</string>
   <string name="database_export_summary">Transferă abonamentele, episoadele redate și coada de redare către FocusPodcast de pe alt dispozitiv</string>

@@ -28,7 +28,6 @@
   <string name="app_action_not_found">«%1$s» یافت نشد</string>
   <!--SwipeActions-->
   <string name="swipeactions_label">کنش‌های کشیدن</string>
-  <string name="swipeactions_summary">انتخاب کنید چه اتفاقی بعد از کشیدن یک اپیزود در لیست بیوفتد</string>
   <string name="swipe_right">کشیدن به راست</string>
   <string name="swipe_left">کشیدن به چپ</string>
   <string name="enable_swipeactions">فعال کردن کشیدن برای این صفحه</string>
@@ -293,8 +292,6 @@
     <string name="no_fav_episodes_head_label">قسمت مورد علاقه‌ای موجود نیست</string>
   <string name="no_subscriptions_head_label">بدون اشتراک</string>
     <!--Preferences-->
-  <string name="storage_pref">حافظه</string>
-  <string name="synchronization_pref">هم‌گام‌سازی</string>
   <string name="automation">اتوماسیون</string>
     <string name="import_export_pref">وارد/صادر کرد</string>
   <string name="import_export_search_keywords">پشتیبان، بازگردانی</string>
@@ -329,7 +326,6 @@
   <string name="pref_favorite_keeps_episodes_sum">اپیزودها را نگه دار وقتی به عنوان علاقمندی علامت گذاری میشود</string>
   <string name="pref_favorite_keeps_episodes_title">اپیزودهای مورد علاقه نگه داشته شده</string>
   <string name="playback_pref">پخش</string>
-  <string name="network_pref">شبکه</string>
   <string name="feed_refresh_title">پادکست ها را بازخوانی کنید</string>
   <string name="feed_refresh_sum">یک بازه یا زمان مشخص از روز را برای بروزرسازی خودکار پادکست ها مشخص کنید</string>
   <string name="feed_refresh_interval">تنظیم بازه</string>
@@ -351,13 +347,11 @@
   <string name="pref_mobileUpdate_auto_download">بارگیری‌های خودکار</string>
   <string name="pref_mobileUpdate_episode_download">دانلود اپیزود</string>
   <string name="pref_mobileUpdate_streaming">جاری شدن</string>
-  <string name="user_interface_label">رابط کاربری</string>
   <string name="pref_set_theme_title">انتخاب پوسته</string>
   <string name="pref_nav_drawer_items_title">تنظیم موارد کشوی پیمایش</string>
   <string name="pref_nav_drawer_items_sum">تغییر موارد قابل نمایش در کشوی پیمایش</string>
   <string name="pref_nav_drawer_feed_order_title">تنظیم سفارش اشتراک</string>
   <string name="pref_nav_drawer_feed_order_sum">تغییر ترتیب اشتراک هایتان</string>
-  <string name="pref_set_theme_sum">تغییر ظاهر آنتن پاد</string>
   <string name="pref_automatic_download_title">بارگیری خودکار</string>
   <string name="pref_automatic_download_on_battery_title">بارگیری زمانی که سیستم شارژ نمیشود مجاز باشد</string>
   <string name="pref_automatic_download_on_battery_sum">وقتی باتری شارژ نمی شود ، امکان بارگیری خودکار وجود داشته باشد</string>
@@ -417,7 +411,6 @@
   <string name="pref_enqueue_downloaded_title">در صف نهادن بارگیری‌شده‌ها</string>
   <string name="pref_enqueue_downloaded_summary">قسمتهای بارگیری شده را به صف اضافه کنید</string>
     <string name="pref_skip_silence_title">رد کردن سکوت در صدا</string>
-  <string name="behavior">رفتار</string>
   <string name="pref_back_button_behavior_title">رفتار دکمه برگشت</string>
   <string name="pref_back_button_behavior_sum">تغییر رفتار دکمه بازگشت</string>
   <string name="back_button_default">پیش فرض</string>
@@ -457,9 +450,6 @@
   <string name="sync_status_success">همگام سازی موفقیت آمیز</string>
   <string name="sync_status_error">همگام سازی ناموفقیت آمیز</string>
   <!--import and export-->
-  <string name="import_export_summary">اشتراک ها و صف را به دستگاه دیگری منتقل کنید</string>
-  <string name="database">پایگاه داده</string>
-  <string name="opml">OPML</string>
   <string name="opml_export_summary">اشتراک های خود را به یک برنامه پادکست دیگر منتقل کنید</string>
   <string name="opml_import_summary">اشتراک های خود را از برنامه پادکست دیگری وارد کنید</string>
   <string name="database_export_summary">اشتراک ها ، قسمت های گوش داده شده و صف را به آنتن پاد در یک دستگاه دیگر منتقل کنید</string>

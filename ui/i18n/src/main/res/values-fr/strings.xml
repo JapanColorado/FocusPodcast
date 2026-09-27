@@ -28,7 +28,6 @@
   <string name="app_action_not_found">\"%1$s\" non trouvé</string>
   <!--SwipeActions-->
   <string name="swipeactions_label">Actions associées au balayage</string>
-  <string name="swipeactions_summary">Choisir les actions lors du balayage d\'un épisode</string>
   <string name="swipe_right">Balayage Droit</string>
   <string name="swipe_left">Balayage Gauche</string>
   <string name="enable_swipeactions">Activer le balayage pour cet écran</string>
@@ -302,8 +301,6 @@
     <string name="no_fav_episodes_head_label">Aucun épisode favori</string>
   <string name="no_subscriptions_head_label">Aucun abonnement</string>
     <!--Preferences-->
-  <string name="storage_pref">Stockage</string>
-  <string name="synchronization_pref">Synchronisation</string>
   <string name="automation">Automatisation</string>
     <string name="import_export_pref">Importation / Exportation</string>
   <string name="import_export_search_keywords">backup, restore, sauvegarde, restauration, import, export</string>
@@ -338,7 +335,6 @@
   <string name="pref_favorite_keeps_episodes_sum">Garder les épisodes marqués comme favoris</string>
   <string name="pref_favorite_keeps_episodes_title">Garder les épisodes favoris</string>
   <string name="playback_pref">Lecture</string>
-  <string name="network_pref">Réseau</string>
   <string name="feed_refresh_title">Actualiser les podcasts</string>
   <string name="feed_refresh_sum">Indiquer la récurrence ou l\'heure de mise à jour des listes d\'épisodes</string>
   <string name="feed_refresh_interval">Intervalle</string>
@@ -360,13 +356,11 @@
   <string name="pref_mobileUpdate_auto_download">Téléchargement automatique</string>
   <string name="pref_mobileUpdate_episode_download">Téléchargement d\'épisodes</string>
   <string name="pref_mobileUpdate_streaming">Streaming</string>
-  <string name="user_interface_label">Interface utilisateur</string>
   <string name="pref_set_theme_title">Choisir un thème</string>
   <string name="pref_nav_drawer_items_title">Changer les éléments du volet de navigation</string>
   <string name="pref_nav_drawer_items_sum">Choisir quels éléments apparaissent dans le volet de navigation</string>
   <string name="pref_nav_drawer_feed_order_title">Définir l\'ordre des abonnements</string>
   <string name="pref_nav_drawer_feed_order_sum">Change l\'ordre de vos abonnements</string>
-  <string name="pref_set_theme_sum">Modifier l\'apparence d\'FocusPodcast.</string>
   <string name="pref_automatic_download_title">Téléchargement automatique</string>
   <string name="pref_automatic_download_on_battery_title">Télécharger lorsque l\'appareil n\'est pas en charge</string>
   <string name="pref_automatic_download_on_battery_sum">Autoriser le téléchargement automatique quand l\'appareil n\'est pas en train de charger</string>
@@ -437,7 +431,6 @@
   <string name="pref_enqueue_downloaded_title">Ajouter à la liste après téléchargement</string>
   <string name="pref_enqueue_downloaded_summary">Mettre les épisodes dans la la liste de lecture après téléchargement</string>
     <string name="pref_skip_silence_title">Supprimer les silences audios</string>
-  <string name="behavior">Comportement</string>
   <string name="pref_back_button_behavior_title">Comportement du bouton retour</string>
   <string name="pref_back_button_behavior_sum">Change le comportement du bouton retour</string>
   <string name="back_button_default">Défaut</string>
@@ -479,9 +472,6 @@
   <string name="sync_status_success">Synchronisation réussie</string>
   <string name="sync_status_error">Echec de la synchronisation</string>
   <!--import and export-->
-  <string name="import_export_summary">Copier les abonnements et la liste de lecture sur un autre appareil</string>
-  <string name="database">Base de données</string>
-  <string name="opml">OPML</string>
   <string name="opml_export_summary">Transférer vos abonnements à une autre application de podcasts</string>
   <string name="opml_import_summary">Importer les abonnements d\'une autre application de podcasts</string>
   <string name="database_export_summary">Transférer les abonnements, les épisodes écoutés et la liste de lecture sur un autre appareil</string>

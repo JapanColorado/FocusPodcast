@@ -28,7 +28,6 @@
   <string name="app_action_not_found">„%1$s” לא נמצא</string>
   <!--SwipeActions-->
   <string name="swipeactions_label">פעולות החלקה</string>
-  <string name="swipeactions_summary">נא לבחור מה יקרה בעת החלקת פרק ברשימה</string>
   <string name="swipe_right">החלקה ימינה</string>
   <string name="swipe_left">החלקה שמאלה</string>
   <string name="enable_swipeactions">הפעלת פעולות החלקה למסך זה</string>
@@ -330,8 +329,6 @@
     <string name="no_fav_episodes_head_label">אין פרקים מועדפים</string>
   <string name="no_subscriptions_head_label">אין מינויים</string>
     <!--Preferences-->
-  <string name="storage_pref">אחסון</string>
-  <string name="synchronization_pref">סנכרון</string>
   <string name="automation">אוטומציה</string>
     <string name="import_export_pref">ייבוא/ייצוא</string>
   <string name="import_export_search_keywords">גיבוי, שחזור</string>
@@ -366,7 +363,6 @@
   <string name="pref_favorite_keeps_episodes_sum">להשאיר פרקים שסומנו כמועדפים</string>
   <string name="pref_favorite_keeps_episodes_title">להשאיר פרקים מועדפים</string>
   <string name="playback_pref">ניגון</string>
-  <string name="network_pref">רשת</string>
   <string name="feed_refresh_title">רענון פודקאסטים</string>
   <string name="feed_refresh_sum">יש לציין הפרש או מועד מסוים לחיפוש פרקים אוטומטית</string>
   <string name="feed_refresh_interval">הפרש</string>
@@ -390,13 +386,11 @@
   <string name="pref_mobileUpdate_auto_download">הורדה אוטומטית</string>
   <string name="pref_mobileUpdate_episode_download">הורדת פרקים</string>
   <string name="pref_mobileUpdate_streaming">הזרמה</string>
-  <string name="user_interface_label">מנשק משתמש</string>
   <string name="pref_set_theme_title">בחירת ערכת עיצוב</string>
   <string name="pref_nav_drawer_items_title">הגדרת פריטי מגירת ניווט</string>
   <string name="pref_nav_drawer_items_sum">החלפת הפריטים שמופיעים במגירת הניווט.</string>
   <string name="pref_nav_drawer_feed_order_title">הגדרת סדר מינויים</string>
   <string name="pref_nav_drawer_feed_order_sum">שינוי סדר המינויים שלך</string>
-  <string name="pref_set_theme_sum">שינוי המראה של אנטנה־פּוֹד</string>
   <string name="pref_automatic_download_title">הורדה אוטומטית</string>
   <string name="pref_automatic_download_on_battery_title">להוריד שלא בזמן טעינה</string>
   <string name="pref_automatic_download_on_battery_sum">לאפשר הורדה אוטומטית כאשר הסוללה אינה בטעינה</string>
@@ -467,7 +461,6 @@
   <string name="pref_enqueue_downloaded_title">הוספת הורדות לתור</string>
   <string name="pref_enqueue_downloaded_summary">הוספת פרקים שהתקבלו לתור</string>
     <string name="pref_skip_silence_title">דילוג על שקט בקטעי ההאזנה</string>
-  <string name="behavior">התנהגות</string>
   <string name="pref_back_button_behavior_title">התנהגות כפתור חזרה</string>
   <string name="pref_back_button_behavior_sum">שינוי התנהגות כפתור החזרה.</string>
   <string name="back_button_default">בררת מחדל</string>
@@ -509,9 +502,6 @@
   <string name="sync_status_success">הסנכרון הצליח</string>
   <string name="sync_status_error">הסנכרון נכשל</string>
   <!--import and export-->
-  <string name="import_export_summary">העברת מינויים ותור למכשיר אחר</string>
-  <string name="database">מסד נתונים</string>
-  <string name="opml">OPML</string>
   <string name="opml_export_summary">העברת המינויים שלך ליישומון פודקאסטים אחר</string>
   <string name="opml_import_summary">ייבוא המינויים שלך מיישומון פודקאסטים אחר</string>
   <string name="database_export_summary">העברת מינויים, פרקים להם האזנת ותור נגינה לאנטנה־פ‎וֹד במכשיר אחר</string>

@@ -28,7 +28,6 @@
   <string name="app_action_not_found">Nie odnaleziono \"%1$s\"</string>
   <!--SwipeActions-->
   <string name="swipeactions_label">Akcje przeciągania</string>
-  <string name="swipeactions_summary">Wybierz co zrobić, gdy przeciągasz odcinek na liście</string>
   <string name="swipe_right">Przeciągnij w prawo</string>
   <string name="swipe_left">Przeciągnij w lewo</string>
   <string name="enable_swipeactions">Włącz akcje przeciągania dla tego ekranu</string>
@@ -331,8 +330,6 @@
     <string name="no_fav_episodes_head_label">Brak ulubionych odcinków</string>
   <string name="no_subscriptions_head_label">Brak subskrypcji</string>
     <!--Preferences-->
-  <string name="storage_pref">Pamięć</string>
-  <string name="synchronization_pref">Synchronizacja</string>
   <string name="automation">Automatyzacja</string>
     <string name="import_export_pref">Import/Eksport</string>
   <string name="import_export_search_keywords">backup, restore, kopia, kopia zapasowa, przywracanie, przywróć</string>
@@ -367,7 +364,6 @@
   <string name="pref_favorite_keeps_episodes_sum">Zachowaj odcinki gdy są oznaczone jako Ulubione</string>
   <string name="pref_favorite_keeps_episodes_title">Zachowaj Ulubione Odcinki</string>
   <string name="playback_pref">Odtwarzanie</string>
-  <string name="network_pref">Sieć</string>
   <string name="feed_refresh_title">Odśwież podcasty</string>
   <string name="feed_refresh_sum">Określ częstotliwość lub czas dnia automatycznego szukania nowych odcinków</string>
   <string name="feed_refresh_interval">Częstotliwość</string>
@@ -391,13 +387,11 @@
   <string name="pref_mobileUpdate_auto_download">Automatyczne pobieranie</string>
   <string name="pref_mobileUpdate_episode_download">Pobieranie odcinków</string>
   <string name="pref_mobileUpdate_streaming">Streamowanie</string>
-  <string name="user_interface_label">Interfejs użytkownika</string>
   <string name="pref_set_theme_title">Wybierz motyw</string>
   <string name="pref_nav_drawer_items_title">Wybierz pozycje panelu nawigacyjnego</string>
   <string name="pref_nav_drawer_items_sum">Zmienia pozycje widoczne w panelu nawigacyjnym.</string>
   <string name="pref_nav_drawer_feed_order_title">Ustaw kolejność subskrypcji</string>
   <string name="pref_nav_drawer_feed_order_sum">Zmień kolejność subskrybowanych kanałów</string>
-  <string name="pref_set_theme_sum">Zmień wygląd FocusPodcast.</string>
   <string name="pref_automatic_download_title">Automatyczne pobieranie</string>
   <string name="pref_automatic_download_on_battery_title">Pobieraj, gdy nie ładuje</string>
   <string name="pref_automatic_download_on_battery_sum">Zezwól na automatyczne pobieranie, gdy bateria nie jest ładowana.</string>
@@ -468,7 +462,6 @@
   <string name="pref_enqueue_downloaded_title">Kolejkuj pobrane</string>
   <string name="pref_enqueue_downloaded_summary">Dodaj pobrane odcinki do kolejki</string>
     <string name="pref_skip_silence_title">Pomiń ciszę w plikach audio</string>
-  <string name="behavior">Zachowanie</string>
   <string name="pref_back_button_behavior_title">Zachowanie przycisku \'Wstecz\'</string>
   <string name="pref_back_button_behavior_sum">Zmień funkcję przycisku \'Wstecz\'/</string>
   <string name="back_button_default">Domyślne</string>
@@ -510,9 +503,6 @@
   <string name="sync_status_success">Synchronizacja udana</string>
   <string name="sync_status_error">Synchronizacja nie powiodła się</string>
   <!--import and export-->
-  <string name="import_export_summary">Przenieś subskrypcje i kolejkę na inne urządzenie</string>
-  <string name="database">Baza danych</string>
-  <string name="opml">OPML</string>
   <string name="opml_export_summary">Przenieś swoje subskrypcje do innej aplikacji</string>
   <string name="opml_import_summary">Przenieś swoje subskrypcje z innej aplikacji</string>
   <string name="database_export_summary">Przenieś subskrypcje, listę odsłuchanych odcinków i kolejkę do FocusPodcast na innym urządzeniu</string>

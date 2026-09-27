@@ -28,7 +28,6 @@
   <string name="app_action_not_found">لم يتم العثور على %1$s</string>
   <!--SwipeActions-->
   <string name="swipeactions_label">خيارات السحب </string>
-  <string name="swipeactions_summary">اختر ما يحدث عند سحب حلقة من القائمة </string>
   <string name="swipe_right">سحب إلى اليمين</string>
   <string name="swipe_left">سحب إلى اليسار </string>
   <string name="enable_swipeactions">تفعيل السحب في هذه الواجهة</string>
@@ -346,8 +345,6 @@
     <string name="no_fav_episodes_head_label">لا توجد حلقات مفضلة</string>
   <string name="no_subscriptions_head_label">لا توجد إشتراكات</string>
     <!--Preferences-->
-  <string name="storage_pref">تخزين</string>
-  <string name="synchronization_pref">مزامنة</string>
   <string name="automation">التشغيل الآلي</string>
     <string name="import_export_pref">استيراد/تصدير</string>
   <string name="import_export_search_keywords">لنسخ الاحتياطي و استرجاع</string>
@@ -382,7 +379,6 @@
   <string name="pref_favorite_keeps_episodes_sum">تعليم الحلقة كمفضلة يبقيها على الجهاز</string>
   <string name="pref_favorite_keeps_episodes_title">إبقاء الحلقات المفضلة</string>
   <string name="playback_pref">تشغيل</string>
-  <string name="network_pref">شبكة</string>
   <string name="feed_refresh_title">حدث البودكاستات</string>
   <string name="feed_refresh_sum">حدد مدة  زمنية أو وقتًا محددًا للبحث عن الحلقات الجديدة تلقائيًا</string>
   <string name="feed_refresh_interval">مدة</string>
@@ -408,13 +404,11 @@
   <string name="pref_mobileUpdate_auto_download">تنزيل تلقائي</string>
   <string name="pref_mobileUpdate_episode_download">تحميل الحلقة</string>
   <string name="pref_mobileUpdate_streaming">بث متدفق</string>
-  <string name="user_interface_label">واجهة الاستخدام</string>
   <string name="pref_set_theme_title">اختيار النمط</string>
   <string name="pref_nav_drawer_items_title">حدد عناصر درج التنقل</string>
   <string name="pref_nav_drawer_items_sum">قم بتغيير العناصر التي تظهر في درج التنقل.</string>
   <string name="pref_nav_drawer_feed_order_title">حدد ترتيب الإشتراكات</string>
   <string name="pref_nav_drawer_feed_order_sum">غير ترتيب إشتراكاتك</string>
-  <string name="pref_set_theme_sum">تغيير مظهر FocusPodcast.</string>
   <string name="pref_automatic_download_title">تنزيل تلقائي</string>
   <string name="pref_automatic_download_on_battery_title">التنزيل عند عدم الشحن الجهاز</string>
   <string name="pref_automatic_download_on_battery_sum">السماح بالتنزيل التلقائي عندما لا يتم شحن البطارية</string>
@@ -474,7 +468,6 @@
   <string name="pref_enqueue_downloaded_title">الـ Enqueue المنزلة</string>
   <string name="pref_enqueue_downloaded_summary">أضف الحلقات المنزلة الى لائحة الاستماع</string>
     <string name="pref_skip_silence_title">تخطي الصمت في الصوت</string>
-  <string name="behavior">سلوك</string>
   <string name="pref_back_button_behavior_title">سلوك زر الرجوع</string>
   <string name="pref_back_button_behavior_sum">تغيير سلوك زر الرجوع</string>
   <string name="back_button_default">إفتراضي</string>
@@ -514,9 +507,6 @@
   <string name="sync_status_success">نجحت المزامنة</string>
   <string name="sync_status_error">فشلت المزامنة</string>
   <!--import and export-->
-  <string name="import_export_summary">نقل الاشتراكات ولائحة الاستماع الى جهاز آخر</string>
-  <string name="database">قاعدة البيانات</string>
-  <string name="opml">OPML</string>
   <string name="opml_export_summary">نقل إشتراكاتك لبرنامج بوكاست آخر</string>
   <string name="opml_import_summary">إستيراد اشتراكاتك من برنامج آخر</string>
   <string name="database_export_summary">نقل الاشتراكات والحلقات المسموعة ولائحة الإستماع لـ FocusPodcast على جهاز آخر</string>

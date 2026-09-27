@@ -28,7 +28,6 @@
   <string name="app_action_not_found">\"%1$s\" nicht gefunden</string>
   <!--SwipeActions-->
   <string name="swipeactions_label">Wisch-Aktionen</string>
-  <string name="swipeactions_summary">Lege fest, was passiert, wenn Du in einer Liste über eine Episode wischst</string>
   <string name="swipe_right">Nach rechts wischen</string>
   <string name="swipe_left">Nach Links wischen</string>
   <string name="enable_swipeactions">Swipe-Aktionen für diesen Bildschirm aktivieren</string>
@@ -295,8 +294,6 @@
     <string name="no_fav_episodes_head_label">Keine Favoriten</string>
   <string name="no_subscriptions_head_label">Keine Abonnements</string>
     <!--Preferences-->
-  <string name="storage_pref">Speicher</string>
-  <string name="synchronization_pref">Synchronisation</string>
   <string name="automation">Automatisierung</string>
     <string name="import_export_pref">Import/Export</string>
   <string name="import_export_search_keywords">backup, Sicherung, Datensicherung, Wiederherstellung</string>
@@ -331,7 +328,6 @@
   <string name="pref_favorite_keeps_episodes_sum">Lösche Episoden nicht, wenn sie als Favorit markiert wurden.</string>
   <string name="pref_favorite_keeps_episodes_title">Favorisierte Episoden nicht löschen</string>
   <string name="playback_pref">Wiedergabe</string>
-  <string name="network_pref">Netzwerk</string>
   <string name="feed_refresh_title">Podcasts aktualisieren</string>
   <string name="feed_refresh_sum">Lege ein Intervall oder eine Tageszeit fest, zu welcher automatisch nach neuen Episoden gesucht werden soll</string>
   <string name="feed_refresh_interval">Intervall</string>
@@ -353,13 +349,11 @@
   <string name="pref_mobileUpdate_auto_download">Automatisches Herunterladen</string>
   <string name="pref_mobileUpdate_episode_download">Episoden herunterladen</string>
   <string name="pref_mobileUpdate_streaming">Streamen</string>
-  <string name="user_interface_label">Benutzeroberfläche</string>
   <string name="pref_set_theme_title">Theme auswählen</string>
   <string name="pref_nav_drawer_items_title">Seitenleiste ändern</string>
   <string name="pref_nav_drawer_items_sum">Ändere, welche Einträge in der Seitenleiste erscheinen</string>
   <string name="pref_nav_drawer_feed_order_title">Reihenfolge der Abonnements einstellen</string>
   <string name="pref_nav_drawer_feed_order_sum">Ändere die Reihenfolge deiner Abonnements</string>
-  <string name="pref_set_theme_sum">Ändere das Aussehen von FocusPodcast.</string>
   <string name="pref_automatic_download_title">Automatisches Herunterladen</string>
   <string name="pref_automatic_download_on_battery_title">Automatischer Download im Batterie Modus</string>
   <string name="pref_automatic_download_on_battery_sum">Automatische Downloads auch erlauben, wenn die Batterie nicht geladen wird</string>
@@ -419,7 +413,6 @@
   <string name="pref_enqueue_downloaded_title">Downloads einreihen</string>
   <string name="pref_enqueue_downloaded_summary">Füge heruntergeladene Episoden zur Warteschlange hinzu</string>
     <string name="pref_skip_silence_title">Stille im Ton überspringen</string>
-  <string name="behavior">Verhalten</string>
   <string name="pref_back_button_behavior_title">Verhalten des Zurück-Buttons</string>
   <string name="pref_back_button_behavior_sum">Verändere das Verhalten vom Zurück-Button</string>
   <string name="back_button_default">Standard</string>
@@ -459,9 +452,6 @@
   <string name="sync_status_success">Synchronisation erfolgreich</string>
   <string name="sync_status_error">Synchronisation fehlgeschlagen</string>
   <!--import and export-->
-  <string name="import_export_summary">Abonnements und Warteschlange auf ein anderes Gerät übertragen</string>
-  <string name="database">Datenbank</string>
-  <string name="opml">OPML</string>
   <string name="opml_export_summary">Deine Abonnements auf eine andere Podcast-App übertragen</string>
   <string name="opml_import_summary">Deine Abonnements von einer anderen Podcast-App importieren</string>
   <string name="database_export_summary">Deine Abonnements, gehörte Episoden und die Warteschlange auf FocusPodcast auf einem anderen Gerät übertragen</string>

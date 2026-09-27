@@ -250,8 +250,6 @@
     <string name="no_fav_episodes_head_label">즐겨 찾기 에피소드 없음</string>
   <string name="no_subscriptions_head_label">구독 없음</string>
     <!--Preferences-->
-  <string name="storage_pref">저장소</string>
-  <string name="synchronization_pref">동기화</string>
   <string name="automation">자동</string>
     <string name="import_export_pref">가져오기/내보내기</string>
   <string name="import_export_search_keywords">백업, 복구</string>
@@ -286,7 +284,6 @@
   <string name="pref_favorite_keeps_episodes_sum">즐겨 찾기로 표시한 에피소드를 유지합니다</string>
   <string name="pref_favorite_keeps_episodes_title">즐겨 찾기 에피소드 유지</string>
   <string name="playback_pref">재생</string>
-  <string name="network_pref">네트워크</string>
   <string name="pref_followQueue_title">연속 재생</string>
   <string name="pref_pauseOnHeadsetDisconnect_title">헤드폰 또는 블루투스 연결 끊김</string>
   <string name="pref_unpauseOnHeadsetReconnect_title">헤드폰 다시 연결</string>
@@ -298,13 +295,11 @@
   <string name="pref_mobileUpdate_auto_download">자동 다운로드</string>
   <string name="pref_mobileUpdate_episode_download">에피소드 다운로드</string>
   <string name="pref_mobileUpdate_streaming">스트리밍</string>
-  <string name="user_interface_label">사용자 인터페이스</string>
   <string name="pref_set_theme_title">테마 선택</string>
   <string name="pref_nav_drawer_items_title">네비게이션 드로어 항목 설정</string>
   <string name="pref_nav_drawer_items_sum">네비게이션 드로어에 어떤 항목을 표시할지 바꿉니다.</string>
   <string name="pref_nav_drawer_feed_order_title">구독 순서 설정</string>
   <string name="pref_nav_drawer_feed_order_sum">구독 순서를 바꿉니다</string>
-  <string name="pref_set_theme_sum">안테나팟의 겉모양을 바꿉니다.</string>
   <string name="pref_automatic_download_title">자동 다운로드</string>
   <string name="pref_automatic_download_on_battery_title">충전하지 않을 때 다운로드</string>
   <string name="pref_automatic_download_on_battery_sum">배터리 충전 중이 아닐 때 자동 다운로드 허용</string>
@@ -364,7 +359,6 @@
   <string name="pref_enqueue_downloaded_title">다운로드한 항목 대기열에 추가</string>
   <string name="pref_enqueue_downloaded_summary">다운로드한 에피소드를 대기열에 추가</string>
     <string name="pref_skip_silence_title">오디오에서 묵음 구간 건너뛰기</string>
-  <string name="behavior">동작</string>
   <string name="pref_back_button_behavior_title">뒤로 가기 버튼 동작</string>
   <string name="pref_back_button_behavior_sum">뒤로 가기 버튼의 동작을 바꿉니다.</string>
   <string name="back_button_default">기본값</string>
@@ -399,9 +393,6 @@
   <string name="sync_status_success">동기화 성공</string>
   <string name="sync_status_error">동기화 실패</string>
   <!--import and export-->
-  <string name="import_export_summary">구독 목록 및 대기열을 다른 장치로 옮기기</string>
-  <string name="database">데이터베이스</string>
-  <string name="opml">OPML</string>
   <string name="opml_export_summary">구독 목록을 다른 팟캐스트 앱으로 옮기기</string>
   <string name="opml_import_summary">다른 팟캐스트 앱에서 구독 목록 가져오기</string>
   <string name="database_export_summary">구독 목록, 재생한 에피소드 목록 및 대기열을 다른 장치의 안테나팟에 옮기기</string>

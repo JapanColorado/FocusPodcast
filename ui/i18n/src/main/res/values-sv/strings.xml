@@ -28,7 +28,6 @@
   <string name="app_action_not_found">\"%1$s\" hittades inte</string>
   <!--SwipeActions-->
   <string name="swipeactions_label">Svepåtgärder</string>
-  <string name="swipeactions_summary">Välj vad som händer när du sveper över en episod i en lista</string>
   <string name="swipe_right">Svepning höger</string>
   <string name="swipe_left">Svepning vänster</string>
   <string name="enable_swipeactions">Aktivera svepåtgärder för denna skärm</string>
@@ -302,8 +301,6 @@
     <string name="no_fav_episodes_head_label">Inga favoritepisoder</string>
   <string name="no_subscriptions_head_label">Inga prenumerationer</string>
     <!--Preferences-->
-  <string name="storage_pref">Lagring</string>
-  <string name="synchronization_pref">Synkronisering</string>
   <string name="automation">Automatisering</string>
     <string name="import_export_pref">Importera/Exportera</string>
   <string name="import_export_search_keywords">säkerhetskopiering, återställning</string>
@@ -338,7 +335,6 @@
   <string name="pref_favorite_keeps_episodes_sum">Behåll episoder när de är favoritmarkerade</string>
   <string name="pref_favorite_keeps_episodes_title">Behåll favoritepisoder</string>
   <string name="playback_pref">Uppspelning</string>
-  <string name="network_pref">Nätverk </string>
   <string name="feed_refresh_title">Uppdatera podcasts</string>
   <string name="feed_refresh_sum">Ange ett intervall eller en specifik tid på dagen för att söka efter nya episoder automatiskt</string>
   <string name="feed_refresh_interval">Intervall</string>
@@ -360,13 +356,11 @@
   <string name="pref_mobileUpdate_auto_download">Automatisk nedladdning</string>
   <string name="pref_mobileUpdate_episode_download">Episodnedladdning</string>
   <string name="pref_mobileUpdate_streaming">Strömning</string>
-  <string name="user_interface_label">Användargränssnitt</string>
   <string name="pref_set_theme_title">Välj tema</string>
   <string name="pref_nav_drawer_items_title">Välj objekt i navigeringsmenyn</string>
   <string name="pref_nav_drawer_items_sum">Ändra vilka saker som visas på navigationsmenyn.</string>
   <string name="pref_nav_drawer_feed_order_title">Välj prenumerationsordning</string>
   <string name="pref_nav_drawer_feed_order_sum">Ändra ordningen på dina prenumerationer</string>
-  <string name="pref_set_theme_sum">Ändra utseendet på FocusPodcast.</string>
   <string name="pref_automatic_download_title">Automatisk nedladdning</string>
   <string name="pref_automatic_download_on_battery_title">Nedladdning vid batteridrift</string>
   <string name="pref_automatic_download_on_battery_sum">Tillåt automatisk nedladdning när batteriet inte laddas</string>
@@ -437,7 +431,6 @@
   <string name="pref_enqueue_downloaded_title">Köa nedladdad</string>
   <string name="pref_enqueue_downloaded_summary">Lägg nedladdade episoder i uppspelningskön</string>
   <string name="pref_skip_silence_title">Hoppa över tystnad i ljud</string>
-  <string name="behavior">Beteende</string>
   <string name="pref_back_button_behavior_title">Tillbakaknappens beteende</string>
   <string name="pref_back_button_behavior_sum">Byt tillbakaknappens beteende.</string>
   <string name="back_button_default">Standard</string>
@@ -479,9 +472,6 @@
   <string name="sync_status_success">Synkronisering lyckades</string>
   <string name="sync_status_error">Synkronisering misslyckades</string>
   <!--import and export-->
-  <string name="import_export_summary">Flytta prenumerationer och kö till annan enhet</string>
-  <string name="database">Databas</string>
-  <string name="opml">OPML</string>
   <string name="opml_export_summary">Överför dina prenumerationer till en annan podcastapp</string>
   <string name="opml_import_summary">Importera dina prenumerationer från en annan podcastapp</string>
   <string name="database_export_summary">Överför prenumerationer, spelade episoder och kön till FocusPodcast på en annan enhet</string>

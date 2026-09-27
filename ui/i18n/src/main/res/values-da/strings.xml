@@ -28,7 +28,6 @@
   <string name="app_action_not_found">\"%1$s\" ikke fundet</string>
   <!--SwipeActions-->
   <string name="swipeactions_label">Strygehandlinger</string>
-  <string name="swipeactions_summary">Vælg hvad der sker, når der stryges på et afsnit i en liste</string>
   <string name="swipe_right">Stryg til højre</string>
   <string name="swipe_left">Stryg til venstre</string>
   <string name="enable_swipeactions">Aktiver strygehandlinger for denne skærm</string>
@@ -302,8 +301,6 @@
     <string name="no_fav_episodes_head_label">Ingen favoritafsnit</string>
   <string name="no_subscriptions_head_label">Ingen abonnementer</string>
     <!--Preferences-->
-  <string name="storage_pref">Lagring</string>
-  <string name="synchronization_pref">Synkronisering</string>
   <string name="automation">Automatisering</string>
     <string name="import_export_pref">Import/eksport</string>
   <string name="import_export_search_keywords">sikkerhedskopiering, sikkerhedskopi, backup, gendan, gendannelse, restore</string>
@@ -338,7 +335,6 @@
   <string name="pref_favorite_keeps_episodes_sum">Behold afsnit, som er markeret som favorit</string>
   <string name="pref_favorite_keeps_episodes_title">Behold favoritafsnit</string>
   <string name="playback_pref">Afspilning</string>
-  <string name="network_pref">Netværk</string>
   <string name="feed_refresh_title">Opdater podcasts</string>
   <string name="feed_refresh_sum">Specificer et interval eller et bestemt tidspunkt at automatisk tjekke for nye afsnit</string>
   <string name="feed_refresh_interval">Interval</string>
@@ -360,13 +356,11 @@
   <string name="pref_mobileUpdate_auto_download">Hent automatisk</string>
   <string name="pref_mobileUpdate_episode_download">Download af afsnit</string>
   <string name="pref_mobileUpdate_streaming">Streaming</string>
-  <string name="user_interface_label">Brugergrænseflade</string>
   <string name="pref_set_theme_title">Vælg tema</string>
   <string name="pref_nav_drawer_items_title">Vælg elementer i navigationspanelet</string>
   <string name="pref_nav_drawer_items_sum">Vælg hvilke elementer, der skal vises i navigationspanelet.</string>
   <string name="pref_nav_drawer_feed_order_title">Vælg abonnementsorden</string>
   <string name="pref_nav_drawer_feed_order_sum">Ændr rækkefølgen af dine abonnementer</string>
-  <string name="pref_set_theme_sum">Ændr FocusPodcasts udseende.</string>
   <string name="pref_automatic_download_title">Automatisk overførsel</string>
   <string name="pref_automatic_download_on_battery_title">Tillad overførsel ved batteridrift</string>
   <string name="pref_automatic_download_on_battery_sum">Tillad automatisk overførsel, når batteriet ikke oplades</string>
@@ -437,7 +431,6 @@
   <string name="pref_enqueue_downloaded_title">Sæt overførte afsnit i kø</string>
   <string name="pref_enqueue_downloaded_summary">Føj downloadede afsnit til køen</string>
   <string name="pref_skip_silence_title">Overspring stilhed i lyd</string>
-  <string name="behavior">Funktion</string>
   <string name="pref_back_button_behavior_title">Funktion for tilbageknappen</string>
   <string name="pref_back_button_behavior_sum">Ændr tilbageknappens funktion.</string>
   <string name="back_button_default">Standard</string>
@@ -479,9 +472,6 @@
   <string name="sync_status_success">Synkroniseret</string>
   <string name="sync_status_error">Synkronisering mislykkedes</string>
   <!--import and export-->
-  <string name="import_export_summary">Flyt abonnementer og kø til anden enhed</string>
-  <string name="database">Database</string>
-  <string name="opml">OPML</string>
   <string name="opml_export_summary">Flyt abonnementer til anden podcast program</string>
   <string name="opml_import_summary">Importér dine abonnementer fra et andet podcast-program</string>
   <string name="database_export_summary">Flyt abonnementer, aflyttede afsnit og kø til FocusPodcast på en anden enhed</string>

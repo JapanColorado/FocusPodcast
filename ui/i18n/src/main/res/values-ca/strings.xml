@@ -28,7 +28,6 @@
   <string name="app_action_not_found">\"%1$s\" no trobat</string>
   <!--SwipeActions-->
   <string name="swipeactions_label">Accions de lliscament</string>
-  <string name="swipeactions_summary">Escull acció quan llisques un episodi d\'una llista</string>
   <string name="swipe_right">Llisca a la dreta</string>
   <string name="swipe_left">Llisca a l\'esquerra</string>
   <string name="enable_swipeactions">Activa les accions de lliscament per a aquesta pantalla</string>
@@ -293,8 +292,6 @@
     <string name="no_fav_episodes_head_label">No hi ha episodis favorits. </string>
   <string name="no_subscriptions_head_label">No hi ha subscripcions</string>
   <!--Preferences-->
-  <string name="storage_pref">Emmagatzematge</string>
-  <string name="synchronization_pref">Sincronització</string>
   <string name="automation">Automatització</string>
     <string name="import_export_pref">Importa/Exporta</string>
   <string name="import_export_search_keywords">còpia de seguretat, restaurar</string>
@@ -329,7 +326,6 @@
   <string name="pref_favorite_keeps_episodes_sum">Conserva els episodis marcats com a preferits.</string>
   <string name="pref_favorite_keeps_episodes_title">Conserva els episodis preferits.</string>
   <string name="playback_pref">Reproducció</string>
-  <string name="network_pref">Xarxa</string>
   <string name="feed_refresh_title">Actualitza els podcasts</string>
   <string name="feed_refresh_sum">Especifiqueu un interval o una hora específica per buscar episodis nous automàticament</string>
   <string name="feed_refresh_interval">Interval</string>
@@ -351,13 +347,11 @@
   <string name="pref_mobileUpdate_auto_download">Baixada automática</string>
   <string name="pref_mobileUpdate_episode_download">Baixada d\'episodis</string>
   <string name="pref_mobileUpdate_streaming">Streaming</string>
-  <string name="user_interface_label">Interfície d\'usuari</string>
   <string name="pref_set_theme_title">Selecciona el tema</string>
   <string name="pref_nav_drawer_items_title">Estableix els elements del calaix de navegació</string>
   <string name="pref_nav_drawer_items_sum">Canvia els elements que apareixen al calaix de navegació.</string>
   <string name="pref_nav_drawer_feed_order_title">Estableix l\'ordre de les subscripcions</string>
   <string name="pref_nav_drawer_feed_order_sum">Canvia l\'ordre de les subscripcions</string>
-  <string name="pref_set_theme_sum">Canvieu l\'aparença d\'FocusPodcast.</string>
   <string name="pref_automatic_download_title">Baixada automàtica</string>
   <string name="pref_automatic_download_on_battery_title">Baixa mentre no es carrega</string>
   <string name="pref_automatic_download_on_battery_sum">Permet les baixades automàtiques mentre la bateria no es carrega</string>
@@ -417,7 +411,6 @@
   <string name="pref_enqueue_downloaded_title">Afegeix les baixades a la cua</string>
   <string name="pref_enqueue_downloaded_summary">Afegeix els episodis descarregats a la cua</string>
     <string name="pref_skip_silence_title">Omet Silenci en Audio</string>
-  <string name="behavior">Comportament</string>
   <string name="pref_back_button_behavior_title">Comportament del botó \"endarrere\"</string>
   <string name="pref_back_button_behavior_sum">Canvia el comportament del botó \"endarrere\"</string>
   <string name="back_button_default">Per defecte</string>
@@ -457,9 +450,6 @@
   <string name="sync_status_success">Sincronització exitosa</string>
   <string name="sync_status_error">Sincronització fallida</string>
   <!--import and export-->
-  <string name="import_export_summary">Mou subscripcions i cola a un altre dispositiu</string>
-  <string name="database">Base de dades</string>
-  <string name="opml">OPML</string>
   <string name="opml_export_summary">Transfereix les teues subscripcions a un altra aplicació de podcast</string>
   <string name="opml_import_summary">Importa les teues subscripcions des d\'un altra aplicació de podcast</string>
   <string name="database_export_summary">Transfereix subscripcions i cola a FocusPodcast en un altre dispositiu</string>

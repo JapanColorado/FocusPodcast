@@ -28,7 +28,6 @@
   <string name="app_action_not_found">\"%1$s\" ezin da aurkitu</string>
   <!--SwipeActions-->
   <string name="swipeactions_label">Irristatze ekintzak</string>
-  <string name="swipeactions_summary">Aukeratu zer gertatzen den zerrendako saio bat irristatzean</string>
   <string name="swipe_right">Irristatu eskuinera</string>
   <string name="swipe_left">Irristatu ezkerrera</string>
   <string name="enable_swipeactions">Gaitu irristatzeko ekintzak pantaila honetan</string>
@@ -293,8 +292,6 @@
     <string name="no_fav_episodes_head_label">Gogoko saiorik ez</string>
   <string name="no_subscriptions_head_label">Ez dago harpidetzarik</string>
     <!--Preferences-->
-  <string name="storage_pref">Biltegia</string>
-  <string name="synchronization_pref">Sinkronizazioa</string>
   <string name="automation">Automatizazioa</string>
     <string name="import_export_pref">Inportatu/esportatu</string>
   <string name="import_export_search_keywords">Babeskopia, berrezarri, backupa, restore</string>
@@ -329,7 +326,6 @@
   <string name="pref_favorite_keeps_episodes_sum">Gorde saioak gogoko gisa markatzean</string>
   <string name="pref_favorite_keeps_episodes_title">Gorde gogoko saioak</string>
   <string name="playback_pref">Erreprodukzioa</string>
-  <string name="network_pref">Sarea</string>
   <string name="feed_refresh_title">Eguneratu podcastak</string>
   <string name="feed_refresh_sum">Zehaztu tarte bat edo denbora zehatz bat atal berriak automatikoki bilatzeko</string>
   <string name="feed_refresh_interval">Tartea</string>
@@ -351,13 +347,11 @@
   <string name="pref_mobileUpdate_auto_download">Deskargatu automatikoki</string>
   <string name="pref_mobileUpdate_episode_download">Saioaren deskarga</string>
   <string name="pref_mobileUpdate_streaming"> Zuzenean</string>
-  <string name="user_interface_label">Erabiltzailearen interfazea</string>
   <string name="pref_set_theme_title">Gai bat aukeratu</string>
   <string name="pref_nav_drawer_items_title">Aldatu nabigatze kutxa</string>
   <string name="pref_nav_drawer_items_sum">Aldatu nabigatze kutxan azaltzen diren elementuak</string>
   <string name="pref_nav_drawer_feed_order_title">Doitu harpidetzaren ordena</string>
   <string name="pref_nav_drawer_feed_order_sum">Aldatu harpidetzen ordena</string>
-  <string name="pref_set_theme_sum">Aldatu FocusPodcasten itxura</string>
   <string name="pref_automatic_download_title">Deskarga automatikoa</string>
   <string name="pref_automatic_download_on_battery_title">Deskargatu kargatzen ari dela</string>
   <string name="pref_automatic_download_on_battery_sum">Onartu deskarga bateria kargatzen ari ez denean</string>
@@ -419,7 +413,6 @@
   <string name="pref_enqueue_downloaded_title">Gehitu deskargatutakoak ilarara</string>
   <string name="pref_enqueue_downloaded_summary">Gehitu deskargatutako saioak ilarara</string>
     <string name="pref_skip_silence_title">Jauzi egin ixilunea audioan</string>
-  <string name="behavior">Joera</string>
   <string name="pref_back_button_behavior_title">Atzera botoiaren jokaera</string>
   <string name="pref_back_button_behavior_sum">Aldatu atzera botoiaren jokaera</string>
   <string name="back_button_default">Aurrez zehaztua</string>
@@ -459,9 +452,6 @@
   <string name="sync_status_success">Sinkronizazioa amaitu da</string>
   <string name="sync_status_error">Sinkronizazioak huts egin du</string>
   <!--import and export-->
-  <string name="import_export_summary">Kopiatu harpidetza eta irakurketa zerrenda beste gailu batean</string>
-  <string name="database">Datu basea</string>
-  <string name="opml">OPML</string>
   <string name="opml_export_summary">Zure harpidetzak podcast-en beste aplikazio batera transferitu</string>
   <string name="opml_import_summary">Ekarri zure harpidetzak podcast-en beste aplikazio batetik</string>
   <string name="database_export_summary">Bidali beste gailu batera harpidetzak, ikusitako saioak eta irakur zerrenda</string>

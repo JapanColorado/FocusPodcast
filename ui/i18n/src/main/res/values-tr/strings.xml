@@ -33,7 +33,6 @@
 
     <!-- SwipeActions -->
     <string name="swipeactions_label">Kaydırma Eylemleri</string>
-    <string name="swipeactions_summary">Liste kaydırma davranışını seçin</string>
     <string name="swipe_right">Sağa Kaydır</string>
     <string name="swipe_left">Sola Kaydır</string>
     <string name="enable_swipeactions">Bu Ekran için Kaydırma Eylemlerini Etkinleştir</string>
@@ -335,12 +334,9 @@
     <string name="no_subscriptions_head_label">Bazı Podcast\'ler ekleme zamanı</string>
     <string name="no_subscriptions_label">En sevdiğiniz podcast\'leri cebe indirmek için alttaki Keşfet butonunu deneyin</string>
     <!-- Tercihler -->
-    <string name="storage_pref">Depolama</string>
-    <string name="synchronization_pref">Senkronizasyon</string>
     <string name="automation">Otomasyon</string>
     <string name="pref_mobile_network">Mobil Ağ</string>
 
-    <string name="pref_geek">Teknoloji Meraklısı</string>
     <string name="import_export_pref">İçe/Dışa Aktar</string>
     <string name="import_export_search_keywords">yedekleme, geri yükleme</string>
     <string name="appearance">Görünüm</string>
@@ -380,7 +376,6 @@
     <string name="pref_favorite_keeps_episodes_sum">Favori olarak işaretlendiğinde bölümleri sakla</string>
     <string name="pref_favorite_keeps_episodes_title">Favori Bölümleri Sakla</string>
     <string name="playback_pref">Oynatma</string>
-    <string name="network_pref">Ağ</string>
     <string name="feed_refresh_title">Podcast\'leri Yenile</string>
     <string name="feed_refresh_sum">Podcast\'leri otomatik olarak yenilemek için bir aralık veya belirli bir zaman belirleyin</string>
     <string name="feed_refresh_interval">Aralık</string>
@@ -402,18 +397,11 @@
     <string name="pref_mobileUpdate_auto_download">Otomatik indirme</string>
     <string name="pref_mobileUpdate_episode_download">Bölüm indirme</string>
     <string name="pref_mobileUpdate_streaming">Yayın</string>
-    <string name="user_interface_label">Görünüm ve His</string>
     <string name="pref_general_title">Genel</string>
 
     <string name="pref_header_lockscreen">Kilit Ekranı</string>
-    <string name="user_interface_sum">Tema, Görünüm, Abonelik</string>
-    <string name="pref_general_sum">Podcast Arama, İşlem, Bildirim</string>
     <string name="pref_summary_lock_screen">Özel kilit ekranı kontrollerini kullan</string>
     <string name="pref_title_lock_screen">Tam Ekran Kontrolleri</string>
-    <string name="playback_pref_sum">Oynatma kontrolleri ve özel oynatma arayüzü</string>
-    <string name="network_pref_sum">Otomatik güncelleme, Otomatik indirme, Mobil ağ</string>
-    <string name="synchronization_sum">Bulut Yedekleme ve Kurtarma</string>
-    <string name="storage_sum">Bölüm otomatik silme, Diğer podcast uygulamalarıyla veri senkronizasyonu</string>
     <string name="accent_color">Vurgu rengi</string>
     <string name="pref_summary_desaturated_color">Material Design yönergelerine göre, koyu modda renkler doygun olmamalıdır</string>
     <string name="pref_title_desaturated_color">Doygunluğu azaltılmış renk</string>
@@ -441,7 +429,6 @@
     <string name="pref_homepage_sum">Uygulamanın varsayılan ana sayfasını seç</string>
     <string name="pref_summary_toggle_full_screen">Sürükleyici mod</string>
     <string name="pref_nav_drawer_episodes_counter_sum">Bölüm sayacının sayım yöntemini değiştir</string>
-    <string name="pref_set_theme_sum">FocusPodcast görünümünü değiştir</string>
     <string name="pref_automatic_download_title">Otomatik İndirmeler</string>
     <string name="pref_refresh_on_start_title">Başlangıçta Senkronize Et</string>
     <string name="pref_automatic_download_on_battery_title">Şarjdayken İndir</string>
@@ -519,7 +506,6 @@
     <string name="pref_skip_silence_title">Sesi Sessizlikleri Atla</string>
     <string name="pref_custom_for_podcast">Podcast için Özel</string>
     <string name="pref_custom_for_podcast_sum">Son oynatma efektlerinizi hatırlayacağız ve bunları tüm podcast\'lerde kullanacağız. Sadece bu podcast için özel olanları oluşturmak isterseniz bunu etkinleştirebilirsiniz</string>
-    <string name="behavior">Davranış</string>
     <string name="pref_back_button_behavior_title">Geri Düğmesi Davranışı</string>
     <string name="pref_back_button_behavior_sum">Geri düğmesinin davranışını değiştirin</string>
     <string name="back_button_default">Varsayılan</string>
@@ -567,9 +553,6 @@
     <string name="sync_status_success">Senkronizasyon başarılı</string>
     <string name="sync_status_error">Senkronizasyon başarısız oldu</string>
     <!-- içe ve dışa aktar -->
-    <string name="import_export_summary">Abonelikleri ve kuyruğu başka bir cihaza taşı</string>
-    <string name="database">Veritabanı</string>
-    <string name="opml">OPML</string>
     <string name="opml_export_summary">Aboneliklerinizi başka bir podcast uygulamasına aktarın</string>
     <string name="opml_import_summary">Aboneliklerinizi başka bir podcast uygulamasından içe aktarın</string>
     <string name="database_export_summary">Abonelikleri, dinlenilen bölümleri ve kuyruğu başka bir cihazdaki FocusPodcast\'e aktar</string>

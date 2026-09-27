@@ -28,7 +28,6 @@
   <string name="app_action_not_found">\"%1$s\" ni bilo najdeno</string>
   <!--SwipeActions-->
   <string name="swipeactions_label">Dejanje s potegom</string>
-  <string name="swipeactions_summary">Izberite, kaj se zgodi, ko povlečete epizodo na seznamu</string>
   <string name="swipe_right">Povlecite desno</string>
   <string name="swipe_left">Povlecite levo</string>
   <string name="enable_swipeactions">Omogočite dejanje vlečenja za ta zaslon</string>
@@ -319,8 +318,6 @@
     <string name="no_fav_episodes_head_label">Ni priljubljenih epizod.</string>
   <string name="no_subscriptions_head_label">Ni naročnin</string>
     <!--Preferences-->
-  <string name="storage_pref">Shramba</string>
-  <string name="synchronization_pref">Sinhronizacija</string>
   <string name="automation">Avtomatizacija</string>
     <string name="import_export_pref">Uvozi/Izvozi</string>
   <string name="import_export_search_keywords">varnostno kopiranje, varnostna obnovitev</string>
@@ -355,7 +352,6 @@
   <string name="pref_favorite_keeps_episodes_sum">Obdržite epizode, ki so označene kot priljubljene</string>
   <string name="pref_favorite_keeps_episodes_title">Obdrži priljubljene epizode</string>
   <string name="playback_pref">Predvajanje</string>
-  <string name="network_pref">Omrežje</string>
   <string name="feed_refresh_title">Osveži podcaste</string>
   <string name="feed_refresh_sum">Določite interval ali določen čas za samodejno iskanje novih epizod</string>
   <string name="feed_refresh_interval">Interval</string>
@@ -379,13 +375,11 @@
   <string name="pref_mobileUpdate_auto_download">Samodejni prenos</string>
   <string name="pref_mobileUpdate_episode_download">Prenos epizode</string>
   <string name="pref_mobileUpdate_streaming">Pretakanje</string>
-  <string name="user_interface_label">Uporabniški vmesnik</string>
   <string name="pref_set_theme_title">Izberi temo</string>
   <string name="pref_nav_drawer_items_title">Nastavite elemente predala za krmarjenje</string>
   <string name="pref_nav_drawer_items_sum">Spremenite, kateri elementi se prikažejo v navigacijskem predalu.</string>
   <string name="pref_nav_drawer_feed_order_title">Nastavite vrstni red naročnine</string>
   <string name="pref_nav_drawer_feed_order_sum">Spremenite vrstni red svojih naročnin</string>
-  <string name="pref_set_theme_sum">Spremenite videz antene FocusPodcast.</string>
   <string name="pref_automatic_download_title">Samodejni prenos</string>
   <string name="pref_automatic_download_on_battery_title">Prenesite, ko se ne polni</string>
   <string name="pref_automatic_download_on_battery_sum">Dovoli samodejni prenos, ko se baterija ne polni</string>
@@ -445,7 +439,6 @@
   <string name="pref_enqueue_downloaded_title">Preneseno v vrsto</string>
   <string name="pref_enqueue_downloaded_summary">Dodajte prenesene epizode v čakalno vrsto</string>
     <string name="pref_skip_silence_title">Preskoči tišino v zvoku</string>
-  <string name="behavior">Obnašanje</string>
   <string name="pref_back_button_behavior_title">Obnašanje gumba za nazaj</string>
   <string name="pref_back_button_behavior_sum">Spremenite obnašanje gumba za nazaj.</string>
   <string name="back_button_default">Privzeto</string>
@@ -485,9 +478,6 @@
   <string name="sync_status_success">Sinhronizacija uspela</string>
   <string name="sync_status_error">Sinhronizacija ni uspela</string>
   <!--import and export-->
-  <string name="import_export_summary">Premaknite naročnine in čakalno vrsto na drugo napravo</string>
-  <string name="database">Podatkovna zbirka</string>
-  <string name="opml">OPML</string>
   <string name="opml_export_summary">Prenesite svoje naročnine v drugo aplikacijo za podcaste</string>
   <string name="opml_import_summary">Uvozite svoje naročnine iz druge aplikacije za podcaste</string>
   <string name="database_export_summary">Prenesite naročnine, poslušane epizode in čakalno vrsto na FocusPodcast, na drugo napravo</string>

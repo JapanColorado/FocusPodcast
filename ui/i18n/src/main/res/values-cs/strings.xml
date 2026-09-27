@@ -298,8 +298,6 @@
     <string name="no_fav_episodes_head_label">Žádné oblíbené epizody</string>
   <string name="no_subscriptions_head_label">Žádné odběry</string>
     <!--Preferences-->
-  <string name="storage_pref">Úložiště</string>
-  <string name="synchronization_pref">Synchronizace</string>
   <string name="automation">Automatizace</string>
     <string name="import_export_pref">Importovat/Exportovat</string>
   <string name="import_export_search_keywords">zálohovat, obnovit</string>
@@ -334,7 +332,6 @@
   <string name="pref_favorite_keeps_episodes_sum">Nemazat epizody označené jako oblíbené.</string>
   <string name="pref_favorite_keeps_episodes_title">Nemazat oblíbené epizody</string>
   <string name="playback_pref">Přehrávání</string>
-  <string name="network_pref">Síť</string>
   <string name="feed_refresh_title">Aktualizovat podcasty</string>
   <string name="feed_refresh_sum">Zvolit interval nebo čas pro automatické hledání nových epizod</string>
   <string name="feed_refresh_interval">Interval</string>
@@ -358,13 +355,11 @@
   <string name="pref_mobileUpdate_auto_download">Automatické stahování</string>
   <string name="pref_mobileUpdate_episode_download">Stahování epizod</string>
   <string name="pref_mobileUpdate_streaming">Streamování</string>
-  <string name="user_interface_label">Uživatelské rozhraní</string>
   <string name="pref_set_theme_title">Vybrat motiv</string>
   <string name="pref_nav_drawer_items_title">Změnit navigační panel</string>
   <string name="pref_nav_drawer_items_sum">Upravit zobrazení položek v navigačním panelu.</string>
   <string name="pref_nav_drawer_feed_order_title">Nastavit pořadí odběrů</string>
   <string name="pref_nav_drawer_feed_order_sum">Upravit pořadí vašich odběrů</string>
-  <string name="pref_set_theme_sum">Změnit vzhled FocusPodcast.</string>
   <string name="pref_automatic_download_title">Automatické stahování</string>
   <string name="pref_automatic_download_on_battery_title">Stahovat, pokud neprobíhá nabíjení</string>
   <string name="pref_automatic_download_on_battery_sum">Povolit automatické stahování i pokud není baterie nabíjena</string>
@@ -424,7 +419,6 @@
   <string name="pref_enqueue_downloaded_title">Zařadit stažené</string>
   <string name="pref_enqueue_downloaded_summary">Přidat stažené epizody do fronty</string>
     <string name="pref_skip_silence_title">Přeskočit ticho v audio souboru</string>
-  <string name="behavior">Chování</string>
   <string name="pref_back_button_behavior_title">Chování tlačítka zpět</string>
   <string name="pref_back_button_behavior_sum">Změnit chování tlačítka zpět.</string>
   <string name="back_button_default">Výchozí</string>
@@ -463,9 +457,6 @@
   <string name="sync_status_success">Synchronizace proběhla úspěšně</string>
   <string name="sync_status_error">Synchronizace selhala</string>
   <!--import and export-->
-  <string name="import_export_summary">Přesunout odběry a frontu do jiného zařízení</string>
-  <string name="database">Databáze</string>
-  <string name="opml">OPML</string>
   <string name="opml_export_summary">Přenést odběry do jiné podcastové aplikace</string>
   <string name="opml_import_summary">Importovat vaše odběry z jiné podcastové aplikace</string>
   <string name="database_export_summary">Přenést odběry, poslechnuté epizody a frontu do aplikace FocusPodcast na jiném zařízení</string>

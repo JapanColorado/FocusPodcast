@@ -28,7 +28,6 @@
   <string name="app_action_not_found">Non se atopa \"%1$s\"</string>
   <!--SwipeActions-->
   <string name="swipeactions_label">Accións ao desprazar</string>
-  <string name="swipeactions_summary">Elixe o que acontecerá cando desprazas sobre un episodio na lista</string>
   <string name="swipe_right">Despraza á dereita</string>
   <string name="swipe_left">Despraza á esquerda</string>
   <string name="enable_swipeactions">Activar as Acción de desprazamento para esta Pantalla</string>
@@ -302,8 +301,6 @@
     <string name="no_fav_episodes_head_label">Sen episodios favoritos</string>
   <string name="no_subscriptions_head_label">Sen subscricións</string>
   <!--Preferences-->
-  <string name="storage_pref">Almacenamento</string>
-  <string name="synchronization_pref">Sincronización</string>
   <string name="automation">Automatizado</string>
     <string name="import_export_pref">Importar/Exportar</string>
   <string name="import_export_search_keywords">respaldar, restaurar</string>
@@ -338,7 +335,6 @@
   <string name="pref_favorite_keeps_episodes_sum">Manter os episodios cando son marcados como Favoritos</string>
   <string name="pref_favorite_keeps_episodes_title">Manter os episodios favoritos</string>
   <string name="playback_pref">Reprodución</string>
-  <string name="network_pref">Rede</string>
   <string name="feed_refresh_title">Actualizar podcast</string>
   <string name="feed_refresh_sum">Indicar un intervalo ou hora concreta na que comprobar se hai novos episodios</string>
   <string name="feed_refresh_interval">Intervalo</string>
@@ -360,13 +356,11 @@
   <string name="pref_mobileUpdate_auto_download">Descarga automática</string>
   <string name="pref_mobileUpdate_episode_download">Descarga de episodio</string>
   <string name="pref_mobileUpdate_streaming">Retransmisión</string>
-  <string name="user_interface_label">Interface de usuaria</string>
   <string name="pref_set_theme_title">Escolle o decorado</string>
   <string name="pref_nav_drawer_items_title">Configurar a Caixa de navegación</string>
   <string name="pref_nav_drawer_items_sum">Cambiar os elementos da Caixa de navegación.</string>
   <string name="pref_nav_drawer_feed_order_title">Indicar a orde das subscricións</string>
   <string name="pref_nav_drawer_feed_order_sum">Cambiar a orde das subscricións</string>
-  <string name="pref_set_theme_sum">Cambiar o aspecto de FocusPodcast.</string>
   <string name="pref_automatic_download_title">Descarga automática</string>
   <string name="pref_automatic_download_on_battery_title">Descargar elementos cando non esté cargando</string>
   <string name="pref_automatic_download_on_battery_sum">Permitir a descarga automática cando a batería non está a cargar</string>
@@ -437,7 +431,6 @@
   <string name="pref_enqueue_downloaded_title">Foron descargados os elementos da cola</string>
   <string name="pref_enqueue_downloaded_summary">Engadir os episodios descargados a cola</string>
     <string name="pref_skip_silence_title">Omitir silencio no Audio</string>
-  <string name="behavior">Comportamento</string>
   <string name="pref_back_button_behavior_title">Comportamento do botón Atrás</string>
   <string name="pref_back_button_behavior_sum">Cambiar o comportamento do botón atrás.</string>
   <string name="back_button_default">Predeterminado</string>
@@ -479,9 +472,6 @@
   <string name="sync_status_success">Sincronización correcta</string>
   <string name="sync_status_error">Fallou a sincronización</string>
   <!--import and export-->
-  <string name="import_export_summary">Mover subscricións e cola a outro dispositivo</string>
-  <string name="database">Base de datos</string>
-  <string name="opml">OPML</string>
   <string name="opml_export_summary">Mover as túas subscricións a outra app de podcast</string>
   <string name="opml_import_summary">Importar as túas subscricións desde outra app de podcast</string>
   <string name="database_export_summary">Mover as subscricións, episodios escoitados e cola a FocusPodcast en outro dispositivo</string>

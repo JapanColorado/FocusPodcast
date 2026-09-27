@@ -28,7 +28,6 @@
   <string name="app_action_not_found">\"%1$s\" non trovato</string>
   <!--SwipeActions-->
   <string name="swipeactions_label">Azioni di scorrimento</string>
-  <string name="swipeactions_summary">Azioni quando si scorre a destra/sinistra un episodio nella lista</string>
   <string name="swipe_right">Scorri a destra</string>
   <string name="swipe_left">Scorri a sinistra</string>
   <string name="enable_swipeactions">Abilita azioni di scorrimento su questa schermata</string>
@@ -302,8 +301,6 @@
     <string name="no_fav_episodes_head_label">Nessun episodio preferito</string>
   <string name="no_subscriptions_head_label">Nessuna iscrizione</string>
     <!--Preferences-->
-  <string name="storage_pref">Memoria</string>
-  <string name="synchronization_pref">Sincronizzazione</string>
   <string name="automation">Automazione</string>
     <string name="import_export_pref">Importa/Esporta</string>
   <string name="import_export_search_keywords">backup, ripristina, ripristino, importa, esporta</string>
@@ -338,7 +335,6 @@
   <string name="pref_favorite_keeps_episodes_sum">Mantiene gli episodi se sono segnati come Preferiti</string>
   <string name="pref_favorite_keeps_episodes_title">Mantieni episodi preferiti</string>
   <string name="playback_pref">Riproduzione</string>
-  <string name="network_pref">Rete</string>
   <string name="feed_refresh_title">Aggiorna i podcast</string>
   <string name="feed_refresh_sum">Specifica un intervallo di tempo oppure un orario in cui verificare automaticamente la disponibilità di nuovi episodi</string>
   <string name="feed_refresh_interval">Intervallo</string>
@@ -360,13 +356,11 @@
   <string name="pref_mobileUpdate_auto_download">Download automatici</string>
   <string name="pref_mobileUpdate_episode_download">Download episodi</string>
   <string name="pref_mobileUpdate_streaming">Streaming</string>
-  <string name="user_interface_label">Interfaccia utente</string>
   <string name="pref_set_theme_title">Seleziona un tema</string>
   <string name="pref_nav_drawer_items_title">Seleziona elementi del menù</string>
   <string name="pref_nav_drawer_items_sum">Aggiungi o rimuovi gli elementi che appaiono nel menù laterale.</string>
   <string name="pref_nav_drawer_feed_order_title">Imposta l\'ordine delle iscrizioni</string>
   <string name="pref_nav_drawer_feed_order_sum">Modifica l\'ordine delle iscrizioni</string>
-  <string name="pref_set_theme_sum">Cambia l\'aspetto di FocusPodcast</string>
   <string name="pref_automatic_download_title">Download automatico</string>
   <string name="pref_automatic_download_on_battery_title">Scarica episodi con batteria non in carica</string>
   <string name="pref_automatic_download_on_battery_sum">Permetti il download automatico quando la batteria non è in carica</string>
@@ -437,7 +431,6 @@
   <string name="pref_enqueue_downloaded_title">Aggiungi i download alla coda</string>
   <string name="pref_enqueue_downloaded_summary">Aggiunge gli episodi alla coda quando vengono scaricati</string>
     <string name="pref_skip_silence_title">Salta il silenzio audio</string>
-  <string name="behavior">Comportamento</string>
   <string name="pref_back_button_behavior_title">Comportamento tasto indietro</string>
   <string name="pref_back_button_behavior_sum">Cambia il comportamento del tasto indietro</string>
   <string name="back_button_default">Predefinito</string>
@@ -479,9 +472,6 @@
   <string name="sync_status_success">Sincronizzazione eseguita con successo</string>
   <string name="sync_status_error">Sincronizzazione fallita</string>
   <!--import and export-->
-  <string name="import_export_summary">Sposta le iscrizioni e la coda su un altro dispositivo.</string>
-  <string name="database">Database</string>
-  <string name="opml">OPML</string>
   <string name="opml_export_summary">Sposta le tue iscrizioni in un\'altra app per i podcast</string>
   <string name="opml_import_summary">Importa le tue iscrizioni da un\'altra app per i podcast</string>
   <string name="database_export_summary">Sposta le iscrizioni, gli episodi ascoltati e la coda su FocusPodcast di un altro dispositivo</string>

@@ -28,7 +28,6 @@
   <string name="app_action_not_found">N\'eo ket bet kavet \"%1$s\"</string>
   <!--SwipeActions-->
   <string name="swipeactions_label">Gwezhiadoù Lamprañ</string>
-  <string name="swipeactions_summary">Dibab petra c\'hoarvez pa vez riklet un degouezh el listenn </string>
   <string name="swipe_right">Lamprañ Dehoù</string>
   <string name="swipe_left">Lamprañ Gleizh</string>
   <string name="enable_swipeactions">Kas war-raok an ober dre al lamprañ evit ar skramm-mañ</string>
@@ -341,8 +340,6 @@
     <string name="no_fav_episodes_head_label">Rann ebet er sinedoù</string>
   <string name="no_subscriptions_head_label">Koumanant ebet</string>
     <!--Preferences-->
-  <string name="storage_pref">Kadaviñ</string>
-  <string name="synchronization_pref">Goubredañ</string>
   <string name="automation">Emgefreekañ</string>
   <string name="import_export_pref">Enporzhiadur / Ezporzhiadur</string>
   <string name="import_export_search_keywords">gwarediñ, assav</string>
@@ -377,7 +374,6 @@
   <string name="pref_favorite_keeps_episodes_sum">Mirout ar rannoù pa vezont lakaet er sinedoù</string>
   <string name="pref_favorite_keeps_episodes_title">Mirout ar rannoù er sinedoù</string>
   <string name="playback_pref">Lenn</string>
-  <string name="network_pref">Rouedad</string>
   <string name="feed_refresh_title">Hizivaat ar podskignadoù</string>
   <string name="feed_refresh_sum">Lakit un etremez pe un eur resis evit klask rannoù nevez ent emgefreek</string>
   <string name="feed_refresh_interval">Etremez</string>
@@ -402,13 +398,11 @@
   <string name="pref_mobileUpdate_auto_download">Pellgargañ emgefreek</string>
   <string name="pref_mobileUpdate_episode_download">Pellgargañ ar rann</string>
   <string name="pref_mobileUpdate_streaming">Streaming</string>
-  <string name="user_interface_label">Ketal arveriad</string>
   <string name="pref_set_theme_title">Dibab un neuz</string>
   <string name="pref_nav_drawer_items_title">Kemmañ elfennoù ar stalaf merdeiñ</string>
   <string name="pref_nav_drawer_items_sum">Kemmañ an elfennoù diskouezet er stalaf merdeiñ</string>
   <string name="pref_nav_drawer_feed_order_title">Despizañ urzh ar c\'houmanantoù</string>
   <string name="pref_nav_drawer_feed_order_sum">Kemmañ urzh ar c\'houmanantoù</string>
-  <string name="pref_set_theme_sum">Kemmañ neuz FocusPodcast</string>
   <string name="pref_automatic_download_title">Pellgargañ emgefreek</string>
   <string name="pref_automatic_download_on_battery_title">Pellgargañ pa ne vez ket o kargañ</string>
   <string name="pref_automatic_download_on_battery_sum">Aotren ar pellgargañ emgefreek pa ne vez ket ar benveg o kargañ</string>
@@ -474,7 +468,6 @@
   <string name="pref_enqueue_downloaded_title">Ouzhpennañ el lost ur wech pellgarget</string>
   <string name="pref_enqueue_downloaded_summary">Ouzhpennañ ar rannoù pellgarget el lost</string>
     <string name="pref_skip_silence_title">Tremen ar mareoù didrouz en aodio</string>
-  <string name="behavior">Emzalc\'h</string>
   <string name="pref_back_button_behavior_title">Emzalc\'h an afell Distreiñ</string>
   <string name="pref_back_button_behavior_sum">Kemmañ a ra emzalc\'h an afell Distreiñ</string>
   <string name="back_button_default">Dre ziouer</string>
@@ -514,9 +507,6 @@
   <string name="sync_status_success">Goubredet gant berzh</string>
   <string name="sync_status_error">C\'hwitadenn en ur c\'houbredañ</string>
   <!--import and export-->
-  <string name="import_export_summary">Dilec\'hiañ ar c\'houmanantoù ha lakaat e lost ur benveg all</string>
-  <string name="database">Stlennvon</string>
-  <string name="opml">OPML</string>
   <string name="opml_export_summary">Treuzkas ho koumanantoù d\'un arload podskignad all</string>
   <string name="opml_import_summary">Enporzhiañ ho koumanantoù adalek un arload podskignad all</string>
   <string name="database_export_summary">Treuzkas ar c\'houmanantoù, ar rannoù lennet hag el lost da FocusPodcast war ur benveg all</string>

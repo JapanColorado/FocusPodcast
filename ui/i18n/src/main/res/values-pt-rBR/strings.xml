@@ -28,7 +28,6 @@
   <string name="app_action_not_found">\"%1$s\" não foi encontrado</string>
   <!--SwipeActions-->
   <string name="swipeactions_label">Ações de arrasto</string>
-  <string name="swipeactions_summary">Defina o que fazer ao arrastar um episódio da lista</string>
   <string name="swipe_right">Arrastar para a direita</string>
   <string name="swipe_left">Arrastar para a esquerda</string>
   <string name="enable_swipeactions">Habilitar as ações de arrasto para essa tela</string>
@@ -298,8 +297,6 @@
     <string name="no_fav_episodes_head_label">Nenhum episódio favorito</string>
   <string name="no_subscriptions_head_label">Nenhuma assinatura</string>
     <!--Preferences-->
-  <string name="storage_pref">Armazenamento</string>
-  <string name="synchronization_pref">Sincronização</string>
   <string name="automation">Automação</string>
     <string name="import_export_pref">Importar/Exportar</string>
   <string name="import_export_search_keywords">backup, cópia, restore, restaurar</string>
@@ -334,7 +331,6 @@
   <string name="pref_favorite_keeps_episodes_sum">Mantém os episódios marcados como Favoritos</string>
   <string name="pref_favorite_keeps_episodes_title">Manter episódios favoritos</string>
   <string name="playback_pref">Reprodução</string>
-  <string name="network_pref">Rede</string>
   <string name="feed_refresh_title">Atualizar podcasts</string>
   <string name="feed_refresh_sum">Especifique um intervalo ou um horário específico para procurar por novos episódios automaticamente</string>
   <string name="feed_refresh_interval">Intervalo</string>
@@ -356,13 +352,11 @@
   <string name="pref_mobileUpdate_auto_download">Download automático</string>
   <string name="pref_mobileUpdate_episode_download">Download de episódios</string>
   <string name="pref_mobileUpdate_streaming">Streaming</string>
-  <string name="user_interface_label">Interface de usuário</string>
   <string name="pref_set_theme_title">Selecionar tema</string>
   <string name="pref_nav_drawer_items_title">Configurar itens da Gaveta de Navegação</string>
   <string name="pref_nav_drawer_items_sum">Escolher quais itens irão aparecer na gaveta de navegação.</string>
   <string name="pref_nav_drawer_feed_order_title">Configurar Ordem de Assinaturas</string>
   <string name="pref_nav_drawer_feed_order_sum">Mudar a ordem de suas assinaturas</string>
-  <string name="pref_set_theme_sum">Altera a aparência do FocusPodcast</string>
   <string name="pref_automatic_download_title">Download automático</string>
   <string name="pref_automatic_download_on_battery_title">Baixar enquanto não está carregando</string>
   <string name="pref_automatic_download_on_battery_sum">Permitir download automático enquanto a bateria não está carregando</string>
@@ -428,7 +422,6 @@
   <string name="pref_enqueue_downloaded_title">Enfileirar os baixados</string>
   <string name="pref_enqueue_downloaded_summary">Adiciona episódios baixados à fila</string>
     <string name="pref_skip_silence_title">Pular silêncio no áudio</string>
-  <string name="behavior">Comportamento</string>
   <string name="pref_back_button_behavior_title">Comportamento do botão voltar</string>
   <string name="pref_back_button_behavior_sum">Altera o comportamento do botão voltar</string>
   <string name="back_button_default">Padrão</string>
@@ -469,9 +462,6 @@
   <string name="sync_status_success">Sincronização bem sucedida</string>
   <string name="sync_status_error">Falha na sincronização</string>
   <!--import and export-->
-  <string name="import_export_summary">Move as assinaturas e a fila para outro dispositivo</string>
-  <string name="database">Banco de dados</string>
-  <string name="opml">OPML</string>
   <string name="opml_export_summary">Transfere suas assinaturas para outro aplicativo de podcast</string>
   <string name="opml_import_summary">Importa suas assinaturas de outro aplicativo de podcast</string>
   <string name="database_export_summary">Transfere as assinaturas, os episódios ouvidos e a fila para o FocusPodcast em outro dispositivo</string>

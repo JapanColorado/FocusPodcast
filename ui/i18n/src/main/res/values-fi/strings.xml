@@ -28,7 +28,6 @@
   <string name="app_action_not_found">Toimintoa \"%1$s\" ei löytynyt</string>
   <!--SwipeActions-->
   <string name="swipeactions_label">Pyyhkäisytoiminnot</string>
-  <string name="swipeactions_summary">Valitse toiminto, kun jaksoa pyyhkäistään listalla</string>
   <string name="swipe_right">Pyyhkäisy oikealle</string>
   <string name="swipe_left">Pyyhkäisy vasemmalle</string>
   <string name="enable_swipeactions">Ota pyyhkäisytoiminnot käyttöön tälle näkymälle</string>
@@ -302,8 +301,6 @@
     <string name="no_fav_episodes_head_label">Ei suosikkijaksoja</string>
   <string name="no_subscriptions_head_label">Ei tilauksia</string>
     <!--Preferences-->
-  <string name="storage_pref">Tallennus</string>
-  <string name="synchronization_pref">Synkronointi</string>
   <string name="automation">Automaatio</string>
     <string name="import_export_pref">Tuo/Vie</string>
   <string name="import_export_search_keywords">varmuuskopiointi, palautus</string>
@@ -338,7 +335,6 @@
   <string name="pref_favorite_keeps_episodes_sum">Säilytä suosikeiksi merkityt jaksot</string>
   <string name="pref_favorite_keeps_episodes_title">Säilytä suosikkijaksot</string>
   <string name="playback_pref">Toisto</string>
-  <string name="network_pref">Verkko</string>
   <string name="feed_refresh_title">Päivitä podcastit</string>
   <string name="feed_refresh_sum">Määritä aikaväli tai tietty aika etsiä uusia jaksoja automaattisesti</string>
   <string name="feed_refresh_interval">Aikaväli</string>
@@ -360,13 +356,11 @@
   <string name="pref_mobileUpdate_auto_download">Automaattinen lataus</string>
   <string name="pref_mobileUpdate_episode_download">Jaksojen lataus</string>
   <string name="pref_mobileUpdate_streaming">Suoratoisto</string>
-  <string name="user_interface_label">Käyttöliittymä</string>
   <string name="pref_set_theme_title">Valitse teema</string>
   <string name="pref_nav_drawer_items_title">Aseta navigointihyllyn asiat</string>
   <string name="pref_nav_drawer_items_sum">Vaihda navigointihyllyssä esiintyviä asioita.</string>
   <string name="pref_nav_drawer_feed_order_title">Aseta tilausten järjestys</string>
   <string name="pref_nav_drawer_feed_order_sum">Vaihda tilauksiesi järjestystä</string>
-  <string name="pref_set_theme_sum">Muuta FocusPodcastin ulkonäköä</string>
   <string name="pref_automatic_download_title">Automaattinen lataus</string>
   <string name="pref_automatic_download_on_battery_title">Lataa, kun akkua ei ladata</string>
   <string name="pref_automatic_download_on_battery_sum">Salli automaattiset lataukset, kun akku ei ole latautumassa</string>
@@ -437,7 +431,6 @@
   <string name="pref_enqueue_downloaded_title">Lisää ladatut jonoon</string>
   <string name="pref_enqueue_downloaded_summary">Lisää ladatut jaksot jonoon</string>
     <string name="pref_skip_silence_title">Skippaa tyhjät kohdat audiossa</string>
-  <string name="behavior">Toiminta</string>
   <string name="pref_back_button_behavior_title">Takaisin-painikkeen toiminta</string>
   <string name="pref_back_button_behavior_sum">Mukauta takaisin-painikkeen toiminta.</string>
   <string name="back_button_default">Oletus</string>
@@ -479,9 +472,6 @@
   <string name="sync_status_success">Synkronointi onnistui</string>
   <string name="sync_status_error">Synkronointi epäonnistui</string>
   <!--import and export-->
-  <string name="import_export_summary">Siirrä tilaukset ja jono toiselle laitteelle</string>
-  <string name="database">Tietokanta</string>
-  <string name="opml">OPML</string>
   <string name="opml_export_summary">Siirrä tilauksesi toiseen podcast-sovellukseen</string>
   <string name="opml_import_summary">Tuo tilauksesi toisesta podcast-sovelluksesta</string>
   <string name="database_export_summary">Siirrä tilaukset, kuunnellut jaksot ja jono toisella laitteella olevaan FocusPodcastiin</string>
