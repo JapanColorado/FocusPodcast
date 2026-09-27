@@ -5,8 +5,6 @@ import allen.town.podcast.activity.SettingsActivity
 import allen.town.podcast.core.pref.Prefs
 import allen.town.podcast.core.pref.Prefs.PREF_HOME_PAGE
 import allen.town.podcast.core.pref.Prefs.setShowRemainTimeSetting
-import allen.town.podcast.dialog.FeedsSortDialog.Companion.newInstance
-import allen.town.podcast.dialog.SubsFilterDialog.showDialog
 import allen.town.podcast.event.PlayerStatusEvent
 import allen.town.podcast.event.UnreadItemsUpdateEvent
 import allen.town.podcast.pref.AppLanguage
@@ -39,18 +37,6 @@ class UserInterfacePrefFragment : AbsSettingsFragment() {
                 setShowRemainTimeSetting(newValue as Boolean?)
                 EventBus.getDefault().post(UnreadItemsUpdateEvent())
                 EventBus.getDefault().post(PlayerStatusEvent())
-                true
-            }
-        findPreference<Preference>(Prefs.PREF_FILTER_FEED)?.onPreferenceClickListener =
-            Preference.OnPreferenceClickListener { preference: Preference? ->
-                showDialog(requireContext())
-                true
-            }
-        findPreference<Preference>(Prefs.PREF_DRAWER_FEED_ORDER)?.onPreferenceClickListener =
-            Preference.OnPreferenceClickListener { preference: Preference? ->
-                newInstance().show(
-                    childFragmentManager, null
-                )
                 true
             }
         requirePreference(PREF_THEME_INTERFACE).onPreferenceClickListener =

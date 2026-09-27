@@ -5,17 +5,6 @@
     <allen.town.podcast.common.common.prefs.supportv7.ATEPreferenceCategory
         android:layout="@layout/preference_category_title"
         android:title="@string/automation">
-        <allen.town.podcast.common.common.prefs.supportv7.ATESwitchPreference
-            android:layout="@layout/list_item_view_switch_no_title"
-            android:key="pref_refresh_on_start"
-            android:title="@string/pref_refresh_on_start_title"
-            android:defaultValue="false"/>
-        <allen.town.podcast.common.common.prefs.supportv7.ATEPreference
-            android:icon="@drawable/ic_refresh"
-            android:key="pref_auto_refresh_interval"
-            android:layout="@layout/list_item_view_no_title"
-            android:summary="@string/feed_refresh_sum"
-            android:title="@string/feed_refresh_title" />
         <allen.town.podcast.common.common.prefs.supportv7.ATEPreference
             android:icon="@drawable/ic_auto_download"
             android:key="prefAutoDownloadSettings"

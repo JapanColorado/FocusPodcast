@@ -3,13 +3,6 @@
     xmlns:search="http://schemas.android.com/apk/allen.town.podcast.searchpreference"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <allen.town.podcast.fragment.pref.PodcastSearchEnginePreference
-        android:key="pref_podcast_search_engine"
-        app:icon="@drawable/ic_podcast_search"
-        android:layout="@layout/list_item_view"
-        android:summary="@string/pref_podcast_search_engine_sum"
-        android:title="@string/pref_podcast_search_engine_title" />
-
     <allen.town.podcast.common.common.prefs.supportv7.ATEPreferenceCategory
         android:layout="@layout/preference_category_title"
         android:title="@string/behavior">

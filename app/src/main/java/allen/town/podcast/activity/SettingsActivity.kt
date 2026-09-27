@@ -130,6 +130,7 @@ enum class SettingsScreen(
     GENERAL(R.xml.pref_general, R.string.pref_general_title, null, { GeneralPrefFragment() }),
     SWIPE(R.xml.pref_swipe, R.string.swipeactions_label, GENERAL, { SwipePrefFragment() }),
     PLAYBACK(R.xml.pref_playback, R.string.playback_pref, null, { PlaybackPrefFragment() }),
+    SUBSCRIPTIONS(R.xml.pref_subscriptions, R.string.pref_subscriptions_updates_title, null, { SubscriptionsPrefFragment() }),
     NETWORK(R.xml.pref_network, R.string.network_pref, null, { NetworkPrefFragment() }),
     AUTO_DOWNLOAD(R.xml.pref_auto_download, R.string.pref_automatic_download_title, NETWORK, { AutoDownloadPrefFragment() }),
     STORAGE(R.xml.pref_storage, R.string.storage_pref, null, { StoragePrefFragment() }),

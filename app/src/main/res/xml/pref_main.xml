@@ -31,6 +31,13 @@
         android:title="@string/playback_pref" />
 
     <allen.town.podcast.common.common.prefs.supportv7.ATEPreference
+        android:icon="@drawable/ic_podcast"
+        android:key="pref_subscriptions"
+        android:layout="@layout/list_item_view_no_title_main"
+        android:summary="@string/pref_subscriptions_updates_sum"
+        android:title="@string/pref_subscriptions_updates_title" />
+
+    <allen.town.podcast.common.common.prefs.supportv7.ATEPreference
         android:icon="@drawable/ic_network"
         android:key="pref_netword"
         android:layout="@layout/list_item_view_no_title_main"

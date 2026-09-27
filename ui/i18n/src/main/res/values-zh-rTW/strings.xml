@@ -800,4 +800,6 @@
   <string name="pref_playback_notification_category">播放通知</string>
   <string name="pref_system_notification_settings_title">系統通知設定</string>
   <string name="pref_system_notification_settings_sum">選擇 FocusPodcast 顯示哪些類型的通知</string>
+  <string name="pref_subscriptions_updates_title">訂閱與更新</string>
+  <string name="pref_subscriptions_updates_sum">播客搜尋、重新整理排程、訂閱列表</string>
 </resources>

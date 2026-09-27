@@ -24,6 +24,7 @@ public class MainPrefFragment extends AbsSettingsFragment {
     private static final String PREF_SCREEN_USER_INTERFACE = "pref_interface";
     private static final String PREF_SCREEN_PLAYBACK = "pref_playback";
     private static final String PREF_SCREEN_NETWORK = "pref_netword";
+    private static final String PREF_SCREEN_SUBSCRIPTIONS = "pref_subscriptions";
     private static final String PREF_SCREEN_SYNCHRONIZATION = "pref_sync";
     private static final String PREF_SCREEN_STORAGE = "pref_storage";
     private static final String PREF_SEND_BUG_REPORT = "pref_report_bug";
@@ -62,6 +63,10 @@ public class MainPrefFragment extends AbsSettingsFragment {
 
         findPreference(PREF_SCREEN_PLAYBACK).setOnPreferenceClickListener(preference -> {
             ((SettingsActivity) getActivity()).openScreen(R.xml.pref_playback);
+            return true;
+        });
+        findPreference(PREF_SCREEN_SUBSCRIPTIONS).setOnPreferenceClickListener(preference -> {
+            ((SettingsActivity) getActivity()).openScreen(R.xml.pref_subscriptions);
             return true;
         });
         findPreference(PREF_SCREEN_NETWORK).setOnPreferenceClickListener(preference -> {

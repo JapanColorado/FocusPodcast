@@ -531,4 +531,6 @@
   <string name="pref_playback_notification_category">再生通知</string>
   <string name="pref_system_notification_settings_title">システムの通知設定</string>
   <string name="pref_system_notification_settings_sum">FocusPodcast が表示する通知の種類を選択します</string>
+  <string name="pref_subscriptions_updates_title">購読と更新</string>
+  <string name="pref_subscriptions_updates_sum">ポッドキャスト検索、更新スケジュール、購読リスト</string>
 </resources>
