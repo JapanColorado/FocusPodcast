@@ -858,7 +858,13 @@ public class PlaybackService extends MediaBrowserServiceCompat {
     private void skipToPrevious(int position, @Nullable FeedMedia previous) {
         PreviousEpisodePolicy.Action action = PreviousEpisodePolicy.decide(position, previous != null);
         if (action == PreviousEpisodePolicy.Action.PLAY_PREVIOUS && previous != null) {
-            new PlaybackServiceStarter(this, previous).callEvenIfRunning(true).start();
+            // The service cannot ask whether to stream over mobile data. If the episode being left
+            // was streaming, the user has already agreed to stream, so the previous one may too;
+            // otherwise startPlaying() posts the usual "streaming not allowed" notification.
+            new PlaybackServiceStarter(this, previous)
+                    .callEvenIfRunning(true)
+                    .shouldStreamThisTime(isStreaming())
+                    .start();
         } else {
             seekTo(0);
         }
