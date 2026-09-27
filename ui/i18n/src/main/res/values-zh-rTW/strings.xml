@@ -809,4 +809,7 @@
   <string name="pref_ad_skip_sum">偵測並跳過已下載單集中的廣告</string>
   <string name="pref_sync_backup_title">同步與備份</string>
   <string name="pref_sync_backup_sum">gpodder.net 或 Nextcloud 同步、資料庫備份、OPML 匯入和匯出</string>
+  <string name="pref_downloads_storage_title">下載與儲存</string>
+  <string name="pref_downloads_storage_sum">自動下載、行動數據、刪除單集、儲存資料夾</string>
+  <string name="pref_deleting_episodes_category">刪除單集</string>
 </resources>

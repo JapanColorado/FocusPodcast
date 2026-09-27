@@ -860,4 +860,7 @@
   <string name="pref_ad_skip_sum">检测并跳过已下载单集中的广告</string>
   <string name="pref_sync_backup_title">同步与备份</string>
   <string name="pref_sync_backup_sum">gpodder.net 或 Nextcloud 同步、数据库备份、OPML 导入和导出</string>
+  <string name="pref_downloads_storage_title">下载与存储</string>
+  <string name="pref_downloads_storage_sum">自动下载、移动数据、删除单集、存储文件夹</string>
+  <string name="pref_deleting_episodes_category">删除单集</string>
 </resources>

@@ -540,4 +540,7 @@
   <string name="pref_ad_skip_sum">ダウンロード済みエピソードの広告を検出してスキップ</string>
   <string name="pref_sync_backup_title">同期とバックアップ</string>
   <string name="pref_sync_backup_sum">gpodder.net または Nextcloud との同期、データベースのバックアップ、OPML のインポートとエクスポート</string>
+  <string name="pref_downloads_storage_title">ダウンロードとストレージ</string>
+  <string name="pref_downloads_storage_sum">自動ダウンロード、モバイルデータ、エピソードの削除、保存先フォルダ</string>
+  <string name="pref_deleting_episodes_category">エピソードの削除</string>
 </resources>

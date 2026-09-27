@@ -2,6 +2,7 @@ package allen.town.podcast.activity
 
 import allen.town.podcast.common.views.AccentMaterialDialog
 import allen.town.podcast.R
+import allen.town.podcast.core.pref.Prefs
 import allen.town.podcast.databinding.SettingsActivityBinding
 import allen.town.podcast.fragment.pref.*
 import android.os.Bundle
@@ -35,7 +36,7 @@ open class SettingsActivity : SimpleToolbarActivity(), SearchPreferenceResultLis
         }
         // Only on a fresh start: after a recreate (theme, language) the back stack is restored.
         if (savedInstanceState == null && intent.getBooleanExtra(OPEN_AUTO_DOWNLOAD_SETTINGS, false)) {
-            openScreen(R.xml.pref_auto_download)
+            openScreen(R.xml.pref_downloads)?.scrollToPreference(Prefs.PREF_ENABLE_AUTODL)
         }
     }
 
@@ -129,9 +130,7 @@ enum class SettingsScreen(
     PLAYBACK(R.xml.pref_playback, R.string.playback_pref, null, { PlaybackPrefFragment() }),
     AD_SKIP(R.xml.pref_ad_skip, R.string.pref_ad_skip_category, null, { AdSkipPrefFragment() }),
     SUBSCRIPTIONS(R.xml.pref_subscriptions, R.string.pref_subscriptions_updates_title, null, { SubscriptionsPrefFragment() }),
-    NETWORK(R.xml.pref_network, R.string.network_pref, null, { NetworkPrefFragment() }),
-    AUTO_DOWNLOAD(R.xml.pref_auto_download, R.string.pref_automatic_download_title, NETWORK, { AutoDownloadPrefFragment() }),
-    STORAGE(R.xml.pref_storage, R.string.storage_pref, null, { StoragePrefFragment() }),
+    DOWNLOADS(R.xml.pref_downloads, R.string.pref_downloads_storage_title, null, { DownloadsPrefFragment() }),
     SYNC(R.xml.pref_sync, R.string.pref_sync_backup_title, null, { SyncPrefFragment() }),
     NOTIFICATIONS(R.xml.pref_notifications, R.string.notification_pref_fragment, null, { NotificationPrefFragment() }),
     OTHERS(R.xml.pref_others, R.string.others, null, { OthersFragment() }),

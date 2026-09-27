@@ -38,17 +38,12 @@
         android:title="@string/pref_subscriptions_updates_title" />
 
     <allen.town.podcast.common.common.prefs.supportv7.ATEPreference
-        android:icon="@drawable/ic_network"
-        android:key="pref_netword"
+        android:icon="@drawable/ic_auto_download"
+        android:key="pref_downloads"
         android:layout="@layout/list_item_view_no_title_main"
-        android:summary="@string/network_pref_sum"
-        android:title="@string/network_pref" />
-    <allen.town.podcast.common.common.prefs.supportv7.ATEPreference
-        android:icon="@drawable/ic_storage"
-        android:key="pref_storage"
-        android:layout="@layout/list_item_view_no_title_main"
-        android:summary="@string/storage_sum"
-        android:title="@string/storage_pref" />
+        android:summary="@string/pref_downloads_storage_sum"
+        android:title="@string/pref_downloads_storage_title" />
+
     <allen.town.podcast.common.common.prefs.supportv7.ATEPreference
         android:icon="@drawable/ic_cloud"
         android:key="pref_sync"
