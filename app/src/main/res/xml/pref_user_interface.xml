@@ -84,6 +84,7 @@
             android:key="language_name"
             android:layout="@layout/list_item_view"
             android:negativeButtonText="@null"
+            android:persistent="false"
             android:positiveButtonText="@null"
             android:title="@string/pref_language_name"
             app:icon="@drawable/ic_language" />

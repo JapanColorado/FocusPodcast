@@ -88,13 +88,6 @@ open class SettingsActivity : SimpleToolbarActivity(), SearchPreferenceResultLis
         return prefFragment
     }
 
-/*    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        if (item.itemId == android.R.id.home) {
-            onBackPressed()
-        }
-        return super.onOptionsItemSelected(item)
-    }*/
-
     fun openScreen(screen: Int): PreferenceFragmentCompat? {
         val fragment = getPreferenceScreen(screen)
         if (screen == R.xml.pref_notifications_under26 && Build.VERSION.SDK_INT >= 26) {

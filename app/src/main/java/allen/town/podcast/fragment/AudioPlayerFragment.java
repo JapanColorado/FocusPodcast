@@ -1013,7 +1013,7 @@ public class AudioPlayerFragment extends Fragment implements
 
     protected void setupDriveMode(){
         if(isDriveMode){
-            driveCloseIv.setOnClickListener(v -> getActivity().onBackPressed());
+            driveCloseIv.setOnClickListener(v -> requireActivity().getOnBackPressedDispatcher().onBackPressed());
         }
     }
 }

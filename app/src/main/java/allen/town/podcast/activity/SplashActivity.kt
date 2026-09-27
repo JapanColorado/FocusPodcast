@@ -8,7 +8,6 @@ import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.view.KeyEvent
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import io.reactivex.Completable
@@ -61,14 +60,5 @@ class SplashActivity : AppCompatActivity() {
         uiHandler.removeCallbacksAndMessages(null)
         disposable?.dispose()
         super.onDestroy()
-    }
-
-    /**
-     * The splash screen must block the back button, otherwise the user can quit the app before the ad is shown and billed.
-     */
-    override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
-        return if (keyCode == KeyEvent.KEYCODE_BACK || keyCode == KeyEvent.KEYCODE_HOME) {
-            true
-        } else super.onKeyDown(keyCode, event)
     }
 }

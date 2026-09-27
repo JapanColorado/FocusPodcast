@@ -47,7 +47,10 @@ project.ext {
 
     // AndroidX
     annotationVersion = "1.8.0"
-    appcompatVersion = "1.4.2"
+    // 1.6 is the first AppCompat with per-app locales (AppCompatDelegate.setApplicationLocales)
+    // and it pulls in androidx.activity 1.6, which routes back through OnBackInvokedCallback for
+    // predictive back. 1.7 needs a newer fragment than the one forced in app/build.gradle.
+    appcompatVersion = "1.6.1"
     coreVersion = "1.5.0"
     coreKtxVersion = "1.7.0"
     fragmentVersion = "1.3.6"

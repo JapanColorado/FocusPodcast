@@ -8,6 +8,7 @@ import android.content.res.Configuration
 import android.util.DisplayMetrics
 import android.view.MenuItem
 import android.view.View
+import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
@@ -22,6 +23,9 @@ import androidx.drawerlayout.widget.DrawerLayout
  * given at construction (which returns true when it consumed the event), and any remaining
  * [drawerCloseCallback] runs afterwards. It performs no fragment transactions itself apart from
  * attaching the drawer fragment.
+ *
+ * [backCallback] closes the drawer on back and is enabled only while the drawer is open, so
+ * predictive back falls through to the next handler otherwise. MainActivity registers it.
  */
 internal class MainNavDrawer(
     private val activity: AppCompatActivity,
@@ -39,8 +43,29 @@ internal class MainNavDrawer(
 
     var drawerCloseCallback: (() -> Unit)? = null
 
+    val backCallback: OnBackPressedCallback = object : OnBackPressedCallback(false) {
+        override fun handleOnBackPressed() {
+            closeDrawerNow()
+        }
+    }
+
     init {
         setNavDrawerSize()
+        // A permanent listener: the toggle is replaced every time a fragment sets up its toolbar.
+        drawerLayout?.addDrawerListener(object : DrawerLayout.SimpleDrawerListener() {
+            override fun onDrawerOpened(drawerView: View) {
+                syncBackCallback()
+            }
+
+            override fun onDrawerClosed(drawerView: View) {
+                syncBackCallback()
+            }
+        })
+    }
+
+    /** Enable [backCallback] exactly while the drawer is open (also after a state restore). */
+    fun syncBackCallback() {
+        backCallback.isEnabled = isDrawerOpen
     }
 
     /**
@@ -60,6 +85,10 @@ internal class MainNavDrawer(
         attachNavDrawer = attach
         navDrawerView.postDelayed(attach, 1000)
     }
+
+    /** False in the tablet/landscape layout, which has no drawer. */
+    val hasDrawer: Boolean
+        get() = drawerLayout != null
 
     val isDrawerOpen: Boolean
         get() = drawerLayout?.isDrawerOpen(navDrawerView) == true
@@ -122,6 +151,7 @@ internal class MainNavDrawer(
     fun onPostCreate() {
         // Tablet layout does not have a drawer
         drawerToggle?.syncState()
+        syncBackCallback()
     }
 
     fun onConfigurationChanged(newConfig: Configuration) {

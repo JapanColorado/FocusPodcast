@@ -1,6 +1,5 @@
 package allen.town.podcast.fragment.pref
 
-import allen.town.podcast.common.extensions.installLanguageAndRecreate
 import allen.town.podcast.R
 import allen.town.podcast.activity.SettingsActivity
 import allen.town.podcast.core.pref.Prefs
@@ -10,7 +9,9 @@ import allen.town.podcast.dialog.FeedsSortDialog.Companion.newInstance
 import allen.town.podcast.dialog.SubsFilterDialog.showDialog
 import allen.town.podcast.event.PlayerStatusEvent
 import allen.town.podcast.event.UnreadItemsUpdateEvent
+import allen.town.podcast.pref.AppLanguage
 import android.os.Bundle
+import androidx.preference.ListPreference
 import androidx.preference.Preference
 import allen.town.podcast.theme.constants.ThemeConstants.LANGUAGE_NAME
 import org.greenrobot.eventbus.EventBus
@@ -57,10 +58,13 @@ class UserInterfacePrefFragment : AbsSettingsFragment() {
                 (requireActivity() as SettingsActivity).openScreen(R.xml.pref_theme)
                 true
             }
-        requirePreference(LANGUAGE_NAME).onPreferenceChangeListener =
-            Preference.OnPreferenceChangeListener { preference, newValue ->
-                setSummary(preference, newValue.toString())
-                requireActivity().installLanguageAndRecreate(newValue.toString())
+        // Not persisted: the per-app locale is the source of truth, and it can also be changed in
+        // the system's app language settings. AppCompat recreates the activities on a change.
+        val language = requirePreference(LANGUAGE_NAME) as ListPreference
+        language.value = AppLanguage.currentCode(language.entryValues)
+        language.onPreferenceChangeListener =
+            Preference.OnPreferenceChangeListener { _, newValue ->
+                AppLanguage.apply(newValue.toString())
                 true
             }
         requirePreference(PREF_HOME_PAGE).onPreferenceChangeListener =

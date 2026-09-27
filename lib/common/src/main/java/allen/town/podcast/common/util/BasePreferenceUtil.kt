@@ -16,7 +16,6 @@ import allen.town.podcast.theme.constants.ThemeConstants.FIRST_INSTALL_AND_LAUNC
 import allen.town.podcast.theme.constants.ThemeConstants.GENERAL_THEME
 import allen.town.podcast.theme.constants.ThemeConstants.INTERSTITIAL_AD_TIME
 import allen.town.podcast.theme.constants.ThemeConstants.KEEP_SCREEN_ON
-import allen.town.podcast.theme.constants.ThemeConstants.LANGUAGE_NAME
 import allen.town.podcast.theme.constants.ThemeConstants.LIBRARY_CATEGORIES
 import allen.town.podcast.theme.constants.ThemeConstants.MATERIAL_YOU
 import allen.town.podcast.theme.constants.ThemeConstants.TAB_TEXT_MODE
@@ -49,9 +48,6 @@ object BasePreferenceUtil {
         get() = checkNotNull(sharedPreferences) {
             "BasePreferenceUtil.instance(context) has not been called yet"
         }
-
-    @JvmStatic
-    val languageCode: String get() = prefs.getString(LANGUAGE_NAME, "auto") ?: "auto"
 
     @JvmStatic
     var libraryCategory: List<CategoryInfo>

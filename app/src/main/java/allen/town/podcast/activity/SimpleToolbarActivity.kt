@@ -2,18 +2,13 @@ package allen.town.podcast.activity
 
 import allen.town.podcast.common.extensions.*
 import allen.town.podcast.common.util.BasePreferenceUtil
-import allen.town.podcast.common.util.LanguageContextWrapper
-import android.content.Context
-import android.content.res.Resources
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatDelegate
-import androidx.core.os.ConfigurationCompat
 import allen.town.podcast.theme.util.VersionUtils
 import allen.town.podcast.common.theme.ThemeManager
 import allen.town.podcast.R
 import allen.town.podcast.core.pref.Prefs
 import allen.town.podcast.common.activity.ToolbarBaseActivity
-import java.util.*
 
 abstract class SimpleToolbarActivity : ToolbarBaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -41,17 +36,5 @@ abstract class SimpleToolbarActivity : ToolbarBaseActivity() {
             //enabling this breaks the context menu background and icons, so it stays off
             setTheme(R.style.CircleFABOverlay)
         }
-    }
-
-    override fun    attachBaseContext(newBase: Context?) {
-        val code = BasePreferenceUtil.languageCode
-        val locale = if (code == "auto") {
-            // Get the device default locale
-            ConfigurationCompat.getLocales(Resources.getSystem().configuration)[0]
-        } else {
-            Locale.forLanguageTag(code)
-        }
-        super.attachBaseContext(LanguageContextWrapper.wrap(newBase, locale))
-        //related to Android App Bundles; used for loading resources. Unclear whether it affects plain APK builds.
     }
 }

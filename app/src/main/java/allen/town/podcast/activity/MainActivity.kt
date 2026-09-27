@@ -48,6 +48,7 @@ import android.view.KeyEvent
 import android.view.MenuItem
 import android.view.View
 import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
@@ -165,6 +166,7 @@ class MainActivity : SimpleToolbarActivity(), OnSharedPreferenceChangeListener {
         playerSheet = MainPlayerSheet(this, navDrawerController.navDrawerView)
         intentHandler = MainIntentHandler(this, fragmentNavigator, playerSheet)
         playerSheet.observePaletteColor()
+        registerBackCallbacks()
 
         if (Prefs.shouldSyncOnStart()) {
             AutoUpdateManager.runImmediate(this)
@@ -283,6 +285,8 @@ class MainActivity : SimpleToolbarActivity(), OnSharedPreferenceChangeListener {
         super.onResume()
         StorageUtils.checkStorageAvailability(this)
         intentHandler.handleNavIntent()
+        // The back button behaviour may have been changed in Settings meanwhile
+        updateExitCallback()
     }
 
     override fun onStop() {
@@ -331,35 +335,64 @@ class MainActivity : SimpleToolbarActivity(), OnSharedPreferenceChangeListener {
         navDrawerController.closeDrawer(callback)
     }
 
-    override fun onBackPressed() {
-        if (isDrawerOpen) {
-            navDrawerController.closeDrawerNow()
-        } else if (bottomSheet.state == BottomSheetBehavior.STATE_EXPANDED) {
-            bottomSheet.setState(BottomSheetBehavior.STATE_COLLAPSED)
-        } else if (supportFragmentManager.backStackEntryCount != 0) {
-            super.onBackPressed()
-        } else {
+    /**
+     * Back is split over [OnBackPressedCallback]s so predictive back knows in advance whether the
+     * app will handle it. The dispatcher asks the most recently added enabled callback first, so
+     * the order is: drawer (enabled while open), player sheet (enabled while expanded), the
+     * FragmentManager's own back-stack callback (registered in super.onCreate), and finally
+     * [exitCallback] for the configured root behaviour. The last two are never enabled together.
+     */
+    private fun registerBackCallbacks() {
+        onBackPressedDispatcher.addCallback(this, exitCallback)
+        onBackPressedDispatcher.addCallback(this, playerSheet.backCallback)
+        onBackPressedDispatcher.addCallback(this, navDrawerController.backCallback)
+        supportFragmentManager.addOnBackStackChangedListener { updateExitCallback() }
+        updateExitCallback()
+    }
+
+    /**
+     * Only enabled at the root of the back stack and when [Prefs.backButtonBehavior] actually
+     * intercepts back; otherwise the system's own behaviour (and its back-to-home animation) runs.
+     */
+    private fun updateExitCallback() {
+        exitCallback.isEnabled = supportFragmentManager.backStackEntryCount == 0 &&
             when (Prefs.backButtonBehavior) {
-                // Tablet layout does not have drawer
+                // Tablet layout does not have a drawer, so there is nothing to open
+                BackButtonBehavior.OPEN_DRAWER -> navDrawerController.hasDrawer
+                BackButtonBehavior.SHOW_PROMPT, BackButtonBehavior.DOUBLE_TAP -> true
+                else -> false
+            }
+    }
+
+    private val exitCallback = object : OnBackPressedCallback(false) {
+        override fun handleOnBackPressed() {
+            when (Prefs.backButtonBehavior) {
                 BackButtonBehavior.OPEN_DRAWER -> navDrawerController.openDrawer()
                 BackButtonBehavior.SHOW_PROMPT -> AccentMaterialDialog(
-                    this,
+                    this@MainActivity,
                     R.style.MaterialAlertDialogTheme
                 )
                     .setMessage(R.string.close_prompt)
-                    .setPositiveButton(R.string.yes) { dialogInterface: DialogInterface?, i: Int -> super@MainActivity.onBackPressed() }
+                    .setPositiveButton(R.string.yes) { _: DialogInterface?, _: Int -> exitViaSystemBack() }
                     .setNegativeButton(R.string.no, null)
                     .setCancelable(false)
                     .show()
                 BackButtonBehavior.DOUBLE_TAP -> if (lastBackButtonPressTime < System.currentTimeMillis() - 2000) {
-                    showSnack(this, R.string.double_tap_toast, Toast.LENGTH_SHORT)
+                    showSnack(this@MainActivity, R.string.double_tap_toast, Toast.LENGTH_SHORT)
                     lastBackButtonPressTime = System.currentTimeMillis()
                 } else {
-                    super.onBackPressed()
+                    exitViaSystemBack()
                 }
-                else -> super.onBackPressed()
+                else -> exitViaSystemBack()
             }
         }
+    }
+
+    /** Run the system's root-activity back behaviour, bypassing [exitCallback] once. */
+    private fun exitViaSystemBack() {
+        exitCallback.isEnabled = false
+        onBackPressedDispatcher.onBackPressed()
+        updateExitCallback()
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)

@@ -720,7 +720,7 @@ class VideoPlayerActivity : ToolbarBaseActivity(), OnSeekBarChangeListener {
             }
             KeyEvent.KEYCODE_F, KeyEvent.KEYCODE_ESCAPE -> {
                 //Exit fullscreen mode
-                onBackPressed()
+                onBackPressedDispatcher.onBackPressed()
                 return true
             }
             KeyEvent.KEYCODE_I -> {

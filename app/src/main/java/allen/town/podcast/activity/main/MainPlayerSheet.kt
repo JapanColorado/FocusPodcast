@@ -9,6 +9,7 @@ import allen.town.podcast.playback.onPaletteColorChanged
 import android.graphics.Color
 import android.view.View
 import android.view.ViewGroup.MarginLayoutParams
+import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.FragmentContainerView
 import androidx.lifecycle.ViewModelProvider
@@ -24,6 +25,9 @@ import com.google.android.material.snackbar.Snackbar
  * clear of the mini player, the palette colour observed from [LibraryViewModel], and the snackbars
  * that have to be anchored above the sheet. Everything here is view/state manipulation on the
  * activity it is constructed with; it owns no fragments and starts no work of its own.
+ *
+ * [backCallback] collapses the sheet on back and is enabled only while the sheet is expanded.
+ * MainActivity registers it.
  */
 internal class MainPlayerSheet(
     private val activity: AppCompatActivity,
@@ -37,6 +41,12 @@ internal class MainPlayerSheet(
 
     private lateinit var libraryViewModel: LibraryViewModel
 
+    val backCallback: OnBackPressedCallback = object : OnBackPressedCallback(false) {
+        override fun handleOnBackPressed() {
+            collapse()
+        }
+    }
+
     private val bottomSheetCallback: BottomSheetCallback = object : BottomSheetCallback() {
         /**
          * Called when the state changes
@@ -44,6 +54,7 @@ internal class MainPlayerSheet(
          * @param state
          */
         override fun onStateChanged(view: View, state: Int) {
+            syncBackCallback()
             if (state == BottomSheetBehavior.STATE_COLLAPSED) {
                 onSlide(view, 0.0f)
                 MainActivity.onPanelCollapsed(activity)
@@ -78,6 +89,16 @@ internal class MainPlayerSheet(
         )
         bottomSheet.setHideable(false)
         bottomSheet.setBottomSheetCallback(bottomSheetCallback)
+        syncBackCallback()
+    }
+
+    /**
+     * Enable [backCallback] exactly while the sheet is expanded. [BottomSheetBehavior.setState]
+     * before layout and state restore change the state without calling [bottomSheetCallback],
+     * so those paths sync explicitly.
+     */
+    private fun syncBackCallback() {
+        backCallback.isEnabled = bottomSheet.state == BottomSheetBehavior.STATE_EXPANDED
     }
 
     fun observePaletteColor() {
@@ -101,6 +122,7 @@ internal class MainPlayerSheet(
 
     /** Re-run the expanded layout after a configuration change restored an expanded sheet. */
     fun onRestoreInstanceState() {
+        syncBackCallback()
         if (bottomSheet.state == BottomSheetBehavior.STATE_EXPANDED) {
             //re-open
             bottomSheetCallback.onSlide(anyView, 1.0f)
@@ -111,10 +133,12 @@ internal class MainPlayerSheet(
     fun expand() {
         bottomSheet.state = BottomSheetBehavior.STATE_EXPANDED
         bottomSheetCallback.onSlide(anyView, 1.0f)
+        syncBackCallback()
     }
 
     fun collapse() {
         bottomSheet.setState(BottomSheetBehavior.STATE_COLLAPSED)
+        syncBackCallback()
     }
 
     fun setPlayerVisible(visible: Boolean) {
@@ -123,6 +147,7 @@ internal class MainPlayerSheet(
             bottomSheetCallback.onStateChanged(anyView, bottomSheet.state) // Update toolbar visibility
         } else {
             bottomSheet.setState(BottomSheetBehavior.STATE_COLLAPSED)
+            syncBackCallback()
         }
 
         val mainView = activity.findViewById<FragmentContainerView>(R.id.main_view)

@@ -11,6 +11,7 @@ import allen.town.podcast.config.PodcastSearchDefaultList
 import allen.town.podcast.core.ApCoreEventBusIndex
 import allen.town.podcast.core.ClientConfig
 import allen.town.podcast.error.RxJavaErrorHandlerSetup
+import allen.town.podcast.pref.AppLanguage
 import android.content.Intent
 import android.os.Handler
 import android.os.Looper
@@ -77,6 +78,7 @@ class MyApp : BaseApplication() {
         }
 
         ClientConfig.initialize(this, DownloadServiceCallbacksImpl())
+        AppLanguage.migrateLegacyPreference(this)
         Iconify.with(FontAwesomeModule())
         Iconify.with(MaterialModule())
         EventBus.builder()
