@@ -806,8 +806,8 @@
   <string name="feed_ad_skip_default_off">使用默认设置（关闭）</string>
   <string name="feed_ad_skip_on">开启</string>
   <string name="feed_ad_skip_off">关闭</string>
-  <string name="feed_ad_skip_default_on_sum">跟随播放设置中的默认设置，当前为开启</string>
-  <string name="feed_ad_skip_default_off_sum">跟随播放设置中的默认设置，当前为关闭</string>
+  <string name="feed_ad_skip_default_on_sum">跟随“跳过广告”设置中的默认设置，当前为开启</string>
+  <string name="feed_ad_skip_default_off_sum">跟随“跳过广告”设置中的默认设置，当前为关闭</string>
   <string name="feed_ad_skip_on_sum">此播客始终开启，不受默认设置影响</string>
   <string name="feed_ad_skip_off_sum">此播客始终关闭，不受默认设置影响</string>
   <string name="reset_to_default">恢复默认</string>

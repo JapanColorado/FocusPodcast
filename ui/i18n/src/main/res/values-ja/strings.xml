@@ -491,8 +491,8 @@
   <string name="feed_ad_skip_default_off">既定値を使用（オフ）</string>
   <string name="feed_ad_skip_on">オン</string>
   <string name="feed_ad_skip_off">オフ</string>
-  <string name="feed_ad_skip_default_on_sum">再生設定の既定値に従います（現在はオン）</string>
-  <string name="feed_ad_skip_default_off_sum">再生設定の既定値に従います（現在はオフ）</string>
+  <string name="feed_ad_skip_default_on_sum">「広告スキップ」設定の既定値に従います（現在はオン）</string>
+  <string name="feed_ad_skip_default_off_sum">「広告スキップ」設定の既定値に従います（現在はオフ）</string>
   <string name="feed_ad_skip_on_sum">既定値に関係なく、このポッドキャストではオン</string>
   <string name="feed_ad_skip_off_sum">既定値に関係なく、このポッドキャストではオフ</string>
   <string name="reset_to_default">デフォルトに戻す</string>

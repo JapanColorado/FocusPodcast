@@ -756,8 +756,8 @@
   <string name="feed_ad_skip_default_off">使用預設值（關閉）</string>
   <string name="feed_ad_skip_on">開啟</string>
   <string name="feed_ad_skip_off">關閉</string>
-  <string name="feed_ad_skip_default_on_sum">依照播放設定中的預設值，目前為開啟</string>
-  <string name="feed_ad_skip_default_off_sum">依照播放設定中的預設值，目前為關閉</string>
+  <string name="feed_ad_skip_default_on_sum">依照「跳過廣告」設定中的預設值，目前為開啟</string>
+  <string name="feed_ad_skip_default_off_sum">依照「跳過廣告」設定中的預設值，目前為關閉</string>
   <string name="feed_ad_skip_on_sum">此播客一律開啟，不受預設值影響</string>
   <string name="feed_ad_skip_off_sum">此播客一律關閉，不受預設值影響</string>
   <string name="reset_to_default">恢復預設</string>

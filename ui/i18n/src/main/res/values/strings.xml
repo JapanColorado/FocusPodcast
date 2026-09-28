@@ -891,8 +891,8 @@
     <string name="feed_ad_skip_default_off">Use default (off)</string>
     <string name="feed_ad_skip_on">On</string>
     <string name="feed_ad_skip_off">Off</string>
-    <string name="feed_ad_skip_default_on_sum">Follows the default from the playback settings, currently on</string>
-    <string name="feed_ad_skip_default_off_sum">Follows the default from the playback settings, currently off</string>
+    <string name="feed_ad_skip_default_on_sum">Follows the default from the Ad skipping settings, currently on</string>
+    <string name="feed_ad_skip_default_off_sum">Follows the default from the Ad skipping settings, currently off</string>
     <string name="feed_ad_skip_on_sum">On for this podcast, whatever the default</string>
     <string name="feed_ad_skip_off_sum">Off for this podcast, whatever the default</string>
     <string name="mark_ad_start_label">Mark ad start</string>
