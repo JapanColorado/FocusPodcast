@@ -878,10 +878,10 @@
     <string name="detect_ads">Detect ads</string>
     <string name="pref_ad_skip_enabled_sum">Default for all podcasts. You can turn it on or off for a single podcast from the player\'s audio effects or the podcast\'s settings. Detection listens for the music bed under ad breaks and for sponsor chapters, and skips what it finds; it can miss an ad or skip a little too much.</string>
     <string name="pref_ad_skip_sensitivity_title">Detection sensitivity</string>
-    <string name="pref_ad_skip_sensitivity_sum">How sure the detector has to be before an ad is skipped: %1$s</string>
-    <string name="ad_skip_sensitivity_low">Low</string>
+    <string name="pref_ad_skip_sensitivity_sum">How eagerly detected ads are skipped: %1$s</string>
+    <string name="ad_skip_sensitivity_low">Low (only clear ads)</string>
     <string name="ad_skip_sensitivity_medium">Medium</string>
-    <string name="ad_skip_sensitivity_high">High</string>
+    <string name="ad_skip_sensitivity_high">High (catches more, more mistakes)</string>
     <string name="pref_ad_skip_analyze_on_download_title">Analyse new downloads</string>
     <string name="pref_ad_skip_analyze_on_download_sum">Look for ads as soon as an episode has finished downloading</string>
     <string name="ad_analysis_notification_title">Analysing for ads</string>
