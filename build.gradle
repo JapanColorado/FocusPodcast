@@ -65,7 +65,6 @@ project.ext {
     // with 2.7.1 an exhausted Android 15 FGS time limit killed the process.
     workManagerVersion = "2.10.5"
     googleMaterialVersion = "1.7.0-alpha02"
-    lifecycle_version = "2.0.0"
 
     // Third-party
     commonslangVersion = "3.7"
