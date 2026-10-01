@@ -155,7 +155,10 @@ public class ExoPlayerWrapper implements IPlayer {
 
         @Override
         public AudioSink buildAudioSink(Context context, boolean z, boolean z2, boolean z3) {
-            return new DefaultAudioSink(AudioCapabilities.DEFAULT_AUDIO_CAPABILITIES, new AudioProcessor[]{ExoPlayerWrapper.this.downMixAudioProcessor});
+            return new DefaultAudioSink.Builder()
+                    .setAudioCapabilities(AudioCapabilities.DEFAULT_AUDIO_CAPABILITIES)
+                    .setAudioProcessors(new AudioProcessor[]{ExoPlayerWrapper.this.downMixAudioProcessor})
+                    .build();
         }
     }
 
@@ -338,7 +341,7 @@ public class ExoPlayerWrapper implements IPlayer {
         }
         TrackGroupArray trackGroups = trackInfo.getTrackGroups(getAudioRendererIndex());
         DefaultTrackSelector.SelectionOverride override = new DefaultTrackSelector.SelectionOverride(track, 0);
-        DefaultTrackSelector.ParametersBuilder params = trackSelector.buildUponParameters()
+        DefaultTrackSelector.Parameters.Builder params = trackSelector.buildUponParameters()
                 .setSelectionOverride(getAudioRendererIndex(), trackGroups, override);
         trackSelector.setParameters(params);
     }

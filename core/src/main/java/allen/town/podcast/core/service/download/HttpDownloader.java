@@ -9,7 +9,6 @@ import android.util.Log;
 import allen.town.podcast.core.util.NetworkUtils;
 import allen.town.podcast.model.download.DownloadStatus;
 import okhttp3.CacheControl;
-import okhttp3.internal.http.StatusLine;
 import org.apache.commons.io.IOUtils;
 
 import java.io.BufferedInputStream;
@@ -38,6 +37,8 @@ import okhttp3.Response;
 import okhttp3.ResponseBody;
 
 public class HttpDownloader extends Downloader {
+    /** 308 Permanent Redirect; HttpURLConnection has no constant for it. */
+    private static final int HTTP_PERM_REDIRECT = 308;
     private static final String TAG = "HttpDownloader";
     private static final int BUFFER_SIZE = 8 * 1024;
 
@@ -292,7 +293,7 @@ public class HttpDownloader extends Downloader {
         int firstCode = responses.get(0).code();
         String firstUrl = responses.get(0).request().url().toString();
         String secondUrl = responses.get(1).request().url().toString();
-        if (firstCode == HttpURLConnection.HTTP_MOVED_PERM || firstCode == StatusLine.HTTP_PERM_REDIRECT) {
+        if (firstCode == HttpURLConnection.HTTP_MOVED_PERM || firstCode == HTTP_PERM_REDIRECT) {
             permanentRedirectUrl = secondUrl;
         } else if (secondUrl.equals(firstUrl.replace("http://", "https://"))) {
             permanentRedirectUrl = secondUrl;

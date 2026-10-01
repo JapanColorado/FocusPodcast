@@ -57,6 +57,11 @@ public class ViewPagerBottomSheetBehavior<V extends View> extends BottomSheetBeh
             return;
         }
         final View scrollingChild = findScrollingChild(viewRef.get());
-        nestedScrollingChildRef = new WeakReference<>(scrollingChild);
+        // Material 1.13+ keeps a list of scrolling children; with multiple-children support off
+        // (the default) it holds at most the one findScrollingChild() returned.
+        nestedScrollingChildrenRef.clear();
+        if (scrollingChild != null) {
+            nestedScrollingChildrenRef.add(new WeakReference<>(scrollingChild));
+        }
     }
 }

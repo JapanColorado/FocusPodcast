@@ -37,11 +37,7 @@ open class ItunesPodcastSearcher : PodcastSearcher {
                 try {
                     val response = client.newCall(httpReq.build()).execute()
                     if (response.isSuccessful) {
-                        val body = response.body ?: run {
-                            subscriber.onError(IOException("no response body for $formattedUrl"))
-                            return@SingleOnSubscribe
-                        }
-                        val resultString = body.string()
+                        val resultString = response.body.string()
                         val result = JSONObject(resultString)
                         val j = result.getJSONArray("results")
                         var podcast: PodcastSearchResult
@@ -85,11 +81,7 @@ open class ItunesPodcastSearcher : PodcastSearcher {
             try {
                 val response = client.newCall(httpReq.build()).execute()
                 if (response.isSuccessful) {
-                    val body = response.body ?: run {
-                        emitter.onError(IOException("no response body for $lookupUrl"))
-                        return@create
-                    }
-                    val resultString = body.string()
+                    val resultString = response.body.string()
                     val result = JSONObject(resultString)
                     val results = result.getJSONArray("results").getJSONObject(0)
                     val feedUrlName = "feedUrl"

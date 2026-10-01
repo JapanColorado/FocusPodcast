@@ -10,7 +10,9 @@ import org.xmlpull.v1.XmlPullParserException;
 import org.xmlpull.v1.XmlPullParserFactory;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.Reader;
 
 import allen.town.podcast.model.feed.Feed;
@@ -85,7 +87,11 @@ public class TypeGetter {
                 // XML document might actually be a HTML document -> try to parse as HTML
                 String rootElement = null;
                 try {
-                    Jsoup.parse(new File(feed.getFile_url()));
+                    // Not Jsoup.parse(File): since jsoup 1.17 it goes through File.toPath(),
+                    // which does not exist below API 26.
+                    try (InputStream in = new FileInputStream(feed.getFile_url())) {
+                        Jsoup.parse(in, null, "");
+                    }
                     rootElement = "html";
                 } catch (IOException e1) {
                     // The HTML fallback is only used to name the root element in the exception below;

@@ -57,11 +57,7 @@ class PodcastIndexPodcastSearcher : PodcastSearcher {
                 try {
                     val response = client.newCall(httpReq.build()).execute()
                     if (response.isSuccessful) {
-                        val body = response.body ?: run {
-                            subscriber.onError(IOException("no response body for $formattedUrl"))
-                            return@SingleOnSubscribe
-                        }
-                        val resultString = body.string()
+                        val resultString = response.body.string()
                         val result = JSONObject(resultString)
                         val j = result.getJSONArray("feeds")
                         for (i in 0 until j.length()) {

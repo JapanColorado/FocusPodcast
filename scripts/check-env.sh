@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Verifies the toolchain (JDK 25, SDK platform 36) before a Gradle invocation and writes local.properties if missing.
+# Verifies the toolchain (JDK 25, SDK platform 37) before a Gradle invocation and writes local.properties if missing.
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
@@ -13,7 +13,7 @@ case "$java_version" in
 esac
 
 [ -n "${ANDROID_HOME:-}" ] || fail "ANDROID_HOME is not set"
-[ -d "$ANDROID_HOME/platforms/android-36" ] || fail "Android platform 36 not found under $ANDROID_HOME/platforms (install it with sdkmanager)"
+ls -d "$ANDROID_HOME"/platforms/android-37* >/dev/null 2>&1 || fail "Android platform 37 not found under $ANDROID_HOME/platforms (install it with sdkmanager)"
 [ -d "$ANDROID_HOME/build-tools/36.0.0" ] || fail "build-tools 36.0.0 not found under $ANDROID_HOME/build-tools"
 
 if [ ! -f local.properties ]; then

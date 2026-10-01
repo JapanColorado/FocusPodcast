@@ -41,55 +41,58 @@ allprojects {
 project.ext {
     //app info
     applicationId = "allen.town.focus.podcast"
-    compileSdkVersion = 36
-    minSdkVersion = 21
+    // androidx.core 1.19 requires compileSdk 37.
+    compileSdkVersion = 37
+    // The current AndroidX releases need 23, WorkManager 2.12 needs 24.
+    minSdkVersion = 24
     targetSdkVersion = 35
     versionCode = 79
     versionName = "2.8.5.20250928"
 
     // AndroidX
-    annotationVersion = "1.8.0"
-    // 1.6 is the first AppCompat with per-app locales (AppCompatDelegate.setApplicationLocales)
-    // and it pulls in androidx.activity 1.6, which routes back through OnBackInvokedCallback for
-    // predictive back. 1.7 needs a newer fragment than the one forced in app/build.gradle.
-    appcompatVersion = "1.6.1"
-    coreVersion = "1.5.0"
-    coreKtxVersion = "1.7.0"
-    fragmentVersion = "1.3.6"
-    mediaVersion = "1.4.3"
+    annotationVersion = "1.11.0"
+    // AppCompat 1.6+ is needed for per-app locales (AppCompatDelegate.setApplicationLocales)
+    // and routes back through OnBackInvokedCallback for predictive back.
+    appcompatVersion = "1.8.0"
+    coreVersion = "1.19.1"
+    coreKtxVersion = "1.19.1"
+    fragmentVersion = "1.9.1"
+    mediaVersion = "1.8.0"
     paletteVersion = "1.0.0"
-    preferenceVersion = "1.2.0"
-    recyclerViewVersion = "1.2.1"
-    viewPager2Version = "1.1.0-beta01"
+    preferenceVersion = "1.2.1"
+    recyclerViewVersion = "1.4.0"
+    viewPager2Version = "1.1.0"
     // 2.10 is the first release whose SystemForegroundService implements Service.onTimeout;
     // with 2.7.1 an exhausted Android 15 FGS time limit killed the process.
-    workManagerVersion = "2.10.5"
-    googleMaterialVersion = "1.7.0-alpha02"
+    workManagerVersion = "2.12.0"
+    googleMaterialVersion = "1.14.0"
 
     // Third-party
-    commonslangVersion = "3.7"
+    commonslangVersion = "3.21.0"
+    // Do not upgrade: from 2.7 on FileUtils/IOUtils call java.nio.file, which Android only
+    // has from API 26 (minSdk is 24).
     commonsioVersion = "2.5"
-    jsoupVersion = "1.15.1"
-    glideVersion = "4.13.2"
-    okhttpVersion = "4.9.2"
-    okioVersion = "1.17.5"
+    jsoupVersion = "1.23.2"
+    glideVersion = "4.16.0"
+    okhttpVersion = "5.5.0"
+    okioVersion = "3.18.2"
     eventbusVersion = "3.3.1"
     rxAndroidVersion = "2.1.1"
-    rxJavaVersion = "2.2.2"
+    rxJavaVersion = "2.2.21"
     iconifyVersion = "2.2.2"
-    exoPlayerVersion = "2.15.1"
-    exoOkhttpExtensionPlayerVersion = "2.14.2"
+    exoPlayerVersion = "2.19.1"
+    exoOkhttpExtensionPlayerVersion = "2.19.1"
     audioPlayerVersion = "v2.0.0"
-    lattieVersion = "5.0.3"
+    lattieVersion = "6.7.1"
 
     //Tests
-    awaitilityVersion = "3.1.6"
-    junitVersion = "4.13"
+    awaitilityVersion = "4.3.0"
+    junitVersion = "4.13.2"
     robolectricVersion = "4.17"
     robotiumSoloVersion = "5.6.3"
-    espressoVersion = "3.2.0"
-    runnerVersion = "1.2.0"
-    rulesVersion = "1.2.0"
+    espressoVersion = "3.7.0"
+    runnerVersion = "1.7.0"
+    rulesVersion = "1.7.0"
 }
 
 
