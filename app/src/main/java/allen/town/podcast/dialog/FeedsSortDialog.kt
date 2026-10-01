@@ -34,9 +34,9 @@ class FeedsSortDialog : DialogFragment() {
         feedOrder = Prefs.feedOrder
         feedOrderMethod = Prefs.feedOrderMethod
         orderValues =
-            requireContext().resources.getStringArray(R.array.nav_drawer_feed_order_values).toList()  as ArrayList<String>
+            requireContext().resources.getStringArray(R.array.nav_drawer_feed_order_values).toCollection(ArrayList())
         orderNames =
-            requireContext().resources.getStringArray(R.array.nav_drawer_feed_order_options).toList() as ArrayList<String>
+            requireContext().resources.getStringArray(R.array.nav_drawer_feed_order_options).toCollection(ArrayList())
         selectedIndex = orderValues.indexOf("$feedOrder")
 
         viewBinding = EditFeedSortDialogLayoutBinding.inflate(
