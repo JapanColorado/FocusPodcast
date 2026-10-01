@@ -4,16 +4,18 @@ import android.util.Log;
 
 import allen.town.podcast.parser.feed.UnsupportedFeedtypeException;
 import org.apache.commons.io.input.XmlStreamReader;
-import org.jsoup.Jsoup;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 import org.xmlpull.v1.XmlPullParserFactory;
+import org.xml.sax.SAXException;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.Reader;
+import java.nio.charset.StandardCharsets;
+import java.util.Locale;
 
 import allen.town.podcast.model.feed.Feed;
 
@@ -27,8 +29,9 @@ public class TypeGetter {
 
     private static final String ATOM_ROOT = "feed";
     private static final String RSS_ROOT = "rss";
+    private static final int HTML_SNIFF_CHARS = 4096;
 
-    public Type getType(Feed feed) throws UnsupportedFeedtypeException {
+    public Type getType(Feed feed) throws UnsupportedFeedtypeException, SAXException {
         XmlPullParserFactory factory;
         if (feed.getFile_url() != null) {
             Reader reader = null;
@@ -84,22 +87,13 @@ public class TypeGetter {
                 }
             } catch (XmlPullParserException e) {
                 Log.e(TAG, "Failed to parse feed as XML: " + feed.getFile_url(), e);
-                // XML document might actually be a HTML document -> try to parse as HTML
-                String rootElement = null;
-                try {
-                    // Not Jsoup.parse(File): since jsoup 1.17 it goes through File.toPath(),
-                    // which does not exist below API 26.
-                    try (InputStream in = new FileInputStream(feed.getFile_url())) {
-                        Jsoup.parse(in, null, "");
-                    }
-                    rootElement = "html";
-                } catch (IOException e1) {
-                    // The HTML fallback is only used to name the root element in the exception below;
-                    // failing to read it just means we report an unknown root element.
-                    Log.e(TAG, "Failed to parse feed as HTML: " + feed.getFile_url(), e1);
+                // Only call it a website when it actually looks like one. Any other parse failure
+                // is a broken feed (or a broken parser) and is reported as such, with the
+                // parser's own message, instead of the misleading "this is a website".
+                if (looksLikeHtml(feed)) {
+                    throw new UnsupportedFeedtypeException(Type.INVALID, "html");
                 }
-                throw new UnsupportedFeedtypeException(Type.INVALID, rootElement);
-
+                throw new SAXException("Not a valid XML feed: " + e.getMessage(), e);
             } catch (IOException e) {
                 // The feed file could not be read at all, so fall through to the
                 // UnsupportedFeedtypeException(INVALID) thrown at the end of this method.
@@ -117,6 +111,27 @@ public class TypeGetter {
         }
         Log.d(TAG, "Type is invalid");
         throw new UnsupportedFeedtypeException(Type.INVALID);
+    }
+
+    /**
+     * Whether the start of the file is an HTML document (a doctype or an {@code <html>} tag
+     * within the first few kilobytes). Unreadable files are not HTML.
+     */
+    private boolean looksLikeHtml(Feed feed) {
+        char[] buffer = new char[HTML_SNIFF_CHARS];
+        int read = 0;
+        try (Reader reader = new InputStreamReader(new FileInputStream(feed.getFile_url()),
+                StandardCharsets.ISO_8859_1)) {
+            int count;
+            while (read < buffer.length && (count = reader.read(buffer, read, buffer.length - read)) != -1) {
+                read += count;
+            }
+        } catch (IOException e) {
+            Log.e(TAG, "Failed to read feed file: " + feed.getFile_url(), e);
+            return false;
+        }
+        String head = new String(buffer, 0, read).toLowerCase(Locale.ROOT);
+        return head.contains("<!doctype html") || head.contains("<html");
     }
 
     private Reader createReader(Feed feed) throws IOException {
