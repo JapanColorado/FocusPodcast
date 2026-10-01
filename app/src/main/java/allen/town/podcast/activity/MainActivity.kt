@@ -31,6 +31,7 @@ import allen.town.podcast.fragment.FeedItemlistFragment
 import allen.town.podcast.fragment.NavigationDrawerFragment
 import allen.town.podcast.fragment.NavigationDrawerFragment.Companion.getLastNavFragment
 import allen.town.podcast.fragment.PlaylistFragment
+import allen.town.podcast.fragment.SubFeedsFragment
 import allen.town.podcast.fragment.TransitionEffect
 import allen.town.podcast.model.feed.Feed
 import allen.town.podcast.playback.getSelectedAudioPlayerFragment
@@ -52,6 +53,7 @@ import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
 import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.RecyclerView.RecycledViewPool
 import allen.town.podcast.theme.constants.ThemeConstants
@@ -326,15 +328,35 @@ class MainActivity : SimpleToolbarActivity(), OnSharedPreferenceChangeListener {
      * Back is split over [OnBackPressedCallback]s so predictive back knows in advance whether the
      * app will handle it. The dispatcher asks the most recently added enabled callback first, so
      * the order is: drawer (enabled while open), player sheet (enabled while expanded), the
-     * FragmentManager's own back-stack callback (registered in super.onCreate), and finally
-     * [exitCallback] for the configured root behaviour. The last two are never enabled together.
+     * FragmentManager's own back-stack callback (registered in super.onCreate), [homeCallback]
+     * (back from any other top-level page goes to Subscriptions), and finally [exitCallback] for
+     * the configured root behaviour on Subscriptions. At most one of the last three is enabled.
      */
     private fun registerBackCallbacks() {
         onBackPressedDispatcher.addCallback(this, exitCallback)
+        onBackPressedDispatcher.addCallback(this, homeCallback)
         onBackPressedDispatcher.addCallback(this, playerSheet.backCallback)
         onBackPressedDispatcher.addCallback(this, navDrawerController.backCallback)
         supportFragmentManager.addOnBackStackChangedListener { updateExitCallback() }
+        // Switching top-level pages replaces the main fragment without touching the back stack
+        supportFragmentManager.registerFragmentLifecycleCallbacks(object : FragmentManager.FragmentLifecycleCallbacks() {
+            override fun onFragmentResumed(fm: FragmentManager, f: Fragment) = updateExitCallback()
+        }, false)
         updateExitCallback()
+    }
+
+    /** True when the root page is something other than Subscriptions, so back should go there first. */
+    private fun isAwayFromHome(): Boolean {
+        val fm = supportFragmentManager
+        if (fm.backStackEntryCount != 0) return false
+        val main = fm.findFragmentByTag(MAIN_FRAGMENT_TAG) ?: return false
+        return main !is SubFeedsFragment
+    }
+
+    private val homeCallback = object : OnBackPressedCallback(false) {
+        override fun handleOnBackPressed() {
+            loadFragment(SubFeedsFragment.TAG, null)
+        }
     }
 
     /**
@@ -342,7 +364,9 @@ class MainActivity : SimpleToolbarActivity(), OnSharedPreferenceChangeListener {
      * intercepts back; otherwise the system's own behaviour (and its back-to-home animation) runs.
      */
     private fun updateExitCallback() {
-        exitCallback.isEnabled = supportFragmentManager.backStackEntryCount == 0 &&
+        val awayFromHome = isAwayFromHome()
+        homeCallback.isEnabled = awayFromHome
+        exitCallback.isEnabled = !awayFromHome && supportFragmentManager.backStackEntryCount == 0 &&
             when (Prefs.backButtonBehavior) {
                 // Tablet layout does not have a drawer, so there is nothing to open
                 BackButtonBehavior.OPEN_DRAWER -> navDrawerController.hasDrawer
