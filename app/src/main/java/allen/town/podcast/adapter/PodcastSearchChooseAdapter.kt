@@ -59,10 +59,10 @@ class PodcastSearchChooseAdapter : RecyclerView.Adapter<PodcastSearchChooseAdapt
                     R.string.podcast_search_itunes
                 }
                 FyydPodcastSearcher.SEARCH_ENGINE_TAG -> {
-                    R.string.podcast_search_podcast_index
+                    R.string.podcast_search_fyyd
                 }
                 PodcastIndexPodcastSearcher.SEARCH_ENGINE_TAG -> {
-                    R.string.podcast_search_fyyd
+                    R.string.podcast_search_podcast_index
                 }
                 else -> {
                     R.string.podcast_search_fyyd
