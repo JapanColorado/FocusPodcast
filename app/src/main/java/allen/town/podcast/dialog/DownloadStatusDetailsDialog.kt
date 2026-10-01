@@ -13,6 +13,7 @@ import android.content.ClipboardManager
 import android.content.Context
 import android.os.Build
 import android.text.format.DateUtils
+import android.widget.TextView
 import android.widget.Toast
 import com.google.android.material.snackbar.Snackbar
 
@@ -45,15 +46,21 @@ object DownloadStatusDetailsDialog {
             .setTitle(title)
             .setMessage(message)
             .setPositiveButton(R.string.close_label, null)
-            .setNeutralButton(android.R.string.copy) { _, _ ->
-                copyToClipboard(activity, "$title\n$message")
-            }
+        // Never more than two buttons: three do not fit on one row, and a stacked button bar
+        // under a long message (duplicate-episode warnings) is squeezed into its own scrolling
+        // strip. A warning trades the Copy button for "Don't show again"; its text stays
+        // selectable below, so it can still be copied.
         if (status.warningKey != null) {
             builder.setNegativeButton(R.string.warning_dont_show_again) { _, _ ->
                 dismissForGood(activity, status)
             }
+        } else {
+            builder.setNeutralButton(android.R.string.copy) { _, _ ->
+                copyToClipboard(activity, "$title\n$message")
+            }
         }
-        builder.show()
+        val dialog = builder.show()
+        dialog.findViewById<TextView>(android.R.id.message)?.setTextIsSelectable(true)
     }
 
     private fun copyToClipboard(activity: Activity, text: String) {
