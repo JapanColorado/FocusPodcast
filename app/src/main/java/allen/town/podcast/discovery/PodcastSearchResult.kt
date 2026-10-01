@@ -3,10 +3,10 @@ package allen.town.podcast.discovery
 import allen.town.podcast.common.util.Timber
 import allen.town.podcast.MyApp.Companion.instance
 import allen.town.podcast.core.util.DateFormatter
+import allen.town.podcast.parser.feed.util.DateUtils
 import allen.town.podcast.parser.feed.util.ItunesEpisodesDateUtils
 import allen.town.podcast.sync.gpoddernet.model.GpodnetPodcast
 import android.text.TextUtils
-import de.mfietz.fyydlin.SearchHit
 import org.json.JSONException
 import org.json.JSONObject
 import java.util.*
@@ -172,15 +172,17 @@ open class PodcastSearchResult(
             )
         }
 
-        fun fromFyyd(searchHit: SearchHit): PodcastSearchResult {
+        /** Maps one entry of fyyd's `/search/podcast` `data` array. */
+        fun fromFyyd(json: JSONObject): PodcastSearchResult {
+            // optString() turns a JSON null into the string "null", so read nullable fields here.
+            fun stringOrNull(key: String): String? = if (json.isNull(key)) null else json.optString(key)
             return PodcastSearchResult(
-                searchHit.title,
-                searchHit.thumbImageURL,
-                searchHit.xmlUrl,
-                searchHit.author, searchHit.description, "", DateFormatter.formatAbbrev(
-                    instance,
-                    searchHit.lastPubDate
-                ), 0
+                stringOrNull("title") ?: "",
+                stringOrNull("thumbImageURL"),
+                stringOrNull("xmlURL"),
+                stringOrNull("author"), stringOrNull("description") ?: "", "",
+                DateFormatter.formatAbbrev(instance, stringOrNull("lastpub")?.let { DateUtils.parse(it) }),
+                0
             )
         }
 
