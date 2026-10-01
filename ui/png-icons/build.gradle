@@ -5,8 +5,8 @@ apply from: "../../common.gradle"
 
 android {
     defaultConfig {
-        namespace "allen.town.podcast.ui.pngicons"
-        vectorDrawables.useSupportLibrary false
+        namespace = "allen.town.podcast.ui.pngicons"
+        vectorDrawables.useSupportLibrary = false
         vectorDrawables.generatedDensities = ["xhdpi"]
     }
 }

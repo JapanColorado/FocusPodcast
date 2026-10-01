@@ -14,6 +14,7 @@ import java.io.IOException
 import java.io.UnsupportedEncodingException
 import java.net.URLEncoder
 import java.util.regex.Pattern
+import java.util.Locale
 
 open class ItunesPodcastSearcher : PodcastSearcher {
     fun searchByApiUrl(query: String?, url: String?): Single<List<PodcastSearchResult?>?> {
@@ -28,7 +29,7 @@ open class ItunesPodcastSearcher : PodcastSearcher {
                     // UTF-8 is always available, so this branch is unreachable in practice.
                     query
                 }
-                val formattedUrl = String.format(apiUrl, encodedQuery)
+                val formattedUrl = String.format(Locale.ROOT, apiUrl, encodedQuery)
                 val client = PodcastHttpClient.getHttpClient()
                 val httpReq = Request.Builder()
                     .url(formattedUrl)

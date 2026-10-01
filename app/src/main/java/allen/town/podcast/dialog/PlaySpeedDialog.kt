@@ -44,7 +44,6 @@ class PlaySpeedDialog : BottomSheetDialogFragment() {
     private var controller: PlaybackController? = null
     private val selectedSpeeds: MutableList<Float>
     private var _binding: SpeedSelectDialogBinding? = null
-    private val binding get() = _binding ?: error("binding accessed outside of view lifecycle")
     private val uiHandler = Handler(Looper.getMainLooper())
 
     /** The slider also reports programmatic updates; those must not be stored as a user choice. */

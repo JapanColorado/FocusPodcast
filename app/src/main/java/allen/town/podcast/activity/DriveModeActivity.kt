@@ -79,7 +79,6 @@ class DriveModeActivity : SimpleToolbarActivity() {
             ).into(binding.image)
     }
 
-    private var paletteColor = Color.WHITE
     private fun updateColor() {
         libraryViewModel.paletteColor.observe(this) { color: Int ->
 /*            paletteColor = color

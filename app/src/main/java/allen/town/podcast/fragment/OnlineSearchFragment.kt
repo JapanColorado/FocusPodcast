@@ -217,7 +217,6 @@ constructor() : Fragment() {
         public override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
             val inflater: LayoutInflater = LayoutInflater.from(parent.getContext())
             val entryView: View = inflater.inflate(R.layout.single_assist_chip, parent, false)
-            val chip: Chip = entryView.findViewById(R.id.chip)
             return ViewHolder(entryView as Chip)
         }
 

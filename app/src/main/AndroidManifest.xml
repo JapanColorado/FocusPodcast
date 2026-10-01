@@ -284,7 +284,8 @@
                 <data android:pathPattern=".*\\.opml" />
                 <data android:pathPattern=".*\\.xml" />
             </intent-filter>
-            <intent-filter android:label="@string/opml_import_label">
+            <!-- Same as above: MIME-type-only on purpose (newer lint also checks SEND filters). -->
+            <intent-filter android:label="@string/opml_import_label" tools:ignore="AppLinkUrlError">
                 <action android:name="android.intent.action.SEND" />
 
                 <category android:name="android.intent.category.BROWSABLE" />
@@ -475,8 +476,10 @@
             </intent-filter>
         </receiver>
 
+        <!-- TileService exists from API 24; older releases never bind it. -->
         <service
             android:name=".core.service.QuickSettingsTileService"
+            tools:targetApi="24"
             android:enabled="true"
             android:exported="true"
             android:label="@string/play_label"

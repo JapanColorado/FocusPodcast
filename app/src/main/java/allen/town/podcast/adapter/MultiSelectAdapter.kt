@@ -45,7 +45,7 @@ abstract class MultiSelectAdapter<T : RecyclerView.ViewHolder?>(
         actionMode = activity.startSupportActionMode(object : ActionMode.Callback {
             override fun onCreateActionMode(mode: ActionMode, menu: Menu): Boolean {
                 val inflater = mode.menuInflater
-                if (menuResId > 0) {
+                if (menuResId != 0) {
                     inflater.inflate(menuResId, menu)
                 }
                 showMenuIcon(menu)

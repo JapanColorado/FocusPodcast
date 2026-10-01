@@ -10,8 +10,8 @@ The app is F-Droid-only: there are no build flavors, no Google Play / Firebase /
 
 ## Build prerequisites
 
-1. **JDK 17** (`compileSdk 35`, Gradle 8.7, AGP 8.4.1, Kotlin 1.9.23). Use pixi: `pixi install` fetches JDK 17 from conda-forge and `scripts/env.sh` exports `JAVA_HOME`/`ANDROID_HOME` on activation, so run every Gradle command as `pixi run <task>` (or `pixi shell` then `./gradlew ...`).
-2. `scripts/check-env.sh` (a `depends-on` of most pixi tasks) verifies JDK 17 and the SDK and writes `local.properties` (gitignored) pointing at `$ANDROID_HOME` (default `~/Android/Sdk`, which must have platform 35 and build-tools 34.0.0). The Debian SDK at `/usr/lib/android-sdk` has no platforms and is unusable.
+1. **JDK 25** to run the build (`compileSdk 36`, Gradle 9.8, AGP 9.4.1, Kotlin 2.4.20; bytecode still targets Java 17). AGP 9 compiles Kotlin itself ("built-in Kotlin"): there is no `kotlin-android` plugin, kapt comes from AGP's `com.android.legacy-kapt` (the `com.android.tools.build:gradle-kotlin` classpath entry), and compiler flags go in a top-level `kotlin { compilerOptions { } }` block. Use pixi: `pixi install` fetches JDK 25 from conda-forge and `scripts/env.sh` exports `JAVA_HOME`/`ANDROID_HOME` on activation, so run every Gradle command as `pixi run <task>` (or `pixi shell` then `./gradlew ...`).
+2. `scripts/check-env.sh` (a `depends-on` of most pixi tasks) verifies JDK 25 and the SDK and writes `local.properties` (gitignored) pointing at `$ANDROID_HOME` (default `~/Android/Sdk`, which must have platform 36 and build-tools 36.0.0; AGP downloads missing ones itself when the SDK licence is accepted). The Debian SDK at `/usr/lib/android-sdk` has no platforms and is unusable.
 3. **Debug builds need no secrets.** `app/build.gradle` reads `secrets.properties` if it exists; if it does not, it prints a notice, uses placeholder PodcastIndex API keys, and falls back to Gradle's default debug signing config. **Release builds need a real keystore**: copy `secrets.properties.sample` to `secrets.properties` and fill in `storeFile`/`storePassword`/`keyAlias`/`keyPassword` (the same entry drives both the release and debug signing configs when present).
 4. There are no git submodules. The three vendored libraries live in-tree under `lib/`.
 5. Dependency resolution uses `google()`, `mavenCentral()`, `gradlePluginPortal()` and JitPack, plus one Aliyun mirror (`maven.aliyun.com/repository/public`) that exists solely because `com.beloo.widget:ChipsLayoutManager:0.3.7` (an ex-jcenter artifact) is not on Maven Central. Do not remove that entry without finding another source for it.
@@ -48,11 +48,11 @@ pixi run clean
 ./gradlew :app:connectedDebugAndroidTest # Espresso/Robotium instrumentation tests (device required)
 ```
 
-JVM unit tests exist in `parser/feed`, `playback/base`, and `core` (`core/src/test`). Robolectric 4.12.2 works under JDK 17 but only emulates up to API 34, so every module with Robolectric tests has `src/test/resources/robolectric.properties` pinning `sdk=34`. Prefer plain JUnit4 for pure logic; use `@RunWith(RobolectricTestRunner.class)` when the code under test needs real Android classes (SQLite, `TextUtils`, resources).
+JVM unit tests exist in `parser/feed`, `playback/base`, and `core` (`core/src/test`). Every module with Robolectric (4.17) tests has `src/test/resources/robolectric.properties` pinning `sdk=35`, the targetSdk. Robolectric older than 4.13 cannot read JDK 25 class files. Prefer plain JUnit4 for pure logic; use `@RunWith(RobolectricTestRunner.class)` when the code under test needs real Android classes (SQLite, `TextUtils`, resources).
 
 ## Module architecture
 
-`settings.gradle` includes 18 modules: 15 app modules plus the three vendored libraries under `lib/`. Every module applies `common.gradle`, which supplies the Kotlin/kapt/parcelize plugins, Java 17, viewBinding and the shared `packagingOptions`/`lintOptions`. All shared versions (SDK levels, `versionCode`/`versionName`, library versions) live in `project.ext` in the root `build.gradle`.
+`settings.gradle` includes 18 modules: 15 app modules plus the three vendored libraries under `lib/`. Every module applies `common.gradle`, which supplies the legacy-kapt and parcelize plugins, Java 17, viewBinding and the shared `packaging`/`lint` blocks. The root `build.gradle` copies `project.ext` into every module, because Gradle 9 deprecates reading parent-project properties by bare name. All shared versions (SDK levels, `versionCode`/`versionName`, library versions) live in `project.ext` in the root `build.gradle`.
 
 Dependency direction (top depends on bottom):
 
@@ -137,10 +137,10 @@ the seek bar and can be disabled or deleted per episode.
 
 - `app/build.gradle` has a `copyLicense` task hooked to `preBuild` that copies the root `LICENSE` to `app/build/generated/license-assets/LICENSE.txt`; that directory is registered as an extra `assets` srcDir. It no longer writes into the source tree — do not reintroduce a source-tree write.
 - Uncaught exceptions crash the app normally. `lib/common/.../crash/CustomCrashHandler` (a Cockroach-style handler that swallowed main-thread exceptions and finished the failing Activity through hidden APIs) is no longer installed: on Android 17 the finish step fails, so a swallowed lifecycle exception left a windowless Activity and an ANR instead of a crash. Do not reinstall it.
-- ProGuard rules are in `app/proguard.cfg`; release enables `minifyEnabled` and `shrinkResources`.
+- ProGuard rules are in `app/proguard.cfg`; release enables `minifyEnabled` and `shrinkResources`. AGP 9 only accepts `proguard-android-optimize.txt` as the default file, so `proguard.cfg` adds `-dontoptimize` to keep the unoptimised R8 output the app has always shipped; `gradle.properties` also keeps `android.enableR8.fullMode=false` and `android.enableJetifier=true` (both deprecated, removed in AGP 10; see the comments there).
 - **detekt is a build gate.** Config lives in `config/detekt/detekt.yml`; it starts from detekt's
   default config and switches off everything stylistic (naming, complexity, `MagicNumber`,
-  `MaxLineLength`, ...) so the gate only reports likely bugs. `maxIssues: 0`, so any finding fails.
+  `MaxLineLength`, ...) so the gate only reports likely bugs. The plugin is detekt **2.0.0-alpha.6** (`dev.detekt`), the only detekt that understands Kotlin 2.4; move to 2.0 stable when it ships. `failOnSeverity = Info` in the root `build.gradle` makes any finding fail (detekt 1.x's `maxIssues: 0`).
   `UnsafeCallOnNullableType`, `PrintStackTrace` and `EmptyCatchBlock` must stay at zero with no
   baseline entry; there is no `config/detekt/baseline.xml` and adding one for those three is not
   allowed. Deliberate exceptions carry `@Suppress("RuleName")` next to a `// detekt: ...` comment

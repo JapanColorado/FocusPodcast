@@ -18,6 +18,7 @@ import java.net.URLEncoder
 import java.security.MessageDigest
 import java.security.NoSuchAlgorithmException
 import java.util.*
+import java.util.Locale
 
 class PodcastIndexPodcastSearcher : PodcastSearcher {
     override fun search(query: String?): Single<List<PodcastSearchResult?>?>? {
@@ -44,7 +45,7 @@ class PodcastIndexPodcastSearcher : PodcastSearcher {
                     // UTF-8 is always available, so this branch is unreachable in practice.
                     query
                 }
-                val formattedUrl = String.format(PODCASTINDEX_API_URL, encodedQuery)
+                val formattedUrl = String.format(Locale.ROOT, PODCASTINDEX_API_URL, encodedQuery)
                 val client = PodcastHttpClient.getHttpClient()
                 val httpReq = Request.Builder()
                     .addHeader("X-Auth-Date", apiHeaderTime)

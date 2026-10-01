@@ -1,19 +1,21 @@
 buildscript {
-    ext.kotlin_version = '1.9.23'
-    // 1.23.8 is the last 1.23.x; it embeds the Kotlin 1.9 compiler, which is what
-    // this project builds with. Do not jump to 2.x without moving Kotlin first.
-    ext.detekt_version = '1.23.8'
+    ext.kotlin_version = '2.4.20'
+    // detekt 1.23.x embeds the Kotlin 2.0 compiler and uses AGP's removed variant API, so it
+    // cannot analyse this Kotlin 2.4 / AGP 9 build. 2.0.0-alpha.6 is built on Kotlin 2.4.10;
+    // move to the 2.0 stable release when it ships.
+    ext.detekt_version = '2.0.0-alpha.6'
     repositories {
         google()
         mavenCentral()
         gradlePluginPortal()
-        maven { url 'https://jitpack.io' }
+        maven { url = 'https://jitpack.io' }
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:8.4.1'
-        classpath 'org.codehaus.groovy:groovy-xml:3.0.9'
+        classpath 'com.android.tools.build:gradle:9.4.1'
+        // com.android.legacy-kapt (kapt under AGP's built-in Kotlin)
+        classpath 'com.android.tools.build:gradle-kotlin:9.4.1'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-        classpath "io.gitlab.arturbosch.detekt:detekt-gradle-plugin:$detekt_version"
+        classpath "dev.detekt:detekt-gradle-plugin:$detekt_version"
     }
 }
 
@@ -21,16 +23,16 @@ allprojects {
     repositories {
         google()
         mavenCentral()
-        maven { url "https://jitpack.io" }
+        maven { url = "https://jitpack.io" }
         // Aliyun's "public" mirror is the only reachable source left for
         // com.beloo.widget:ChipsLayoutManager:0.3.7, an ex-jcenter artifact that was
         // never published to Maven Central.
-        maven { url "https://maven.aliyun.com/repository/public" }
+        maven { url = "https://maven.aliyun.com/repository/public" }
     }
 
-    tasks.withType(org.jetbrains.kotlin.gradle.tasks.AbstractKotlinCompile).configureEach {
-        kotlinOptions {
-            jvmTarget = "17"
+    tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile).configureEach {
+        compilerOptions {
+            jvmTarget = org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17
         }
     }
 }
@@ -39,7 +41,7 @@ allprojects {
 project.ext {
     //app info
     applicationId = "allen.town.focus.podcast"
-    compileSdkVersion = 35 //jdk need 17 and latter
+    compileSdkVersion = 36
     minSdkVersion = 21
     targetSdkVersion = 35
     versionCode = 79
@@ -84,13 +86,19 @@ project.ext {
     //Tests
     awaitilityVersion = "3.1.6"
     junitVersion = "4.13"
-    robolectricVersion = "4.12.2"
+    robolectricVersion = "4.17"
     robotiumSoloVersion = "5.6.3"
     espressoVersion = "3.2.0"
     runnerVersion = "1.2.0"
     rulesVersion = "1.2.0"
 }
 
+
+// Module scripts read the shared versions above as bare names ("$glideVersion"). Gradle 9
+// deprecates resolving those through the parent project, so copy them into every module.
+subprojects {
+    rootProject.ext.properties.each { key, value -> ext.set(key, value) }
+}
 
 // ---------------------------------------------------------------------------
 // detekt: static analysis for the Kotlin sources.
@@ -102,7 +110,7 @@ project.ext {
 // exceptions and keeps deliberately empty stubs.
 // ---------------------------------------------------------------------------
 subprojects {
-    apply plugin: "io.gitlab.arturbosch.detekt"
+    apply plugin: "dev.detekt"
 
     detekt {
         toolVersion = rootProject.ext.detekt_version
@@ -113,6 +121,8 @@ subprojects {
         // set `baseline = rootProject.file("config/detekt/baseline.xml")` here -- but never
         // for UnsafeCallOnNullableType, PrintStackTrace or EmptyCatchBlock.
         ignoreFailures = false
+        // Any finding fails the build (detekt 1.x expressed this as build.maxIssues: 0).
+        failOnSeverity = dev.detekt.gradle.extensions.FailOnSeverity.Info
         parallel = true
         source.setFrom(
                 files("src/main/java", "src/main/kotlin").filter { it.exists() }
@@ -127,14 +137,13 @@ subprojects {
         tasks.named("detekt") { dependsOn("detektDebug") }
     }
 
-    tasks.withType(io.gitlab.arturbosch.detekt.Detekt).configureEach {
+    tasks.withType(dev.detekt.gradle.Detekt).configureEach {
         jvmTarget = "17"
         reports {
             html.required = true
-            xml.required = false
-            txt.required = true
+            checkstyle.required = false
             sarif.required = false
-            md.required = false
+            markdown.required = false
         }
     }
 }

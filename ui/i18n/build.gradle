@@ -5,11 +5,11 @@ apply from: "../../common.gradle"
 
 android {
     defaultConfig {
-        namespace "allen.town.podcast.ui.i18n"
+        namespace = "allen.town.podcast.ui.i18n"
     }
-    lintOptions {
-        disable "Typos", "ExtraTranslation", "ImpliedQuantity",
-                "PluralsCandidate", "UnusedQuantity", "TypographyEllipsis"
+    lint {
+        disable += ["Typos", "ExtraTranslation", "ImpliedQuantity",
+                "PluralsCandidate", "UnusedQuantity", "TypographyEllipsis"]
     }
 }
 

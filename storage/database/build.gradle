@@ -5,10 +5,10 @@ apply from: "../../common.gradle"
 
 android {
     defaultConfig {
-        namespace "allen.town.podcast.storage.database"
+        namespace = "allen.town.podcast.storage.database"
     }
-    lintOptions {
-        disable "StaticFieldLeak"
+    lint {
+        disable += ["StaticFieldLeak"]
     }
 }
 

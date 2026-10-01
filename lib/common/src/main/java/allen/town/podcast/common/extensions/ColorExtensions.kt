@@ -189,14 +189,13 @@ fun MaterialButton.accentOutlineColor() {
 fun MaterialButton.accentOutlineBackgroundColor() {
     if (materialYou) return
     val color = ThemeStore.accentColor(context)
-    val colorStateList = ColorStateList.valueOf(color)
     val sl = ColorStateList(
         arrayOf(
             intArrayOf(android.R.attr.state_enabled, -android.R.attr.state_checked),
             intArrayOf(android.R.attr.state_enabled, android.R.attr.state_checked)
         ), intArrayOf(
             context.surfaceColor(),
-            ThemeStore.accentColor(context).addAlpha(accentAlpha)
+            color.addAlpha(accentAlpha)
         )
     )
 

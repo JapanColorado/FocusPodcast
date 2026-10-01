@@ -42,7 +42,8 @@ class StatisticsFragment : PagedToolbarFragment() {
         super.onCreateView(inflater, container, savedInstanceState)
         setHasOptionsMenu(true)
         val rootView = inflater.inflate(R.layout.collapsing_pager_fragment, container, false)
-        viewPager = rootView.findViewById(R.id.viewpager)
+        val viewPager: ViewPager2 = rootView.findViewById(R.id.viewpager)
+        this.viewPager = viewPager
         toolbar = rootView.findViewById<TopAppBarLayout>(R.id.appBarLayout).toolbar
         toolbar.setTitle(getString(R.string.statistics_label))
         toolbar.setNavigationOnClickListener(View.OnClickListener { v: View? -> parentFragmentManager.popBackStack() })

@@ -1,6 +1,5 @@
 plugins {
     id('com.android.application')
-    id 'org.jetbrains.kotlin.android'
 }
 apply from: "../common.gradle"
 
@@ -17,10 +16,10 @@ android {
     def hasSigningSecrets = secrets.getProperty('storeFile') != null
 
     defaultConfig {
-        namespace "allen.town.podcast"
-        versionCode rootProject.ext.versionCode
-        versionName rootProject.ext.versionName
-        applicationId rootProject.ext.applicationId
+        namespace = "allen.town.podcast"
+        versionCode = rootProject.ext.versionCode
+        versionName = rootProject.ext.versionName
+        applicationId = rootProject.ext.applicationId
 
         buildConfigField "String", "PODCASTINDEX_API_KEY",
                 secrets.getProperty('podcastindexApiKey', '"optional"')
@@ -37,19 +36,19 @@ android {
     signingConfigs {
         if (hasSigningSecrets) {
             releaseConfig {
-                enableV1Signing true
-                enableV2Signing true
-                storeFile file(secrets.getProperty('storeFile'))
-                storePassword secrets.getProperty('storePassword')
-                keyAlias secrets.getProperty('keyAlias')
-                keyPassword secrets.getProperty('keyPassword')
+                enableV1Signing = true
+                enableV2Signing = true
+                storeFile = file(secrets.getProperty('storeFile'))
+                storePassword = secrets.getProperty('storePassword')
+                keyAlias = secrets.getProperty('keyAlias')
+                keyPassword = secrets.getProperty('keyPassword')
             }
 
             debugConfig {
-                storeFile file(secrets.getProperty('storeFile'))
-                storePassword secrets.getProperty('storePassword')
-                keyAlias secrets.getProperty('keyAlias')
-                keyPassword secrets.getProperty('keyPassword')
+                storeFile = file(secrets.getProperty('storeFile'))
+                storePassword = secrets.getProperty('storePassword')
+                keyAlias = secrets.getProperty('keyAlias')
+                keyPassword = secrets.getProperty('keyPassword')
             }
         }
     }
@@ -57,23 +56,22 @@ android {
     buildTypes {
         debug {
             // Separate package so the debug build installs next to the release build with its own data
-            applicationIdSuffix ".debug"
-            versionNameSuffix "-debug"
-            signingConfig hasSigningSecrets ? signingConfigs.debugConfig : signingConfigs.debug
+            applicationIdSuffix = ".debug"
+            versionNameSuffix = "-debug"
+            signingConfig = hasSigningSecrets ? signingConfigs.debugConfig : signingConfigs.debug
         }
         release {
-            minifyEnabled true
-            shrinkResources true
-            zipAlignEnabled true
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard.cfg'
+            minifyEnabled = true
+            shrinkResources = true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard.cfg'
             if (hasSigningSecrets) {
-                signingConfig signingConfigs.releaseConfig
+                signingConfig = signingConfigs.releaseConfig
             }
         }
     }
 
-    lintOptions {
-        disable 'ObsoleteLintCustomCheck', 'UnusedAttribute', 'BatteryLife', 'InflateParams',
+    lint {
+        disable += ['ObsoleteLintCustomCheck', 'UnusedAttribute', 'BatteryLife', 'InflateParams',
                 'RestrictedApi', 'VectorDrawableCompat',
                 'UseCompoundDrawables', 'NestedWeights', 'Overdraw', 'UselessParent', 'TextFields',
                 'AlwaysShowAction', 'Autofill', 'ClickableViewAccessibility', 'ContentDescription',
@@ -82,11 +80,11 @@ android {
                 // False positive: PlaybackService does declare the android.media.browse
                 // .MediaBrowserService intent-filter, but it is declared in core's manifest and
                 // lint only sees app's own when checkDependencies is off.
-                'MissingMediaBrowserServiceIntentFilter'
+                'MissingMediaBrowserServiceIntentFilter']
     }
 
-    aaptOptions {
-        additionalParameters "--no-version-vectors"
+    androidResources {
+        additionalParameters += "--no-version-vectors"
     }
 
     configurations.all {
@@ -186,12 +184,12 @@ dependencies {
 // extra assets source.
 task copyLicense(type: Copy) {
     from "$rootDir/LICENSE"
-    into "$buildDir/generated/license-assets/"
+    into layout.buildDirectory.dir("generated/license-assets")
     rename { String fileName ->
         fileName + ".txt"
     }
 }
 
-android.sourceSets.main.assets.srcDirs += "$buildDir/generated/license-assets"
+android.sourceSets.main.assets.srcDirs += layout.buildDirectory.dir("generated/license-assets").get().asFile
 
 preBuild.dependsOn copyLicense

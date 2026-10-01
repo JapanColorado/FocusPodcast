@@ -8,18 +8,15 @@ android {
     // only a handful of Kotlin files. Keeping those warning-free is cheap here, so the
     // gate is on for core only (app has far too much legacy Kotlin for this today).
     // jvmTarget comes from the allprojects block in the root build.gradle.
-    kotlinOptions {
-        allWarningsAsErrors = true
-    }
 
-    lintOptions {
-        disable "ObsoleteLintCustomCheck", "DefaultLocale", "UnusedAttribute",
+    lint {
+        disable += ["ObsoleteLintCustomCheck", "DefaultLocale", "UnusedAttribute",
                 "ParcelClassLoader",
-                "IconDensities", "IconDuplicates"
+                "IconDensities", "IconDuplicates"]
     }
 
     defaultConfig {
-        namespace "allen.town.podcast.core"
+        namespace = "allen.town.podcast.core"
         buildConfigField "String", "VERSION_NAME", "\"${rootProject.ext.versionName}\""
         kapt {
             arguments {
@@ -28,6 +25,12 @@ android {
         }
     }
 
+}
+
+kotlin {
+    compilerOptions {
+        allWarningsAsErrors = true
+    }
 }
 
 dependencies {

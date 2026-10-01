@@ -723,7 +723,6 @@ class PlaylistFragment : Fragment(), Toolbar.OnMenuItemClickListener, OnSelectMo
             override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
                 val inflater = LayoutInflater.from(parent.context)
                 val entryView = inflater.inflate(R.layout.single_tag_chip, parent, false)
-                val chip = entryView.findViewById<Chip>(R.id.chip)
                 return ViewHolder(entryView as Chip)
             }
 

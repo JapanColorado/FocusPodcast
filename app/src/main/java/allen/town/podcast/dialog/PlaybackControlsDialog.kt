@@ -38,7 +38,6 @@ import org.greenrobot.eventbus.EventBus
 class PlaybackControlsDialog : DialogFragment() {
     private var controller: PlaybackController? = null
     private var _binding: AudioControlsBinding? = null
-    private val binding get() = _binding ?: error("binding accessed outside of view lifecycle")
     private val uiHandler = Handler(Looper.getMainLooper())
     private var disposable: Disposable? = null
 

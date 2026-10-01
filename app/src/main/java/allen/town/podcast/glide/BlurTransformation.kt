@@ -30,12 +30,7 @@ class BlurTransformation : BitmapTransformation {
         init(builder)
     }
 
-    private constructor(builder: Builder, bitmapPool: BitmapPool) : super() {
-        init(builder)
-    }
-
     class Builder(val context: Context) {
-        private var bitmapPool: BitmapPool? = null
         var blurRadius = DEFAULT_BLUR_RADIUS
         var sampling = 0
 
@@ -57,20 +52,8 @@ class BlurTransformation : BitmapTransformation {
             return this
         }
 
-        /**
-         * @param bitmapPool The BitmapPool to use.
-         * @return the same Builder
-         */
-        fun bitmapPool(bitmapPool: BitmapPool?): Builder {
-            this.bitmapPool = bitmapPool
-            return this
-        }
-
         fun build(): BlurTransformation {
-            val pool = bitmapPool
-            return if (pool != null) {
-                BlurTransformation(this, pool)
-            } else BlurTransformation(this)
+            return BlurTransformation(this)
         }
     }
 

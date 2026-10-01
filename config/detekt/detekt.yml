@@ -23,10 +23,6 @@
 # therefore makes `detekt` depend on the per-variant `detektDebug` task, so
 # `./gradlew detekt` runs both the classpath-free and the type-resolved analysis.
 
-build:
-  maxIssues: 0
-  excludeCorrectable: false
-
 config:
   validation: true
   warningsAsErrors: false
@@ -88,7 +84,7 @@ empty-blocks:
     active: false
   EmptyInitBlock:
     active: false
-  EmptyKtFile:
+  EmptyKotlinFile:
     active: false
   EmptySecondaryConstructor:
     active: false
@@ -152,7 +148,7 @@ potential-bugs:
 style:
   active: true
   # Dead code -- the only part of the `style` rule set this project gates on.
-  UnusedImports:
+  UnusedImport:
     active: true
     severity: error
   UnusedParameter:
@@ -165,7 +161,7 @@ style:
   UnusedPrivateClass:
     active: true
     severity: error
-  UnusedPrivateMember:
+  UnusedPrivateFunction:
     active: true
     severity: error
   UnusedPrivateProperty:
@@ -190,7 +186,7 @@ style:
     active: false
   MaxLineLength:
     active: false
-  MayBeConst:
+  MayBeConstant:
     active: false
   ModifierOrder:
     active: false
@@ -214,7 +210,9 @@ style:
     active: false
   ThrowsCount:
     active: false
-  UnnecessaryAbstractClass:
+  AbstractClassCanBeConcreteClass:
+    active: false
+  AbstractClassCanBeInterface:
     active: false
   UnnecessaryApply:
     active: false

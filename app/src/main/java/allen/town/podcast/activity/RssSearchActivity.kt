@@ -38,7 +38,6 @@ import org.greenrobot.eventbus.EventBus
  * and the activity will finish as soon as the error dialog is closed.
  */
 class RssSearchActivity : DialogActivity() {
-    private val feeds: List<Feed>? = null
     private var feed: Feed? = null
     private val downloader: Downloader? = null
     private var username: String? = null

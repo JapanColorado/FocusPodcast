@@ -14,6 +14,7 @@ import android.widget.TextView
 import androidx.core.util.Consumer
 import androidx.recyclerview.widget.RecyclerView
 import java.io.File
+import java.util.Locale
 
 class ChooseStorageFolderAdapter(context: Context, selectionHandler: Consumer<String>) :
     RecyclerView.Adapter<ChooseStorageFolderAdapter.ViewHolder>() {
@@ -33,7 +34,7 @@ class ChooseStorageFolderAdapter(context: Context, selectionHandler: Consumer<St
         val freeSpace = Formatter.formatShortFileSize(context, storagePath.availableSpace)
         val totalSpace = Formatter.formatShortFileSize(context, storagePath.totalSpace)
         holder.path.text = storagePath.shortPath
-        holder.size.text = String.format(freeSpaceString, freeSpace, totalSpace)
+        holder.size.text = String.format(Locale.getDefault(), freeSpaceString, freeSpace, totalSpace)
         holder.progressBar.progress = storagePath.usagePercentage
         val selectListener =
             View.OnClickListener { v: View? -> selectionHandler.accept(storagePath.fullPath) }

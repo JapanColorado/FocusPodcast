@@ -5,10 +5,10 @@ apply from: "../../common.gradle"
 
 android {
     defaultConfig {
-        namespace "allen.town.podcast.parser.feed"
+        namespace = "allen.town.podcast.parser.feed"
     }
-    lintOptions {
-        disable "TrustAllX509TrustManager"
+    lint {
+        disable += ["TrustAllX509TrustManager"]
     }
 }
 
