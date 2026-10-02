@@ -96,14 +96,19 @@ public class EpisodeMultiSelectActionHandler {
 
 
     private void downloadChecked() {
-        // download the check episodes in the same order as they are currently displayed
+        // download the check episodes in the same order as they are currently displayed.
+        // Already-downloaded episodes are skipped: their complete file would be treated as a
+        // partial one, and the Range request past its end gets it deleted and fetched again.
         List<DownloadRequest> requests = new ArrayList<>();
         for (FeedItem episode : selectedItems) {
-            if (episode.hasMedia() && !episode.getFeed().isLocalFeed()) {
+            if (episode.hasMedia() && !episode.getMedia().isDownloaded()
+                    && episode.getFeed() != null && !episode.getFeed().isLocalFeed()) {
                 requests.add(DownloadRequestCreator.create(episode.getMedia()).build());
             }
         }
-        DownloadService.download(activity, true, requests.toArray(new DownloadRequest[0]));
+        if (!requests.isEmpty()) {
+            DownloadService.download(activity, true, requests.toArray(new DownloadRequest[0]));
+        }
         showMessage(R.plurals.downloading_batch_label, requests.size());
     }
 
