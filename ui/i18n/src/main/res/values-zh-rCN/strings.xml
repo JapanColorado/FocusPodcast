@@ -179,6 +179,12 @@
   <string name="marked_as_unplayed_label">标记为未播放</string>
   <string name="mark_read_no_media_label">标记为已读</string>
   <string name="play_this_to_seek_position">要跳转到此处，请先播放这一集</string>
+  <plurals name="added_to_favorites_batch_label">
+    <item quantity="other">已将%d个剧集加入收藏</item>
+  </plurals>
+  <plurals name="removed_from_favorites_batch_label">
+    <item quantity="other">已将%d个剧集移出收藏</item>
+  </plurals>
   <plurals name="marked_read_batch_label">
     <item quantity="other">已将%d个剧集标记为已播放</item>
   </plurals>
@@ -827,9 +833,6 @@
   <string name="not_now_label">以后再说</string>
   <plurals name="feed_filter_hides_all_episodes">
     <item quantity="other">全部 %d 个单集都被过滤隐藏了</item>
-  </plurals>
-  <plurals name="feed_filter_hidden_count">
-    <item quantity="other">已隐藏 %d 个</item>
   </plurals>
   <string name="pref_playback_notification_category">播放通知</string>
   <string name="pref_system_notification_settings_title">系统通知设置</string>

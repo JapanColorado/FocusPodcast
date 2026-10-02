@@ -132,8 +132,7 @@ class FeedItemlistFragment() : Fragment(), OnItemClickListener, Toolbar.OnMenuIt
         emptyView = EmptyViewHandler(requireContext())
         emptyView.attachTo(binding.emptyViewContainer)
         header = FeedItemListHeader(
-            this, root, binding.filterItems, binding.filterChip,
-            { loader.feed }, { loader.hiddenItemCount }
+            this, root, binding.filterItems, { loader.feed }
         ) {
             if (getParentFragmentManager().getBackStackEntryCount() > 0) {
                 getParentFragmentManager().popBackStack()

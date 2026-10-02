@@ -236,6 +236,14 @@
         <item quantity="other">%d episodes removed from playlist</item>
     </plurals>
     <string name="add_to_favorite_label">Add to Favorites</string>
+    <plurals name="added_to_favorites_batch_label">
+        <item quantity="one">%d episode added to Favorites.</item>
+        <item quantity="other">%d episodes added to Favorites.</item>
+    </plurals>
+    <plurals name="removed_from_favorites_batch_label">
+        <item quantity="one">%d episode removed from Favorites.</item>
+        <item quantity="other">%d episodes removed from Favorites.</item>
+    </plurals>
     <string name="remove_from_favorite_label">Remove from Favorites</string>
     <string name="visit_website_label">Visit Website</string>
     <string name="skip_episode_label">Skip episode</string>
@@ -933,10 +941,6 @@
     <plurals name="feed_filter_hides_all_episodes">
         <item quantity="one">The only episode is hidden by your filter</item>
         <item quantity="other">All %d episodes are hidden by your filter</item>
-    </plurals>
-    <plurals name="feed_filter_hidden_count">
-        <item quantity="one">%d hidden</item>
-        <item quantity="other">%d hidden</item>
     </plurals>
     <string name="pref_playback_notification_category">Playback notification</string>
     <string name="pref_system_notification_settings_title">System notification settings</string>

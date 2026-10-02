@@ -81,17 +81,17 @@ public class EpisodeMultiSelectActionHandler {
     }
 
     private void addToFav() {
-        long[] checkedIds = getSelectedIds();
         for (FeedItem feedItem : selectedItems) {
             DBWriter.addFavoriteItem(feedItem);
         }
+        showMessage(R.plurals.added_to_favorites_batch_label, selectedItems.size());
     }
 
     private void removeFromFav() {
-        long[] checkedIds = getSelectedIds();
         for (FeedItem feedItem : selectedItems) {
             DBWriter.removeFavoriteItem(feedItem);
         }
+        showMessage(R.plurals.removed_from_favorites_batch_label, selectedItems.size());
     }
 
 

@@ -141,6 +141,12 @@
   <string name="marked_as_played_label">再生済みとマーク済み</string>
   <string name="mark_read_no_media_label">既読にする</string>
   <string name="play_this_to_seek_position">位置にジャンプするには、エピソードを再生する必要があります</string>
+  <plurals name="added_to_favorites_batch_label">
+    <item quantity="other">%d エピソードをお気に入りに追加しました</item>
+  </plurals>
+  <plurals name="removed_from_favorites_batch_label">
+    <item quantity="other">%d エピソードをお気に入りから削除しました</item>
+  </plurals>
   <plurals name="marked_read_batch_label">
     <item quantity="other">%d エピソードを再生済にしました</item>
   </plurals>
@@ -515,9 +521,6 @@
   <string name="not_now_label">後で</string>
   <plurals name="feed_filter_hides_all_episodes">
     <item quantity="other">%d 件のエピソードがすべてフィルターで非表示になっています</item>
-  </plurals>
-  <plurals name="feed_filter_hidden_count">
-    <item quantity="other">%d 件を非表示</item>
   </plurals>
   <string name="pref_playback_notification_category">再生通知</string>
   <string name="pref_system_notification_settings_title">システムの通知設定</string>
