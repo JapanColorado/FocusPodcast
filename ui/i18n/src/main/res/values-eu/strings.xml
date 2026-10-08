@@ -571,7 +571,6 @@
   <string name="discover_more">gehiago »</string>
     <string name="search_powered_by">%1$s -ren emaitzak</string>
   <!--Local feeds-->
-  <string name="add_local_folder">Gehitu tokiko karpeta</string>
   <string name="local_folder">Tokiko karpeta</string>
   <string name="reconnect_local_folder">Birkonektatu tokiko karpeta</string>
   <string name="reconnect_local_folder_warning">Baimenik izan ezean, hau erabil dezakezu karpeta berdina birkonektatzeko. Ez aukeratu beste karpetarik.</string>

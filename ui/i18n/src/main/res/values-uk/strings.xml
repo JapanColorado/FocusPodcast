@@ -603,7 +603,6 @@
   <string name="discover_more">більше »</string>
     <string name="search_powered_by">Результати за %1$s</string>
   <!--Local feeds-->
-  <string name="add_local_folder">Додати локальну папку</string>
   <string name="local_folder">Локальна папка</string>
   <string name="reconnect_local_folder">Перепідключити локальну папку</string>
   <string name="reconnect_local_folder_warning">У разі відмови у дозволі ви можете використовувати це для повторного підключення до тієї ж папки. Не вибирайте іншу папку.</string>

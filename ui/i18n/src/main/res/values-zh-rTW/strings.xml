@@ -584,7 +584,6 @@
   <string name="discover_more">更多 »</string>
   <string name="search_powered_by">來自 %1$s 的搜尋結果</string>
   <!--Local feeds-->
-  <string name="add_local_folder">新增本機資料夾</string>
   <string name="local_folder">本機資料夾</string>
   <string name="reconnect_local_folder">重新連接本機資料夾</string>
   <string name="reconnect_local_folder_warning">若因權限問題被拒絕連接，您可以用此方法重新連上同一個資料夾，此時請勿選擇其他的資料夾</string>
@@ -592,6 +591,21 @@
   <string name="local_file">本機檔案</string>
   <string name="local_file_feed_description">此虛擬 Podcast 是在 FocusPodcast 裡增加檔案而產生的</string>
   <string name="sort_track_order">曲目順序</string>
+  <string name="library_label">資料庫</string>
+  <string name="audiobooks_label">有聲書</string>
+  <string name="podcasts_label">Podcast</string>
+  <string name="see_all_label">查看全部</string>
+  <string name="add_podcast_folder">新增 Podcast 資料夾</string>
+  <string name="add_audiobook">新增有聲書</string>
+  <string name="audiobook_file">有聲書檔案</string>
+  <string name="audiobook_folder">有聲書資料夾</string>
+  <string name="feed_audiobook_title">有聲書</string>
+  <string name="feed_audiobook_summary">依序播放曲目，不計入單集列表和新單集數</string>
+  <string name="no_audiobooks_head_label">沒有有聲書</string>
+  <string name="no_audiobooks_label">從裝置新增有聲書檔案（例如 .m4b）或曲目資料夾。</string>
+  <string name="audiobook_percent">%1$d%%</string>
+  <string name="audiobook_time_left">剩餘 %1$s</string>
+  <string name="audiobook_finished">已聽完</string>
   <string name="unable_to_start_system_file_manager">無法啟用系統的檔案管理工具</string>
   <string name="filter">篩選</string>
   <string name="hide_is_favorite_label">為最愛</string>

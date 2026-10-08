@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:foreground="?attr/selectableItemBackground"
+    android:orientation="vertical"
+    android:padding="6dp">
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <allen.town.podcast.ui.common.SquareImageView
+            android:id="@+id/imgvCover"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/non_square_icon_background"
+            android:importantForAccessibility="no"
+            android:scaleType="fitCenter"
+            android:src="@drawable/ic_podcast_background"
+            tools:src="@tools:sample/avatars" />
+
+        <ImageView
+            android:id="@+id/butPlay"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:layout_gravity="bottom|end"
+            android:layout_margin="6dp"
+            android:background="@drawable/audiobook_play_background"
+            android:padding="6dp"
+            android:src="@drawable/ic_play_24dp"
+            app:tint="@android:color/white"
+            tools:ignore="ContentDescription" />
+    </FrameLayout>
+
+    <TextView
+        android:id="@+id/txtvTitle"
+        style="@style/FocusPodcast.TextView.ListItemPrimaryTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="6dp"
+        android:maxLines="1"
+        android:textSize="14sp"
+        tools:text="Audiobook title" />
+
+    <com.google.android.material.progressindicator.LinearProgressIndicator
+        android:id="@+id/progress"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:max="100"
+        app:trackCornerRadius="4dp"
+        tools:progress="42" />
+
+    <TextView
+        android:id="@+id/txtvProgress"
+        style="@style/FocusPodcast.TextView.ListItemSecondaryTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="2dp"
+        tools:text="42% · 3 hours 12 minutes left" />
+
+</LinearLayout>

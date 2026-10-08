@@ -14,9 +14,13 @@
         <menu>
             <group>
                 <item
-                    android:title="@string/add_local_folder"
-                    android:id="@+id/addLocalFolder"
+                    android:title="@string/add_podcast_folder"
+                    android:id="@+id/addPodcastFolder"
                     android:icon="@drawable/ic_add_virtual_podcast"/>
+                <item
+                    android:title="@string/add_audiobook"
+                    android:id="@+id/addAudiobook"
+                    android:icon="@drawable/ic_audiobook"/>
                 <item
                     android:title="@string/add_podcast_by_url_label"
                     android:id="@+id/addByUrl"

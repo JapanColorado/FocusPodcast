@@ -54,7 +54,10 @@ class CategoryInfoAdapter : RecyclerView.Adapter<CategoryInfoAdapter.ViewHolder>
         holder.binding.title.setText(
             when (categoryInfo.tag) {
                 SubFeedsFragment.TAG -> {
-                    R.string.subscriptions_label
+                    R.string.library_label
+                }
+                AudiobooksFragment.TAG -> {
+                    R.string.audiobooks_label
                 }
                 EpisodesFragment.TAG -> {
                     R.string.episodes_label

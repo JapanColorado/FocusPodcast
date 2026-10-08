@@ -582,7 +582,6 @@
   <string name="discover_more">více »</string>
     <string name="search_powered_by">Výsledky dle %1$s</string>
   <!--Local feeds-->
-  <string name="add_local_folder">Přidat místní adresář</string>
   <string name="local_folder">Místní adresář</string>
   <string name="reconnect_local_folder">Znovu připojit místní adresář</string>
   <string name="reconnect_local_folder_warning">V případě zamítnutých oprávnění může být tato možnost použita pro připojení ke stejnému adresáři. Nevybírejte ale jiný adresář.</string>

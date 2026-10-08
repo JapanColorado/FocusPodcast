@@ -361,6 +361,7 @@ class NavigationDrawerFragment : Fragment(), OnSharedPreferenceChangeListener {
             PlaylistFragment.TAG,
             EpisodesFragment.TAG,
             SubFeedsFragment.TAG,
+            AudiobooksFragment.TAG,
             FavoriteEpisodesFragment.TAG,
             DownloadPagerFragment.TAG,
             PlaybackHistoryFragment.TAG,

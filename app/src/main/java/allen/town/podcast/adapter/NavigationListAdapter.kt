@@ -83,7 +83,8 @@ class NavigationListAdapter(private val itemAccess: ItemAccess, context: Activit
             EpisodesFragment.TAG -> context.getString(R.string.episodes_label)
             DownloadPagerFragment.TAG -> context.getString(R.string.downloads_label)
             PlaybackHistoryFragment.TAG -> context.getString(R.string.playback_history_label)
-            SubFeedsFragment.TAG -> context.getString(R.string.subscriptions_label)
+            SubFeedsFragment.TAG -> context.getString(R.string.library_label)
+            AudiobooksFragment.TAG -> context.getString(R.string.audiobooks_label)
             DiscoverFragment.TAG -> context.getString(R.string.discover)
             FavoriteEpisodesFragment.TAG -> context.getString(R.string.favorite_episodes_label)
             else -> ""
@@ -98,6 +99,7 @@ class NavigationListAdapter(private val itemAccess: ItemAccess, context: Activit
             DownloadPagerFragment.TAG -> R.drawable.ic_download
             PlaybackHistoryFragment.TAG -> R.drawable.ic_history
             SubFeedsFragment.TAG -> R.drawable.ic_my_subs
+            AudiobooksFragment.TAG -> R.drawable.ic_audiobook
             DiscoverFragment.TAG -> R.drawable.ic_discover
             FavoriteEpisodesFragment.TAG -> R.drawable.ic_star
             else -> 0

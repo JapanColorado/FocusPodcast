@@ -596,7 +596,6 @@
   <string name="discover_more">meer »</string>
     <string name="search_powered_by">Resultaten van %1$s</string>
   <!--Local feeds-->
-  <string name="add_local_folder">Lokale map toevoegen</string>
   <string name="local_folder">Lokale map</string>
   <string name="reconnect_local_folder">Lokale map opnieuw koppelen</string>
   <string name="reconnect_local_folder_warning">Als je geen rechten hebt, gebruik dan dit om de map opnieuw te koppelen. Kies geen andere map.</string>

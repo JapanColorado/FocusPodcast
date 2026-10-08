@@ -11,6 +11,7 @@ import allen.town.podcast.fragment.LocalSearchFragment
 import allen.town.podcast.fragment.PlaybackHistoryFragment
 import allen.town.podcast.fragment.PlaylistFragment
 import allen.town.podcast.fragment.SubFeedsFragment
+import allen.town.podcast.fragment.AudiobooksFragment
 import allen.town.podcast.fragment.TransitionEffect
 import allen.town.podcast.model.feed.Feed
 import allen.town.podcast.ui.startintent.MainActivityStarter
@@ -93,7 +94,8 @@ internal class MainIntentHandler(
                     "history" -> navigator.loadFragment(PlaybackHistoryFragment.TAG, null)
                     "episodes" -> navigator.loadFragment(EpisodesFragment.TAG, null)
                     "playlist" -> navigator.loadFragment(PlaylistFragment.TAG, null)
-                    "subscriptions" -> navigator.loadFragment(SubFeedsFragment.TAG, null)
+                    "subscriptions", "library" -> navigator.loadFragment(SubFeedsFragment.TAG, null)
+                    "audiobooks" -> navigator.loadFragment(AudiobooksFragment.TAG, null)
                     "favorite" -> navigator.loadFragment(FavoriteEpisodesFragment.TAG, null)
                     else -> {
                         showSnack(

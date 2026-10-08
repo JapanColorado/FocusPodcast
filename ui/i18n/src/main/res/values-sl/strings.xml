@@ -603,7 +603,6 @@
   <string name="discover_more">več »</string>
     <string name="search_powered_by">Rezultati od %1$s</string>
   <!--Local feeds-->
-  <string name="add_local_folder">Dodaj lokalno mapo</string>
   <string name="local_folder">Lokalna mapa</string>
   <string name="reconnect_local_folder">Ponovno povežite lokalno mapo</string>
   <string name="reconnect_local_folder_warning">V primeru zavrnitve dovoljenj lahko to uporabite za ponovno povezavo s popolnoma isto mapo. Ne izberite druge mape.</string>

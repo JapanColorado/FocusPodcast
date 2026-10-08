@@ -6,6 +6,8 @@ import allen.town.podcast.common.util.MenuIconUtil.showToolbarMenuIcon
 import allen.town.podcast.common.util.Timber
 import allen.town.podcast.R
 import allen.town.podcast.activity.MainActivity
+import allen.town.podcast.adapter.AudiobookEntry
+import allen.town.podcast.adapter.LibraryShelfAdapter
 import allen.town.podcast.adapter.MultiSelectAdapter
 import allen.town.podcast.adapter.MultiSelectAdapter.OnSelectModeListener
 import allen.town.podcast.adapter.SubFeedsAdapter
@@ -28,10 +30,13 @@ import allen.town.podcast.dialog.SubsFilterDialog.showDialog
 import allen.town.podcast.dialog.TagEditDialog
 import allen.town.podcast.dialog.TagEditDialog.Companion.newInstance
 import allen.town.podcast.discovery.CombinedSearcher
+import allen.town.podcast.event.FeedItemEvent
 import allen.town.podcast.event.FeedListUpdateEvent
+import allen.town.podcast.event.PlayerStatusEvent
 import allen.town.podcast.event.UnreadItemsUpdateEvent
 import allen.town.podcast.fragment.actions.FeedMultiSelectActionHandler
 import allen.town.podcast.statistics.StatisticsFragment
+import allen.town.podcast.util.LocalFeedImporter
 import allen.town.podcast.util.OpmlImportLauncher
 import allen.town.podcast.util.SkeletonRecyclerDelay
 import allen.town.podcast.view.EmptyViewHandler
@@ -46,6 +51,7 @@ import android.view.ContextMenu.ContextMenuInfo
 import android.view.animation.AnimationUtils
 import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
@@ -63,12 +69,20 @@ import org.greenrobot.eventbus.ThreadMode
 import java.util.*
 
 /**
- * Fragment for displaying feed subscriptions
+ * The Library page: a row of audiobooks with their progress (only when there are any) above the
+ * grid of podcast subscriptions. Opened for a tag folder ([newInstance]) it shows only that
+ * folder's podcasts. The class keeps its old name and [TAG] so that stored drawer settings, the
+ * last opened page, deep links and launcher shortcuts keep working.
  */
 class SubFeedsFragment : Fragment(), Toolbar.OnMenuItemClickListener, OnSelectModeListener,
     DoubleClickBackToContentTopListener.IBackToContentTopView {
     private lateinit var subscriptionRecycler: RecyclerView
     private lateinit var subscriptionAdapter: SubFeedsAdapter
+    /** The audiobook row; null in a tag folder, which shows podcasts only. */
+    private var shelfAdapter: LibraryShelfAdapter? = null
+    private var concatAdapter: ConcatAdapter? = null
+    private val localFeedImporter = LocalFeedImporter(this)
+    private var shelfDisposable: Disposable? = null
     private lateinit var subscriptionAddButton: FloatingActionButton
     private lateinit var emptyView: EmptyViewHandler
     private val opmlImportLauncher = OpmlImportLauncher(this)
@@ -134,7 +148,9 @@ class SubFeedsFragment : Fragment(), Toolbar.OnMenuItemClickListener, OnSelectMo
                 resources.getInteger(R.integer.swipe_to_refresh_duration_in_ms).toLong()
             )
         }
-        toolbar.setTitle(getString(R.string.subscriptions_label))
+        if (displayedFolder == null) {
+            toolbar.setTitle(R.string.library_label)
+        }
         return root
     }
 
@@ -142,6 +158,11 @@ class SubFeedsFragment : Fragment(), Toolbar.OnMenuItemClickListener, OnSelectMo
         super.onDestroyView()
         uiHandler.removeCallbacksAndMessages(null)
         userActions.clear()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        localFeedImporter.dispose()
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -202,6 +223,14 @@ class SubFeedsFragment : Fragment(), Toolbar.OnMenuItemClickListener, OnSelectMo
             context,
             columns, RecyclerView.VERTICAL, false
         )
+        // the audiobook row spans the whole width; the skeleton adapter (while loading) does not
+        // contain it, hence the adapter check
+        gridLayoutManager.spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
+            override fun getSpanSize(position: Int): Int {
+                val shelf = shelfAdapter ?: return 1
+                return if (subscriptionRecycler.adapter === concatAdapter && position < shelf.itemCount) columns else 1
+            }
+        }
         subscriptionRecycler.layoutManager = gridLayoutManager
         prefs.edit().putInt(PREF_NUM_COLUMNS, columns).apply()
         refreshToolbarState()
@@ -222,6 +251,9 @@ class SubFeedsFragment : Fragment(), Toolbar.OnMenuItemClickListener, OnSelectMo
         }
         emptyView.addAction(R.string.add_podcast_by_url_label, R.drawable.ic_link) {
             AddFeedByUrlDialog.show(requireContext())
+        }
+        emptyView.addAction(R.string.add_audiobook, R.drawable.ic_audiobook) {
+            localFeedImporter.addAudiobook()
         }
         emptyView.attachToRecyclerView(subscriptionRecycler)
     }
@@ -249,7 +281,22 @@ class SubFeedsFragment : Fragment(), Toolbar.OnMenuItemClickListener, OnSelectMo
             }
         }
         subscriptionAdapter.setOnSelectModeListener(this)
-        subscriptionRecycler.adapter = subscriptionAdapter
+        if (displayedFolder == null) {
+            val shelf = LibraryShelfAdapter(requireActivity() as MainActivity) {
+                (activity as? MainActivity)?.loadChildFragment(AudiobooksFragment())
+            }
+            shelfAdapter = shelf
+            val concat = ConcatAdapter(
+                ConcatAdapter.Config.Builder()
+                    .setStableIdMode(ConcatAdapter.Config.StableIdMode.ISOLATED_STABLE_IDS)
+                    .build(),
+                shelf, subscriptionAdapter
+            )
+            concatAdapter = concat
+            subscriptionRecycler.adapter = concat
+        } else {
+            subscriptionRecycler.adapter = subscriptionAdapter
+        }
 
         subscriptionAdapter.setOnMenuItemClickListener(object :
             MultiSelectAdapter.OnMenuItemClickListener {
@@ -283,38 +330,39 @@ class SubFeedsFragment : Fragment(), Toolbar.OnMenuItemClickListener, OnSelectMo
         super.onStop()
         EventBus.getDefault().unregister(this)
         disposable?.dispose()
+        shelfDisposable?.dispose()
+        uiHandler.removeCallbacks(shelfReloader)
         subscriptionAdapter.endSelectMode()
+    }
+
+    override fun onHiddenChanged(hidden: Boolean) {
+        super.onHiddenChanged(hidden)
+        // back from a book's page or the Audiobooks page: show the progress made there
+        if (!hidden && isAdded) {
+            loadShelf()
+        }
     }
 
     private fun loadSubscriptions() {
         disposable?.dispose()
         emptyView.hide()
+        val withShelf = shelfAdapter != null
         disposable = Observable.fromCallable {
-            val data = DBReader.getNavDrawerData(true, FeedKind.PODCASTS)
-            val items = data.items
-            val feedItems: MutableList<DrawerItem> = ArrayList()
-            for (item in items) {
-                if (item.type == DrawerItem.Type.TAG
-                    && item.title == displayedFolder
-                ) {
-                    return@fromCallable (item as TagDrawerItem).children
-                } else {
-                    if (item.type != DrawerItem.Type.TAG) {
-                        feedItems.add(item)
-                    }
-                }
-            }
-            feedItems
+            Pair(
+                loadDrawerItems(),
+                if (withShelf) AudiobookEntry.load() else emptyList()
+            )
         }
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe(
-                { result: List<DrawerItem> ->
+                { (result: List<DrawerItem>, books: List<AudiobookEntry>) ->
                     if (listItems.size > result.size) {
                         // We have fewer items. This can result in items being selected that are no longer visible.
                         subscriptionAdapter.endSelectMode()
                     }
                     listItems = result
+                    shelfAdapter?.setEntries(books, result.isNotEmpty())
                     subscriptionAdapter.setItems(result)
                     subscriptionAdapter.notifyDataSetChanged()
                     if (skeleton.isSkeleton()) {
@@ -327,6 +375,34 @@ class SubFeedsFragment : Fragment(), Toolbar.OnMenuItemClickListener, OnSelectMo
             }
 
         refreshToolbarState()
+    }
+
+    /** Reloads only the audiobook row, e.g. after progress was made. */
+    private fun loadShelf() {
+        val shelf = shelfAdapter ?: return
+        shelfDisposable?.dispose()
+        shelfDisposable = Observable.fromCallable { AudiobookEntry.load() }
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(
+                { books: List<AudiobookEntry> -> shelf.setEntries(books, listItems.isNotEmpty()) },
+                { error: Throwable -> Log.e(TAG, "loading the audiobooks failed", error) }
+            )
+    }
+
+    private fun loadDrawerItems(): List<DrawerItem> {
+        val data = DBReader.getNavDrawerData(true, FeedKind.PODCASTS)
+        val feedItems: MutableList<DrawerItem> = ArrayList()
+        for (item in data.items) {
+            if (item.type == DrawerItem.Type.TAG
+                && item.title == displayedFolder
+            ) {
+                return (item as TagDrawerItem).children
+            } else if (item.type != DrawerItem.Type.TAG) {
+                feedItems.add(item)
+            }
+        }
+        return feedItems
     }
 
     private val defaultNumOfColumns: Int
@@ -369,6 +445,25 @@ class SubFeedsFragment : Fragment(), Toolbar.OnMenuItemClickListener, OnSelectMo
         loadSubscriptions()
     }
 
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    fun onFeedItemsChanged(event: FeedItemEvent?) {
+        scheduleShelfReload()
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    fun onPlayerStatusChanged(event: PlayerStatusEvent?) {
+        scheduleShelfReload()
+    }
+
+    /** Item events come in bursts (a feed refresh, marking many played): reload once they settle. */
+    private fun scheduleShelfReload() {
+        if (shelfAdapter == null) return
+        uiHandler.removeCallbacks(shelfReloader)
+        uiHandler.postDelayed(shelfReloader, SHELF_RELOAD_DELAY_MS)
+    }
+
+    private val shelfReloader = Runnable { loadShelf() }
+
     @Subscribe(sticky = true, threadMode = ThreadMode.MAIN)
     fun onEventMainThread(event: DownloadEvent) {
         if (event.hasChangedFeedUpdateStatus(isUpdatingFeeds)) {
@@ -380,12 +475,14 @@ class SubFeedsFragment : Fragment(), Toolbar.OnMenuItemClickListener, OnSelectMo
         UpdateRefreshMenuItemChecker { DownloadService.isRunning() && DownloadService.isDownloadingFeeds() }
 
     override fun onEndSelectMode() {
+        shelfAdapter?.hidden = false
         subscriptionAdapter.setItems(listItems)
         subscriptionAdapter.notifyDataSetChanged()
         toolbar.visibility = View.VISIBLE
     }
 
     override fun onStartSelectMode() {
+        shelfAdapter?.hidden = true
         toolbar.visibility = View.GONE
         val feedsOnly: MutableList<DrawerItem> = ArrayList()
         for (item in listItems) {
@@ -404,6 +501,7 @@ class SubFeedsFragment : Fragment(), Toolbar.OnMenuItemClickListener, OnSelectMo
         private const val KEY_UP_ARROW = "up_arrow"
         private const val ARGUMENT_FOLDER = "folder"
         private const val MIN_NUM_COLUMNS = 3
+        private const val SHELF_RELOAD_DELAY_MS = 1000L
         private val COLUMN_CHECKBOX_IDS = intArrayOf(
             R.id.subscription_num_columns_3,
             R.id.subscription_num_columns_4,

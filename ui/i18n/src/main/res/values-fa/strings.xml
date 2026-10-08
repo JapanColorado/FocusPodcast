@@ -569,7 +569,6 @@
   <string name="discover_more">بیشتر </string>
     <string name="search_powered_by">نتایج توسط %1$s</string>
   <!--Local feeds-->
-  <string name="add_local_folder">پوشه محلی را اضافه کنید</string>
   <string name="local_folder">پوشه محلی</string>
   <string name="reconnect_local_folder">اتصال دوباره پوشه محلی</string>
   <string name="reconnect_local_folder_warning">در صورت عدم پذیرش اجازه ، می توانید این را برای اتصال مجدد  به همان پوشه قبلی استفاده کنید. پوشه دیگری را انتخاب نکنید.</string>

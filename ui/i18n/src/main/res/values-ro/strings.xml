@@ -614,7 +614,6 @@
   <string name="discover_more">mai mult »</string>
     <string name="search_powered_by">Rezultatele %1$s</string>
   <!--Local feeds-->
-  <string name="add_local_folder">Adaugă director local</string>
   <string name="local_folder">Director local</string>
   <string name="reconnect_local_folder">Reconectează directorul local</string>
   <string name="reconnect_local_folder_warning">În cazul în care permisiunile sunt refuzate, poți sa folosești această opțiune pentru a te reconecta la exact același director. Nu selecta alt director.</string>

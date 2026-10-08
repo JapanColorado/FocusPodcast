@@ -545,7 +545,6 @@
   <string name="discover_more">mer »</string>
     <string name="search_powered_by">Resultater fra %1$s</string>
   <!--Local feeds-->
-  <string name="add_local_folder">Legg til lokal mappe</string>
   <string name="local_folder">Lokale mappe</string>
   <string name="reconnect_local_folder">Tilkoble lokal mappe igjen</string>
   <string name="reconnect_local_folder_warning">Hvis rettighetene er ikke godkjent, så kan du bruke denne tilkoblingen til akkurat samme mappen. Ikke velg en annen mappe.</string>

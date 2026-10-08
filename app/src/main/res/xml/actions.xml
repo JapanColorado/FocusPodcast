@@ -20,6 +20,8 @@
         <entity identifier="episodes" name="@string/episodes_label" />
         <entity identifier="downloads" name="@string/downloads_label" />
         <entity identifier="subscriptions" name="@string/subscriptions_label" />
+        <entity identifier="library" name="@string/library_label" />
+        <entity identifier="audiobooks" name="@string/audiobooks_label" />
         <entity identifier="history" name="@string/playback_history_label" />
         <entity identifier="favorite" name="@string/favorite_episodes_label" />
     </entity-set>

@@ -3,9 +3,18 @@ package allen.town.podcast.pref;
 import android.content.Context;
 import android.content.SharedPreferences;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.preference.PreferenceManager;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 import allen.town.podcast.BuildConfig;
+import allen.town.podcast.common.model.CategoryInfo;
+import allen.town.podcast.common.util.BasePreferenceUtil;
 import allen.town.podcast.core.util.download.AutoUpdateManager;
 
 /**
@@ -23,12 +32,72 @@ public class PreferenceUpgrader {
         int oldVersion = upgraderPrefs.getInt(PREF_CONFIGURED_VERSION, -1);
         int newVersion = BuildConfig.VERSION_CODE;
 
+        // Not tied to a version code: debug builds reuse it, and the step is idempotent and cheap.
+        addMissingLibraryCategories();
+
         if (oldVersion != newVersion) {
             AutoUpdateManager.restartUpdateAlarm(context);
 
             upgrade(oldVersion, context);
             upgraderPrefs.edit().putInt(PREF_CONFIGURED_VERSION, newVersion).apply();
         }
+    }
+
+    /**
+     * The drawer pages are stored as a list ({@link BasePreferenceUtil#getLibraryCategory()}) once
+     * the user reorders or hides one, so a page added in a later version (Audiobooks) would never
+     * show up for them, not even in the "Categories" dialog. Inserts every default page missing
+     * from the stored list right after the default page that precedes it, with its default
+     * visibility, and leaves the user's order and choices alone.
+     */
+    private static void addMissingLibraryCategories() {
+        List<CategoryInfo> defaults = BasePreferenceUtil.INSTANCE.getDefaultCategories();
+        List<CategoryInfo> merged = mergeCategories(BasePreferenceUtil.getLibraryCategory(), defaults);
+        if (merged != null) {
+            BasePreferenceUtil.setLibraryCategory(merged);
+        }
+    }
+
+    /**
+     * @return the stored list with the missing default entries inserted, or null when nothing is
+     *     missing
+     */
+    @Nullable
+    static List<CategoryInfo> mergeCategories(@NonNull List<CategoryInfo> stored,
+                                              @NonNull List<CategoryInfo> defaults) {
+        Set<String> storedTags = new HashSet<>();
+        for (CategoryInfo info : stored) {
+            storedTags.add(info.getTag());
+        }
+        List<CategoryInfo> result = new ArrayList<>(stored);
+        boolean changed = false;
+        for (int i = 0; i < defaults.size(); i++) {
+            CategoryInfo missing = defaults.get(i);
+            if (storedTags.contains(missing.getTag())) {
+                continue;
+            }
+            int insertAt = 0;
+            for (int j = i - 1; j >= 0; j--) {
+                int index = indexOfTag(result, defaults.get(j).getTag());
+                if (index >= 0) {
+                    insertAt = index + 1;
+                    break;
+                }
+            }
+            result.add(insertAt, new CategoryInfo(missing.getTag(), missing.getVisible(), missing.getDragAble()));
+            storedTags.add(missing.getTag());
+            changed = true;
+        }
+        return changed ? result : null;
+    }
+
+    private static int indexOfTag(List<CategoryInfo> list, String tag) {
+        for (int i = 0; i < list.size(); i++) {
+            if (list.get(i).getTag().equals(tag)) {
+                return i;
+            }
+        }
+        return -1;
     }
 
     /**

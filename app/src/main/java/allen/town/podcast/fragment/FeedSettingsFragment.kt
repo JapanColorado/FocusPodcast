@@ -185,6 +185,7 @@ class FeedSettingsFragment : Fragment() {
                     setupFeedAutoSkipPreference()
                     setupFeedAdSkipPreference()
                     setupEpisodeNotificationPreference()
+                    setupAudiobookPreference()
                     setupTags()
                     updateAutoDeleteSummary()
                     updateVolumeReductionValue()
@@ -567,6 +568,22 @@ class FeedSettingsFragment : Fragment() {
             requirePreference<Preference>(PREF_EPISODE_FILTER).isEnabled = enabled
         }
 
+        private fun setupAudiobookPreference() {
+            val feedPreferences = this.feedPreferences ?: return
+            val pref = requirePreference<ATESwitchPreference>(PREF_AUDIOBOOK)
+            pref.isChecked = feedPreferences.isAudiobook
+            pref.onPreferenceChangeListener =
+                Preference.OnPreferenceChangeListener { _: Preference?, newValue: Any ->
+                    val checked = newValue === java.lang.Boolean.TRUE
+                    // Keep the in-memory copy in step: the other switches here save the whole
+                    // FeedPreferences object, which would otherwise write the old flag back.
+                    feedPreferences.isAudiobook = checked
+                    DBWriter.setFeedAudiobook(feedPreferences.feedID, checked)
+                    pref.isChecked = checked
+                    false
+                }
+        }
+
         private fun setupTags() {
             val feedPreferences = this.feedPreferences ?: return
             requirePreference<Preference>(PREF_TAGS).onPreferenceClickListener =
@@ -596,6 +613,7 @@ class FeedSettingsFragment : Fragment() {
         companion object {
             private val PREF_EPISODE_FILTER: CharSequence = "episodeFilter"
             private val PREF_SCREEN: CharSequence = "feedSettingsScreen"
+            private val PREF_AUDIOBOOK: CharSequence = "audiobook"
             private val PREF_AUTHENTICATION: CharSequence = "authentication"
             private val PREF_AUTO_DELETE: CharSequence = "autoDelete"
             private val PREF_CATEGORY_AUTO_DOWNLOAD: CharSequence = "autoDownloadCategory"

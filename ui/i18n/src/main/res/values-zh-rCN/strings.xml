@@ -650,7 +650,6 @@
   <string name="discover_more">更多</string>
   <string name="search_powered_by">按 %1$s 显示结果</string>
   <!--Local feeds-->
-  <string name="add_local_folder">添加本地文件夹</string>
   <string name="local_folder">本地文件夹</string>
   <string name="reconnect_local_folder">重新连接本地文件夹</string>
   <string name="reconnect_local_folder_warning">在权限遭拒的情况下，您可以使用它重新连接到完全相同的文件夹，不要选择其他文件夹</string>
@@ -658,6 +657,21 @@
   <string name="local_file">本地文件</string>
   <string name="local_file_feed_description">这个虚拟播客是通过向FocusPodcast添加一个文件创建的</string>
   <string name="sort_track_order">曲目顺序</string>
+  <string name="library_label">资料库</string>
+  <string name="audiobooks_label">有声书</string>
+  <string name="podcasts_label">播客</string>
+  <string name="see_all_label">查看全部</string>
+  <string name="add_podcast_folder">添加播客文件夹</string>
+  <string name="add_audiobook">添加有声书</string>
+  <string name="audiobook_file">有声书文件</string>
+  <string name="audiobook_folder">有声书文件夹</string>
+  <string name="feed_audiobook_title">有声书</string>
+  <string name="feed_audiobook_summary">按顺序播放曲目，不计入单集列表和新单集数</string>
+  <string name="no_audiobooks_head_label">没有有声书</string>
+  <string name="no_audiobooks_label">从设备添加有声书文件（例如 .m4b）或曲目文件夹。</string>
+  <string name="audiobook_percent">%1$d%%</string>
+  <string name="audiobook_time_left">剩余 %1$s</string>
+  <string name="audiobook_finished">已听完</string>
   <string name="unable_to_start_system_file_manager">无法启动系统文件管理器</string>
   <string name="filter">过滤</string>
   <string name="hide_is_favorite_label">喜爱的</string>

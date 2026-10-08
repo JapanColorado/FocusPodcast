@@ -585,7 +585,6 @@
   <string name="discover_more">több »</string>
     <string name="search_powered_by">%1$s javaslatok</string>
   <!--Local feeds-->
-  <string name="add_local_folder">Helyi mappa hozzáadása</string>
   <string name="local_folder">Helyi mappa</string>
   <string name="reconnect_local_folder">Helyi mappa újracsatlakoztatása</string>
   <string name="reconnect_local_folder_warning">Jogosultság-megtagadás esetén arra használhatja, hogy újracsatlakoztassa ugyanazt a mappát. Ne válasszon másik mappát.</string>

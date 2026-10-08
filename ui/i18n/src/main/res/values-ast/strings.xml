@@ -453,7 +453,6 @@
   <string name="discover_more">más »</string>
     <string name="search_powered_by">Resultaos de %1$s</string>
   <!--Local feeds-->
-  <string name="add_local_folder">Amestar una carpeta llocal</string>
   <string name="local_folder">Carpeta llocal</string>
   <string name="local_feed_description">Esti podcast virtual creóse por amestar una carpeta a FocusPodcast.</string>
   <string name="unable_to_start_system_file_manager">Nun ye posible aniciar el xestor de ficheros del sistema</string>

@@ -632,7 +632,6 @@
   <string name="discover_more">viac »</string>
     <string name="search_powered_by">Výsledky podľa %1$s</string>
   <!--Local feeds-->
-  <string name="add_local_folder">Pridať lokálny priečinok</string>
   <string name="local_folder">Lokálny priečinok</string>
   <string name="reconnect_local_folder">Znova pripojiť lokálny priečinok</string>
   <string name="reconnect_local_folder_warning">V prípade zamietnutia povolenia môžete toto použiť na opätovné pripojenie k presne rovnakému priečinku. Nevyberajte iný priečinok.</string>

@@ -635,7 +635,6 @@
   <string name="discover_more">muioc\'h »</string>
     <string name="search_powered_by">Disoc\'hioù gant %1$s</string>
   <!--Local feeds-->
-  <string name="add_local_folder">Ouzhpennañ un teuliad lec\'hel</string>
   <string name="local_folder">Teuliad lec\'hel</string>
   <string name="reconnect_local_folder">Adkennaskañ un teuliad lec\'hel</string>
   <string name="reconnect_local_folder_warning">Gallout a rit implijout an dra-se evit adkennaskañ ar memes teuliad pa vez nac\'het an aotre. Arabat dibab un teuliad all.</string>

@@ -2,12 +2,7 @@ package allen.town.podcast.fragment;
 
 import static android.content.Context.MODE_PRIVATE;
 
-import android.content.ActivityNotFoundException;
-import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
-import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -16,13 +11,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.annotation.RequiresApi;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -46,13 +37,11 @@ import java.util.Locale;
 
 import allen.town.podcast.common.util.DoubleClickBackToContentTopListener;
 import allen.town.podcast.common.util.Timber;
-import allen.town.podcast.common.util.TopSnackbarUtil;
 import allen.town.podcast.MyApp;
 import allen.town.podcast.R;
 import allen.town.podcast.activity.MainActivity;
 import allen.town.podcast.adapter.ItunesAdapter;
 import allen.town.podcast.core.storage.DBReader;
-import allen.town.podcast.core.feed.LocalFeedCreator;
 import allen.town.podcast.databinding.DiscoverLayoutBinding;
 import allen.town.podcast.discovery.CombinedSearcher;
 import allen.town.podcast.discovery.ItunesCategoryTopLoader;
@@ -60,15 +49,14 @@ import allen.town.podcast.discovery.PodcastSearchResult;
 import allen.town.podcast.event.FeedListUpdateEvent;
 import allen.town.podcast.event.ItunesCategoryChangeEvent;
 import allen.town.podcast.common.common.prefs.supportv7.dialogs.PreferenceListDialog;
-import allen.town.podcast.model.feed.Feed;
 import allen.town.podcast.dialog.AddFeedByUrlDialog;
+import allen.town.podcast.util.LocalFeedImporter;
 import allen.town.podcast.util.OpmlImportLauncher;
 import allen.town.podcast.util.SkeletonRecyclerDelay;
 import allen.town.podcast.view.TagsSectionView;
 import allen.town.podcast.theme.util.scroll.ThemedFastScroller;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 
@@ -122,8 +110,7 @@ public class DiscoverFragment extends Fragment implements Toolbar.OnMenuItemClic
     }
 
     private final OpmlImportLauncher opmlImportLauncher = new OpmlImportLauncher(this);
-    private final ActivityResultLauncher<Uri> addLocalFolderLauncher =
-            registerForActivityResult(new AddLocalFolder(), this::addLocalFolderResult);
+    private final LocalFeedImporter localFeedImporter = new LocalFeedImporter(this);
 
 
     @Override
@@ -175,9 +162,6 @@ public class DiscoverFragment extends Fragment implements Toolbar.OnMenuItemClic
 
     private Disposable getFeedsListDisposable;
 
-    /** One-off user actions; they touch the activity, so they must not outlive it. */
-    private final CompositeDisposable userActions = new CompositeDisposable();
-
     private void getSubedFeedsList() {
         getFeedsListDisposable = Observable.fromCallable(DBReader::getFeedList)
                 .subscribeOn(Schedulers.io())
@@ -199,12 +183,11 @@ public class DiscoverFragment extends Fragment implements Toolbar.OnMenuItemClic
     @Override
     public boolean onMenuItemClick(MenuItem item) {
         final int itemId = item.getItemId();
-        if (itemId == R.id.addLocalFolder) {
-            try {
-                addLocalFolderLauncher.launch(null);
-            } catch (ActivityNotFoundException e) {
-                TopSnackbarUtil.showSnack(getActivity(), R.string.unable_to_start_system_file_manager, Toast.LENGTH_LONG);
-            }
+        if (itemId == R.id.addPodcastFolder) {
+            localFeedImporter.addPodcastFolder();
+            return true;
+        } else if (itemId == R.id.addAudiobook) {
+            localFeedImporter.addAudiobook();
             return true;
         } else if (itemId == R.id.opmlImport) {
             opmlImportLauncher.launch();
@@ -237,23 +220,6 @@ public class DiscoverFragment extends Fragment implements Toolbar.OnMenuItemClic
         prefs = getActivity().getSharedPreferences(ItunesCategoryTopLoader.PREFS, MODE_PRIVATE);
         countryCode = prefs.getString(ItunesCategoryTopLoader.PREF_KEY_COUNTRY_CODE, Locale.getDefault().getCountry());
         categoryCode = prefs.getInt(ItunesCategoryTopLoader.PREF_KEY_CATEGORY_CODE, 0);
-    }
-
-    private void addLocalFolderResult(final Uri uri) {
-        if (uri == null) {
-            return;
-        }
-        userActions.add(Observable.fromCallable(() -> addLocalFolder(uri))
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(
-                        feed -> {
-                            Fragment fragment = FeedItemlistFragment.newInstance(feed.getId());
-                            ((MainActivity) getActivity()).loadChildFragment(fragment);
-                        }, error -> {
-                            Log.e(TAG, "adding a local folder failed", error);
-                            TopSnackbarUtil.showSnack(getActivity(), error.getLocalizedMessage(), Toast.LENGTH_LONG);
-                        }));
     }
 
     private void loadToplist(String country) {
@@ -332,25 +298,10 @@ public class DiscoverFragment extends Fragment implements Toolbar.OnMenuItemClic
         });
     }
 
-    private Feed addLocalFolder(Uri uri) {
-        return LocalFeedCreator.addLocalFolder(requireContext(), uri, false);
-    }
-
     @Override
     public void backToContentTop() {
         gridView.scrollToPosition(5);
         gridView.post(() -> gridView.smoothScrollToPosition(0));
-    }
-
-
-    private static class AddLocalFolder extends ActivityResultContracts.OpenDocumentTree {
-        @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
-        @NonNull
-        @Override
-        public Intent createIntent(@NonNull final Context context, @Nullable final Uri input) {
-            return super.createIntent(context, input)
-                    .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-        }
     }
 
 
@@ -364,7 +315,7 @@ public class DiscoverFragment extends Fragment implements Toolbar.OnMenuItemClic
         if (getFeedsListDisposable != null) {
             getFeedsListDisposable.dispose();
         }
-        userActions.dispose();
+        localFeedImporter.dispose();
     }
 
 

@@ -569,7 +569,6 @@
   <string name="discover_more">més »</string>
     <string name="search_powered_by">Resultats per %1$s</string>
   <!--Local feeds-->
-  <string name="add_local_folder">Afegir carpeta local</string>
   <string name="local_folder">Carpeta local</string>
   <string name="reconnect_local_folder">Torna a connectar la carpeta local</string>
   <string name="reconnect_local_folder_warning">En cas de denegació de permisos, pots utilitzar-ho per tornar a connectar a la mateixa carpeta. No seleccionis cap altra carpeta.</string>

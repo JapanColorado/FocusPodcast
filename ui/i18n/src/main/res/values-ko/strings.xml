@@ -505,7 +505,6 @@
   <string name="discover_more">더 보기 »</string>
     <string name="search_powered_by">%1$s 검색 결과</string>
   <!--Local feeds-->
-  <string name="add_local_folder">로컬 폴더 추가</string>
   <string name="local_folder">로컬 폴더</string>
   <string name="reconnect_local_folder">로컬 폴더 다시 연결</string>
   <string name="reconnect_local_folder_warning">권한이 거부된 경우, 이 기능을 사용해 정확히 같은 폴더에 다시 연결할 수 있습니다. 다른 폴더를 선택하지 마십시오.</string>

@@ -573,7 +573,6 @@
   <string name="discover_more">mehr »</string>
     <string name="search_powered_by">Ergebnisse von %1$s</string>
   <!--Local feeds-->
-  <string name="add_local_folder">Lokalen Ordner hinzufügen</string>
   <string name="local_folder">Lokaler Ordner</string>
   <string name="reconnect_local_folder">Lokalen Ordner erneut verbinden</string>
   <string name="reconnect_local_folder_warning">Im Falle von Berechtigungsverweigerungen können Sie hiermit eine erneute Verbindung zu genau demselben Ordner herstellen. Wählen Sie keinen anderen Ordner aus.</string>

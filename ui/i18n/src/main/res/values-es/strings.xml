@@ -571,7 +571,6 @@
   <string name="discover_more">más »</string>
     <string name="search_powered_by">Resultados de %1$s</string>
   <!--Local feeds-->
-  <string name="add_local_folder">Añadir carpeta local</string>
   <string name="local_folder">Carpeta local</string>
   <string name="reconnect_local_folder">Re-conectar carpeta local</string>
   <string name="reconnect_local_folder_warning">En caso de falta de permisos, puedes usar esto para re-conectar la misma carpeta. No selecciones otra carpeta.</string>

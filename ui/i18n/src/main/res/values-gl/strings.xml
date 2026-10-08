@@ -596,7 +596,6 @@
   <string name="discover_more">máis »</string>
     <string name="search_powered_by">Resultados por %1$s</string>
   <!--Local feeds-->
-  <string name="add_local_folder">Engadir cartafol local</string>
   <string name="local_folder">Cartafol local</string>
   <string name="reconnect_local_folder">Reconectar cartafol local</string>
   <string name="reconnect_local_folder_warning">En caso de faltar permisos, podes usar esto para reconectar o exactamente o mesmo cartafol. Non elixas outro cartafol.</string>

@@ -329,8 +329,8 @@ class MainActivity : SimpleToolbarActivity(), OnSharedPreferenceChangeListener {
      * app will handle it. The dispatcher asks the most recently added enabled callback first, so
      * the order is: drawer (enabled while open), player sheet (enabled while expanded), the
      * FragmentManager's own back-stack callback (registered in super.onCreate), [homeCallback]
-     * (back from any other top-level page goes to Subscriptions), and finally [exitCallback] for
-     * the configured root behaviour on Subscriptions. At most one of the last three is enabled.
+     * (back from any other top-level page goes to Library, i.e. [SubFeedsFragment]), and finally [exitCallback] for
+     * the configured root behaviour on Library. At most one of the last three is enabled.
      */
     private fun registerBackCallbacks() {
         onBackPressedDispatcher.addCallback(this, exitCallback)
@@ -345,7 +345,7 @@ class MainActivity : SimpleToolbarActivity(), OnSharedPreferenceChangeListener {
         updateExitCallback()
     }
 
-    /** True when the root page is something other than Subscriptions, so back should go there first. */
+    /** True when the root page is something other than Library ([SubFeedsFragment]), so back should go there first. */
     private fun isAwayFromHome(): Boolean {
         val fm = supportFragmentManager
         if (fm.backStackEntryCount != 0) return false

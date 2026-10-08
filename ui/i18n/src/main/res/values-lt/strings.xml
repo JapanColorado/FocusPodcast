@@ -632,7 +632,6 @@
   <string name="discover_more">daugiau »</string>
     <string name="search_powered_by">Rezultatus pateikė „%1$s“</string>
   <!--Local feeds-->
-  <string name="add_local_folder">Pridėti vietinį aplanką</string>
   <string name="local_folder">Vietinis aplankas</string>
   <string name="reconnect_local_folder">Prijungti vietinį aplanką iš naujo</string>
   <string name="reconnect_local_folder_warning">Atmetus leidimą, galite naudoti tai prijungti tam pačiam aplankui. Nenustatykite kito aplanko.</string>

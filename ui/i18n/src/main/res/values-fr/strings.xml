@@ -596,7 +596,6 @@
   <string name="discover_more">plus »</string>
     <string name="search_powered_by">Résultats de %1$s</string>
   <!--Local feeds-->
-  <string name="add_local_folder">Ajouter un dossier</string>
   <string name="local_folder">Dossier local</string>
   <string name="reconnect_local_folder">Se reconnecter au dossier</string>
   <string name="reconnect_local_folder_warning">En cas de refus de permission vous pouvez utiliser cette option pour vous reconnecter au même dossier. Ne sélectionnez pas un autre dossier.</string>

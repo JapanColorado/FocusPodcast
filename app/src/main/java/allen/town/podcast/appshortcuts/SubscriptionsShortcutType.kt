@@ -17,7 +17,7 @@ class SubscriptionsShortcutType(context: Context) : BaseShortcutType(context) {
         get() = ShortcutInfo.Builder(
             context,
             id
-        ).setShortLabel(context.getString(R.string.subscriptions_label)).setIcon(
+        ).setShortLabel(context.getString(R.string.library_label)).setIcon(
             AppShortcutIconGenerator.generateThemedIcon(
                 context,
                 R.drawable.ic_folder_shortcut

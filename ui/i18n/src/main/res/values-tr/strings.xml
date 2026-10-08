@@ -689,7 +689,6 @@
     <string name="search_powered_by">Sonuçlar %1$s tarafından sağlanmıştır</string>
 
     <!-- Yerel akışlar -->
-    <string name="add_local_folder">Yerel klasör ekle</string>
     <string name="local_folder">Yerel klasör</string>
     <string name="reconnect_local_folder">Yerel klasörü yeniden bağla</string>
     <string name="reconnect_local_folder_warning">İzin reddi durumunda, aynı klasörü yeniden bağlamak için bunu kullanabilirsiniz. Başka bir klasör seçmeyin.</string>

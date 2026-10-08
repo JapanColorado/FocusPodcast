@@ -21,6 +21,14 @@
         android:title="@string/episode_notification"
         app:icon="@drawable/ic_notifications" />
 
+    <allen.town.podcast.common.common.prefs.supportv7.ATESwitchPreference
+        android:defaultValue="false"
+        android:key="audiobook"
+        android:layout="@layout/list_item_view_switch"
+        android:summary="@string/feed_audiobook_summary"
+        android:title="@string/feed_audiobook_title"
+        app:icon="@drawable/ic_audiobook" />
+
     <allen.town.podcast.common.common.prefs.supportv7.ATEPreference
         android:key="tags"
         android:layout="@layout/list_item_view_no_title"

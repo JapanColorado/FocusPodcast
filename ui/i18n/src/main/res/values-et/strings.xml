@@ -555,7 +555,6 @@
   <string name="discover_more">veel »</string>
     <string name="search_powered_by">Tulemused: %1$s</string>
   <!--Local feeds-->
-  <string name="add_local_folder">Lisa kohalik kaust</string>
   <string name="local_folder">Kohalik kaust</string>
   <string name="reconnect_local_folder">Ühenda kohalik kaust uuesti</string>
   <string name="reconnect_local_folder_warning">Ligipääsuõiguste keelamise puhul võid kasutada seda, et täpselt sama kausta uuesti ühendada. Ära valli mõnda teist kausta.</string>
