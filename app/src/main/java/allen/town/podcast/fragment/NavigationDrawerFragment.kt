@@ -9,6 +9,7 @@ import allen.town.podcast.adapter.NavigationListAdapter.ItemAccess
 import allen.town.podcast.appshortcuts.SubscriptionActivityStarter
 import allen.town.podcast.core.pref.Prefs
 import allen.town.podcast.core.storage.DBReader
+import allen.town.podcast.core.storage.FeedKind
 import allen.town.podcast.core.storage.NavDrawerData
 import allen.town.podcast.core.storage.NavDrawerData.*
 import allen.town.podcast.core.util.LottieHelper.getRandomLottieFileName
@@ -306,7 +307,7 @@ class NavigationDrawerFragment : Fragment(), OnSharedPreferenceChangeListener {
 
     private fun loadData() {
         disposable = Observable.fromCallable {
-            val data = DBReader.getNavDrawerData(false)
+            val data = DBReader.getNavDrawerData(false, FeedKind.PODCASTS)
             Pair(data, makeFlatDrawerData(data.items, 0))
         }
             .subscribeOn(Schedulers.io())

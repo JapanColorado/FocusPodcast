@@ -462,7 +462,7 @@ public final class DBTasks {
             // Add a new Feed
             // all new feeds will have the most recent item marked as unplayed
             FeedItem mostRecent = newFeed.getMostRecentItem();
-            if (mostRecent != null) {
+            if (mostRecent != null && !newFeed.isAudiobook()) {
                 mostRecent.setNew();
             }
 
@@ -563,12 +563,25 @@ public final class DBTasks {
                     // (if the most recent date is null then we can assume there are no items
                     // and this is the first, hence 'new')
                     // New items that do not have a pubDate set are always marked as new
-                    if (item.getPubDate() == null || priorMostRecentDate == null
+                    // Audiobook tracks are never NEW: they stay out of the inbox and the
+                    // new-episode notifications and are stored as UNPLAYED.
+                    if (savedFeed.isAudiobook()) {
+                        item.setPlayed(false);
+                    } else if (item.getPubDate() == null || priorMostRecentDate == null
                             || priorMostRecentDate.before(item.getPubDate())
                             || priorMostRecentDate.equals(item.getPubDate())) {
                         Log.d(TAG, "Marking item published on " + item.getPubDate()
                                 + " new, prior most recent date = " + priorMostRecentDate);
                         item.setNew();
+                    }
+                }
+            }
+
+            if (savedFeed.isAudiobook()) {
+                // also covers an existing item that FeedItem.updateFromOther flagged NEW
+                for (FeedItem feedItem : savedFeed.getItems()) {
+                    if (feedItem.isNew()) {
+                        feedItem.setPlayed(false);
                     }
                 }
             }

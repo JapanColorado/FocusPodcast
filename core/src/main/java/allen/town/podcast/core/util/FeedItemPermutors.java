@@ -13,6 +13,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import allen.town.podcast.core.util.comparator.NaturalOrderComparator;
+import allen.town.podcast.model.feed.Feed;
 import allen.town.podcast.model.feed.FeedItem;
 import allen.town.podcast.model.feed.SortOrder;
 
@@ -51,6 +53,12 @@ public class FeedItemPermutors {
             case DURATION_LONG_SHORT:
                 comparator = (f1, f2) -> Integer.compare(duration(f2), duration(f1));
                 break;
+            case TRACK_ORDER:
+                comparator = TRACK_ORDER_COMPARATOR;
+                break;
+            case TRACK_ORDER_REVERSED:
+                comparator = TRACK_ORDER_COMPARATOR.reversed();
+                break;
             case FEED_TITLE_A_Z:
                 comparator = (f1, f2) -> feedTitle(f1).compareTo(feedTitle(f2));
                 break;
@@ -74,6 +82,64 @@ public class FeedItemPermutors {
             permutor = (queue) -> Collections.sort(queue, comparator2);
         }
         return permutor;
+    }
+
+    /**
+     * Book order, see {@link SortOrder#TRACK_ORDER}: disc number, then the folder the file is in,
+     * then track number, then the natural order of the relative path, then the id. An unknown (0)
+     * disc or track number sorts after every known one, which keeps the order transitive when only
+     * some files are tagged. The folder step keeps "CD1/" and "CD2/" apart when the files carry
+     * per-disc track numbers but no disc tag. Items that are not from a local feed have no
+     * relative path and use their title instead.
+     */
+    public static final Comparator<FeedItem> TRACK_ORDER_COMPARATOR = (f1, f2) -> {
+        int result = Integer.compare(knownFirst(f1.getDiscNumber()), knownFirst(f2.getDiscNumber()));
+        if (result != 0) {
+            return result;
+        }
+        String path1 = trackPath(f1);
+        String path2 = trackPath(f2);
+        result = NaturalOrderComparator.INSTANCE.compare(parentOf(f1, path1), parentOf(f2, path2));
+        if (result != 0) {
+            return result;
+        }
+        result = Integer.compare(knownFirst(f1.getTrackNumber()), knownFirst(f2.getTrackNumber()));
+        if (result != 0) {
+            return result;
+        }
+        result = NaturalOrderComparator.INSTANCE.compare(path1, path2);
+        if (result != 0) {
+            return result;
+        }
+        return Long.compare(f1.getId(), f2.getId());
+    };
+
+    private static int knownFirst(int number) {
+        return number > 0 ? number : Integer.MAX_VALUE;
+    }
+
+    private static boolean isLocal(@NonNull FeedItem item) {
+        Feed feed = item.getFeed();
+        return feed != null && feed.isLocalFeed();
+    }
+
+    /** The relative path of a local file (stored as the item's link), else the title. */
+    @NonNull
+    private static String trackPath(@NonNull FeedItem item) {
+        String value = isLocal(item) ? item.getLink() : item.getTitle();
+        if (value == null) {
+            value = item.getTitle();
+        }
+        return value != null ? value : "";
+    }
+
+    @NonNull
+    private static String parentOf(@NonNull FeedItem item, @NonNull String path) {
+        if (!isLocal(item)) {
+            return "";
+        }
+        int slash = path.lastIndexOf('/');
+        return slash > 0 ? path.substring(0, slash) : "";
     }
 
     // Null-safe accessors

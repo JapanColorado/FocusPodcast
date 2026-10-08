@@ -86,6 +86,9 @@ public abstract class FeedPreferencesCursorMapper {
                 showNotification,
                 new HashSet<>(Arrays.asList(tagsString.split(FeedPreferences.TAG_SEPARATOR))),skipSilence,loudness,mono,isUseFeedEffect);
         preferences.setAdSkipOverride(adSkipOverride);
+        // Version 7 column; a projection without it reads "not an audiobook".
+        int indexAudiobook = cursor.getColumnIndex(Db.KEY_AUDIOBOOK);
+        preferences.setAudiobook(indexAudiobook >= 0 && cursor.getInt(indexAudiobook) > 0);
         return preferences;
     }
 }

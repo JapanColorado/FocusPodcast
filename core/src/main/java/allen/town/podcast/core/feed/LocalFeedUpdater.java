@@ -17,10 +17,13 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
@@ -29,29 +32,44 @@ import allen.town.podcast.model.download.DownloadStatus;
 import allen.town.podcast.core.storage.DBReader;
 import allen.town.podcast.core.storage.DBTasks;
 import allen.town.podcast.core.storage.DBWriter;
+import allen.town.podcast.core.util.FeedItemPermutors;
+import allen.town.podcast.core.util.comparator.NaturalOrderComparator;
 import allen.town.podcast.parser.feed.util.DateUtils;
 import allen.town.podcast.model.download.DownloadError;
 import allen.town.podcast.model.feed.Feed;
 import allen.town.podcast.model.feed.FeedItem;
 import allen.town.podcast.model.feed.FeedMedia;
 import allen.town.podcast.model.feed.FeedPreferences;
-import allen.town.podcast.model.playback.MediaType;
 import allen.town.podcast.parser.feed.util.MimeTypeUtils;
 import allen.town.podcast.parser.media.id3.ID3ReaderException;
 import allen.town.podcast.parser.media.id3.Id3MetadataReader;
 import allen.town.podcast.parser.media.vorbis.VorbisCommentMetadataReader;
 import allen.town.podcast.parser.media.vorbis.VorbisCommentReaderException;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.input.CountingInputStream;
 
 public class LocalFeedUpdater {
     private static final String TAG = "LocalFeedUpdater";
 
-    static final String[] PREFERRED_FEED_IMAGE_FILENAMES = { "folder.jpg", "Folder.jpg", "folder.png", "Folder.png" };
+    /**
+     * File names (compared case-insensitively) that are used as the cover of a folder feed, in
+     * order of preference.
+     */
+    static final String[] PREFERRED_FEED_IMAGE_FILENAMES = {
+            "folder.jpg", "folder.jpeg", "folder.png", "folder.webp",
+            "cover.jpg", "cover.jpeg", "cover.png", "cover.webp",
+            "front.jpg", "front.jpeg", "front.png",
+            "albumart.jpg", "album.jpg", "album.png",
+    };
 
     public static void updateFeed(Feed feed, Context context,
                                   @Nullable UpdaterProgressListener updaterProgressListener) {
         try {
-            tryUpdateFeed(feed, context, updaterProgressListener);
+            if (feed.isLocalFileFeed()) {
+                tryUpdateFileFeed(feed, context, updaterProgressListener);
+            } else {
+                tryUpdateFolderFeed(feed, context, updaterProgressListener);
+            }
 
             if (mustReportDownloadSuccessful(feed)) {
                 reportSuccess(feed);
@@ -64,10 +82,11 @@ public class LocalFeedUpdater {
         }
     }
 
-    private static void tryUpdateFeed(Feed feed, Context context, UpdaterProgressListener updaterProgressListener)
+    private static void tryUpdateFolderFeed(Feed feed, Context context,
+                                            @Nullable UpdaterProgressListener updaterProgressListener)
             throws IOException {
-        String uriString = feed.getDownload_url().replace(Feed.PREFIX_LOCAL_FOLDER, "");
-        DocumentFile documentFolder = DocumentFile.fromTreeUri(context, Uri.parse(uriString));
+        Uri treeUri = Uri.parse(feed.getDownload_url().substring(Feed.PREFIX_LOCAL_FOLDER.length()));
+        DocumentFile documentFolder = DocumentFile.fromTreeUri(context, treeUri);
         if (documentFolder == null) {
             throw new IOException("Unable to retrieve document tree. "
                     + "Try re-connecting the folder on the podcast info page.");
@@ -83,28 +102,124 @@ public class LocalFeedUpdater {
         //make sure it is the latest 'version' of this feed from the db (all items etc)
         feed = DBTasks.updateFeed(context, feed, false);
 
-        // list files in feed folder
-        List<DocumentFile> mediaFiles = new ArrayList<>();
-        Set<String> mediaFileNames = new HashSet<>();
-        for (DocumentFile file : documentFolder.listFiles()) {
-            String mimeType = MimeTypeUtils.getMimeType(file.getType(), file.getUri().toString());
-            MediaType mediaType = MediaType.fromMimeType(mimeType);
-            if (mediaType == MediaType.AUDIO || mediaType == MediaType.VIDEO) {
-                mediaFiles.add(file);
-                mediaFileNames.add(file.getName());
+        LocalFolderScanner.Result scan = LocalFolderScanner.scan(context, treeUri);
+        TagTally tally = new TagTally();
+        boolean everyItemRead = mergeFiles(feed, scan.mediaFiles, context, tally, updaterProgressListener);
+
+        List<FeedItem> items = feed.getItems();
+        feed.setImageUrl(getImageUrl(scan.imageFiles, items,
+                Feed.PREFIX_GENERATIVE_COVER + documentFolder.getUri()));
+
+        feed.getPreferences().setAutoDownload(false);
+        feed.getPreferences().setAutoDeleteAction(FeedPreferences.AutoDeleteAction.NO);
+        feed.setDescription(context.getString(R.string.local_feed_description));
+        if (everyItemRead) {
+            // Only when every file's tags were read in this pass (the first scan, or after all
+            // files changed): a partial pass would vote on a few files only. A user's rename is
+            // a custom title and always wins over this.
+            String album = tally.mostCommonAlbum();
+            if (album != null) {
+                feed.setTitle(album);
             }
+            String artist = tally.mostCommonArtist();
+            feed.setAuthor(artist != null ? artist : context.getString(R.string.local_folder));
+        } else if (feed.getAuthor() == null) {
+            feed.setAuthor(context.getString(R.string.local_folder));
         }
 
-        // add new files to feed and update item data
-        List<FeedItem> newItems = feed.getItems();
+        // update items, delete items without existing file;
+        // only delete items if the folder contains at least one element to avoid accidentally
+        // deleting played state or position in case the folder is temporarily unavailable.
+        // A truncated scan is not exhaustive either.
+        boolean removeUnlistedItems = !items.isEmpty() && !scan.truncated;
+        DBTasks.updateFeed(context, feed, removeUnlistedItems);
+    }
+
+    /**
+     * A feed made from one file, usually a whole audiobook (.m4b): one item, metadata from the
+     * file's tags.
+     */
+    private static void tryUpdateFileFeed(Feed feed, Context context,
+                                          @Nullable UpdaterProgressListener updaterProgressListener)
+            throws IOException {
+        Uri documentUri = Uri.parse(feed.getDownload_url().substring(Feed.PREFIX_LOCAL_FILE.length()));
+        DocumentFile document = DocumentFile.fromSingleUri(context, documentUri);
+        if (document == null || !document.exists() || !document.canRead()) {
+            throw new IOException("Cannot read the local file. Try adding it again.");
+        }
+        String name = document.getName() != null ? document.getName() : documentUri.getLastPathSegment();
+        if (name == null) {
+            name = "";
+        }
+        LocalFolderScanner.LocalFile file = new LocalFolderScanner.LocalFile(documentUri, name, name,
+                MimeTypeUtils.getMimeType(document.getType(), name), document.length(),
+                document.lastModified(), 0);
+
+        if (feed.getItems() == null) {
+            feed.setItems(new ArrayList<>());
+        }
+        feed = DBTasks.updateFeed(context, feed, false);
+
+        TagTally tally = new TagTally();
+        boolean everyItemRead = mergeFiles(feed, Collections.singletonList(file), context, tally,
+                updaterProgressListener);
+
+        List<FeedItem> items = feed.getItems();
+        feed.setImageUrl(getImageUrl(Collections.emptyList(), items,
+                Feed.PREFIX_GENERATIVE_COVER + documentUri));
+        feed.getPreferences().setAutoDownload(false);
+        feed.getPreferences().setAutoDeleteAction(FeedPreferences.AutoDeleteAction.NO);
+        feed.setDescription(context.getString(R.string.local_file_feed_description));
+        if (everyItemRead) {
+            String album = tally.mostCommonAlbum();
+            if (album != null) {
+                feed.setTitle(album);
+            } else if (!items.isEmpty() && !TextUtils.isEmpty(items.get(0).getTitle())) {
+                feed.setTitle(items.get(0).getTitle());
+            }
+            String artist = tally.mostCommonArtist();
+            feed.setAuthor(artist != null ? artist : context.getString(R.string.local_file));
+        } else if (feed.getAuthor() == null) {
+            feed.setAuthor(context.getString(R.string.local_file));
+        }
+        DBTasks.updateFeed(context, feed, !items.isEmpty());
+    }
+
+    /**
+     * Adds an item for every new file, re-reads the tags of files whose size changed and drops
+     * items whose file is gone (from {@code feed.getItems()}; the database is updated by the
+     * caller). Items are identified by their relative path, stored as the item's link. Rows
+     * written before subfolders were scanned hold the bare file name, which is the relative path
+     * of a file at the top of the folder, so they keep their played state and position.
+     *
+     * @return true if the tags of every remaining item were read in this pass
+     */
+    private static boolean mergeFiles(Feed feed, List<LocalFolderScanner.LocalFile> mediaFiles,
+                                      Context context, TagTally tally,
+                                      @Nullable UpdaterProgressListener updaterProgressListener) {
+        List<FeedItem> items = feed.getItems();
+        Map<String, FeedItem> byPath = new HashMap<>();
+        for (FeedItem item : items) {
+            if (item.getMedia() != null && item.getLink() != null) {
+                byPath.put(item.getLink(), item);
+            }
+        }
+        Set<String> paths = new HashSet<>();
+        boolean everyItemRead = true;
         for (int i = 0; i < mediaFiles.size(); i++) {
-            FeedItem oldItem = feedContainsFile(feed, mediaFiles.get(i).getName());
+            LocalFolderScanner.LocalFile file = mediaFiles.get(i);
+            paths.add(file.relativePath);
+            FeedItem oldItem = byPath.get(file.relativePath);
             if (oldItem == null) {
-                newItems.add(createFeedItem(feed, mediaFiles.get(i), context));
-            } else if (oldItem.getMedia() != null && oldItem.getMedia().getSize() != mediaFiles.get(i).length()) {
+                FeedItem newItem = createFeedItem(feed, file, context, tally);
+                items.add(newItem);
+                byPath.put(file.relativePath, newItem);
+            } else if (oldItem.getMedia() != null && oldItem.getMedia().getSize() != file.size) {
                 // file content changed: re-read metadata; unchanged files are left alone so a
                 // refresh does not parse every file in the folder again
-                oldItem.updateFromOther(createFeedItem(feed, mediaFiles.get(i), context));
+                oldItem.updateFromOther(createFeedItem(feed, file, context, tally));
+            } else {
+                everyItemRead = false;
             }
             if (updaterProgressListener != null) {
                 updaterProgressListener.onLocalFileScanned(i, mediaFiles.size());
@@ -112,75 +227,91 @@ public class LocalFeedUpdater {
         }
 
         // remove feed items without corresponding file
-        Iterator<FeedItem> it = newItems.iterator();
+        Iterator<FeedItem> it = items.iterator();
         while (it.hasNext()) {
-            FeedItem feedItem = it.next();
-            if (!mediaFileNames.contains(feedItem.getLink())) {
+            if (!paths.contains(it.next().getLink())) {
                 it.remove();
             }
         }
-
-        feed.setImageUrl(getImageUrl(documentFolder));
-
-        feed.getPreferences().setAutoDownload(false);
-        feed.getPreferences().setAutoDeleteAction(FeedPreferences.AutoDeleteAction.NO);
-        feed.setDescription(context.getString(R.string.local_feed_description));
-        feed.setAuthor(context.getString(R.string.local_folder));
-
-        // update items, delete items without existing file;
-        // only delete items if the folder contains at least one element to avoid accidentally
-        // deleting played state or position in case the folder is temporarily unavailable.
-        boolean removeUnlistedItems = (newItems.size() >= 1);
-        DBTasks.updateFeed(context, feed, removeUnlistedItems);
+        return everyItemRead;
     }
 
     /**
-     * Returns the image URL for the local feed.
+     * Returns the image URL for a local feed: a cover file (see
+     * {@link #PREFERRED_FEED_IMAGE_FILENAMES}) closest to the top of the folder, else the first
+     * image file closest to the top, else the embedded picture of the first track in track order,
+     * else {@code fallback} (a generated cover).
      */
     @NonNull
-    static String getImageUrl(@NonNull DocumentFile documentFolder) {
-        // look for special file names
-        for (String iconLocation : PREFERRED_FEED_IMAGE_FILENAMES) {
-            DocumentFile image = documentFolder.findFile(iconLocation);
-            if (image != null) {
-                return image.getUri().toString();
+    static String getImageUrl(@NonNull List<LocalFolderScanner.LocalFile> images,
+                              @NonNull List<FeedItem> items, @NonNull String fallback) {
+        LocalFolderScanner.LocalFile best = null;
+        int bestRank = Integer.MAX_VALUE;
+        for (LocalFolderScanner.LocalFile image : images) {
+            int preference = preferredImageIndex(image.name);
+            if (preference < 0) {
+                continue;
+            }
+            int rank = image.depth * PREFERRED_FEED_IMAGE_FILENAMES.length + preference;
+            if (rank < bestRank) {
+                best = image;
+                bestRank = rank;
             }
         }
-
-        // use the first image in the folder if existing
-        for (DocumentFile file : documentFolder.listFiles()) {
-            String mime = file.getType();
-            if (mime != null && (mime.startsWith("image/jpeg") || mime.startsWith("image/png"))) {
-                return file.getUri().toString();
+        if (best == null) {
+            for (LocalFolderScanner.LocalFile image : images) {
+                if (!isCoverFormat(image.mimeType)) {
+                    continue;
+                }
+                if (best == null || image.depth < best.depth || (image.depth == best.depth
+                        && NaturalOrderComparator.INSTANCE.compare(image.relativePath, best.relativePath) < 0)) {
+                    best = image;
+                }
             }
         }
+        if (best != null) {
+            return best.uri.toString();
+        }
 
-        // use default icon as fallback
-        return Feed.PREFIX_GENERATIVE_COVER + documentFolder.getUri();
+        List<FeedItem> sorted = new ArrayList<>(items);
+        sorted.sort(FeedItemPermutors.TRACK_ORDER_COMPARATOR);
+        if (!sorted.isEmpty()) {
+            FeedMedia first = sorted.get(0).getMedia();
+            if (first != null && first.getLocalMediaUrl() != null && first.hasEmbeddedPicture()) {
+                // MetadataRetrieverLoader (Glide) reads the picture out of the file
+                return FeedMedia.FILENAME_PREFIX_EMBEDDED_COVER + first.getLocalMediaUrl();
+            }
+        }
+        return fallback;
     }
 
-    private static FeedItem feedContainsFile(Feed feed, String filename) {
-        List<FeedItem> items = feed.getItems();
-        for (FeedItem i : items) {
-            if (i.getMedia() != null && i.getLink().equals(filename)) {
+    private static int preferredImageIndex(String name) {
+        for (int i = 0; i < PREFERRED_FEED_IMAGE_FILENAMES.length; i++) {
+            if (PREFERRED_FEED_IMAGE_FILENAMES[i].equalsIgnoreCase(name)) {
                 return i;
             }
         }
-        return null;
+        return -1;
     }
 
-    private static FeedItem createFeedItem(Feed feed, DocumentFile file, Context context) {
-        FeedItem item = new FeedItem(0, file.getName(), UUID.randomUUID().toString(),
-                file.getName(), new Date(file.lastModified()), FeedItem.UNPLAYED, feed);
+    private static boolean isCoverFormat(@Nullable String mime) {
+        return mime != null && (mime.startsWith("image/jpeg") || mime.startsWith("image/png")
+                || mime.startsWith("image/webp"));
+    }
+
+    private static FeedItem createFeedItem(Feed feed, LocalFolderScanner.LocalFile file, Context context,
+                                           TagTally tally) {
+        FeedItem item = new FeedItem(0, FilenameUtils.getBaseName(file.name), UUID.randomUUID().toString(),
+                file.relativePath, new Date(file.lastModified), FeedItem.UNPLAYED, feed);
         item.disableAutoDownload();
 
-        long size = file.length();
-        FeedMedia media = new FeedMedia(0, item, 0, 0, size, file.getType(),
-                file.getUri().toString(), file.getUri().toString(), false, null, 0, 0);
+        String uri = file.uri.toString();
+        FeedMedia media = new FeedMedia(0, item, 0, 0, file.size, file.mimeType,
+                uri, uri, false, null, 0, 0);
         item.setMedia(media);
 
         try {
-            loadMetadata(item, file, context);
+            loadMetadata(item, file.uri, context, tally);
         } catch (Exception e) {
             item.setDescriptionIfLonger(e.getMessage());
         }
@@ -188,10 +319,10 @@ public class LocalFeedUpdater {
         return item;
     }
 
-    private static void loadMetadata(FeedItem item, DocumentFile file, Context context) {
+    private static void loadMetadata(FeedItem item, Uri uri, Context context, TagTally tally) {
         MediaMetadataRetriever mediaMetadataRetriever = new MediaMetadataRetriever();
         try {
-            loadMetadata(item, file, context, mediaMetadataRetriever);
+            loadMetadata(item, uri, context, mediaMetadataRetriever, tally);
         } finally {
             // native resource, must be released explicitly
             try {
@@ -202,9 +333,9 @@ public class LocalFeedUpdater {
         }
     }
 
-    private static void loadMetadata(FeedItem item, DocumentFile file, Context context,
-                                     MediaMetadataRetriever mediaMetadataRetriever) {
-        mediaMetadataRetriever.setDataSource(context, file.getUri());
+    private static void loadMetadata(FeedItem item, Uri uri, Context context,
+                                     MediaMetadataRetriever mediaMetadataRetriever, TagTally tally) {
+        mediaMetadataRetriever.setDataSource(context, uri);
 
         String dateStr = mediaMetadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DATE);
         if (!TextUtils.isEmpty(dateStr) && !"19040101T000000.000Z".equals(dateStr)) {
@@ -229,22 +360,101 @@ public class LocalFeedUpdater {
             item.getMedia().setDuration((int) Long.parseLong(durationStr));
         }
 
+        item.setTrackNumber(parseLeadingNumber(
+                mediaMetadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_CD_TRACK_NUMBER)));
+        item.setDiscNumber(parseLeadingNumber(
+                mediaMetadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DISC_NUMBER)));
+        tally.addAlbum(mediaMetadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ALBUM));
+        String albumArtist = mediaMetadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ALBUMARTIST);
+        tally.addArtist(!TextUtils.isEmpty(albumArtist) ? albumArtist
+                : mediaMetadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ARTIST));
+
         item.getMedia().setHasEmbeddedPicture(mediaMetadataRetriever.getEmbeddedPicture() != null);
 
-        try (InputStream inputStream = context.getContentResolver().openInputStream(file.getUri())) {
+        try (InputStream inputStream = context.getContentResolver().openInputStream(uri)) {
             Id3MetadataReader reader = new Id3MetadataReader(new CountingInputStream(inputStream));
             reader.readInputStream();
             item.setDescriptionIfLonger(reader.getComment());
         } catch (IOException | ID3ReaderException e) {
-            Log.w(TAG, "unable to parse ID3  " + file.getUri() + ": " + e.getMessage());
+            Log.w(TAG, "unable to parse ID3  " + uri + ": " + e.getMessage());
 
-            try (InputStream inputStream = context.getContentResolver().openInputStream(file.getUri())) {
+            try (InputStream inputStream = context.getContentResolver().openInputStream(uri)) {
                 VorbisCommentMetadataReader reader = new VorbisCommentMetadataReader(inputStream);
                 reader.readInputStream();
                 item.setDescriptionIfLonger(reader.getDescription());
             } catch (IOException | VorbisCommentReaderException e2) {
-                Log.w(TAG, "unable to parse vorbis comments  " + file.getUri() + ": " + e2.getMessage());
+                Log.w(TAG, "unable to parse vorbis comments  " + uri + ": " + e2.getMessage());
             }
+        }
+    }
+
+    /**
+     * Parses the number at the start of a track or disc tag such as "3", "03" or "3/12";
+     * 0 when there is none.
+     */
+    static int parseLeadingNumber(@Nullable String value) {
+        if (value == null) {
+            return 0;
+        }
+        String trimmed = value.trim();
+        int end = 0;
+        while (end < trimmed.length() && end < 9 && Character.isDigit(trimmed.charAt(end))) {
+            end++;
+        }
+        if (end == 0) {
+            return 0;
+        }
+        try {
+            return Integer.parseInt(trimmed.substring(0, end));
+        } catch (NumberFormatException e) {
+            return 0;
+        }
+    }
+
+    /** Counts album and artist tags across the files of one scan to pick the feed's metadata. */
+    static final class TagTally {
+        private final Map<String, Integer> albums = new LinkedHashMap<>();
+        private final Map<String, Integer> artists = new LinkedHashMap<>();
+
+        void addAlbum(@Nullable String album) {
+            add(albums, album);
+        }
+
+        void addArtist(@Nullable String artist) {
+            add(artists, artist);
+        }
+
+        @Nullable
+        String mostCommonAlbum() {
+            return mostCommon(albums);
+        }
+
+        @Nullable
+        String mostCommonArtist() {
+            return mostCommon(artists);
+        }
+
+        private static void add(Map<String, Integer> counts, @Nullable String value) {
+            if (value == null || value.trim().isEmpty()) {
+                return;
+            }
+            String key = value.trim();
+            Integer count = counts.get(key);
+            counts.put(key, count == null ? 1 : count + 1);
+        }
+
+        /** The most frequent value; the first one seen wins a tie. */
+        @Nullable
+        private static String mostCommon(Map<String, Integer> counts) {
+            String best = null;
+            int bestCount = 0;
+            for (Map.Entry<String, Integer> entry : counts.entrySet()) {
+                if (entry.getValue() > bestCount) {
+                    best = entry.getKey();
+                    bestCount = entry.getValue();
+                }
+            }
+            return best;
         }
     }
 

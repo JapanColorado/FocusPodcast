@@ -555,4 +555,7 @@
   <plurals name="delete_played_confirm">
     <item quantity="other">再生済みのエピソード %1$d 件を削除しますか？(%2$s)</item>
   </plurals>
+  <string name="local_file">ローカルファイル</string>
+  <string name="local_file_feed_description">この仮想ポッドキャストはファイルを FocusPodcast に追加して作成されました。</string>
+  <string name="sort_track_order">トラック順</string>
 </resources>

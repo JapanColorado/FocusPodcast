@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 
 import allen.town.podcast.core.feed.SubscriptionsFilter;
+import allen.town.podcast.core.feed.util.AudiobookUtils;
 import allen.town.podcast.core.pref.Prefs;
 import allen.town.podcast.core.util.LongList;
 import allen.town.podcast.core.util.comparator.DownloadStatusComparator;
@@ -24,6 +25,7 @@ import allen.town.podcast.core.util.comparator.FeedItemPubdateComparator;
 import allen.town.podcast.core.util.comparator.PlaybackCompletionDateComparator;
 import allen.town.podcast.model.download.DownloadStatus;
 import allen.town.podcast.model.feed.AdSegment;
+import allen.town.podcast.model.feed.AudiobookProgress;
 import allen.town.podcast.model.feed.Chapter;
 import allen.town.podcast.model.feed.Feed;
 import allen.town.podcast.model.feed.FeedItem;
@@ -127,7 +129,7 @@ public final class DBReader {
             List<String> result = new ArrayList<>(cursor.getCount());
             while (cursor.moveToNext()) {
                 String url = cursor.getString(1);
-                if (url != null && !url.startsWith(Feed.PREFIX_LOCAL_FOLDER)) {
+                if (url != null && !Feed.isLocalFeedUrl(url)) {
                     result.add(url);
                 }
             }
@@ -1059,16 +1061,39 @@ public final class DBReader {
      * the list of subscriptions, the number of items in the queue and the number of unread
      * items.
      *
+     * Same as {@link #getNavDrawerData(boolean, FeedKind)} with {@link FeedKind#ALL}: podcasts and
+     * audiobooks together.
+     *
      * @param includeNoTags true returns all feeds, false returns only the ones that have a tag
      */
     @NonNull
     public static NavDrawerData getNavDrawerData(boolean includeNoTags) {
+        return getNavDrawerData(includeNoTags, FeedKind.ALL);
+    }
+
+    /**
+     * Returns data necessary for displaying the navigation drawer or a subscriptions grid, limited
+     * to one kind of feed: the Subscriptions page and the drawer show {@link FeedKind#PODCASTS},
+     * the audiobook shelf shows {@link FeedKind#AUDIOBOOKS}. The queue, new and downloaded
+     * counters are global and do not depend on {@code kind}.
+     *
+     * @param includeNoTags true returns all feeds, false returns only the ones that have a tag
+     * @param kind          which feeds to include
+     */
+    @NonNull
+    public static NavDrawerData getNavDrawerData(boolean includeNoTags, @NonNull FeedKind kind) {
         Db adapter = Db.getInstance();
         adapter.open();
 
         final LongIntMap feedCounters = adapter.getFeedCounters(Prefs.getFeedCounterSetting());
         SubscriptionsFilter subscriptionsFilter = Prefs.getSubscriptionsFilter();
-        List<Feed> feeds = subscriptionsFilter.filter(getFeedList(adapter), feedCounters);
+        List<Feed> ofKind = new ArrayList<>();
+        for (Feed feed : getFeedList(adapter)) {
+            if (kind.matches(feed)) {
+                ofKind.add(feed);
+            }
+        }
+        List<Feed> feeds = subscriptionsFilter.filter(ofKind, feedCounters);
 
         Comparator<Feed> comparator;
         int feedOrder = Prefs.getFeedOrder();
@@ -1168,6 +1193,66 @@ public final class DBReader {
                 feedCounters, Prefs.getEpisodeCleanupAlgorithm().getReclaimableItems());
         adapter.close();
         return result;
+    }
+
+    /**
+     * Subscribed audiobook feeds, sorted by title, with their preferences loaded (their items are
+     * not loaded).
+     */
+    @NonNull
+    public static List<Feed> getAudiobookFeeds() {
+        Db adapter = Db.getInstance();
+        adapter.open();
+        try {
+            List<Feed> result = new ArrayList<>();
+            for (Feed feed : getFeedList(adapter)) {
+                if (feed.isAudiobook()) {
+                    result.add(feed);
+                }
+            }
+            return result;
+        } finally {
+            adapter.close();
+        }
+    }
+
+    /**
+     * Progress of every subscribed audiobook, keyed by feed id. Reads all tracks of all audiobooks
+     * in one query and computes the totals in memory ({@link AudiobookUtils#computeProgress}).
+     * A book without tracks has no entry. The resume item of each entry has its media and feed set.
+     * Must not run on the main thread.
+     */
+    @NonNull
+    public static Map<Long, AudiobookProgress> getAudiobookProgress() {
+        Db adapter = Db.getInstance();
+        adapter.open();
+        try {
+            List<FeedItem> items;
+            try (Cursor cursor = adapter.getAudiobookItemsCursor()) {
+                items = extractItemlistFromCursor(adapter, cursor);
+            }
+            Map<Long, Feed> feeds = new HashMap<>();
+            for (Feed feed : getFeedList(adapter)) {
+                feeds.put(feed.getId(), feed);
+            }
+            Map<Long, List<FeedItem>> byFeed = new HashMap<>();
+            for (FeedItem item : items) {
+                item.setFeed(feeds.get(item.getFeedId()));
+                List<FeedItem> list = byFeed.get(item.getFeedId());
+                if (list == null) {
+                    list = new ArrayList<>();
+                    byFeed.put(item.getFeedId(), list);
+                }
+                list.add(item);
+            }
+            Map<Long, AudiobookProgress> result = new HashMap<>();
+            for (Map.Entry<Long, List<FeedItem>> entry : byFeed.entrySet()) {
+                result.put(entry.getKey(), AudiobookUtils.computeProgress(entry.getKey(), entry.getValue()));
+            }
+            return result;
+        } finally {
+            adapter.close();
+        }
     }
 
     /**

@@ -42,7 +42,17 @@ public abstract class FeedItemCursorMapper {
         String imageUrl = cursor.getString(indexImageUrl);
         String podcastIndexChapterUrl = cursor.getString(indexPodcastIndexChapterUrl);
 
-        return new FeedItem(id, title, link, pubDate, paymentLink, feedId,
+        FeedItem item = new FeedItem(id, title, link, pubDate, paymentLink, feedId,
                 hasChapters, imageUrl, state, itemIdentifier, autoDownload, podcastIndexChapterUrl);
+        // Version 7 columns; projections that do not select them leave the numbers unknown (0).
+        int indexDisc = cursor.getColumnIndex(Db.KEY_DISC_NUMBER);
+        if (indexDisc >= 0) {
+            item.setDiscNumber(cursor.getInt(indexDisc));
+        }
+        int indexTrack = cursor.getColumnIndex(Db.KEY_TRACK_NUMBER);
+        if (indexTrack >= 0) {
+            item.setTrackNumber(cursor.getInt(indexTrack));
+        }
+        return item;
     }
 }

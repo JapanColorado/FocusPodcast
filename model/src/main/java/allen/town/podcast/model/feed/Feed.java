@@ -20,7 +20,13 @@ public class Feed extends FeedFile implements Parcelable {
     public static final int FEEDFILETYPE_FEED = 0;
     public static final String TYPE_RSS2 = "rss";
     public static final String TYPE_ATOM1 = "atom";
+    /** Download-URL prefix of a feed made from a folder picked with the storage access framework. */
     public static final String PREFIX_LOCAL_FOLDER = "FocusPodcastLocal:";
+    /**
+     * Download-URL prefix of a feed made from one single file (typically an .m4b audiobook) picked
+     * with the storage access framework. Note that it does not start with {@link #PREFIX_LOCAL_FOLDER}.
+     */
+    public static final String PREFIX_LOCAL_FILE = "FocusPodcastLocalFile:";
     public static final String PREFIX_GENERATIVE_COVER = "FocusPodcastLocalGenCover:";
 
     /**
@@ -550,8 +556,36 @@ public class Feed extends FeedFile implements Parcelable {
         this.lastUpdateFailed = lastUpdateFailed;
     }
 
+    /**
+     * True for every feed backed by the device's own storage instead of an RSS URL: a local folder
+     * ({@link #PREFIX_LOCAL_FOLDER}) or a single local file ({@link #PREFIX_LOCAL_FILE}).
+     */
     public boolean isLocalFeed() {
-        return !TextUtils.isEmpty(download_url) && download_url.startsWith(PREFIX_LOCAL_FOLDER);
+        return isLocalFeedUrl(download_url);
+    }
+
+    /** True if the feed was made from a local folder. */
+    public boolean isLocalFolderFeed() {
+        return download_url != null && download_url.startsWith(PREFIX_LOCAL_FOLDER);
+    }
+
+    /** True if the feed was made from one single local file. */
+    public boolean isLocalFileFeed() {
+        return download_url != null && download_url.startsWith(PREFIX_LOCAL_FILE);
+    }
+
+    /** Whether a feed download URL points at local storage (folder or single file). */
+    public static boolean isLocalFeedUrl(@Nullable String downloadUrl) {
+        return downloadUrl != null
+                && (downloadUrl.startsWith(PREFIX_LOCAL_FOLDER) || downloadUrl.startsWith(PREFIX_LOCAL_FILE));
+    }
+
+    /**
+     * True if the user marked this feed as an audiobook ({@link FeedPreferences#isAudiobook()}).
+     * False when the preferences have not been loaded.
+     */
+    public boolean isAudiobook() {
+        return preferences != null && preferences.isAudiobook();
     }
 
     private boolean isSubscribed = false;

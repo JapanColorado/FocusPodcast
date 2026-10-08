@@ -2,6 +2,7 @@ package allen.town.podcast.core.storage;
 
 import android.app.backup.BackupManager;
 import android.content.Context;
+import android.database.Cursor;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -53,6 +54,7 @@ import allen.town.podcast.model.feed.FeedPreferences;
 import allen.town.podcast.model.feed.SortOrder;
 import allen.town.podcast.model.playback.Playable;
 import allen.town.podcast.storage.db.Db;
+import allen.town.podcast.storage.db.mapper.FeedCursorMapper;
 import allen.town.podcast.sync.model.EpisodeAction;
 
 /**
@@ -1053,6 +1055,55 @@ public class DBWriter {
             EventBus.getDefault().post(new FeedListUpdateEvent(feedId));
             if (afterWrite != null) {
                 EventBus.getDefault().post(afterWrite);
+            }
+        });
+    }
+
+    /**
+     * Marks a feed as an audiobook or back as a podcast (read-modify-write of the stored
+     * preferences, so nothing else is overwritten). Turning it on also
+     * <ul>
+     *     <li>sets the feed's sort order to {@link SortOrder#TRACK_ORDER} if the user never chose
+     *     one (a chosen order is kept), and</li>
+     *     <li>turns the feed's NEW items into UNPLAYED ones, since audiobooks have no inbox.</li>
+     * </ul>
+     * Posts {@link FeedListUpdateEvent} (subscription lists and the drawer reload),
+     * {@link UnreadItemsUpdateEvent} and, if the sort order changed, a
+     * {@link FeedEvent.Action#SORT_ORDER_CHANGED} event.
+     */
+    public static Future<?> setFeedAudiobook(final long feedId, final boolean audiobook) {
+        return dbExec.submit(() -> {
+            FeedPreferences stored = DBReader.getFeedPreferences(feedId);
+            if (stored == null) {
+                Log.w(TAG, "setFeedAudiobook: feed " + feedId + " has no preferences");
+                return;
+            }
+            stored.setAudiobook(audiobook);
+            boolean sortChanged = false;
+            Db adapter = Db.getInstance();
+            adapter.open();
+            try {
+                adapter.setFeedPreferences(stored);
+                if (audiobook) {
+                    SortOrder current = null;
+                    try (Cursor cursor = adapter.getFeedCursor(feedId)) {
+                        if (cursor.moveToFirst()) {
+                            current = FeedCursorMapper.convert(cursor).getSortOrder();
+                        }
+                    }
+                    if (current == null) {
+                        adapter.setFeedItemSortOrder(feedId, SortOrder.TRACK_ORDER);
+                        sortChanged = true;
+                    }
+                    adapter.setFeedItems(FeedItem.NEW, FeedItem.UNPLAYED, feedId);
+                }
+            } finally {
+                adapter.close();
+            }
+            EventBus.getDefault().post(new FeedListUpdateEvent(feedId));
+            EventBus.getDefault().post(new UnreadItemsUpdateEvent());
+            if (sortChanged) {
+                EventBus.getDefault().post(new FeedEvent(FeedEvent.Action.SORT_ORDER_CHANGED, feedId));
             }
         });
     }

@@ -97,7 +97,7 @@ public class DownloadServiceNotification {
             DownloadRequest request = downloader.getDownloadRequest();
             if (request.getFeedfileType() == FeedMedia.FEEDFILETYPE_FEEDMEDIA) {
                 stringBuilder.append(" [").append(request.getProgressPercent()).append("%] ");
-            } else if (request.getSource().startsWith(Feed.PREFIX_LOCAL_FOLDER)) {
+            } else if (Feed.isLocalFeedUrl(request.getSource())) {
                 stringBuilder.append(" [").append(request.getSoFar())
                         .append("/").append(request.getSize()).append("] ");
             }

@@ -48,7 +48,7 @@ import allen.town.podcast.storage.db.mapper.FeedMediaCursorMapper;
  * stamp an older {@code user_version} onto it and assert that reopening runs {@code onUpgrade}
  * without error, leaves the rows intact and lands on {@link Db#VERSION}. That is what makes every
  * statement in {@link DBUpgrade} re-runnable against objects that already exist; the 3 -&gt; 4,
- * 4 -&gt; 5 and 5 -&gt; 6 steps are additionally exercised directly against a database rebuilt in the old layout.</p>
+ * 4 -&gt; 5, 5 -&gt; 6 and 6 -&gt; 7 steps are additionally exercised directly against a database rebuilt in the old layout.</p>
  */
 @RunWith(RobolectricTestRunner.class)
 public class DbTest {
@@ -70,8 +70,8 @@ public class DbTest {
     // ---------------------------------------------------------------- schema
 
     @Test
-    public void freshDatabaseIsAtSchemaVersion6() {
-        assertEquals(6, Db.VERSION);
+    public void freshDatabaseIsAtSchemaVersion7() {
+        assertEquals(7, Db.VERSION);
         assertEquals(Db.VERSION, Db.getInstance().getDb().getVersion());
     }
 
@@ -163,6 +163,94 @@ public class DbTest {
         // Running it again must not fail on the objects it just created.
         DBUpgrade.upgrade(db, 5, Db.VERSION);
         assertEquals(1, rowCount(db, Db.TABLE_NAME_DOWNLOAD_LOG));
+    }
+
+    @Test
+    public void upgradeFromVersion6ReachesTheCurrentVersionAndKeepsRows() {
+        assertUpgradePreservesRows(6);
+    }
+
+    /**
+     * The real 6 -&gt; 7 step: rebuild the feeds and items tables without the audiobook flag and
+     * the disc/track numbers, run the ladder and check the columns come back with their defaults
+     * on the old rows.
+     */
+    @Test
+    public void upgradeFromVersion6AddsTheAudiobookAndTrackColumns() {
+        SQLiteDatabase db = Db.getInstance().getDb();
+        String audiobookColumn = DbSchema.KEY_AUDIOBOOK + " INTEGER DEFAULT 0,";
+        assertTrue(DbSchema.CREATE_TABLE_FEEDS.contains(audiobookColumn));
+        db.execSQL("DROP TABLE " + Db.TABLE_NAME_FEEDS);
+        db.execSQL(DbSchema.CREATE_TABLE_FEEDS.replace(audiobookColumn, ""));
+        String trackColumns = "," + DbSchema.KEY_DISC_NUMBER + " INTEGER DEFAULT 0,"
+                + DbSchema.KEY_TRACK_NUMBER + " INTEGER DEFAULT 0)";
+        assertTrue(DbSchema.CREATE_TABLE_FEED_ITEMS.endsWith(trackColumns));
+        db.execSQL("DROP TABLE " + Db.TABLE_NAME_FEED_ITEMS);
+        db.execSQL(DbSchema.CREATE_TABLE_FEED_ITEMS.replace(trackColumns, ")"));
+        db.execSQL("INSERT INTO " + Db.TABLE_NAME_FEEDS + " (" + Db.KEY_TITLE + ") VALUES ('Old feed')");
+        long feedId = lastInsertId(db);
+        db.execSQL("INSERT INTO " + Db.TABLE_NAME_FEED_ITEMS + " (" + Db.KEY_TITLE + ", " + Db.KEY_FEED
+                + ") VALUES ('Old item', " + feedId + ")");
+        assertFalse(columnNames(db, Db.TABLE_NAME_FEEDS).contains(Db.KEY_AUDIOBOOK));
+        assertFalse(columnNames(db, Db.TABLE_NAME_FEED_ITEMS).contains(Db.KEY_TRACK_NUMBER));
+
+        DBUpgrade.upgrade(db, 6, Db.VERSION);
+
+        assertTrue(columnNames(db, Db.TABLE_NAME_FEEDS).contains(Db.KEY_AUDIOBOOK));
+        assertTrue(columnNames(db, Db.TABLE_NAME_FEED_ITEMS).contains(Db.KEY_DISC_NUMBER));
+        assertTrue(columnNames(db, Db.TABLE_NAME_FEED_ITEMS).contains(Db.KEY_TRACK_NUMBER));
+        try (Cursor cursor = Db.getInstance().getFeedCursor(feedId)) {
+            assertTrue(cursor.moveToFirst());
+            assertFalse(FeedCursorMapper.convert(cursor).getPreferences().isAudiobook());
+        }
+        try (Cursor cursor = db.rawQuery("SELECT " + Db.KEY_DISC_NUMBER + ", " + Db.KEY_TRACK_NUMBER
+                + " FROM " + Db.TABLE_NAME_FEED_ITEMS, null)) {
+            assertTrue(cursor.moveToFirst());
+            assertEquals(0, cursor.getInt(0));
+            assertEquals(0, cursor.getInt(1));
+        }
+
+        // Running it again must not fail on the columns it just added.
+        DBUpgrade.upgrade(db, 6, Db.VERSION);
+        assertEquals(1, rowCount(db, Db.TABLE_NAME_FEED_ITEMS));
+    }
+
+    @Test
+    public void audiobookFlagRoundTripsThroughTheFeedPreferences() {
+        Db db = Db.getInstance();
+        Feed feed = newFeed("Book");
+        db.setCompleteFeed(feed);
+        try (Cursor cursor = db.getFeedCursor(feed.getId())) {
+            assertTrue(cursor.moveToFirst());
+            assertFalse("a new feed is a podcast", FeedCursorMapper.convert(cursor).getPreferences().isAudiobook());
+        }
+
+        feed.getPreferences().setAudiobook(true);
+        db.setFeedPreferences(feed.getPreferences());
+        try (Cursor cursor = db.getFeedCursor(feed.getId())) {
+            assertTrue(cursor.moveToFirst());
+            Feed reloaded = FeedCursorMapper.convert(cursor);
+            assertTrue(reloaded.getPreferences().isAudiobook());
+            assertTrue(reloaded.isAudiobook());
+        }
+    }
+
+    @Test
+    public void discAndTrackNumbersRoundTripThroughTheItemMapper() {
+        Db db = Db.getInstance();
+        Feed feed = newFeed("Book");
+        FeedItem item = newItem(feed, "Chapter", "body");
+        item.setDiscNumber(2);
+        item.setTrackNumber(14);
+        feed.setItems(new ArrayList<>(Arrays.asList(item)));
+        db.setCompleteFeed(feed);
+
+        try (Cursor cursor = db.getItemsOfFeedCursor(feed, FeedItemFilter.unfiltered())) {
+            assertTrue(cursor.moveToFirst());
+            FeedItem reloaded = FeedItemCursorMapper.convert(cursor);
+            assertEquals(2, reloaded.getDiscNumber());
+            assertEquals(14, reloaded.getTrackNumber());
+        }
     }
 
     /**

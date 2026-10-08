@@ -199,9 +199,11 @@
         <item>@string/date</item>
         <item>@string/title</item>
         <item>@string/duration</item>
+        <item>@string/sort_track_order</item>
     </string-array>
 
 
+    <!-- pairs in the order (descending, ascending); index / 2 must equal SortOrder.groupIndex -->
     <string-array name="feed_episodes_sort_values">
         <item>DATE_NEW_OLD</item>
         <item>DATE_OLD_NEW</item>
@@ -209,6 +211,8 @@
         <item>EPISODE_TITLE_A_Z</item>
         <item>DURATION_LONG_SHORT</item>
         <item>DURATION_SHORT_LONG</item>
+        <item>TRACK_ORDER_REVERSED</item>
+        <item>TRACK_ORDER</item>
     </string-array>
 
     <string-array name="queue_sort_values">

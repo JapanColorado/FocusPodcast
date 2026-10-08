@@ -18,6 +18,18 @@ public enum SortOrder {
     EPISODE_TITLE_A_Z(4, INTRA_FEED,3,1),
     DURATION_LONG_SHORT(5, INTRA_FEED,5,2),
     DURATION_SHORT_LONG(6, INTRA_FEED,5,2),
+    /**
+     * Book order reversed. Track order pairs with {@link #TRACK_ORDER} like the other intra-feed
+     * pairs (code - ascBaseCode == DESC_INDEX). Its groupIndex 3 is its position in the feed sort
+     * dialog; it shares that number with FEED_TITLE_* only because the queue dialog, which uses
+     * those, never offers track order.
+     */
+    TRACK_ORDER_REVERSED(7, INTRA_FEED, 7, 3),
+    /**
+     * Book order: disc number, then folder, then track number, then the natural order of the
+     * file's relative path ("Ch 2" before "Ch 10"). The default for local feeds and audiobooks.
+     */
+    TRACK_ORDER(8, INTRA_FEED, 7, 3),
     FEED_TITLE_Z_A(101, INTER_FEED,101,3),
     FEED_TITLE_A_Z(102, INTER_FEED,101,3),
     RANDOM(103, INTER_FEED,0,4),

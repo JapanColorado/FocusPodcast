@@ -119,6 +119,9 @@ public class Db {
     public static final String KEY_EPISODE_NOTIFICATION = DbSchema.KEY_EPISODE_NOTIFICATION;
     public static final String KEY_FEED_PLAYBACK_SPEED = DbSchema.KEY_FEED_PLAYBACK_SPEED;
     public static final String KEY_FEED_AD_SKIP_OVERRIDE = DbSchema.KEY_FEED_AD_SKIP_OVERRIDE;
+    public static final String KEY_AUDIOBOOK = DbSchema.KEY_AUDIOBOOK;
+    public static final String KEY_DISC_NUMBER = DbSchema.KEY_DISC_NUMBER;
+    public static final String KEY_TRACK_NUMBER = DbSchema.KEY_TRACK_NUMBER;
     public static final String KEY_AD_START_MS = DbSchema.KEY_AD_START_MS;
     public static final String KEY_AD_END_MS = DbSchema.KEY_AD_END_MS;
     public static final String KEY_AD_SOURCE = DbSchema.KEY_AD_SOURCE;
@@ -518,6 +521,11 @@ public class Db {
 
     public final Cursor getRecentlyPublishedItemsCursor(int offset, int limit, FeedItemFilter filter) {
         return itemDao.getRecentlyPublishedItemsCursor(offset, limit, filter);
+    }
+
+    /** Every item (with media) of every subscribed audiobook feed, unordered. */
+    public final Cursor getAudiobookItemsCursor() {
+        return itemDao.getAudiobookItemsCursor();
     }
 
     /** Number of items of the feed, ignoring the feed's item filter. */

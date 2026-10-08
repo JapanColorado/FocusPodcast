@@ -81,7 +81,20 @@ public class FeedPreferences implements Serializable {
      */
     @Nullable
     private Boolean adSkipOverride = null;
+    /**
+     * Whether this feed is an audiobook: its items play one after the other in the feed's order,
+     * are never NEW and stay out of the podcast-wide lists and the automatic refresh.
+     */
+    private boolean audiobook = false;
     private final Set<String> tags = new HashSet<>();
+
+    public boolean isAudiobook() {
+        return audiobook;
+    }
+
+    public void setAudiobook(boolean audiobook) {
+        this.audiobook = audiobook;
+    }
 
     /**
      * @return TRUE or FALSE when the user chose ad skipping for this feed, null when the feed

@@ -655,6 +655,9 @@
   <string name="reconnect_local_folder">重新连接本地文件夹</string>
   <string name="reconnect_local_folder_warning">在权限遭拒的情况下，您可以使用它重新连接到完全相同的文件夹，不要选择其他文件夹</string>
   <string name="local_feed_description">这个虚拟播客是通过向FocusPodcast添加一个文件夹创建的</string>
+  <string name="local_file">本地文件</string>
+  <string name="local_file_feed_description">这个虚拟播客是通过向FocusPodcast添加一个文件创建的</string>
+  <string name="sort_track_order">曲目顺序</string>
   <string name="unable_to_start_system_file_manager">无法启动系统文件管理器</string>
   <string name="filter">过滤</string>
   <string name="hide_is_favorite_label">喜爱的</string>

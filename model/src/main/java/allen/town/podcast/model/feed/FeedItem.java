@@ -43,6 +43,13 @@ public class FeedItem extends FeedComponent implements Serializable {
     private long feedId;
     private String podcastIndexChapterUrl;
 
+    /**
+     * Disc and track number from the file's tags (local feeds only); 0 when unknown. Used by
+     * {@link SortOrder#TRACK_ORDER}.
+     */
+    private int discNumber;
+    private int trackNumber;
+
     private int state;
     public static final int NEW = -1;
     public static final int UNPLAYED = 0;
@@ -162,6 +169,30 @@ public class FeedItem extends FeedComponent implements Serializable {
         if (other.podcastIndexChapterUrl != null) {
             podcastIndexChapterUrl = other.podcastIndexChapterUrl;
         }
+        if (other.discNumber > 0) {
+            discNumber = other.discNumber;
+        }
+        if (other.trackNumber > 0) {
+            trackNumber = other.trackNumber;
+        }
+    }
+
+    /** Disc number from the file's tags, 0 when unknown. */
+    public int getDiscNumber() {
+        return discNumber;
+    }
+
+    public void setDiscNumber(int discNumber) {
+        this.discNumber = Math.max(0, discNumber);
+    }
+
+    /** Track number from the file's tags, 0 when unknown. */
+    public int getTrackNumber() {
+        return trackNumber;
+    }
+
+    public void setTrackNumber(int trackNumber) {
+        this.trackNumber = Math.max(0, trackNumber);
     }
 
     /**

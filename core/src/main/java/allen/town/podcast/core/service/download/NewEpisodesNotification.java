@@ -43,7 +43,7 @@ public class NewEpisodesNotification {
 
     public void showIfNeeded(Context context, Feed feed) {
         FeedPreferences prefs = feed.getPreferences();
-        if (!prefs.getKeepUpdated() || !prefs.getShowEpisodeNotification()) {
+        if (!prefs.getKeepUpdated() || !prefs.getShowEpisodeNotification() || prefs.isAudiobook()) {
             return;
         }
 

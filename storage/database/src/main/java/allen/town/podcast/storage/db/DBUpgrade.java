@@ -39,6 +39,22 @@ class DBUpgrade {
                         + DbSchema.KEY_WARNING_KEY + " TEXT");
             }
         }
+        if (oldVersion < 7) {
+            // Audiobooks: the per-feed flag, and the disc/track numbers of local files that the
+            // track-order sort uses. Existing rows read 0 (not an audiobook, numbers unknown).
+            if (!hasColumn(db, DbSchema.TABLE_NAME_FEEDS, DbSchema.KEY_AUDIOBOOK)) {
+                db.execSQL("ALTER TABLE " + DbSchema.TABLE_NAME_FEEDS + " ADD COLUMN "
+                        + DbSchema.KEY_AUDIOBOOK + " INTEGER DEFAULT 0");
+            }
+            if (!hasColumn(db, DbSchema.TABLE_NAME_FEED_ITEMS, DbSchema.KEY_DISC_NUMBER)) {
+                db.execSQL("ALTER TABLE " + DbSchema.TABLE_NAME_FEED_ITEMS + " ADD COLUMN "
+                        + DbSchema.KEY_DISC_NUMBER + " INTEGER DEFAULT 0");
+            }
+            if (!hasColumn(db, DbSchema.TABLE_NAME_FEED_ITEMS, DbSchema.KEY_TRACK_NUMBER)) {
+                db.execSQL("ALTER TABLE " + DbSchema.TABLE_NAME_FEED_ITEMS + " ADD COLUMN "
+                        + DbSchema.KEY_TRACK_NUMBER + " INTEGER DEFAULT 0");
+            }
+        }
     }
 
     /**

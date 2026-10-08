@@ -12,7 +12,7 @@ import static allen.town.podcast.model.feed.FeedPreferences.SPEED_USE_GLOBAL;
 final class DbSchema {
 
     public static final String DATABASE_NAME = "focusPodcastApp.db";
-    public static final int VERSION = 6;
+    public static final int VERSION = 7;
 
     /**
      * Maximum number of arguments for IN-operator.
@@ -96,6 +96,11 @@ final class DbSchema {
      * column, so upgraded databases keep it unused.
      */
     static final String KEY_FEED_AD_SKIP_V4 = "feed_ad_skip";
+    /** Whether the feed is an audiobook ({@code FeedPreferences.isAudiobook()}); added in version 7. */
+    public static final String KEY_AUDIOBOOK = "audiobook";
+    /** Disc and track number from a local file's tags, 0 when unknown; added in version 7. */
+    public static final String KEY_DISC_NUMBER = "disc_number";
+    public static final String KEY_TRACK_NUMBER = "track_number";
     public static final String KEY_AD_START_MS = "start_ms";
     public static final String KEY_AD_END_MS = "end_ms";
     public static final String KEY_AD_SOURCE = "source";
@@ -156,6 +161,7 @@ final class DbSchema {
             + KEY_FEED_TAGS + " TEXT,"
             + KEY_EPISODE_NOTIFICATION + " INTEGER DEFAULT 0,"
             + KEY_FEED_SKIP_INTRO + " INTEGER DEFAULT 0,"
+            + KEY_AUDIOBOOK + " INTEGER DEFAULT 0,"
             + KEY_FEED_AD_SKIP_OVERRIDE + " INTEGER)";
 
     static final String CREATE_TABLE_FEED_ITEMS = "CREATE TABLE "
@@ -167,7 +173,9 @@ final class DbSchema {
             + KEY_AUTO_DOWNLOAD_ATTEMPTS + " INTEGER,"
             + KEY_IMAGE_URL + " TEXT,"
             + KEY_HAS_CHAPTERS + " INTEGER," + KEY_ITEM_IDENTIFIER + " TEXT,"
-            + KEY_PODCASTINDEX_CHAPTER_URL + " TEXT)";
+            + KEY_PODCASTINDEX_CHAPTER_URL + " TEXT,"
+            + KEY_DISC_NUMBER + " INTEGER DEFAULT 0,"
+            + KEY_TRACK_NUMBER + " INTEGER DEFAULT 0)";
 
     static final String CREATE_TABLE_FEED_MEDIA = "CREATE TABLE "
             + TABLE_NAME_FEED_MEDIA + " (" + TABLE_PRIMARY_KEY + KEY_DURATION
@@ -296,7 +304,8 @@ final class DbSchema {
             TABLE_NAME_FEEDS + "." + KEY_FEED_SKIP_INTRO,
             TABLE_NAME_FEEDS + "." + KEY_FEED_SKIP_ENDING,
             TABLE_NAME_FEEDS + "." + KEY_EPISODE_NOTIFICATION,
-            TABLE_NAME_FEEDS + "." + KEY_FEED_AD_SKIP_OVERRIDE
+            TABLE_NAME_FEEDS + "." + KEY_FEED_AD_SKIP_OVERRIDE,
+            TABLE_NAME_FEEDS + "." + KEY_AUDIOBOOK
     };
 
     /**
@@ -330,6 +339,8 @@ final class DbSchema {
                     + TABLE_NAME_FEED_ITEMS + "." + KEY_READ + ", "
                     + TABLE_NAME_FEED_ITEMS + "." + KEY_AUTO_DOWNLOAD_ATTEMPTS + ", "
                     + TABLE_NAME_FEED_ITEMS + "." + KEY_IMAGE_URL + ", "
+                    + TABLE_NAME_FEED_ITEMS + "." + KEY_DISC_NUMBER + ", "
+                    + TABLE_NAME_FEED_ITEMS + "." + KEY_TRACK_NUMBER + ", "
             + TABLE_NAME_FEED_ITEMS + "." + KEY_PODCASTINDEX_CHAPTER_URL;
 
     static final String KEYS_FEED_MEDIA =

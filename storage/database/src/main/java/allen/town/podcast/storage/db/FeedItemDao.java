@@ -3,7 +3,10 @@ package allen.town.podcast.storage.db;
 import static allen.town.podcast.storage.db.DbSchema.IN_OPERATOR_MAXIMUM;
 import static allen.town.podcast.storage.db.DbSchema.JOIN_FEED_ITEM_AND_FEED;
 import static allen.town.podcast.storage.db.DbSchema.JOIN_FEED_ITEM_AND_MEDIA;
+import static allen.town.podcast.storage.db.DbSchema.KEY_AUDIOBOOK;
 import static allen.town.podcast.storage.db.DbSchema.KEY_AUTO_DOWNLOAD_ATTEMPTS;
+import static allen.town.podcast.storage.db.DbSchema.KEY_DISC_NUMBER;
+import static allen.town.podcast.storage.db.DbSchema.KEY_TRACK_NUMBER;
 import static allen.town.podcast.storage.db.DbSchema.KEY_DESCRIPTION;
 import static allen.town.podcast.storage.db.DbSchema.KEY_DOWNLOADED;
 import static allen.town.podcast.storage.db.DbSchema.KEY_DOWNLOAD_URL;
@@ -170,6 +173,8 @@ class FeedItemDao extends Dao {
         }
         values.put(KEY_IMAGE_URL, item.getImageUrl());
         values.put(KEY_PODCASTINDEX_CHAPTER_URL, item.getPodcastIndexChapterUrl());
+        values.put(KEY_DISC_NUMBER, item.getDiscNumber());
+        values.put(KEY_TRACK_NUMBER, item.getTrackNumber());
 
         if (item.getId() == 0) {
             item.setId(db.insert(TABLE_NAME_FEED_ITEMS, null, values));
@@ -337,18 +342,45 @@ class FeedItemDao extends Dao {
                 + " WHERE " + TABLE_NAME_FEED_ITEMS + "." + KEY_READ + "=" + FeedItem.NEW
                     + " AND " + TABLE_NAME_FEEDS + "." + KEY_KEEP_UPDATED + " > 0"
                     + " AND " + TABLE_NAME_FEEDS + "." + KEY_IS_SUBSCRIBED + "=1"
+                    + " AND " + NOT_AUDIOBOOK
                 + " ORDER BY " + TABLE_NAME_FEED_ITEMS + "." + KEY_PUBDATE + " DESC"
                 + " LIMIT " + offset + ", " + limit;
         return db.rawQuery(query, null);
     }
 
-    final Cursor getRecentlyPublishedItemsCursor(int offset, int limit, FeedItemFilter filter) {
-        // Filter out the episodes of feeds that are not actually subscribed
+    /**
+     * SQL condition (on a query that joins {@code feeds}) that keeps only items of feeds that are
+     * not audiobooks. Audiobooks stay out of the podcast-wide lists: All Episodes, the new-item
+     * list and its count.
+     */
+    static final String NOT_AUDIOBOOK = "COALESCE(" + TABLE_NAME_FEEDS + "." + KEY_AUDIOBOOK + ", 0) = 0";
+
+    /**
+     * WHERE clause of the episode lists: subscribed feeds only, no audiobooks, plus the filter.
+     */
+    private static String episodeListWhereClause(FeedItemFilter filter) {
         String filterQuery = FeedItemFilterQuery.generateFrom(filter);
-        String whereClause = "".equals(filterQuery) ? " WHERE " + TABLE_NAME_FEEDS + "." + KEY_IS_SUBSCRIBED + "=1"
-                : " WHERE " + filterQuery + " AND " + TABLE_NAME_FEEDS + "." + KEY_IS_SUBSCRIBED + "=1";
-        final String query = SELECT_FEED_ITEMS_AND_MEDIA + JOIN_FEED_ITEM_AND_FEED + whereClause
+        String base = TABLE_NAME_FEEDS + "." + KEY_IS_SUBSCRIBED + "=1 AND " + NOT_AUDIOBOOK;
+        return "".equals(filterQuery) ? " WHERE " + base : " WHERE " + filterQuery + " AND " + base;
+    }
+
+    /** Items of subscribed, non-audiobook feeds matching the filter, newest first. */
+    final Cursor getRecentlyPublishedItemsCursor(int offset, int limit, FeedItemFilter filter) {
+        final String query = SELECT_FEED_ITEMS_AND_MEDIA + JOIN_FEED_ITEM_AND_FEED + episodeListWhereClause(filter)
                 + " ORDER BY " + KEY_PUBDATE + " DESC LIMIT " + offset + ", " + limit;
+        return db.rawQuery(query, null);
+    }
+
+    /**
+     * Every item, with its media, of every subscribed audiobook feed. Unordered; the caller sorts
+     * per feed in track order.
+     */
+    final Cursor getAudiobookItemsCursor() {
+        final String query = SELECT_FEED_ITEMS_AND_MEDIA
+                + " INNER JOIN " + TABLE_NAME_FEEDS
+                + " ON " + TABLE_NAME_FEED_ITEMS + "." + KEY_FEED + "=" + TABLE_NAME_FEEDS + "." + KEY_ID
+                + " WHERE " + TABLE_NAME_FEEDS + "." + KEY_AUDIOBOOK + "=1"
+                + " AND " + TABLE_NAME_FEEDS + "." + KEY_IS_SUBSCRIBED + "=1";
         return db.rawQuery(query, null);
     }
 
@@ -361,11 +393,14 @@ class FeedItemDao extends Dao {
         }
     }
 
+    /**
+     * Counts what {@link #getRecentlyPublishedItemsCursor} lists. (Before version 7 an empty filter
+     * left this without a WHERE, so the subscribed condition ended up in the LEFT JOIN's ON clause
+     * and every item was counted.)
+     */
     final Cursor getTotalEpisodeCountCursor(FeedItemFilter filter) {
-        String filterQuery = FeedItemFilterQuery.generateFrom(filter);
-        String whereClause = "".equals(filterQuery) ? "" : " WHERE " + filterQuery;
         final String query = "SELECT count(" + TABLE_NAME_FEED_ITEMS + "." + KEY_ID + ") FROM " + TABLE_NAME_FEED_ITEMS
-                + JOIN_FEED_ITEM_AND_MEDIA + JOIN_FEED_ITEM_AND_FEED + whereClause + " AND " + TABLE_NAME_FEEDS + "." + KEY_IS_SUBSCRIBED + "=1";
+                + JOIN_FEED_ITEM_AND_MEDIA + JOIN_FEED_ITEM_AND_FEED + episodeListWhereClause(filter);
         return db.rawQuery(query, null);
     }
 
@@ -434,6 +469,7 @@ class FeedItemDao extends Dao {
                 TABLE_NAME_FEED_ITEMS + "." + KEY_FEED + "=" + TABLE_NAME_FEEDS + "." + KEY_ID,
                 TABLE_NAME_FEED_ITEMS + "." + KEY_READ + "=" + FeedItem.NEW
                         + " AND " + TABLE_NAME_FEEDS + "." + KEY_KEEP_UPDATED + " > 0"
+                        + " AND " + NOT_AUDIOBOOK
         };
         final String query = String.format("SELECT COUNT(%s) FROM %s INNER JOIN %s ON %s WHERE %s", args);
         Cursor c = db.rawQuery(query, null);

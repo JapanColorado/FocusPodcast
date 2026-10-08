@@ -4,6 +4,7 @@ import static allen.town.podcast.model.feed.SortOrder.toCodeString;
 import static allen.town.podcast.storage.db.DbSchema.ALL_TABLES;
 import static allen.town.podcast.storage.db.DbSchema.FEED_SEL_STD;
 import static allen.town.podcast.storage.db.DbSchema.JOIN_FEED_ITEM_AND_FEED;
+import static allen.town.podcast.storage.db.DbSchema.KEY_AUDIOBOOK;
 import static allen.town.podcast.storage.db.DbSchema.KEY_AUTHOR;
 import static allen.town.podcast.storage.db.DbSchema.KEY_AUTO_DELETE_ACTION;
 import static allen.town.podcast.storage.db.DbSchema.KEY_AUTO_DOWNLOAD_ENABLED;
@@ -160,6 +161,7 @@ class FeedDao extends Dao {
         values.put(KEY_FEED_SKIP_INTRO, prefs.getFeedSkipIntro());
         values.put(KEY_FEED_SKIP_ENDING, prefs.getFeedSkipEnding());
         values.put(KEY_EPISODE_NOTIFICATION, prefs.getShowEpisodeNotification());
+        values.put(KEY_AUDIOBOOK, prefs.isAudiobook());
         // Boolean → INTEGER 1/0, and null stays NULL: "follow the global default".
         Boolean adSkipOverride = prefs.getAdSkipOverride();
         if (adSkipOverride == null) {

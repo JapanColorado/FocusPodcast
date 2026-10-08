@@ -11,7 +11,11 @@ import androidx.annotation.Nullable;
 
 import org.greenrobot.eventbus.EventBus;
 
+import java.util.Collections;
+import java.util.List;
+
 import allen.town.podcast.core.R;
+import allen.town.podcast.core.feed.util.AudiobookUtils;
 import allen.town.podcast.core.pref.PlaybackPreferences;
 import allen.town.podcast.core.pref.Prefs;
 import allen.town.podcast.core.pref.SleepTimerPreferences;
@@ -24,6 +28,7 @@ import allen.town.podcast.core.util.IntentUtils;
 import allen.town.podcast.core.util.NetworkUtils;
 import allen.town.podcast.core.util.playback.PlaybackServiceStarter;
 import allen.town.podcast.event.MessageEvent;
+import allen.town.podcast.model.feed.Feed;
 import allen.town.podcast.model.feed.FeedItem;
 import allen.town.podcast.model.feed.FeedMedia;
 import allen.town.podcast.model.feed.FeedPreferences;
@@ -203,6 +208,9 @@ class PlaybackServicePlayerCallback implements PlaybackServiceMediaPlayer.PSMPCa
             PlaybackPreferences.writeNoMediaPlaying();
             return null;
         }
+        if (item.getFeed() != null && item.getFeed().isAudiobook()) {
+            return getNextAudiobookTrack(item, item.getFeed());
+        }
         FeedItem nextItem;
         nextItem = DBReader.getNextInQueue(item);
 
@@ -223,6 +231,33 @@ class PlaybackServicePlayerCallback implements PlaybackServiceMediaPlayer.PSMPCa
             service.notificationUpdater.displayStreamingNotAllowedNotification(
                     new PlaybackServiceStarter(service, nextItem.getMedia())
                             .getIntent());
+            PlaybackPreferences.writeNoMediaPlaying();
+            service.stateManager.stopService();
+            return null;
+        }
+        return nextItem.getMedia();
+    }
+
+    /**
+     * The track of the same audiobook that follows {@code item} in the book's order
+     * ({@link AudiobookUtils#playbackOrder}), whatever the queue holds and whether or not "follow
+     * queue" is on. At the end of the book playback stops instead of falling through to the queue.
+     */
+    @Nullable
+    private Playable getNextAudiobookTrack(@NonNull FeedItem item, @NonNull Feed feed) {
+        List<FeedItem> tracks = DBReader.getFeedItemList(feed);
+        FeedItem nextItem = AudiobookUtils.nextTrack(tracks, AudiobookUtils.playbackOrder(feed), item.getId());
+        if (nextItem == null || nextItem.getMedia() == null) {
+            Log.d(TAG, "getNextInQueue(): end of the audiobook");
+            PlaybackPreferences.writeNoMediaPlaying();
+            return null;
+        }
+        // queue and favourite tags, so that post-playback treats the track like any other
+        DBReader.loadAdditionalFeedItemListData(Collections.singletonList(nextItem));
+        if (!nextItem.getMedia().localFileAvailable() && !NetworkUtils.isStreamingAllowed()
+                && !feed.isLocalFeed()) {
+            service.notificationUpdater.displayStreamingNotAllowedNotification(
+                    new PlaybackServiceStarter(service, nextItem.getMedia()).getIntent());
             PlaybackPreferences.writeNoMediaPlaying();
             service.stateManager.stopService();
             return null;
@@ -326,8 +361,11 @@ class PlaybackServicePlayerCallback implements PlaybackServiceMediaPlayer.PSMPCa
                 // Delete episode if enabled
                 FeedPreferences.AutoDeleteAction action =
                         item.getFeed().getPreferences().getCurrentAutoDelete();
-                boolean shouldAutoDelete = action == FeedPreferences.AutoDeleteAction.YES
-                        || (action == FeedPreferences.AutoDeleteAction.GLOBAL && Prefs.isAutoDelete());
+                // Never for local files (deleting one would only drop its content URI from the
+                // row and make the track unplayable) nor for audiobooks, which are re-listened to.
+                boolean keepFile = item.getFeed().isLocalFeed() || item.getFeed().isAudiobook();
+                boolean shouldAutoDelete = !keepFile && (action == FeedPreferences.AutoDeleteAction.YES
+                        || (action == FeedPreferences.AutoDeleteAction.GLOBAL && Prefs.isAutoDelete()));
                 if (shouldAutoDelete && (!item.isTagged(FeedItem.TAG_FAVORITE)
                         || !Prefs.shouldFavoriteKeepEpisode())) {
                     DBWriter.deleteFeedMediaOfItem(service, media.getId());

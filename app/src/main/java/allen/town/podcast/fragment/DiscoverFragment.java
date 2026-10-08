@@ -24,7 +24,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.widget.Toolbar;
-import androidx.documentfile.provider.DocumentFile;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -53,7 +52,7 @@ import allen.town.podcast.R;
 import allen.town.podcast.activity.MainActivity;
 import allen.town.podcast.adapter.ItunesAdapter;
 import allen.town.podcast.core.storage.DBReader;
-import allen.town.podcast.core.storage.DBTasks;
+import allen.town.podcast.core.feed.LocalFeedCreator;
 import allen.town.podcast.databinding.DiscoverLayoutBinding;
 import allen.town.podcast.discovery.CombinedSearcher;
 import allen.town.podcast.discovery.ItunesCategoryTopLoader;
@@ -62,7 +61,6 @@ import allen.town.podcast.event.FeedListUpdateEvent;
 import allen.town.podcast.event.ItunesCategoryChangeEvent;
 import allen.town.podcast.common.common.prefs.supportv7.dialogs.PreferenceListDialog;
 import allen.town.podcast.model.feed.Feed;
-import allen.town.podcast.model.feed.SortOrder;
 import allen.town.podcast.dialog.AddFeedByUrlDialog;
 import allen.town.podcast.util.OpmlImportLauncher;
 import allen.town.podcast.util.SkeletonRecyclerDelay;
@@ -335,24 +333,7 @@ public class DiscoverFragment extends Fragment implements Toolbar.OnMenuItemClic
     }
 
     private Feed addLocalFolder(Uri uri) {
-        getActivity().getContentResolver()
-                .takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
-        DocumentFile documentFile = DocumentFile.fromTreeUri(getContext(), uri);
-        if (documentFile == null) {
-            throw new IllegalArgumentException("Unable to retrieve document tree");
-        }
-        String title = documentFile.getName();
-        if (title == null) {
-            title = getString(R.string.local_folder);
-        }
-        Feed dirFeed = new Feed(Feed.PREFIX_LOCAL_FOLDER + uri.toString(), null, title);
-        dirFeed.setItems(Collections.emptyList());
-        dirFeed.setSortOrder(SortOrder.EPISODE_TITLE_A_Z);
-        dirFeed.setSubscribed(true);
-
-        Feed fromDatabase = DBTasks.updateFeed(getContext(), dirFeed, false);
-        DBTasks.forceRefreshFeed(getContext(), fromDatabase, true);
-        return fromDatabase;
+        return LocalFeedCreator.addLocalFolder(requireContext(), uri, false);
     }
 
     @Override

@@ -589,6 +589,9 @@
   <string name="reconnect_local_folder">重新連接本機資料夾</string>
   <string name="reconnect_local_folder_warning">若因權限問題被拒絕連接，您可以用此方法重新連上同一個資料夾，此時請勿選擇其他的資料夾</string>
   <string name="local_feed_description">此虛擬 Podcast 是在 FocusPodcast 裡增加資料夾而產生的</string>
+  <string name="local_file">本機檔案</string>
+  <string name="local_file_feed_description">此虛擬 Podcast 是在 FocusPodcast 裡增加檔案而產生的</string>
+  <string name="sort_track_order">曲目順序</string>
   <string name="unable_to_start_system_file_manager">無法啟用系統的檔案管理工具</string>
   <string name="filter">篩選</string>
   <string name="hide_is_favorite_label">為最愛</string>

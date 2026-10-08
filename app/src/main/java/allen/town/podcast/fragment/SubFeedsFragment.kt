@@ -15,6 +15,7 @@ import allen.town.podcast.core.event.DownloadEvent
 import allen.town.podcast.core.pref.Prefs.subscriptionsFilter
 import allen.town.podcast.core.service.download.DownloadService
 import allen.town.podcast.core.storage.DBReader
+import allen.town.podcast.core.storage.FeedKind
 import allen.town.podcast.core.storage.NavDrawerData.*
 import allen.town.podcast.core.util.download.AutoUpdateManager
 import allen.town.podcast.core.util.menuhandler.MenuItemUtils
@@ -289,7 +290,7 @@ class SubFeedsFragment : Fragment(), Toolbar.OnMenuItemClickListener, OnSelectMo
         disposable?.dispose()
         emptyView.hide()
         disposable = Observable.fromCallable {
-            val data = DBReader.getNavDrawerData(true)
+            val data = DBReader.getNavDrawerData(true, FeedKind.PODCASTS)
             val items = data.items
             val feedItems: MutableList<DrawerItem> = ArrayList()
             for (item in items) {

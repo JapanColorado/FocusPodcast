@@ -291,7 +291,8 @@ class DownloadPipeline {
         boolean initiatedByUser = intent.getBooleanExtra(DownloadService.EXTRA_INITIATED_BY_USER, false);
         List<Feed> feeds = DBReader.getFeedList();
         for (Feed feed : feeds) {
-            if (feed.getPreferences().getKeepUpdated()) {
+            // Audiobooks are only rescanned when the user refreshes that one feed.
+            if (feed.getPreferences().getKeepUpdated() && !feed.isAudiobook()) {
                 DownloadRequest.Builder builder = DownloadRequestCreator.create(feed);
                 builder.withInitiatedByUser(initiatedByUser);
                 if (feed.hasLastUpdateFailed()) {
@@ -321,7 +322,7 @@ class DownloadPipeline {
             return;
         }
         Log.d(TAG, "add new request -> " + request.getSource());
-        if (request.getSource().startsWith(Feed.PREFIX_LOCAL_FOLDER)) {
+        if (Feed.isLocalFeedUrl(request.getSource())) {
             Downloader downloader = new LocalFeedStubDownloader(context.getApplicationContext(), request);
             queue.submit(downloader, () -> performLocalFeedRefresh(downloader, request));
         } else {
