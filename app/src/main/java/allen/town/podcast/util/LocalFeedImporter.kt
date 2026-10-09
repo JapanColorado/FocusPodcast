@@ -3,7 +3,6 @@ package allen.town.podcast.util
 import allen.town.podcast.R
 import allen.town.podcast.activity.MainActivity
 import allen.town.podcast.common.util.TopSnackbarUtil.showSnack
-import allen.town.podcast.common.views.AccentMaterialDialog
 import allen.town.podcast.core.feed.LocalFeedCreator
 import allen.town.podcast.fragment.FeedItemlistFragment
 import allen.town.podcast.model.feed.Feed
@@ -21,11 +20,12 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
 
 /**
- * Adds feeds from the device's own storage: a podcast folder, or an audiobook picked either as a
- * single file (.m4b, .m4a, .mp3, ...) or as a folder of tracks. The new feed opens once it is
- * stored; a failure is shown as a snackbar.
+ * Adds a folder from the device's own storage as a feed. Whether it becomes an audiobook or a
+ * podcast is guessed from its files (see `LocalFolderClassifier`) unless the caller says; either
+ * way the user can change it in the feed settings. The new feed opens once it is stored; a
+ * failure is shown as a snackbar.
  *
- * The pickers are registered in the constructor, and a fragment may only register before it is
+ * The picker is registered in the constructor, and a fragment may only register before it is
  * created, so create this as a field initializer (or in `onCreate`), not in a click handler.
  * Call [dispose] from the fragment's `onDestroy`.
  */
@@ -33,45 +33,25 @@ class LocalFeedImporter(private val fragment: Fragment) {
 
     private val disposables = CompositeDisposable()
 
-    private val podcastFolderLauncher =
+    /** The audiobook flag for the folder being picked; null to guess. */
+    private var pendingAudiobook: Boolean? = null
+
+    private val folderLauncher =
         fragment.registerForActivityResult(OpenFolder()) { uri: Uri? ->
-            if (uri != null) add(uri) { context -> LocalFeedCreator.addLocalFolder(context, uri, false) }
+            val audiobook = pendingAudiobook
+            if (uri != null) add(uri) { context -> LocalFeedCreator.addLocalFolder(context, uri, audiobook) }
         }
 
-    private val audiobookFolderLauncher =
-        fragment.registerForActivityResult(OpenFolder()) { uri: Uri? ->
-            if (uri != null) add(uri) { context -> LocalFeedCreator.addLocalFolder(context, uri, true) }
-        }
-
-    private val audiobookFileLauncher =
-        fragment.registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri: Uri? ->
-            if (uri != null) add(uri) { context -> LocalFeedCreator.addLocalFile(context, uri, true) }
-        }
-
-    /** Picks a folder and adds it as a podcast. */
-    fun addPodcastFolder() {
-        launch { podcastFolderLauncher.launch(null) }
+    /** Picks a folder and adds it as an audiobook or a podcast, whichever it looks like. */
+    fun addFromDevice() {
+        pendingAudiobook = null
+        launch { folderLauncher.launch(null) }
     }
 
-    /** Asks whether the audiobook is one file or a folder of tracks, then picks it. */
+    /** Picks a folder and adds it as an audiobook, for pages that only show audiobooks. */
     fun addAudiobook() {
-        val context = fragment.context ?: return
-        val choices = arrayOf(
-            context.getString(R.string.audiobook_file),
-            context.getString(R.string.audiobook_folder)
-        )
-        AccentMaterialDialog(context, R.style.MaterialAlertDialogTheme)
-            .setTitle(R.string.add_audiobook)
-            .setItems(choices) { dialog, which ->
-                dialog.dismiss()
-                if (which == 0) {
-                    launch { audiobookFileLauncher.launch(AUDIOBOOK_MIME_TYPES) }
-                } else {
-                    launch { audiobookFolderLauncher.launch(null) }
-                }
-            }
-            .setNegativeButton(android.R.string.cancel, null)
-            .show()
+        pendingAudiobook = true
+        launch { folderLauncher.launch(null) }
     }
 
     fun dispose() {
@@ -112,17 +92,5 @@ class LocalFeedImporter(private val fragment: Fragment) {
 
     private companion object {
         private const val TAG = "LocalFeedImporter"
-
-        /**
-         * Audiobook files often lack a proper audio type: .m4b is reported as audio/x-m4b,
-         * audio/mp4 or, by many file managers, as a generic binary.
-         */
-        private val AUDIOBOOK_MIME_TYPES = arrayOf(
-            "audio/*",
-            "audio/mp4",
-            "audio/x-m4b",
-            "audio/m4b",
-            "application/octet-stream"
-        )
     }
 }

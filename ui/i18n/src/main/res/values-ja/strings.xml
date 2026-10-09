@@ -562,10 +562,9 @@
   <string name="audiobooks_label">オーディオブック</string>
   <string name="podcasts_label">ポッドキャスト</string>
   <string name="see_all_label">すべて表示</string>
-  <string name="add_podcast_folder">ポッドキャストフォルダを追加</string>
   <string name="add_audiobook">オーディオブックを追加</string>
-  <string name="audiobook_file">オーディオブックファイル</string>
-  <string name="audiobook_folder">オーディオブックフォルダ</string>
+  <string name="add_from_device">デバイスから追加</string>
+  <string name="add_to_library">ライブラリに追加</string>
   <string name="feed_audiobook_title">オーディオブック</string>
   <string name="feed_audiobook_summary">トラックを順番に再生し、エピソード一覧と新着数から除外します</string>
   <string name="no_audiobooks_head_label">オーディオブックはありません</string>

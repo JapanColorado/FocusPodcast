@@ -3,13 +3,14 @@ package allen.town.podcast.core.feed;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.annotation.WorkerThread;
 import androidx.documentfile.provider.DocumentFile;
 
-import org.apache.commons.io.FilenameUtils;
-
+import java.io.IOException;
 import java.util.Collections;
 import java.util.concurrent.ExecutionException;
 
@@ -21,16 +22,18 @@ import allen.town.podcast.model.feed.FeedPreferences;
 import allen.town.podcast.model.feed.SortOrder;
 
 /**
- * Creates feeds from the device's own storage: a folder ({@link Feed#PREFIX_LOCAL_FOLDER}) or one
- * single file ({@link Feed#PREFIX_LOCAL_FILE}), both picked with the storage access framework.
- * Each call keeps read access to the picked document across reboots, stores the feed (subscribed,
- * sorted in {@link SortOrder#TRACK_ORDER}, optionally marked as an audiobook) and starts the first
- * scan, which {@link LocalFeedUpdater} runs in the download service. Adding the same folder or
- * file again returns the existing feed and rescans it.
+ * Creates feeds from folders on the device's own storage ({@link Feed#PREFIX_LOCAL_FOLDER}), picked
+ * with the storage access framework. It keeps read access to the picked folder across reboots,
+ * stores the feed (subscribed, sorted in {@link SortOrder#TRACK_ORDER}, marked as an audiobook when
+ * asked to or when it looks like one) and starts the first scan, which {@link LocalFeedUpdater}
+ * runs in the download service. Adding the same folder again returns the existing feed and
+ * rescans it. Single-file feeds ({@link Feed#PREFIX_LOCAL_FILE}) can no longer be created, but
+ * existing ones are still updated.
  *
- * <p>Both methods block on database writes, so they must not run on the main thread.</p>
+ * <p>It blocks on database writes, so they must not run on the main thread.</p>
  */
 public final class LocalFeedCreator {
+    private static final String TAG = "LocalFeedCreator";
 
     private LocalFeedCreator() {
     }
@@ -39,13 +42,15 @@ public final class LocalFeedCreator {
      * Adds a folder picked with {@code ActivityResultContracts.OpenDocumentTree}.
      *
      * @param treeUri   the tree URI the picker returned
-     * @param audiobook true to mark the new feed as an audiobook
+     * @param audiobook true or false to mark the new feed as an audiobook or a podcast, null to
+     *                  let {@link LocalFolderClassifier} guess from the folder's files
      * @return the feed as stored in the database
      * @throws IllegalArgumentException if the folder cannot be resolved
      */
     @WorkerThread
     @NonNull
-    public static Feed addLocalFolder(@NonNull Context context, @NonNull Uri treeUri, boolean audiobook) {
+    public static Feed addLocalFolder(@NonNull Context context, @NonNull Uri treeUri,
+                                      @Nullable Boolean audiobook) {
         context.getContentResolver().takePersistableUriPermission(treeUri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
         DocumentFile documentFile = DocumentFile.fromTreeUri(context, treeUri);
         if (documentFile == null) {
@@ -55,29 +60,19 @@ public final class LocalFeedCreator {
         if (title == null) {
             title = context.getString(R.string.local_folder);
         }
-        return addFeed(context, Feed.PREFIX_LOCAL_FOLDER + treeUri, title, audiobook);
+        boolean isAudiobook = audiobook != null ? audiobook : looksLikeAudiobook(context, treeUri);
+        return addFeed(context, Feed.PREFIX_LOCAL_FOLDER + treeUri, title, isAudiobook);
     }
 
-    /**
-     * Adds one file picked with {@code ActivityResultContracts.OpenDocument}, typically a whole
-     * audiobook (.m4b, .m4a, .mp3).
-     *
-     * @param documentUri the document URI the picker returned
-     * @param audiobook   true to mark the new feed as an audiobook
-     * @return the feed as stored in the database
-     * @throws IllegalArgumentException if the file cannot be resolved
-     */
-    @WorkerThread
-    @NonNull
-    public static Feed addLocalFile(@NonNull Context context, @NonNull Uri documentUri, boolean audiobook) {
-        context.getContentResolver().takePersistableUriPermission(documentUri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
-        DocumentFile documentFile = DocumentFile.fromSingleUri(context, documentUri);
-        if (documentFile == null || !documentFile.exists()) {
-            throw new IllegalArgumentException("Unable to open the file");
+    private static boolean looksLikeAudiobook(@NonNull Context context, @NonNull Uri treeUri) {
+        try {
+            return LocalFolderClassifier.looksLikeAudiobook(context,
+                    LocalFolderScanner.scan(context, treeUri).mediaFiles);
+        } catch (IOException e) {
+            // the first scan reports the problem on the feed; until then, treat it as a podcast
+            Log.w(TAG, "unable to scan " + treeUri + ": " + e.getMessage());
+            return false;
         }
-        String name = documentFile.getName();
-        String title = name != null ? FilenameUtils.getBaseName(name) : context.getString(R.string.local_file);
-        return addFeed(context, Feed.PREFIX_LOCAL_FILE + documentUri, title, audiobook);
     }
 
     @NonNull

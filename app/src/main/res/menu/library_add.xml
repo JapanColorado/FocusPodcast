@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/libraryAddDiscover"
+        android:icon="@drawable/ic_discover"
+        android:title="@string/discover" />
+    <item
+        android:id="@+id/libraryAddSearch"
+        android:icon="@drawable/ic_search"
+        android:title="@string/search_podcasts_label" />
+    <item
+        android:id="@+id/libraryAddByUrl"
+        android:icon="@drawable/ic_link"
+        android:title="@string/add_podcast_by_url_label" />
+    <item
+        android:id="@+id/libraryAddFromDevice"
+        android:icon="@drawable/ic_add_virtual_podcast"
+        android:title="@string/add_from_device" />
+    <item
+        android:id="@+id/libraryAddOpml"
+        android:icon="@drawable/ic_import_opml"
+        android:title="@string/opml_add_podcast_label" />
+</menu>

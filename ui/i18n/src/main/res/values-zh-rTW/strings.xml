@@ -595,10 +595,9 @@
   <string name="audiobooks_label">有聲書</string>
   <string name="podcasts_label">Podcast</string>
   <string name="see_all_label">查看全部</string>
-  <string name="add_podcast_folder">新增 Podcast 資料夾</string>
   <string name="add_audiobook">新增有聲書</string>
-  <string name="audiobook_file">有聲書檔案</string>
-  <string name="audiobook_folder">有聲書資料夾</string>
+  <string name="add_from_device">從裝置新增</string>
+  <string name="add_to_library">新增至資料庫</string>
   <string name="feed_audiobook_title">有聲書</string>
   <string name="feed_audiobook_summary">依序播放曲目，不計入單集列表和新單集數</string>
   <string name="no_audiobooks_head_label">沒有有聲書</string>

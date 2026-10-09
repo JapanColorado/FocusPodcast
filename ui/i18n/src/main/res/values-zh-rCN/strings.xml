@@ -661,10 +661,9 @@
   <string name="audiobooks_label">有声书</string>
   <string name="podcasts_label">播客</string>
   <string name="see_all_label">查看全部</string>
-  <string name="add_podcast_folder">添加播客文件夹</string>
   <string name="add_audiobook">添加有声书</string>
-  <string name="audiobook_file">有声书文件</string>
-  <string name="audiobook_folder">有声书文件夹</string>
+  <string name="add_from_device">从设备添加</string>
+  <string name="add_to_library">添加到资料库</string>
   <string name="feed_audiobook_title">有声书</string>
   <string name="feed_audiobook_summary">按顺序播放曲目，不计入单集列表和新单集数</string>
   <string name="no_audiobooks_head_label">没有有声书</string>

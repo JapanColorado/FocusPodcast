@@ -183,11 +183,8 @@ public class DiscoverFragment extends Fragment implements Toolbar.OnMenuItemClic
     @Override
     public boolean onMenuItemClick(MenuItem item) {
         final int itemId = item.getItemId();
-        if (itemId == R.id.addPodcastFolder) {
-            localFeedImporter.addPodcastFolder();
-            return true;
-        } else if (itemId == R.id.addAudiobook) {
-            localFeedImporter.addAudiobook();
+        if (itemId == R.id.addFromDevice) {
+            localFeedImporter.addFromDevice();
             return true;
         } else if (itemId == R.id.opmlImport) {
             opmlImportLauncher.launch();

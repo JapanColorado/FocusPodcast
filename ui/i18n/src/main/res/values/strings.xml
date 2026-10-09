@@ -724,10 +724,9 @@
     <string name="audiobooks_label">Audiobooks</string>
     <string name="podcasts_label">Podcasts</string>
     <string name="see_all_label">See all</string>
-    <string name="add_podcast_folder">Add podcast folder</string>
     <string name="add_audiobook">Add audiobook</string>
-    <string name="audiobook_file">Audiobook file</string>
-    <string name="audiobook_folder">Audiobook folder</string>
+    <string name="add_from_device">Add from device</string>
+    <string name="add_to_library">Add to library</string>
     <string name="feed_audiobook_title">Audiobook</string>
     <string name="feed_audiobook_summary">Play tracks in order, keep out of Episodes and new-episode counts</string>
     <string name="no_audiobooks_head_label">No audiobooks</string>

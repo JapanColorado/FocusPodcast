@@ -49,6 +49,7 @@ import android.util.Log
 import android.view.*
 import android.view.ContextMenu.ContextMenuInfo
 import android.view.animation.AnimationUtils
+import androidx.appcompat.widget.PopupMenu
 import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.ConcatAdapter
@@ -252,8 +253,8 @@ class SubFeedsFragment : Fragment(), Toolbar.OnMenuItemClickListener, OnSelectMo
         emptyView.addAction(R.string.add_podcast_by_url_label, R.drawable.ic_link) {
             AddFeedByUrlDialog.show(requireContext())
         }
-        emptyView.addAction(R.string.add_audiobook, R.drawable.ic_audiobook) {
-            localFeedImporter.addAudiobook()
+        emptyView.addAction(R.string.add_from_device, R.drawable.ic_add_virtual_podcast) {
+            localFeedImporter.addFromDevice()
         }
         emptyView.attachToRecyclerView(subscriptionRecycler)
     }
@@ -310,14 +311,34 @@ class SubFeedsFragment : Fragment(), Toolbar.OnMenuItemClickListener, OnSelectMo
             }
         })
         setupEmptyView()
-        subscriptionAddButton.setOnClickListener { view: View? ->
-            (activity as? MainActivity)?.loadChildFragment(DiscoverFragment())
-        }
+        subscriptionAddButton.setOnClickListener { showAddMenu(it) }
         skeleton =
             subscriptionRecycler.applySkeleton(R.layout.item_grid_recyclerview_skeleton, 30)
         skeletonRecyclerDelay = SkeletonRecyclerDelay(skeleton, subscriptionRecycler)
         skeletonRecyclerDelay.showSkeleton()
         Timber.v("subfeeds onview create ")
+    }
+
+    /** Everything that adds to the library: browse, search, a feed URL, local files, OPML. */
+    private fun showAddMenu(anchor: View) {
+        val popup = PopupMenu(requireContext(), anchor)
+        popup.inflate(R.menu.library_add)
+        popup.setForceShowIcon(true)
+        popup.setOnMenuItemClickListener { item: MenuItem ->
+            val mainActivity = activity as? MainActivity
+            when (item.itemId) {
+                R.id.libraryAddDiscover -> mainActivity?.loadChildFragment(DiscoverFragment())
+                R.id.libraryAddSearch -> mainActivity?.loadChildFragment(
+                    OnlineSearchFragment.newInstance(CombinedSearcher::class.java, "")
+                )
+                R.id.libraryAddByUrl -> AddFeedByUrlDialog.show(requireContext())
+                R.id.libraryAddFromDevice -> localFeedImporter.addFromDevice()
+                R.id.libraryAddOpml -> opmlImportLauncher.launch()
+                else -> return@setOnMenuItemClickListener false
+            }
+            true
+        }
+        popup.show()
     }
 
     override fun onStart() {
