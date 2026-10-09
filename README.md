@@ -37,14 +37,15 @@ The build is driven by [pixi](https://pixi.sh), which provides JDK 25. You need 
 
 ```bash
 pixi install          # one-time: fetches the JDK
-pixi run build        # debug APK (no secrets needed)
+pixi run build        # signed, minified release APK (needs secrets.properties)
+pixi run install      # build + install the release APK on a connected device
+pixi run run          # install + launch
+pixi run build-debug / install-debug / run-debug   # debug variants (no secrets needed)
 pixi run test         # JVM unit tests (JUnit4 + Robolectric)
 pixi run lint         # Android lint
 pixi run detekt       # detekt static analysis
 pixi run nn           # Kotlin !! ratchet (must stay at 0)
-pixi run check        # build + test + lint + nn + detekt
-pixi run install      # install the debug APK on a connected device
-pixi run release      # signed, minified release APK
+pixi run check        # build-debug + test + lint + nn + detekt
 ```
 
 Release builds additionally need a `secrets.properties` (copy `secrets.properties.sample`) with your signing keystore. See [CONTRIBUTING.md](CONTRIBUTING.md) for details, and `docs/REFACTOR_BASELINE.md` for the metrics the fork's quality gates are built around.

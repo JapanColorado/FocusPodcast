@@ -42,12 +42,12 @@ Submit a pull request
 Building From Source
 --------------------------
 1. Clone the repository. There are no submodules; the vendored libraries live in-tree under `lib/`.
-1. Install [pixi](https://pixi.sh) and an Android SDK with platform 35 and build-tools 34.0.0
+1. Install [pixi](https://pixi.sh) and an Android SDK with platform 37 and build-tools 36.0.0
    (default location `~/Android/Sdk`; set `ANDROID_HOME` to override).
-1. `pixi install` downloads JDK 17 into the project environment.
-1. `pixi run build` produces the debug APK; `pixi run test`, `pixi run lint` and `pixi run check`
-   run the verification tasks. `pixi task list` shows everything available.
-1. For release builds copy `secrets.properties.sample` to `secrets.properties` and fill in your
-   signing keystore.
-1. Android Studio works too: open the project, set Gradle JDK to 17, and use `pixi shell` for the
+1. `pixi install` downloads JDK 25 into the project environment.
+1. `pixi run build-debug` produces the debug APK and `pixi run install-debug` puts it on a connected
+   device; `pixi run test`, `pixi run lint` and `pixi run check` run the verification tasks. `pixi task list` shows everything available.
+1. For release builds (`pixi run build` / `install` / `run`, the defaults) copy
+   `secrets.properties.sample` to `secrets.properties` and fill in your signing keystore.
+1. Android Studio works too: open the project, set Gradle JDK to 25, and use `pixi shell` for the
    terminal so `JAVA_HOME` and `ANDROID_HOME` are set.

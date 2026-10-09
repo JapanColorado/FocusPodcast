@@ -11,12 +11,16 @@ openjdk = "25.*"
 scripts = ["scripts/env.sh"]
 
 [tasks]
-# Environment sanity: JDK 17, Android SDK platform 35 / build-tools 34, local.properties.
+# Environment sanity: JDK 25, Android SDK platform 37 / build-tools 36, local.properties.
 check-env = "bash scripts/check-env.sh"
 
-# Build
-build = { cmd = "./gradlew assembleDebug", depends-on = ["check-env"], description = "Assemble the debug APK" }
-release = { cmd = "./gradlew assembleRelease", depends-on = ["check-env"], description = "Assemble the signed, minified release APK (needs secrets.properties)" }
+# Build / install / run: release is the default, -debug variants use the .debug appId.
+build = { cmd = "./gradlew assembleRelease", depends-on = ["check-env"], description = "Assemble the signed, minified release APK (needs secrets.properties)" }
+build-debug = { cmd = "./gradlew assembleDebug", depends-on = ["check-env"], description = "Assemble the debug APK" }
+install = { cmd = "bash scripts/install.sh release", depends-on = ["build"], description = "Build and install the release APK on the connected adb device (needs secrets.properties)" }
+install-debug = { cmd = "bash scripts/install.sh debug", depends-on = ["build-debug"], description = "Build and install the debug APK on the connected adb device" }
+run = { cmd = "adb shell am start -n allen.town.focus.podcast/allen.town.podcast.activity.SplashActivity", depends-on = ["install"], description = "Install the release APK and launch it" }
+run-debug = { cmd = "adb shell am start -n allen.town.focus.podcast.debug/allen.town.podcast.activity.SplashActivity", depends-on = ["install-debug"], description = "Install the debug APK and launch it" }
 clean = { cmd = "./gradlew clean", description = "Delete all Gradle build outputs" }
 
 # Verification
@@ -24,8 +28,4 @@ test = { cmd = "./gradlew testDebugUnitTest", depends-on = ["check-env"], descri
 lint = { cmd = "./gradlew lint", depends-on = ["check-env"], description = "Run Android lint on every module" }
 nn = { cmd = "bash scripts/count-bangbang.sh", description = "Fail if the Kotlin !! count exceeds scripts/bangbang.max" }
 detekt = { cmd = "./gradlew detekt", depends-on = ["check-env"], description = "Run detekt static analysis (config/detekt/detekt.yml)" }
-check = { depends-on = ["build", "test", "lint", "nn", "detekt"], description = "Everything CI would run" }
-
-# Device
-install = { cmd = "bash scripts/install.sh", depends-on = ["build"], description = "Install the debug APK on the connected adb device" }
-install-release = { cmd = "bash scripts/install.sh release", depends-on = ["release"], description = "Install the release APK on the connected adb device (needs secrets.properties)" }
+check = { depends-on = ["build-debug", "test", "lint", "nn", "detekt"], description = "Everything CI would run" }

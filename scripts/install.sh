@@ -1,14 +1,14 @@
 #!/usr/bin/env bash
-# Installs the debug (default) or release APK on the single connected adb device.
-# Usage: scripts/install.sh [debug|release]
+# Installs the release (default) or debug APK on the single connected adb device.
+# Usage: scripts/install.sh [release|debug]
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
-type="${1:-debug}"
+type="${1:-release}"
 case "$type" in
-  debug) build_task="build" ;;
-  release) build_task="release" ;;
-  *) echo "install: unknown build type '$type' (expected debug or release)" >&2; exit 2 ;;
+  release) build_task="build"; package="allen.town.focus.podcast" ;;
+  debug) build_task="build-debug"; package="allen.town.focus.podcast.debug" ;;
+  *) echo "install: unknown build type '$type' (expected release or debug)" >&2; exit 2 ;;
 esac
 
 apk="$(ls app/build/outputs/apk/"$type"/*.apk 2>/dev/null | head -n1 || true)"
@@ -22,7 +22,7 @@ if ! out="$(adb install -r "$apk" 2>&1)"; then
   echo "$out" >&2
   if grep -q "INSTALL_FAILED_UPDATE_INCOMPATIBLE" <<<"$out"; then
     echo "install: the installed app is signed with a different key. Uninstall it first:" >&2
-    echo "    adb uninstall allen.town.focus.podcast" >&2
+    echo "    adb uninstall $package" >&2
   fi
   exit 1
 fi

@@ -21,15 +21,17 @@ The app is F-Droid-only: there are no build flavors, no Google Play / Firebase /
 There is no flavor dimension, so task names are just `<buildType>`, e.g. `assembleDebug`.
 
 ```bash
-pixi run build      # assembleDebug
-pixi run test       # testDebugUnitTest
-pixi run lint       # ./gradlew lint
-pixi run nn         # !! ratchet (scripts/count-bangbang.sh)
-pixi run detekt     # detekt static analysis (config/detekt/detekt.yml)
-pixi run check      # build + test + lint + nn + detekt
-pixi run release    # assembleRelease (needs secrets.properties)
-pixi run install    # adb install the debug APK
-pixi run install-release  # adb install the release APK (needs secrets.properties)
+pixi run build          # assembleRelease (needs secrets.properties)
+pixi run install        # build + adb install the release APK
+pixi run run            # install + launch
+pixi run build-debug    # assembleDebug (no secrets needed)
+pixi run install-debug  # build + adb install the debug APK (allen.town.focus.podcast.debug)
+pixi run run-debug      # debug install + launch
+pixi run test           # testDebugUnitTest
+pixi run lint           # ./gradlew lint
+pixi run nn             # !! ratchet (scripts/count-bangbang.sh)
+pixi run detekt         # detekt static analysis (config/detekt/detekt.yml)
+pixi run check          # build-debug + test + lint + nn + detekt
 pixi run clean
 
 # Raw Gradle equivalents (inside `pixi shell`):
