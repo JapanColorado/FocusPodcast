@@ -49,9 +49,6 @@ import allen.town.podcast.discovery.PodcastSearchResult;
 import allen.town.podcast.event.FeedListUpdateEvent;
 import allen.town.podcast.event.ItunesCategoryChangeEvent;
 import allen.town.podcast.common.common.prefs.supportv7.dialogs.PreferenceListDialog;
-import allen.town.podcast.dialog.AddFeedByUrlDialog;
-import allen.town.podcast.util.LocalFeedImporter;
-import allen.town.podcast.util.OpmlImportLauncher;
 import allen.town.podcast.util.SkeletonRecyclerDelay;
 import allen.town.podcast.view.TagsSectionView;
 import allen.town.podcast.theme.util.scroll.ThemedFastScroller;
@@ -109,8 +106,6 @@ public class DiscoverFragment extends Fragment implements Toolbar.OnMenuItemClic
         adapter.addAll(result);
     }
 
-    private final OpmlImportLauncher opmlImportLauncher = new OpmlImportLauncher(this);
-    private final LocalFeedImporter localFeedImporter = new LocalFeedImporter(this);
 
 
     @Override
@@ -130,7 +125,7 @@ public class DiscoverFragment extends Fragment implements Toolbar.OnMenuItemClic
             displayUpArrow = savedInstanceState.getBoolean(KEY_UP_ARROW);
         }
         ((MainActivity) getActivity()).setupToolbarToggle(toolbar, displayUpArrow);
-        toolbar.inflateMenu(R.menu.add_subscription);
+        toolbar.inflateMenu(R.menu.discover);
 
         View root = viewBinding.getRoot();
         gridView = root.findViewById(R.id.gridView);
@@ -183,16 +178,7 @@ public class DiscoverFragment extends Fragment implements Toolbar.OnMenuItemClic
     @Override
     public boolean onMenuItemClick(MenuItem item) {
         final int itemId = item.getItemId();
-        if (itemId == R.id.addFromDevice) {
-            localFeedImporter.addFromDevice();
-            return true;
-        } else if (itemId == R.id.opmlImport) {
-            opmlImportLauncher.launch();
-            return true;
-        } else if (itemId == R.id.addByUrl) {
-            AddFeedByUrlDialog.show(requireContext());
-            return true;
-        } else if (itemId == R.id.switch_country) {
+        if (itemId == R.id.switch_country) {
             showSwitchCountryDialog();
             return true;
         } else if (itemId == R.id.search) {
@@ -312,7 +298,6 @@ public class DiscoverFragment extends Fragment implements Toolbar.OnMenuItemClic
         if (getFeedsListDisposable != null) {
             getFeedsListDisposable.dispose();
         }
-        localFeedImporter.dispose();
     }
 
 

@@ -56,9 +56,6 @@ class CategoryInfoAdapter : RecyclerView.Adapter<CategoryInfoAdapter.ViewHolder>
                 SubFeedsFragment.TAG -> {
                     R.string.library_label
                 }
-                AudiobooksFragment.TAG -> {
-                    R.string.audiobooks_label
-                }
                 EpisodesFragment.TAG -> {
                     R.string.episodes_label
                 }
@@ -70,15 +67,6 @@ class CategoryInfoAdapter : RecyclerView.Adapter<CategoryInfoAdapter.ViewHolder>
                 }
                 DownloadPagerFragment.TAG -> {
                     R.string.downloads_label
-                }
-                PlaybackHistoryFragment.TAG -> {
-                    R.string.playback_history_label
-                }
-                DiscoverFragment.TAG -> {
-                    R.string.discover
-                }
-                NavigationListAdapter.SUBSCRIPTION_LIST_TAG -> {
-                    R.string.subscriptions_list_label
                 }
                 else -> {
                     R.string.episodes_label

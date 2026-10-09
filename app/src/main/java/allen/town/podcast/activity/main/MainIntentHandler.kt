@@ -91,11 +91,19 @@ internal class MainIntentHandler(
                 val feature = uri.getQueryParameter("page") ?: return
                 when (feature) {
                     "downloads" -> navigator.loadFragment(DownloadPagerFragment.TAG, null)
-                    "history" -> navigator.loadFragment(PlaybackHistoryFragment.TAG, null)
+                    "history" -> {
+                        // not a drawer page: open it from the Playlist, like its toolbar menu does
+                        navigator.loadFragment(PlaylistFragment.TAG, null)
+                        loadChild(PlaybackHistoryFragment())
+                    }
                     "episodes" -> navigator.loadFragment(EpisodesFragment.TAG, null)
                     "playlist" -> navigator.loadFragment(PlaylistFragment.TAG, null)
                     "subscriptions", "library" -> navigator.loadFragment(SubFeedsFragment.TAG, null)
-                    "audiobooks" -> navigator.loadFragment(AudiobooksFragment.TAG, null)
+                    "audiobooks" -> {
+                        // not a drawer page any more: open it from the Library, like its shelf does
+                        navigator.loadFragment(SubFeedsFragment.TAG, null)
+                        loadChild(AudiobooksFragment())
+                    }
                     "favorite" -> navigator.loadFragment(FavoriteEpisodesFragment.TAG, null)
                     else -> {
                         showSnack(

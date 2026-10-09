@@ -4,8 +4,6 @@ import allen.town.podcast.R
 import allen.town.podcast.activity.SettingsActivity
 import allen.town.podcast.core.pref.Prefs
 import allen.town.podcast.dialog.FeedRefreshPrefDialog
-import allen.town.podcast.dialog.FeedsSortDialog
-import allen.town.podcast.dialog.SubsFilterDialog
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.text.format.DateFormat
@@ -15,7 +13,7 @@ import java.util.Calendar
 import java.util.GregorianCalendar
 import java.util.concurrent.TimeUnit
 
-/** Podcast search engine, the refresh schedule and how the subscription list looks. */
+/** Podcast search engine, the refresh schedule and how the Library looks. */
 class SubscriptionsPrefFragment : AbsSettingsFragment(),
     SharedPreferences.OnSharedPreferenceChangeListener {
 
@@ -24,16 +22,6 @@ class SubscriptionsPrefFragment : AbsSettingsFragment(),
         findPreference<Preference>(Prefs.PREF_UPDATE_INTERVAL)?.onPreferenceClickListener =
             Preference.OnPreferenceClickListener {
                 FeedRefreshPrefDialog(requireContext()).show()
-                true
-            }
-        findPreference<Preference>(Prefs.PREF_FILTER_FEED)?.onPreferenceClickListener =
-            Preference.OnPreferenceClickListener {
-                SubsFilterDialog.showDialog(requireContext())
-                true
-            }
-        findPreference<Preference>(Prefs.PREF_DRAWER_FEED_ORDER)?.onPreferenceClickListener =
-            Preference.OnPreferenceClickListener {
-                FeedsSortDialog.newInstance().show(childFragmentManager, null)
                 true
             }
     }

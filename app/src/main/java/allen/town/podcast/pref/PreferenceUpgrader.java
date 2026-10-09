@@ -33,7 +33,7 @@ public class PreferenceUpgrader {
         int newVersion = BuildConfig.VERSION_CODE;
 
         // Not tied to a version code: debug builds reuse it, and the step is idempotent and cheap.
-        addMissingLibraryCategories();
+        syncLibraryCategories();
 
         if (oldVersion != newVersion) {
             AutoUpdateManager.restartUpdateAlarm(context);
@@ -45,12 +45,13 @@ public class PreferenceUpgrader {
 
     /**
      * The drawer pages are stored as a list ({@link BasePreferenceUtil#getLibraryCategory()}) once
-     * the user reorders or hides one, so a page added in a later version (Audiobooks) would never
-     * show up for them, not even in the "Categories" dialog. Inserts every default page missing
-     * from the stored list right after the default page that precedes it, with its default
-     * visibility, and leaves the user's order and choices alone.
+     * the user reorders or hides one, so a page added in a later version would never show up for
+     * them, not even in the "Categories" dialog, and a page dropped from the drawer (Discover,
+     * Audiobooks, History, the subscription list) would linger. Drops stored pages that are no longer defaults, inserts every
+     * default page missing from the stored list right after the default page that precedes it,
+     * with its default visibility, and leaves the user's order and choices alone.
      */
-    private static void addMissingLibraryCategories() {
+    private static void syncLibraryCategories() {
         List<CategoryInfo> defaults = BasePreferenceUtil.INSTANCE.getDefaultCategories();
         List<CategoryInfo> merged = mergeCategories(BasePreferenceUtil.getLibraryCategory(), defaults);
         if (merged != null) {
@@ -59,18 +60,27 @@ public class PreferenceUpgrader {
     }
 
     /**
-     * @return the stored list with the missing default entries inserted, or null when nothing is
-     *     missing
+     * @return the stored list without entries that are no longer defaults and with the missing
+     *     default entries inserted, or null when nothing changed
      */
     @Nullable
     static List<CategoryInfo> mergeCategories(@NonNull List<CategoryInfo> stored,
                                               @NonNull List<CategoryInfo> defaults) {
-        Set<String> storedTags = new HashSet<>();
-        for (CategoryInfo info : stored) {
-            storedTags.add(info.getTag());
+        Set<String> defaultTags = new HashSet<>();
+        for (CategoryInfo info : defaults) {
+            defaultTags.add(info.getTag());
         }
-        List<CategoryInfo> result = new ArrayList<>(stored);
+        Set<String> storedTags = new HashSet<>();
+        List<CategoryInfo> result = new ArrayList<>();
         boolean changed = false;
+        for (CategoryInfo info : stored) {
+            if (defaultTags.contains(info.getTag())) {
+                storedTags.add(info.getTag());
+                result.add(info);
+            } else {
+                changed = true;
+            }
+        }
         for (int i = 0; i < defaults.size(); i++) {
             CategoryInfo missing = defaults.get(i);
             if (storedTags.contains(missing.getTag())) {
@@ -88,7 +98,20 @@ public class PreferenceUpgrader {
             storedTags.add(missing.getTag());
             changed = true;
         }
+        if (changed && !hasVisiblePage(result)) {
+            // the only visible page was dropped: show the first default page so the drawer is not empty
+            result.get(indexOfTag(result, defaults.get(0).getTag())).setVisible(true);
+        }
         return changed ? result : null;
+    }
+
+    private static boolean hasVisiblePage(List<CategoryInfo> list) {
+        for (CategoryInfo info : list) {
+            if (info.getVisible()) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private static int indexOfTag(List<CategoryInfo> list, String tag) {

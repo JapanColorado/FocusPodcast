@@ -2,14 +2,11 @@ package allen.town.podcast.activity.main
 
 import allen.town.podcast.R
 import allen.town.podcast.activity.MainActivity
-import allen.town.podcast.fragment.AudiobooksFragment
-import allen.town.podcast.fragment.DiscoverFragment
 import allen.town.podcast.fragment.DownloadPagerFragment
 import allen.town.podcast.fragment.EpisodesFragment
 import allen.town.podcast.fragment.FavoriteEpisodesFragment
 import allen.town.podcast.fragment.FeedItemlistFragment
 import allen.town.podcast.fragment.NavigationDrawerFragment.Companion.saveLastNavFragment
-import allen.town.podcast.fragment.PlaybackHistoryFragment
 import allen.town.podcast.fragment.PlaylistFragment
 import allen.town.podcast.fragment.SubFeedsFragment
 import allen.town.podcast.fragment.TransitionEffect
@@ -48,11 +45,8 @@ internal class MainFragmentNavigator(
             PlaylistFragment.TAG -> fragment = PlaylistFragment()
             EpisodesFragment.TAG -> fragment = EpisodesFragment()
             DownloadPagerFragment.TAG -> fragment = DownloadPagerFragment()
-            PlaybackHistoryFragment.TAG -> fragment = PlaybackHistoryFragment()
-            DiscoverFragment.TAG -> fragment = DiscoverFragment()
             SubFeedsFragment.TAG -> fragment =
                 SubFeedsFragment()
-            AudiobooksFragment.TAG -> fragment = AudiobooksFragment()
             FavoriteEpisodesFragment.TAG -> fragment = FavoriteEpisodesFragment()
             else -> {
                 // default to the queue

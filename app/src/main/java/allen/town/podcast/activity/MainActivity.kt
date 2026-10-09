@@ -204,9 +204,10 @@ class MainActivity : SimpleToolbarActivity(), OnSharedPreferenceChangeListener {
 
     private fun checkFirstLaunch() {
         val prefs = getSharedPreferences(PREF_NAME, MODE_PRIVATE)
-        //on first launch, open the add-subscription drawer
+        //on first launch, open Discover on top of the (empty) Library, where its "+" menu lives
         if (prefs.getBoolean(PREF_IS_FIRST_LAUNCH, true)) {
-            loadFragment(DiscoverFragment.TAG, null)
+            loadFragment(SubFeedsFragment.TAG, null)
+            loadChildFragment(DiscoverFragment())
 
             // for backward compatibility, we only change defaults for fresh installs
             Prefs.updateInterval = 12
