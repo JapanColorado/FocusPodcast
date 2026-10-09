@@ -56,6 +56,22 @@ public class FeedItemCountTest {
     }
 
     @Test
+    public void filteredCountMatchesTheFilteredListOfOneFeed() {
+        Db db = Db.getInstance();
+        Feed feed = feedWithItems("https://example.com/a.xml", "A",
+                FeedItem.PLAYED, FeedItem.NEW, FeedItem.UNPLAYED);
+        Feed other = feedWithItems("https://example.com/b.xml", "B", FeedItem.PLAYED);
+        db.setCompleteFeed(feed, other);
+
+        FeedItemFilter played = new FeedItemFilter(new String[]{FeedItemFilter.PLAYED});
+        FeedItemFilter unplayed = new FeedItemFilter(new String[]{FeedItemFilter.UNPLAYED});
+        assertEquals(1, db.getFeedItemCount(feed.getId(), played));
+        assertEquals(2, db.getFeedItemCount(feed.getId(), unplayed));
+        assertEquals(3, db.getFeedItemCount(feed.getId(), FeedItemFilter.unfiltered()));
+        assertEquals(1, db.getFeedItemCount(other.getId(), played));
+    }
+
+    @Test
     public void unknownFeedHasNoItems() {
         assertEquals(0, Db.getInstance().getFeedItemCount(4242L));
     }

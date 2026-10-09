@@ -456,16 +456,9 @@
   <string name="double_tap_toast">Apasă pe butonul \"înapoi\" din nou pentru a ieși</string>
   <string name="pref_delete_removes_from_queue_title">Șterge fișierele scoase din coadă</string>
   <string name="pref_delete_removes_from_queue_sum">Șterge automat episoadele din coadă când acestea sunt șterse</string>
-  <string name="pref_filter_feed_title">Filtru de abonamente</string>
   <string name="pref_filter_feed_sum">Filtrează abonamentele în sertarul de navigare și ecranul cu abonamente</string>
   <string name="subscriptions_are_filtered">Abonamentele sunt filtrate</string>
-  <string name="subscriptions_counter_greater_zero">Contor diferit de zero</string>
-  <string name="auto_downloaded">Descărcare automată</string>
-  <string name="not_auto_downloaded">Nu se descarcă automat</string>
   <string name="kept_updated">Actualizate</string>
-  <string name="not_kept_updated">Nu sunt actualizate</string>
-  <string name="new_episode_notification_enabled">Notificări pornite</string>
-  <string name="new_episode_notification_disabled">Notificări oprite</string>
   <string name="pref_feed_settings_dialog_msg">Această setare este unică pentru fiecare podcast. Poți schimba această setare dacă deschizi pagina podcastului.</string>
   <string name="pref_contribute">Contribuie</string>
   <string name="pref_show_subscription_title">Arată titlul abonamentului</string>
@@ -597,7 +590,6 @@
   <string name="episode_filters_description">Listă de termeni folosită pentru a decide dacă un episod va fi sau nu inclus când descărcarea automată este pornită</string>
   <string name="episode_filters_include">Include</string>
   <string name="episode_filters_exclude">Exclude</string>
-  <string name="episode_filters_duration">Durata minimă (în minute)</string>
   <string name="episode_filters_hint">Un singur cuvânt \"Cuvinte multiple\"</string>
   <string name="keep_updated">Menține actualizat</string>
   <string name="keep_updated_summary">Include acest podcast când reîmprospătarea automată a podcasturilor este pornită</string>
@@ -620,18 +612,6 @@
   <string name="local_feed_description">Acest podcast virtual a fost creat prin adăugarea unui director la FocusPodcast.</string>
   <string name="unable_to_start_system_file_manager">Incapabil de a porni sistemul de management al fișierelor</string>
   <string name="filter">Filtrează</string>
-  <string name="hide_is_favorite_label">Este favorit</string>
-  <string name="not_favorite">Nu este favorit</string>
-  <string name="hide_downloaded_episodes_label">Descărcat</string>
-  <string name="hide_not_downloaded_episodes_label">Nu este descărcat</string>
-  <string name="queued_label">În coada de redare</string>
-  <string name="not_queued_label">Nu este în coada de redare</string>
-  <string name="has_media">Are parte media</string>
-  <string name="no_media">Fără parte media</string>
-  <string name="hide_paused_episodes_label">Pauză</string>
-  <string name="not_paused">Nu sa întrerupt</string>
-  <string name="hide_played_episodes_label">Redat</string>
-  <string name="not_played">Nu sa redat</string>
   <!--Sort-->
   <string name="sort_title_a_z">Titlul (A \u2192 Z)</string>
   <string name="sort_title_z_a">Titlul (A \u2192 Z)</string>

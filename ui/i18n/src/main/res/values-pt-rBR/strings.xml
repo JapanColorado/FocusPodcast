@@ -432,16 +432,9 @@
   <string name="double_tap_toast">Clique novamente no botão voltar para sair</string>
   <string name="pref_delete_removes_from_queue_title">Excluir remove da fila</string>
   <string name="pref_delete_removes_from_queue_sum">Remove automaticamente um episódio da fila quando ele é excluído.</string>
-  <string name="pref_filter_feed_title">Filtro de Assinaturas</string>
   <string name="pref_filter_feed_sum">Filtre suas assinaturas na navegação e na tela de assinaturas.</string>
   <string name="subscriptions_are_filtered">Assinaturas estão filtradas.</string>
-  <string name="subscriptions_counter_greater_zero">Contador maior que zero</string>
-  <string name="auto_downloaded">Download automático</string>
-  <string name="not_auto_downloaded">Download não automático</string>
   <string name="kept_updated">Mantido atualizado</string>
-  <string name="not_kept_updated">Não atualizado</string>
-  <string name="new_episode_notification_enabled">Notificação habilitada</string>
-  <string name="new_episode_notification_disabled">Notificação desabilitada</string>
   <string name="pref_feed_settings_dialog_msg">Essa configuração é única para cada podcast. Você pode alterá-la abrindo a página do podcast.</string>
   <string name="pref_contribute">Contribuir</string>
     <!--About screen-->
@@ -589,18 +582,6 @@
   <string name="local_feed_description">Este podcast virtual foi criado adicionando uma pasta ao FocusPodcast.</string>
   <string name="unable_to_start_system_file_manager">Incapaz de iniciar o gerenciador de arquivos do sistema</string>
   <string name="filter">Filtrar</string>
-  <string name="hide_is_favorite_label">É favorito</string>
-  <string name="not_favorite">Não favorito</string>
-  <string name="hide_downloaded_episodes_label">Baixado</string>
-  <string name="hide_not_downloaded_episodes_label">Não baixado</string>
-  <string name="queued_label">Enfileirado</string>
-  <string name="not_queued_label">Não enfileirado</string>
-  <string name="has_media">Possui mídia</string>
-  <string name="no_media">Nenhuma media</string>
-  <string name="hide_paused_episodes_label">Pausado</string>
-  <string name="not_paused">Não pausado</string>
-  <string name="hide_played_episodes_label">Reproduzido</string>
-  <string name="not_played">Não tocado</string>
   <!--Sort-->
   <string name="sort_title_a_z">Título (A \u2192 Z)</string>
   <string name="sort_title_z_a">Título (Z \u2192 A)</string>

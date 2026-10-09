@@ -449,16 +449,9 @@
   <string name="double_tap_toast">Za izhod znova tapnite gumb za nazaj</string>
   <string name="pref_delete_removes_from_queue_title">Izbriši odstranjene iz čakalne vrste</string>
   <string name="pref_delete_removes_from_queue_sum">Samodejno odstranite epizodo iz čakalne vrste, ko je izbrisana.</string>
-  <string name="pref_filter_feed_title">Filter za naročnine</string>
   <string name="pref_filter_feed_sum">Filtrirajte svoje naročnine v navigacijskem predalu in na zaslonu z naročninami.</string>
   <string name="subscriptions_are_filtered">Naročnine so filtrirane.</string>
-  <string name="subscriptions_counter_greater_zero">Števec je večji od nič</string>
-  <string name="auto_downloaded">Samodejni prenos</string>
-  <string name="not_auto_downloaded">Ni samodejno preneseno</string>
   <string name="kept_updated">Naročnine, ki se posodabljajo</string>
-  <string name="not_kept_updated">Naročnine, ki se ne posodabljajo</string>
-  <string name="new_episode_notification_enabled">Obvestila omogočena</string>
-  <string name="new_episode_notification_disabled">Obvestila onemogočena</string>
   <string name="pref_feed_settings_dialog_msg">Ta nastavitev je unikatna za vsak podcast. Spremenite jo lahko tako, da odprete stran podcasta.</string>
   <string name="pref_contribute">Prispevajte</string>
   <!--About screen-->
@@ -609,18 +602,6 @@
   <string name="local_feed_description">Ta virtualni podcast je bil ustvarjen z dodajanjem mape v FocusPodcast.</string>
   <string name="unable_to_start_system_file_manager">Sistemskega upravitelja datotek ni mogoče zagnati</string>
   <string name="filter">Filter</string>
-  <string name="hide_is_favorite_label">Je med priljubljenimi</string>
-  <string name="not_favorite">Ni priljubljeno</string>
-  <string name="hide_downloaded_episodes_label">Prenešeno</string>
-  <string name="hide_not_downloaded_episodes_label">Ni prenešeno</string>
-  <string name="queued_label">V čakalni vrsti</string>
-  <string name="not_queued_label">Ni v čakalni vrsti</string>
-  <string name="has_media">Ima predstavnostno vsebino</string>
-  <string name="no_media">Nima predstavnostne vsebine</string>
-  <string name="hide_paused_episodes_label">Pavza</string>
-  <string name="not_paused">Ni začasno ustavljeno</string>
-  <string name="hide_played_episodes_label">Predvajano</string>
-  <string name="not_played">Ni predvajano</string>
   <!--Sort-->
   <string name="sort_title_a_z">Naslov (A \u2192 Z)</string>
   <string name="sort_title_z_a">Naslov (Z \u2192 A)</string>

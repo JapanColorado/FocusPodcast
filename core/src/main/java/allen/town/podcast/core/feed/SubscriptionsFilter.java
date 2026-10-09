@@ -62,15 +62,18 @@ public class SubscriptionsFilter {
         }
     }
 
+    /** True when any key this filter understands is set (unknown stored keys do not count). */
     public boolean isEnabled() {
-        return properties.length > 0;
+        return showIfCounterGreaterZero || showAutoDownloadEnabled || showAutoDownloadDisabled
+                || showUpdatedEnabled || showUpdatedDisabled
+                || showEpisodeNotificationEnabled || showEpisodeNotificationDisabled;
     }
 
     /**
      * Run a list of feed items through the filter.
      */
     public List<Feed> filter(List<Feed> items, LongIntMap feedCounters) {
-        if (properties.length == 0) {
+        if (!isEnabled()) {
             return items;
         }
 

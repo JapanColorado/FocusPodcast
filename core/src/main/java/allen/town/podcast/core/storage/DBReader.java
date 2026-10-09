@@ -16,6 +16,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import allen.town.podcast.core.feed.EpisodeFilterOptions;
 import allen.town.podcast.core.feed.SubscriptionsFilter;
 import allen.town.podcast.core.feed.util.AudiobookUtils;
 import allen.town.podcast.core.pref.Prefs;
@@ -247,6 +248,11 @@ public final class DBReader {
         Feed feed = FeedCursorMapper.convert(cursor);
         FeedPreferences preferences = FeedPreferencesCursorMapper.convert(cursor);
         feed.setPreferences(preferences);
+        if (feed.getItemFilter() != null) {
+            // a filter saved before the filter sheet may hold keys it no longer shows; they must
+            // not hide episodes invisibly
+            feed.setItemFilter(EpisodeFilterOptions.sanitize(feed.getItemFilter().getValues()));
+        }
         return feed;
     }
 
@@ -441,6 +447,41 @@ public final class DBReader {
         adapter.open();
         try {
             return adapter.getFeedItemCount(feedId);
+        } finally {
+            adapter.close();
+        }
+    }
+
+    /**
+     * Number of items of a feed that match {@code filter} (subscribed or not). Must not run on the
+     * main thread.
+     */
+    public static int getFeedItemCount(long feedId, @NonNull FeedItemFilter filter) {
+        Db adapter = Db.getInstance();
+        adapter.open();
+        try {
+            return adapter.getFeedItemCount(feedId, filter);
+        } finally {
+            adapter.close();
+        }
+    }
+
+    /**
+     * Number of feeds of {@code kind} that {@code filter} lets through, as the Library page would
+     * show them with that filter. Must not run on the main thread.
+     */
+    public static int getFilteredFeedCount(@NonNull FeedKind kind, @NonNull SubscriptionsFilter filter) {
+        Db adapter = Db.getInstance();
+        adapter.open();
+        try {
+            final LongIntMap feedCounters = adapter.getFeedCounters(Prefs.getFeedCounterSetting());
+            List<Feed> ofKind = new ArrayList<>();
+            for (Feed feed : getFeedList(adapter)) {
+                if (kind.matches(feed)) {
+                    ofKind.add(feed);
+                }
+            }
+            return filter.filter(ofKind, feedCounters).size();
         } finally {
             adapter.close();
         }

@@ -533,6 +533,11 @@ public class Db {
         return itemDao.getFeedItemCount(feedId);
     }
 
+    /** Number of items of the feed that match {@code filter}. */
+    public final int getFeedItemCount(long feedId, FeedItemFilter filter) {
+        return itemDao.getFeedItemCount(feedId, filter);
+    }
+
     public final Cursor getTotalEpisodeCountCursor(FeedItemFilter filter) {
         return itemDao.getTotalEpisodeCountCursor(filter);
     }

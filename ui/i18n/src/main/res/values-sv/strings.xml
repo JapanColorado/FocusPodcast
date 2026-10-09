@@ -441,16 +441,9 @@
   <string name="double_tap_toast">Tryck på tillbakaknappen igen för att avsluta</string>
   <string name="pref_delete_removes_from_queue_title">Radering tar bort från kön</string>
   <string name="pref_delete_removes_from_queue_sum">Ta automatiskt bort episoder från kön när de raderas.</string>
-  <string name="pref_filter_feed_title">Prenumerationsfilter</string>
   <string name="pref_filter_feed_sum">Filtrera dina prenumerationer i navigeringsmenyn och på prenumerationsskärmen.</string>
   <string name="subscriptions_are_filtered">Prenumerationer är filtrerade.</string>
-  <string name="subscriptions_counter_greater_zero">Räknare högre än noll</string>
-  <string name="auto_downloaded">Automatiskt nedladdad</string>
-  <string name="not_auto_downloaded">Manuellt nedladdad</string>
   <string name="kept_updated">Hålls uppdaterad</string>
-  <string name="not_kept_updated">Manuell uppdatering</string>
-  <string name="new_episode_notification_enabled">Avisering aktiverad</string>
-  <string name="new_episode_notification_disabled">Avisering avstängt</string>
   <string name="pref_feed_settings_dialog_msg">Denna inställning är unik för var podcast. Du kan ändra den genom att öppna podcastsidan.</string>
   <string name="pref_contribute">Bidra</string>
   <string name="pref_show_subscription_title">Visa Prenumerationstitel</string>
@@ -579,7 +572,6 @@
   <string name="episode_filters_description">Lista av termer som används för att avgöra om en episod ska inkluderas eller exkluderas vid automatisk nedladdning</string>
   <string name="episode_filters_include">Inkludera</string>
   <string name="episode_filters_exclude">Exkludera</string>
-  <string name="episode_filters_duration">Minsta längd (i minuter)</string>
   <string name="episode_filters_hint">Enstaka ord \"Flera ord\"</string>
   <string name="keep_updated">Håll uppdaterad</string>
   <string name="keep_updated_summary">Inkludera detta flöde vid (auto-)uppdatering av alla podcasts</string>
@@ -602,18 +594,6 @@
   <string name="local_feed_description">Denna virtuella podcast skapades genom att lägga till en katalog till FocusPodcast.</string>
   <string name="unable_to_start_system_file_manager">Kunde inte starta systemets filhanterare</string>
   <string name="filter">Filtrera</string>
-  <string name="hide_is_favorite_label">Är favorit</string>
-  <string name="not_favorite">Ej favorit</string>
-  <string name="hide_downloaded_episodes_label">Nedladdade</string>
-  <string name="hide_not_downloaded_episodes_label">Ej nedladdade</string>
-  <string name="queued_label">Köad</string>
-  <string name="not_queued_label">Ej köad</string>
-  <string name="has_media">Har media</string>
-  <string name="no_media">Ingen media</string>
-  <string name="hide_paused_episodes_label">Pausade</string>
-  <string name="not_paused">Ej pausad</string>
-  <string name="hide_played_episodes_label">Spelad</string>
-  <string name="not_played">Ej spelad</string>
   <!--Sort-->
   <string name="sort_title_a_z">Titel (A \u2192 Ö)</string>
   <string name="sort_title_z_a">Titel (Ö \u2192 A)</string>

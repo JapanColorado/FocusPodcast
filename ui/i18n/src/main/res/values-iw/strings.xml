@@ -471,16 +471,9 @@
   <string name="double_tap_toast">יש לגעת בכפתור החזרה שוב כדי לצאת</string>
   <string name="pref_delete_removes_from_queue_title">מחיקה מסירה מהתור</string>
   <string name="pref_delete_removes_from_queue_sum">הסרת פרק מהתור אוטומטית עם מחיקתו.</string>
-  <string name="pref_filter_feed_title">מסנן מינויים</string>
   <string name="pref_filter_feed_sum">סינון המינויים שלך במגירת הניווט ובמסך המינויים.</string>
   <string name="subscriptions_are_filtered">המינויים מסוננים.</string>
-  <string name="subscriptions_counter_greater_zero">המונה גדול מאפס</string>
-  <string name="auto_downloaded">התקבלו אוטומטית</string>
-  <string name="not_auto_downloaded">לא התקבלו אוטומטית</string>
   <string name="kept_updated">נשאר עדכני</string>
-  <string name="not_kept_updated">לא נשאר עדכני</string>
-  <string name="new_episode_notification_enabled">ההתראות פעילות</string>
-  <string name="new_episode_notification_disabled">ההתראות מושבתות</string>
   <string name="pref_feed_settings_dialog_msg">הגדרה זו היא ייחודית לפי פודקאסט. ניתן לשנות אותה על ידי פתיחת עמוד הפודקאסט.</string>
   <string name="pref_contribute">תרומה</string>
   <string name="pref_show_subscription_title">הצגת כותרת מינוי</string>
@@ -615,7 +608,6 @@
   <string name="episode_filters_description">רשימת המונחים בהם יעשה שימוש כדי להחליט אם להכליל או להחריג פרק כלשהו במהלך הורדה אוטומטית</string>
   <string name="episode_filters_include">להכליל</string>
   <string name="episode_filters_exclude">להחריג</string>
-  <string name="episode_filters_duration">משך זמן מזערי (בדקות)</string>
   <string name="episode_filters_hint">מילים בודדות \n\"אוסף מילים\"</string>
   <string name="keep_updated">לשמור על עדכניות</string>
   <string name="keep_updated_summary">לכלול את הפודקאסט בעת רענון (אוטומטי) של כל הפודקאסטים</string>
@@ -638,18 +630,6 @@
   <string name="local_feed_description">הפודקאסט הווירטואלי הזה נוצר על ידי הוספת תיקייה לאנטנה־פּוֹד.</string>
   <string name="unable_to_start_system_file_manager">לא ניתן להפעיל את מנהל הקבצים של המערכת</string>
   <string name="filter">מסנן</string>
-  <string name="hide_is_favorite_label">עם סימון מועדף</string>
-  <string name="not_favorite">לא במועדפים</string>
-  <string name="hide_downloaded_episodes_label">הורד</string>
-  <string name="hide_not_downloaded_episodes_label">לא הורד</string>
-  <string name="queued_label">בתור</string>
-  <string name="not_queued_label">לא בתור</string>
-  <string name="has_media">יש מדיה</string>
-  <string name="no_media">אין מדיה</string>
-  <string name="hide_paused_episodes_label">מושהה</string>
-  <string name="not_paused">לא מושהים</string>
-  <string name="hide_played_episodes_label">נוגן</string>
-  <string name="not_played">לא נוגנו</string>
   <!--Sort-->
   <string name="sort_title_a_z">כותרת (א \u2192 ת)</string>
   <string name="sort_title_z_a">כותרת (ת \u2192 א)</string>

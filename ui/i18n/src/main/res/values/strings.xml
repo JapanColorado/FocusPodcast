@@ -538,16 +538,9 @@
     <string name="double_tap_toast">Click the back button again to exit</string>
     <string name="pref_delete_removes_from_queue_title">Remove from Playlist</string>
     <string name="pref_delete_removes_from_queue_sum">Automatically remove the episode from the queue when it is deleted</string>
-    <string name="pref_filter_feed_title">Subscription Filter</string>
     <string name="pref_filter_feed_sum">Filter your subscriptions in navigation drawer and subscriptions screen.</string>
     <string name="subscriptions_are_filtered">Subscriptions are filtered</string>
-    <string name="subscriptions_counter_greater_zero">Counter greater than zero</string>
-    <string name="auto_downloaded">Auto downloaded</string>
-    <string name="not_auto_downloaded">Not auto downloaded</string>
     <string name="kept_updated">Kept updated</string>
-    <string name="not_kept_updated">Not kept updated</string>
-    <string name="new_episode_notification_enabled">Notification enabled</string>
-    <string name="new_episode_notification_disabled">Notification disabled</string>
     <string name="pref_feed_settings_dialog_msg">This setting is unique to each podcast. You can change it by opening the podcast page.</string>
     <string name="pref_contribute">Contribute</string>
     <string name="pref_show_subscription_title">Show Subscription Title</string>
@@ -693,7 +686,6 @@
     <string name="episode_filters_description">Include or exclude an episode when downloading automatically</string>
     <string name="episode_filters_include">Include</string>
     <string name="episode_filters_exclude">Exclude</string>
-    <string name="episode_filters_duration">Minimal Duration (in minutes)</string>
     <string name="episode_filters_hint">Single words \"Multiple Words\"</string>
     <string name="keep_updated">Keep Updated</string>
     <string name="keep_updated_summary">Include this podcast when automatically refreshing all podcasts</string>
@@ -737,18 +729,6 @@
     <string name="unable_to_start_system_file_manager">Unable to start system file manager</string>
 
     <string name="filter">Filter</string>
-    <string name="hide_is_favorite_label">Is favorite</string>
-    <string name="not_favorite">Not favorite</string>
-    <string name="hide_downloaded_episodes_label">Downloaded</string>
-    <string name="hide_not_downloaded_episodes_label">Not downloaded</string>
-    <string name="queued_label">Already in playlist</string>
-    <string name="not_queued_label">Not in playlist</string>
-    <string name="has_media">Has media</string>
-    <string name="no_media">No media</string>
-    <string name="hide_paused_episodes_label">Paused</string>
-    <string name="not_paused">Not paused</string>
-    <string name="hide_played_episodes_label">Played</string>
-    <string name="not_played">Not played</string>
 
     <!-- Sort  -->
     <string name="sort_title_a_z">Title (A \u2192 Z)</string>
@@ -990,5 +970,52 @@
     <plurals name="delete_played_confirm">
         <item quantity="one">Delete %1$d played episode (%2$s)?</item>
         <item quantity="other">Delete %1$d played episodes (%2$s)?</item>
+    </plurals>
+    <string name="sort_and_filter">Sort &amp; filter</string>
+    <string name="filter_section_status">Status</string>
+    <string name="filter_section_downloaded">Downloaded</string>
+    <string name="filter_section_favorite">Favorite</string>
+    <string name="filter_unplayed">Unplayed</string>
+    <string name="filter_in_progress">In progress</string>
+    <string name="filter_played">Played</string>
+    <string name="filter_downloaded">Downloaded</string>
+    <string name="filter_not_downloaded">Not downloaded</string>
+    <string name="filter_favorite">Favorite</string>
+    <string name="filter_not_favorite">Not favorite</string>
+    <string name="filter_section_new_episodes">New episodes</string>
+    <string name="filter_has_new_episodes">Has new episodes</string>
+    <string name="filter_section_auto_download">Auto download</string>
+    <string name="filter_section_auto_refresh">Auto refresh</string>
+    <string name="filter_section_notifications">New-episode notifications</string>
+    <string name="filter_on">On</string>
+    <string name="filter_off">Off</string>
+    <string name="filter_section_author">Author</string>
+    <string name="filter_section_length">Length</string>
+    <string name="audiobook_sort_recently_played">Recently played</string>
+    <string name="audiobook_sort_title">Title</string>
+    <string name="audiobook_sort_author">Author</string>
+    <string name="audiobook_sort_progress">Progress</string>
+    <string name="audiobook_sort_date_added">Date added</string>
+    <string name="audiobook_status_not_started">Not started</string>
+    <string name="audiobook_length_under_5h">Under 5 h</string>
+    <string name="audiobook_length_5_to_15h">5–15 h</string>
+    <string name="audiobook_length_over_15h">Over 15 h</string>
+    <string name="no_audiobooks_match_filter">No audiobooks match the filter</string>
+    <string name="no_audiobooks_match_filter_msg">Change or clear the filter to see your other audiobooks</string>
+    <string name="episode_filters_min_duration">Minimum duration (minutes)</string>
+    <string name="episode_filters_add_term">Add term</string>
+    <string name="episode_filters_remove_term">Remove %1$s</string>
+    <string name="save_label">Save</string>
+    <plurals name="filter_episodes_shown">
+        <item quantity="one">%d episode shown</item>
+        <item quantity="other">%d episodes shown</item>
+    </plurals>
+    <plurals name="filter_podcasts_shown">
+        <item quantity="one">%d podcast shown</item>
+        <item quantity="other">%d podcasts shown</item>
+    </plurals>
+    <plurals name="filter_audiobooks_shown">
+        <item quantity="one">%d audiobook shown</item>
+        <item quantity="other">%d audiobooks shown</item>
     </plurals>
 </resources>

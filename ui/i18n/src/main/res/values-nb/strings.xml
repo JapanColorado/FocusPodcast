@@ -397,16 +397,9 @@
   <string name="double_tap_toast">Trykk tilbake-knappen igjen for å lukke</string>
   <string name="pref_delete_removes_from_queue_title">Sletting fjerner fra køen</string>
   <string name="pref_delete_removes_from_queue_sum">Å slette en episode fjerner den automatisk også fra køen.</string>
-  <string name="pref_filter_feed_title">Abonnement filter</string>
   <string name="pref_filter_feed_sum">Filtrer dine abonnementer i navigasjonslinjen og på abonnementer skjermen.</string>
   <string name="subscriptions_are_filtered">Abonnementer er filtrert.</string>
-  <string name="subscriptions_counter_greater_zero">Teller er større en null</string>
-  <string name="auto_downloaded">Automatisk nedlastet</string>
-  <string name="not_auto_downloaded">Ikke automatisk nedlastet</string>
   <string name="kept_updated">Hold oppdatert</string>
-  <string name="not_kept_updated">Ikke holdt oppdatert</string>
-  <string name="new_episode_notification_enabled">Varslinger slått på</string>
-  <string name="new_episode_notification_disabled">Varslinger slått av</string>
   <string name="pref_feed_settings_dialog_msg">Den innstillingen er unik til hver podkast. Du kan endre den med å åpne siden til podkasten.</string>
   <string name="pref_contribute">Bidra</string>
   <!--About screen-->
@@ -551,18 +544,6 @@
   <string name="local_feed_description">Denne virtuelle podkasten ble laget ved å legge en mappe til i FocusPodcast.</string>
   <string name="unable_to_start_system_file_manager">Kan ikke start systemets fil eksplorer.</string>
   <string name="filter">Filter</string>
-  <string name="hide_is_favorite_label">Er favoritt</string>
-  <string name="not_favorite">Ikke favoritt</string>
-  <string name="hide_downloaded_episodes_label">Nedlastet</string>
-  <string name="hide_not_downloaded_episodes_label">Ikke nedlastet</string>
-  <string name="queued_label">I kø</string>
-  <string name="not_queued_label">Ikke i kø</string>
-  <string name="has_media">Har media</string>
-  <string name="no_media">Ingen media</string>
-  <string name="hide_paused_episodes_label">Pauset</string>
-  <string name="not_paused">Ikke på pause</string>
-  <string name="hide_played_episodes_label">Avspilt</string>
-  <string name="not_played">Ikke avspillt</string>
   <!--Sort-->
   <string name="sort_title_a_z">Tittel (A \u2192 Z)</string>
   <string name="sort_title_z_a">Tittel (Z \u2192 A)</string>

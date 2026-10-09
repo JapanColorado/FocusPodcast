@@ -128,4 +128,28 @@ public class AudiobookUtilsTest {
         assertEquals(0, progress.getPercent());
         assertEquals(0, progress.getListenedDuration());
     }
+
+    @Test
+    public void lastPlayedIsTheLatestOfAnyTrackAndStartedNeedsPlayOrPosition() {
+        AudiobookProgress progress = AudiobookUtils.computeProgress(1, Arrays.asList(
+                track(1, "Ch 1.mp3", FeedItem.PLAYED, 1000, 0, 500),
+                track(2, "Ch 2.mp3", FeedItem.UNPLAYED, 1000, 100, 300),
+                track(3, "Ch 3.mp3", FeedItem.UNPLAYED, 1000, 0, 0)));
+        assertEquals(500, progress.getLastPlayedTime());
+        assertTrue(progress.isStarted());
+
+        AudiobookProgress untouched = AudiobookUtils.computeProgress(1, Arrays.asList(
+                track(1, "Ch 1.mp3", FeedItem.UNPLAYED, 1000, 0, 0),
+                track(2, "Ch 2.mp3", FeedItem.NEW, 1000, 0, 0)));
+        assertEquals(0, untouched.getLastPlayedTime());
+        assertFalse(untouched.isStarted());
+
+        AudiobookProgress markedPlayed = AudiobookUtils.computeProgress(1, Collections.singletonList(
+                track(1, "Ch 1.mp3", FeedItem.PLAYED, 1000, 0, 0)));
+        assertTrue(markedPlayed.isStarted());
+
+        AudiobookProgress unknownDuration = AudiobookUtils.computeProgress(1, Collections.singletonList(
+                track(1, "Ch 1.mp3", FeedItem.UNPLAYED, 0, 300, 9)));
+        assertTrue(unknownDuration.isStarted());
+    }
 }

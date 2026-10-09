@@ -393,6 +393,18 @@ class FeedItemDao extends Dao {
         }
     }
 
+    /** Number of items of the feed that match {@code filter} (what its episode list shows). */
+    final int getFeedItemCount(long feedId, FeedItemFilter filter) {
+        String filterQuery = FeedItemFilterQuery.generateFrom(filter);
+        final String query = "SELECT COUNT(" + TABLE_NAME_FEED_ITEMS + "." + KEY_ID + ") FROM "
+                + TABLE_NAME_FEED_ITEMS + JOIN_FEED_ITEM_AND_MEDIA
+                + " WHERE " + TABLE_NAME_FEED_ITEMS + "." + KEY_FEED + "=?"
+                + ("".equals(filterQuery) ? "" : " AND " + filterQuery);
+        try (Cursor c = db.rawQuery(query, new String[]{String.valueOf(feedId)})) {
+            return c.moveToFirst() ? c.getInt(0) : 0;
+        }
+    }
+
     /**
      * Counts what {@link #getRecentlyPublishedItemsCursor} lists. (Before version 7 an empty filter
      * left this without a WHERE, so the subscribed condition ended up in the LEFT JOIN's ON clause

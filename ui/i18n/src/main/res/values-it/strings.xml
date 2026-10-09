@@ -441,16 +441,9 @@
   <string name="double_tap_toast">Premi nuovamente il tasto Indietro per uscire</string>
   <string name="pref_delete_removes_from_queue_title">Rimuovi dalla coda gli eliminati</string>
   <string name="pref_delete_removes_from_queue_sum">Quando un episodio viene eliminato lo rimuove automaticamente dalla coda.</string>
-  <string name="pref_filter_feed_title">Filtro iscrizioni</string>
   <string name="pref_filter_feed_sum">Filtra le iscrizioni nella barra laterale e nella schermata Iscrizioni.</string>
   <string name="subscriptions_are_filtered">Iscrizioni filtrate.</string>
-  <string name="subscriptions_counter_greater_zero">Contatore maggiore di zero</string>
-  <string name="auto_downloaded">Con download automatico</string>
-  <string name="not_auto_downloaded">Senza download automatico</string>
   <string name="kept_updated">Mantenute aggiornate</string>
-  <string name="not_kept_updated">Non mantenute aggiornate</string>
-  <string name="new_episode_notification_enabled">Notifiche abilitate</string>
-  <string name="new_episode_notification_disabled">Notifiche disabilitate</string>
   <string name="pref_feed_settings_dialog_msg">Questa impostazione è univoca per ogni podcast. Puoi modificarla aprendo la pagina del podcast.</string>
   <string name="pref_contribute">Contribuisci</string>
   <string name="pref_show_subscription_title">Mostra il titolo del podcast</string>
@@ -579,7 +572,6 @@
   <string name="episode_filters_description">Elenco di termini per filtrare gli episodi da includere o escludere dai download automatici.</string>
   <string name="episode_filters_include">Includi</string>
   <string name="episode_filters_exclude">Escludi</string>
-  <string name="episode_filters_duration">Durata minima (in minuti)</string>
   <string name="episode_filters_hint">Parole singole \"Parole multiple\"</string>
   <string name="keep_updated">Mantieni aggiornato</string>
   <string name="keep_updated_summary">Includi questo podcast nell\'auto-aggiornamento generale</string>
@@ -602,18 +594,6 @@
   <string name="local_feed_description">Questo podcast virtuale è generato dall\'aggiunta di una cartella ad FocusPodcast.</string>
   <string name="unable_to_start_system_file_manager">Impossibile avviare il gestore file di sistema</string>
   <string name="filter">Filtra</string>
-  <string name="hide_is_favorite_label">Preferiti</string>
-  <string name="not_favorite">Non preferito</string>
-  <string name="hide_downloaded_episodes_label">Scaricati</string>
-  <string name="hide_not_downloaded_episodes_label">Non scaricati</string>
-  <string name="queued_label">In coda</string>
-  <string name="not_queued_label">Non in coda</string>
-  <string name="has_media">Con media</string>
-  <string name="no_media">Nessun media</string>
-  <string name="hide_paused_episodes_label">In pausa</string>
-  <string name="not_paused">Non in pausa</string>
-  <string name="hide_played_episodes_label">Riprodotti</string>
-  <string name="not_played">Non riprodotto</string>
   <!--Sort-->
   <string name="sort_title_a_z">Titolo (A \u2192 Z)</string>
   <string name="sort_title_z_a">Titolo (Z \u2192 A)</string>

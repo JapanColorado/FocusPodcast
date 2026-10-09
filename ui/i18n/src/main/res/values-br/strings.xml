@@ -478,16 +478,9 @@
   <string name="double_tap_toast">Stokañ ur wech ouzhpenn evit kuitaa</string>
   <string name="pref_delete_removes_from_queue_title">Dilemel a denn eus al lost</string>
   <string name="pref_delete_removes_from_queue_sum">Tennañ ur rann eus al lost ent emgefreek pa vez dilamet.</string>
-  <string name="pref_filter_feed_title">Sil ar c\'houmanantoù</string>
   <string name="pref_filter_feed_sum">Silañ ho koumanantoù war ar stalaf merdeiñ ha war skramm ar c\'houmanantoù.</string>
   <string name="subscriptions_are_filtered">Silet eo ar c\'houmanantoù.</string>
-  <string name="subscriptions_counter_greater_zero">Konter brasoc\'h eget mann</string>
-  <string name="auto_downloaded">Pellgarget ent emgefreek</string>
-  <string name="not_auto_downloaded">N\'eo ket pellgarget ent emgefreek</string>
   <string name="kept_updated">Lezet hizivaet</string>
-  <string name="not_kept_updated">N\'eo ket lezet hizivaet</string>
-  <string name="new_episode_notification_enabled">Gweredekaet eo bet ar rebuzadurioù.</string>
-  <string name="new_episode_notification_disabled">Diweredekaet eo bet ar rebuzadurioù.</string>
   <string name="pref_feed_settings_dialog_msg">An dibarzh-mañ a zo dibar evit pep podskignad. Gallout a rit kemmañ anezhañ e pajenn ar podskignad.</string>
   <string name="pref_contribute">Kemer perzh</string>
   <!--About screen-->
@@ -641,18 +634,6 @@
   <string name="local_feed_description">Krouet eo bet ar podskignad galloudel-mañ en ur ouzhpennañ un teuliad da FocusPodcast.</string>
   <string name="unable_to_start_system_file_manager">N\'haller ket loc\'hañ merour restroù ar reizhiad</string>
   <string name="filter">Sil</string>
-  <string name="hide_is_favorite_label">Ur sined eo</string>
-  <string name="not_favorite">N\'eo ket ur sined</string>
-  <string name="hide_downloaded_episodes_label">Pellgarget</string>
-  <string name="hide_not_downloaded_episodes_label">N\'eo ket pellgarget</string>
-  <string name="queued_label">Lakaet el lost</string>
-  <string name="not_queued_label">N\'emañ ket el lost</string>
-  <string name="has_media">Gant ur media</string>
-  <string name="no_media">Media ebet</string>
-  <string name="hide_paused_episodes_label">Ehanet</string>
-  <string name="not_paused">N\'eo ket ehanet</string>
-  <string name="hide_played_episodes_label">Lennet</string>
-  <string name="not_played">N\'eo ket lennet</string>
   <!--Sort-->
   <string name="sort_title_a_z">Titl (A \u2192 Z)</string>
   <string name="sort_title_z_a">Titl (Z \u2192 A)</string>

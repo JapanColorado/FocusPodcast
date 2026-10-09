@@ -3,6 +3,7 @@ package allen.town.podcast.core.pref
 import allen.town.podcast.common.util.BasePreferenceUtil.materialYou
 import allen.town.podcast.common.util.ThemeUtils.generalThemeValue
 import allen.town.podcast.core.R
+import allen.town.podcast.core.feed.AudiobookShelfFilter
 import allen.town.podcast.core.feed.SubscriptionsFilter
 import allen.town.podcast.core.playback.AlbumCoverStyle
 import allen.town.podcast.core.playback.NowPlayingScreen
@@ -31,6 +32,10 @@ internal object UiPrefs {
     private const val PREF_SHOW_DOWNLOAD_REPORT = "pref_show_download_sync_failed"
     private const val PREF_SHOW_AUTO_DOWNLOAD_REPORT = "pref_show_auto_downlod_result"
     private const val PREF_NOTIFICATION_RATIONALE_SHOWN = "pref_notification_rationale_shown"
+    private const val PREF_AUDIOBOOKS_SORT = "pref_audiobooks_sort"
+    private const val PREF_AUDIOBOOKS_STATUS = "pref_audiobooks_status"
+    private const val PREF_AUDIOBOOKS_AUTHORS = "pref_audiobooks_authors"
+    private const val PREF_AUDIOBOOKS_LENGTH = "pref_audiobooks_length"
 
     private const val NOTIFICATION_BUTTON_REWIND = 0
     private const val NOTIFICATION_BUTTON_FAST_FORWARD = 1
@@ -305,6 +310,26 @@ internal object UiPrefs {
                 .putString(Prefs.PREF_FILTER_FEED, value.serialize())
                 .apply()
         }
+
+    /** Sort and filter of the Audiobooks page (not the audiobook row of the Library page). */
+    var audiobookShelfFilter: AudiobookShelfFilter
+        get() = AudiobookShelfFilter(
+            enumOrNull<AudiobookShelfFilter.Sort>(prefs.getString(PREF_AUDIOBOOKS_SORT, null)),
+            enumOrNull<AudiobookShelfFilter.Status>(prefs.getString(PREF_AUDIOBOOKS_STATUS, null)),
+            prefs.getStringSet(PREF_AUDIOBOOKS_AUTHORS, null),
+            enumOrNull<AudiobookShelfFilter.Length>(prefs.getString(PREF_AUDIOBOOKS_LENGTH, null))
+        )
+        set(value) {
+            prefs.edit()
+                .putString(PREF_AUDIOBOOKS_SORT, value.sort.name)
+                .putString(PREF_AUDIOBOOKS_STATUS, value.status?.name)
+                .putStringSet(PREF_AUDIOBOOKS_AUTHORS, HashSet(value.authors))
+                .putString(PREF_AUDIOBOOKS_LENGTH, value.length?.name)
+                .apply()
+        }
+
+    private inline fun <reified E : Enum<E>> enumOrNull(name: String?): E? =
+        enumValues<E>().firstOrNull { it.name == name }
 
     fun shouldShowSubscriptionTitle(): Boolean {
         return prefs.getBoolean(Prefs.PREF_SUBSCRIPTION_TITLE, false)

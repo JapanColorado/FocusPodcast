@@ -1,6 +1,7 @@
 package allen.town.podcast.core.pref
 
 import allen.town.podcast.common.model.CategoryInfo
+import allen.town.podcast.core.feed.AudiobookShelfFilter
 import allen.town.podcast.core.feed.SubscriptionsFilter
 import allen.town.podcast.core.playback.AlbumCoverStyle
 import allen.town.podcast.core.playback.NowPlayingScreen
@@ -553,6 +554,13 @@ object Prefs {
         get() = UiPrefs.subscriptionsFilter
         set(value) {
             UiPrefs.subscriptionsFilter = value
+        }
+
+    @JvmStatic
+    var audiobookShelfFilter: AudiobookShelfFilter
+        get() = UiPrefs.audiobookShelfFilter
+        set(value) {
+            UiPrefs.audiobookShelfFilter = value
         }
 
     @JvmStatic

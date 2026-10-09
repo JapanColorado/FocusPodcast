@@ -26,7 +26,7 @@ import allen.town.podcast.dialog.AddFeedByUrlDialog
 import allen.town.podcast.dialog.FeedsSortDialog.Companion.newInstance
 import allen.town.podcast.dialog.RemoveFeedDialog.show
 import allen.town.podcast.dialog.RenameItemDialog
-import allen.town.podcast.dialog.SubsFilterDialog.showDialog
+import allen.town.podcast.dialog.filter.SubscriptionFilterSheet
 import allen.town.podcast.dialog.TagEditDialog
 import allen.town.podcast.dialog.TagEditDialog.Companion.newInstance
 import allen.town.podcast.discovery.CombinedSearcher
@@ -195,7 +195,9 @@ class SubFeedsFragment : Fragment(), Toolbar.OnMenuItemClickListener, OnSelectMo
             AutoUpdateManager.runImmediate(requireContext())
             return true
         } else if (itemId == R.id.subscriptions_filter) {
-            showDialog(requireContext())
+            if (childFragmentManager.findFragmentByTag(SubscriptionFilterSheet.TAG) == null) {
+                SubscriptionFilterSheet().show(childFragmentManager, SubscriptionFilterSheet.TAG)
+            }
             return true
         } else if (itemId == R.id.subscriptions_sort) {
             newInstance().show(childFragmentManager, null)

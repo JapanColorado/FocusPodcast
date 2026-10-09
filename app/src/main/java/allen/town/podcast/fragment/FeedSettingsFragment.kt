@@ -13,9 +13,9 @@ import allen.town.podcast.core.storage.DBTasks
 import allen.town.podcast.core.storage.DBWriter
 import allen.town.podcast.databinding.PlaybackSpeedFeedSettingDialogBinding
 import allen.town.podcast.dialog.AuthenticationDialog
-import allen.town.podcast.dialog.EpisodeFilterDialog
 import allen.town.podcast.dialog.FeedSkipPreDialog
 import allen.town.podcast.dialog.TagEditDialog
+import allen.town.podcast.dialog.filter.KeywordFilterSheet
 import allen.town.podcast.event.playback.TitleChangeEvent
 import allen.town.podcast.event.settings.AdSkipChangedEvent
 import allen.town.podcast.event.settings.SkipIntroEndingChangedEvent
@@ -118,7 +118,7 @@ class FeedSettingsFragment : Fragment() {
         EventBus.getDefault().unregister(this)
     }
 
-    class FeedSettingsPreferenceFragment : AbsSettingsFragment() {
+    class FeedSettingsPreferenceFragment : AbsSettingsFragment(), KeywordFilterSheet.Host {
         private var feed: Feed? = null
         private var disposable: Disposable? = null
         private val preferenceWrites = CompositeDisposable()
@@ -380,14 +380,24 @@ class FeedSettingsFragment : Fragment() {
             val feedPreferences = this.feedPreferences ?: return
             requirePreference<Preference>(PREF_EPISODE_FILTER).onPreferenceClickListener =
                 Preference.OnPreferenceClickListener { preference: Preference? ->
-                    object : EpisodeFilterDialog(context, feedPreferences.filter) {
-                        override fun onConfirmed(filter: FeedFilter?) {
-                            feedPreferences.filter = filter ?: return
-                            DBWriter.setFeedPreferences(feedPreferences)
-                        }
-                    }.show()
+                    if (childFragmentManager.findFragmentByTag(KeywordFilterSheet.TAG) == null) {
+                        KeywordFilterSheet.newInstance(feedPreferences.feedID, feedPreferences.filter)
+                            .show(childFragmentManager, KeywordFilterSheet.TAG)
+                    }
                     false
                 }
+        }
+
+        override fun onKeywordFilterSaved(filter: FeedFilter) {
+            val feedPreferences = this.feedPreferences
+            if (feedPreferences == null) {
+                // recreated and not loaded again yet: store into the current row
+                val feedId = requireArguments().getLong(EXTRA_FEED_ID)
+                DBWriter.updateFeedPreferences(feedId) { it.filter = filter }
+                return
+            }
+            feedPreferences.filter = filter
+            DBWriter.setFeedPreferences(feedPreferences)
         }
 
         private fun setupAuthentificationPreference() {

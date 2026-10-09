@@ -471,16 +471,9 @@
   <string name="double_tap_toast">Jei norite išeiti, dar kartą palieskite grįžimo mygtuką</string>
   <string name="pref_delete_removes_from_queue_title">Ištrynus pašalinti iš eilės</string>
   <string name="pref_delete_removes_from_queue_sum">Ištrynus epizodą automatiškai pašalinti jį iš eilės</string>
-  <string name="pref_filter_feed_title">Prenumeratų filtras</string>
   <string name="pref_filter_feed_sum">Filtruokite prenumeratas naršymo stalčiuje ir prenumeratų lange.</string>
   <string name="subscriptions_are_filtered">Yra taikomas prenumeratų filtras.</string>
-  <string name="subscriptions_counter_greater_zero">Skaitiklio reikšmė didesnė už nulį</string>
-  <string name="auto_downloaded">Atsiųstas automatiškai</string>
-  <string name="not_auto_downloaded">Atsiųstas ne automatiškai</string>
   <string name="kept_updated">Pastoviai atnaujinama</string>
-  <string name="not_kept_updated">Neatnaujinama</string>
-  <string name="new_episode_notification_enabled">Pranešimas įjungtas</string>
-  <string name="new_episode_notification_disabled">Pranešimas išjungtas</string>
   <string name="pref_feed_settings_dialog_msg">Šis nustatymas individualus kiekvienai tinklalaidei. Jį pakeisti galite atvėrę tinklalaidės langą.</string>
   <string name="pref_contribute">Prisidėti</string>
   <string name="pref_show_subscription_title">Rodyti prenumeratos pavadinimą</string>
@@ -615,7 +608,6 @@
   <string name="episode_filters_description">Žodžių ar frazių sąrašas, kuriuo remiantis sprendžiama, ar epizodas turėtų būti įtrauktas ar išbrauktas iš automatiškai atsiunčiamų epizodų</string>
   <string name="episode_filters_include">Įtraukti</string>
   <string name="episode_filters_exclude">Išbraukti</string>
-  <string name="episode_filters_duration">Minimali trukmė (minutėmis)</string>
   <string name="episode_filters_hint">Pavieniai žodžiai \"frazės kabutėse\"</string>
   <string name="keep_updated">Pastoviai atnaujinti</string>
   <string name="keep_updated_summary">Įtraukti šią tinklalaidę į (automatinį) visų tinklalaidžių atnaujinimą</string>
@@ -638,18 +630,6 @@
   <string name="local_feed_description">Ši virtuali tinklalaidė sukurta į „FocusPodcast“ pridėjus aplanką.</string>
   <string name="unable_to_start_system_file_manager">Nepavyko paleisti sistemos failų tvarkytuvės</string>
   <string name="filter">Filtruoti</string>
-  <string name="hide_is_favorite_label">Mėgstami</string>
-  <string name="not_favorite">Ne mėgstami</string>
-  <string name="hide_downloaded_episodes_label">Atsiųsti</string>
-  <string name="hide_not_downloaded_episodes_label">Neatsiųsti</string>
-  <string name="queued_label">Eilėje</string>
-  <string name="not_queued_label">Ne eilėje</string>
-  <string name="has_media">Turintys medijos failų</string>
-  <string name="no_media">Be medijos failų</string>
-  <string name="hide_paused_episodes_label">Pristabdyti</string>
-  <string name="not_paused">Ne pristabdyti</string>
-  <string name="hide_played_episodes_label">Perklausyti</string>
-  <string name="not_played">Neperklausyti</string>
   <!--Sort-->
   <string name="sort_title_a_z">Pavadinimas (A \u2192 Z)</string>
   <string name="sort_title_z_a">Pavadinimas (Z \u2192 A)</string>

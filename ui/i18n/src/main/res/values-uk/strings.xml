@@ -449,16 +449,9 @@
   <string name="double_tap_toast">Натисніть кнопку назад ще раз, щоб вийти</string>
   <string name="pref_delete_removes_from_queue_title">Видалення з черги видалених епізодів</string>
   <string name="pref_delete_removes_from_queue_sum">Автоматично видаляти епізод із черги, коли він буде видалений.</string>
-  <string name="pref_filter_feed_title">Фільтр підписки</string>
   <string name="pref_filter_feed_sum">Фільтруйте свої підписки на панелі навігації та на екрані підписок.</string>
   <string name="subscriptions_are_filtered">Підписки фільтровано.</string>
-  <string name="subscriptions_counter_greater_zero">Лічильник більше нуля</string>
-  <string name="auto_downloaded">Завантажено автоматично</string>
-  <string name="not_auto_downloaded">Не завантажено автоматично</string>
   <string name="kept_updated">Оновлюється</string>
-  <string name="not_kept_updated">Не оновлюється</string>
-  <string name="new_episode_notification_enabled">Сповіщення ввімкнено</string>
-  <string name="new_episode_notification_disabled">Сповіщення вимкнено</string>
   <string name="pref_feed_settings_dialog_msg">Цей параметр унікальний для кожного подкасту. Ви можете змінити його, відкривши сторінку подкасту.</string>
   <string name="pref_contribute">Посприяти</string>
   <!--About screen-->
@@ -609,18 +602,6 @@
   <string name="local_feed_description">Цей віртуальний подкаст був створений шляхом додавання папки до FocusPodcast.</string>
   <string name="unable_to_start_system_file_manager">Не запускається системний файловий менеджер</string>
   <string name="filter">Фільтр</string>
-  <string name="hide_is_favorite_label">В улюблених</string>
-  <string name="not_favorite">Не в улюблених</string>
-  <string name="hide_downloaded_episodes_label">Завантажені</string>
-  <string name="hide_not_downloaded_episodes_label">Не завантажені</string>
-  <string name="queued_label">В черзі</string>
-  <string name="not_queued_label">Не в черзі</string>
-  <string name="has_media">З медіа</string>
-  <string name="no_media">Без медіа</string>
-  <string name="hide_paused_episodes_label">Призупинені</string>
-  <string name="not_paused">Не призупинені</string>
-  <string name="hide_played_episodes_label">Відтворені</string>
-  <string name="not_played">Не відтворені</string>
   <!--Sort-->
   <string name="sort_title_a_z">Назва (А - Я)</string>
   <string name="sort_title_z_a">Назва (Я - А)</string>

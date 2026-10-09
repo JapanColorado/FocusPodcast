@@ -58,19 +58,27 @@ public final class AudiobookUtils {
      * Progress through one book. {@code items} are all its tracks, with media loaded. Played tracks
      * count with their whole duration, unplayed ones with their saved position. The resume track is
      * the unplayed track with a saved position that was played most recently, else the first
-     * unplayed track in track order.
+     * unplayed track in track order. The book's last-played time is the latest of its tracks', so
+     * the Audiobooks page can sort by it without another query.
      */
     @NonNull
     public static AudiobookProgress computeProgress(long feedId, @NonNull List<FeedItem> items) {
         long total = 0;
         long listened = 0;
         int played = 0;
+        boolean started = false;
+        long lastPlayed = 0;
         FeedItem inProgress = null;
         long inProgressLastPlayed = Long.MIN_VALUE;
         for (FeedItem item : items) {
             FeedMedia media = item.getMedia();
             long duration = media != null ? Math.max(0, media.getDuration()) : 0;
             total += duration;
+            if (media != null) {
+                lastPlayed = Math.max(lastPlayed, media.getLastPlayedTime());
+                started |= media.getPosition() > 0;
+            }
+            started |= item.isPlayed();
             if (item.isPlayed()) {
                 played++;
                 listened += duration;
@@ -94,6 +102,7 @@ public final class AudiobookUtils {
                 }
             }
         }
-        return new AudiobookProgress(feedId, items.size(), played, total, listened, resume);
+        return new AudiobookProgress(feedId, items.size(), played, total, listened, resume, started,
+                lastPlayed);
     }
 }

@@ -421,16 +421,9 @@
   <string name="double_tap_toast">برای خروج دوباره روی دکمه برگشت ضربه بزنید</string>
   <string name="pref_delete_removes_from_queue_title">حذف باعث پاک شدن از صف شود</string>
   <string name="pref_delete_removes_from_queue_sum">وقتی اپیزود حذف شد ، به طور خودکار از صف حذف شود.</string>
-  <string name="pref_filter_feed_title">فیلتر اشتراک</string>
   <string name="pref_filter_feed_sum">اشتراک های خود را در کشوی ناوبری و صفحه اشتراک ها فیلتر کنید.</string>
   <string name="subscriptions_are_filtered">اشتراک ها فیلتر می شوند.</string>
-  <string name="subscriptions_counter_greater_zero">شمارنده بزرگتر از صفر</string>
-  <string name="auto_downloaded">بارگیری خودکار</string>
-  <string name="not_auto_downloaded">بارگیری خودکار انجام نشود</string>
   <string name="kept_updated">بروز نگهداری شد</string>
-  <string name="not_kept_updated">بروز نگهداری نشد</string>
-  <string name="new_episode_notification_enabled">آگاهی به کار افتاده</string>
-  <string name="new_episode_notification_disabled">آگاهی از کار افتاده</string>
   <string name="pref_feed_settings_dialog_msg">این تنظیم برای هر پادکست منحصر به فرد است. با باز کردن صفحه پادکست می توانید آن را تغییر دهید.</string>
   <string name="pref_contribute">مشارکت</string>
   <!--About screen-->
@@ -575,18 +568,6 @@
   <string name="local_feed_description">این پادکست مجازی با افزودن پوشه ای به  آنتن پاد ایجاد شده است.</string>
   <string name="unable_to_start_system_file_manager">مدیریت فایل سیستم امکان پذیر نیست</string>
   <string name="filter">فیلتر</string>
-  <string name="hide_is_favorite_label">مورد علاقه</string>
-  <string name="not_favorite">مورد علاقه نیست</string>
-  <string name="hide_downloaded_episodes_label">بارگیری‌شده</string>
-  <string name="hide_not_downloaded_episodes_label">بارگیری‌نشده</string>
-  <string name="queued_label">در صف گذاشته شد</string>
-  <string name="not_queued_label">در صف گذاشته نشد</string>
-  <string name="has_media">رسانه دارد</string>
-  <string name="no_media">رسانه ندارد</string>
-  <string name="hide_paused_episodes_label">متوقف شد</string>
-  <string name="not_paused">مکث نشده</string>
-  <string name="hide_played_episodes_label">پخش شد</string>
-  <string name="not_played">اجرا نشده</string>
   <!--Sort-->
   <string name="sort_title_a_z">عنوان (الفبایی معکوس)</string>
   <string name="sort_title_z_a">عنوان (الفبایی)</string>

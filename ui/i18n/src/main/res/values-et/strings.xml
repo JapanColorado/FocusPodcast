@@ -411,16 +411,9 @@
   <string name="double_tap_toast">Koputa nuppu väljumiseks uuesti</string>
   <string name="pref_delete_removes_from_queue_title">Kustutamine eemaldab järjekorrast</string>
   <string name="pref_delete_removes_from_queue_sum">Saade eemaldatakse järjekorrast pärast kustutamist automaatselt.</string>
-  <string name="pref_filter_feed_title">Tellimuste filter</string>
   <string name="pref_filter_feed_sum">Filtreeri oma tellimusi navigeerimisribal ja tellimuste lehel.</string>
   <string name="subscriptions_are_filtered">Tellimused on filtreeritud.</string>
-  <string name="subscriptions_counter_greater_zero">Loendur on suurem kui null</string>
-  <string name="auto_downloaded">Automaatselt alla laaditud</string>
-  <string name="not_auto_downloaded">Pole automaatselt alla laaditud</string>
   <string name="kept_updated">Hoitakse uuendatuna</string>
-  <string name="not_kept_updated">Ei hoita uuendatuna</string>
-  <string name="new_episode_notification_enabled">Teavitus lubatud</string>
-  <string name="new_episode_notification_disabled">Teavitus keelatud</string>
   <!--About screen-->
   <string name="about_pref">Info</string>
   <string name="privacy_policy">Privaatsus</string>
@@ -561,18 +554,6 @@
   <string name="local_feed_description">See virtuaalne taskuhääling loodi kausta lisamisega FocusPodcasti.</string>
   <string name="unable_to_start_system_file_manager">Süsteemi failihalduri käivitamine ebaõnnestus</string>
   <string name="filter">Filter</string>
-  <string name="hide_is_favorite_label">On lemmik</string>
-  <string name="not_favorite">Pole lemmik</string>
-  <string name="hide_downloaded_episodes_label">Alla laaditud</string>
-  <string name="hide_not_downloaded_episodes_label">Pole alla laaditud</string>
-  <string name="queued_label">Järjekorras</string>
-  <string name="not_queued_label">Pole järjekorras</string>
-  <string name="has_media">On meediafaile</string>
-  <string name="no_media">Meediafaile pole</string>
-  <string name="hide_paused_episodes_label">Peatatud</string>
-  <string name="not_paused">Pole pausitud</string>
-  <string name="hide_played_episodes_label">Esitatud</string>
-  <string name="not_played">Pole esitatud</string>
   <!--Sort-->
   <string name="sort_title_a_z">Pealkiri (A \u2192 Z)</string>
   <string name="sort_title_z_a">Pealkiri (Z \u2192 A)</string>

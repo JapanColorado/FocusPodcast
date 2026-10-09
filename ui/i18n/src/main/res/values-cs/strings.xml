@@ -429,16 +429,9 @@
   <string name="double_tap_toast">Znovu se dotkněte tlačítka zpět pro ukončení aplikace</string>
   <string name="pref_delete_removes_from_queue_title">Mazání také odstraňuje epizody z fronty</string>
   <string name="pref_delete_removes_from_queue_sum">Automaticky odstraní epizodu z fronty poté, co je smazána.</string>
-  <string name="pref_filter_feed_title">Filtr odběrů</string>
   <string name="pref_filter_feed_sum">Filtrujte svoje odběry v navigačním panelu a na obrazovce odběrů.</string>
   <string name="subscriptions_are_filtered">Odběry jsou filtrovány.</string>
-  <string name="subscriptions_counter_greater_zero">Počet vyšší než nula</string>
-  <string name="auto_downloaded">Automaticky stahováno</string>
-  <string name="not_auto_downloaded">Nebylo automaticky staženo</string>
   <string name="kept_updated">Udržováno aktuální</string>
-  <string name="not_kept_updated">Neaktualizováno</string>
-  <string name="new_episode_notification_enabled">Upozornění zapnuta</string>
-  <string name="new_episode_notification_disabled">Upozornění vypnuta</string>
   <string name="pref_feed_settings_dialog_msg">Toto nastavení je specifické pro každý podcast zvlášť. Lze ho měnit otevřením přehledové stránky podcastu.</string>
   <string name="pref_contribute">Pomozte</string>
   <!--About screen-->
@@ -588,18 +581,6 @@
   <string name="local_feed_description">Byl založen následující virtuální podcast vytvořením adresáře v FocusPodcast.</string>
   <string name="unable_to_start_system_file_manager">Nedaří se spustit správce souborů</string>
   <string name="filter">Filtr</string>
-  <string name="hide_is_favorite_label">Je mezi oblíbenými</string>
-  <string name="not_favorite">Není mezi oblíbenými</string>
-  <string name="hide_downloaded_episodes_label">Stažené</string>
-  <string name="hide_not_downloaded_episodes_label">Nestažené</string>
-  <string name="queued_label">Ve frontě</string>
-  <string name="not_queued_label">Mimo frontu</string>
-  <string name="has_media">Obsahuje média</string>
-  <string name="no_media">Žádná média</string>
-  <string name="hide_paused_episodes_label">Pozastavené</string>
-  <string name="not_paused">Nepozastaveno</string>
-  <string name="hide_played_episodes_label">Poslechnuté</string>
-  <string name="not_played">Nepřehraných</string>
   <!--Sort-->
   <string name="sort_title_a_z">Názvu (A \u2192 Z)</string>
   <string name="sort_title_z_a">Názvu (Z \u2192 A)</string>

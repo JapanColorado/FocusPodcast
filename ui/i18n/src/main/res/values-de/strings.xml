@@ -423,16 +423,9 @@
   <string name="double_tap_toast">Zurück-Button erneut tippen zum Verlassen</string>
   <string name="pref_delete_removes_from_queue_title">Löschen entfernt aus Warteschlange</string>
   <string name="pref_delete_removes_from_queue_sum">Entferne Episoden automatisch aus der Warteschlange, wenn sie gelöscht werden.</string>
-  <string name="pref_filter_feed_title">Abonnement-Filter</string>
   <string name="pref_filter_feed_sum">Filtere deine Abonnements in der Navigation und auf der Abonnement-Übersicht. </string>
   <string name="subscriptions_are_filtered">Abonnements sind gefiltert</string>
-  <string name="subscriptions_counter_greater_zero">Anzahl größer als Null</string>
-  <string name="auto_downloaded">Automatisch heruntergeladen </string>
-  <string name="not_auto_downloaded">Nicht automatisch heruntergeladen</string>
   <string name="kept_updated">Aktuell gehalten</string>
-  <string name="not_kept_updated">Nicht aktuell gehalten</string>
-  <string name="new_episode_notification_enabled">Benachrichtigung aktiviert</string>
-  <string name="new_episode_notification_disabled">Benachrichtigung deaktiviert</string>
   <string name="pref_feed_settings_dialog_msg">Diese Einstellung wird pro Podcast festgelegt. Du kannst sie ändern, indem du die Podcast-Seite öffnest.</string>
   <string name="pref_contribute">Mitwirken</string>
   <!--About screen-->
@@ -579,18 +572,6 @@
   <string name="local_feed_description">Dieser virtuelle Podcast wurde durch einen lokalen Ordner hinzugefügt.</string>
   <string name="unable_to_start_system_file_manager">System-Dateimanager kann nicht gestartet werden</string>
   <string name="filter">Filtern</string>
-  <string name="hide_is_favorite_label">Favorit</string>
-  <string name="not_favorite">Nicht favorisiert</string>
-  <string name="hide_downloaded_episodes_label">Heruntergeladen</string>
-  <string name="hide_not_downloaded_episodes_label">Nicht heruntergeladen</string>
-  <string name="queued_label">In Warteschlange</string>
-  <string name="not_queued_label">Nicht in Warteschlange</string>
-  <string name="has_media">Hat Medien</string>
-  <string name="no_media">Keine Medien</string>
-  <string name="hide_paused_episodes_label">Pausiert</string>
-  <string name="not_paused">Nicht pausiert</string>
-  <string name="hide_played_episodes_label">Gespielt</string>
-  <string name="not_played">Nicht abgespielt</string>
   <!--Sort-->
   <string name="sort_title_a_z">Titel (A \u2192 Z)</string>
   <string name="sort_title_z_a">Titel (Z \u2192 A)</string>

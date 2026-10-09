@@ -471,16 +471,9 @@
   <string name="double_tap_toast">Pre ukončenie aplikácie sa opäť dotknite tlačidla späť</string>
   <string name="pref_delete_removes_from_queue_title">Mazanie tiež odstraňuje epizódy z poradia</string>
   <string name="pref_delete_removes_from_queue_sum">Po zmazaní automaticky odstráni epizódu z poradia.</string>
-  <string name="pref_filter_feed_title">Filter odberov</string>
   <string name="pref_filter_feed_sum">Filtrujte svoje odbery v navigačnom paneli a na obrazovke odberov.</string>
   <string name="subscriptions_are_filtered">Odbery sú filtrované.</string>
-  <string name="subscriptions_counter_greater_zero">Počet vyšší ako nula</string>
-  <string name="auto_downloaded">Automaticky stiahnuté</string>
-  <string name="not_auto_downloaded">Nebolo automaticky stiahnuté</string>
   <string name="kept_updated">Udržované aktuálne</string>
-  <string name="not_kept_updated">Neaktualizované</string>
-  <string name="new_episode_notification_enabled">Upozornenia zapnuté</string>
-  <string name="new_episode_notification_disabled">Upozornenia vypnuté</string>
   <string name="pref_feed_settings_dialog_msg">Toto nastavenie je špecifické pre každý podcast zvlášť. Je možné ho meniť po otvorení prehľadovej stránky podcastu.</string>
   <string name="pref_contribute">Pomôžte</string>
   <string name="pref_show_subscription_title">Ukázať názov odberu</string>
@@ -615,7 +608,6 @@
   <string name="episode_filters_description">Zoznam výrazov použitých na rozhodnutie, či má byť epizóda zahrnutá alebo vylúčená pri automatickom sťahovaní</string>
   <string name="episode_filters_include">Pridať</string>
   <string name="episode_filters_exclude">Vylúčiť</string>
-  <string name="episode_filters_duration">Minimálna dĺžka trvania (v minútach)</string>
   <string name="episode_filters_hint">Jednotlivé slová „Viaceré slová“</string>
   <string name="keep_updated">Priebežne aktualizovať</string>
   <string name="keep_updated_summary">Zahrnúť tento podcast pri (automatickej) obnove všetkých podcastov</string>
@@ -638,18 +630,6 @@
   <string name="local_feed_description">Tento virtuálny podcast bol vytvorený pridaním priečinka do programu FocusPodcast.</string>
   <string name="unable_to_start_system_file_manager">Nie je možné spustiť systémového správcu súborov</string>
   <string name="filter">Filter</string>
-  <string name="hide_is_favorite_label">Je v obľúbených</string>
-  <string name="not_favorite">Nie je v obľúbených</string>
-  <string name="hide_downloaded_episodes_label">Stiahnuté</string>
-  <string name="hide_not_downloaded_episodes_label">Nestiahnuté</string>
-  <string name="queued_label">V poradí</string>
-  <string name="not_queued_label">Nie je v poradí</string>
-  <string name="has_media">Obsahuje médiá</string>
-  <string name="no_media">Žiadne médiá</string>
-  <string name="hide_paused_episodes_label">Pozastavené</string>
-  <string name="not_paused">Nie je pozastavené</string>
-  <string name="hide_played_episodes_label">Prehrané</string>
-  <string name="not_played">Nehrá sa</string>
   <!--Sort-->
   <string name="sort_title_a_z">Názov (A \u2192 Z)</string>
   <string name="sort_title_z_a">Názov (A \u2192 Z)</string>

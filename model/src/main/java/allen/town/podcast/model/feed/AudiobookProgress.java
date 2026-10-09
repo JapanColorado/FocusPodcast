@@ -14,15 +14,24 @@ public class AudiobookProgress {
     private final long listenedDuration;
     @Nullable
     private final FeedItem resumeItem;
+    private final boolean started;
+    private final long lastPlayedTime;
 
+    /**
+     * @param started        true when any track is played or has a saved position
+     * @param lastPlayedTime the most recent last-played time of any track, 0 if none was played
+     */
     public AudiobookProgress(long feedId, int trackCount, int playedTrackCount, long totalDuration,
-                             long listenedDuration, @Nullable FeedItem resumeItem) {
+                             long listenedDuration, @Nullable FeedItem resumeItem, boolean started,
+                             long lastPlayedTime) {
         this.feedId = feedId;
         this.trackCount = trackCount;
         this.playedTrackCount = playedTrackCount;
         this.totalDuration = totalDuration;
         this.listenedDuration = Math.min(listenedDuration, totalDuration);
         this.resumeItem = resumeItem;
+        this.started = started;
+        this.lastPlayedTime = lastPlayedTime;
     }
 
     public long getFeedId() {
@@ -78,5 +87,15 @@ public class AudiobookProgress {
     /** True when the book has tracks and all of them are played. */
     public boolean isFinished() {
         return trackCount > 0 && playedTrackCount == trackCount;
+    }
+
+    /** True when any track is marked played or has a saved position. */
+    public boolean isStarted() {
+        return started;
+    }
+
+    /** The most recent time any track of the book was played (epoch ms), 0 if never. */
+    public long getLastPlayedTime() {
+        return lastPlayedTime;
     }
 }

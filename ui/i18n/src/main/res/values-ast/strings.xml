@@ -333,12 +333,7 @@
   <string name="double_tap_toast">Volvi tocar el botón Atrás pa colar</string>
     <string name="pref_delete_removes_from_queue_title">«Desaniciar» quita de la cola</string>
   <string name="pref_delete_removes_from_queue_sum">Quita automáticamente los episodios de la cola al desanicialos.</string>
-  <string name="pref_filter_feed_title">Peñera de soscripciones</string>
   <string name="pref_filter_feed_sum">Peñera les soscripciones del caxón de navegación y de la pantalla de soscripciones.</string>
-  <string name="auto_downloaded">Baxó automáticamente</string>
-  <string name="not_auto_downloaded">Nun baxó automáticamente</string>
-  <string name="new_episode_notification_enabled">Avisu activáu</string>
-  <string name="new_episode_notification_disabled">Avisu desactiváu</string>
   <string name="pref_contribute">Collaborar</string>
   <!--About screen-->
   <string name="about_pref">Tocante a</string>
@@ -457,15 +452,6 @@
   <string name="local_feed_description">Esti podcast virtual creóse por amestar una carpeta a FocusPodcast.</string>
   <string name="unable_to_start_system_file_manager">Nun ye posible aniciar el xestor de ficheros del sistema</string>
   <string name="filter">Peñera</string>
-  <string name="hide_is_favorite_label">Ta en Favoritos</string>
-  <string name="hide_downloaded_episodes_label">Baxó</string>
-  <string name="hide_not_downloaded_episodes_label">Nun baxó</string>
-  <string name="queued_label">Na cola</string>
-  <string name="not_queued_label">Nun ta na cola</string>
-  <string name="has_media">Tien multimedia</string>
-  <string name="no_media">Nun tien multimedia</string>
-  <string name="hide_paused_episodes_label">En posa</string>
-  <string name="hide_played_episodes_label">Reprodúxose</string>
   <!--Sort-->
   <string name="sort_title_a_z">Títulu (A \u2192 Z)</string>
   <string name="sort_title_z_a">Títulu (Z \u2192 A)</string>

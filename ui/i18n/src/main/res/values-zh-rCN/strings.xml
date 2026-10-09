@@ -484,16 +484,9 @@
   <string name="double_tap_toast">再次点击返回键退出</string>
   <string name="pref_delete_removes_from_queue_title">从播放列表移除</string>
   <string name="pref_delete_removes_from_queue_sum">剧集被删除时自动将其从播放列表移除</string>
-  <string name="pref_filter_feed_title">订阅过滤器</string>
   <string name="pref_filter_feed_sum">在导航抽屉和订阅屏幕中筛选订阅</string>
   <string name="subscriptions_are_filtered">订阅已过滤</string>
-  <string name="subscriptions_counter_greater_zero">仅显示有计数的订阅</string>
-  <string name="auto_downloaded">自动下载的</string>
-  <string name="not_auto_downloaded">非自动下载的</string>
   <string name="kept_updated">保持更新的</string>
-  <string name="not_kept_updated">未保持更新的</string>
-  <string name="new_episode_notification_enabled">通知已启用</string>
-  <string name="new_episode_notification_disabled">通知已禁用</string>
   <string name="pref_feed_settings_dialog_msg">您可以为每个播客设置不同的间隔或时间，可以通过打开播客页面来改变它</string>
   <string name="pref_contribute">贡献</string>
   <string name="pref_show_subscription_title">显示订阅标题</string>
@@ -629,7 +622,6 @@
   <string name="episode_filters_description">自动下载时包括或排除某一集</string>
   <string name="episode_filters_include">包含</string>
   <string name="episode_filters_exclude">排除</string>
-  <string name="episode_filters_duration">最短持续时间（分钟）</string>
   <string name="episode_filters_hint">单个单词  “多个单词”</string>
   <string name="keep_updated">保持最新</string>
   <string name="keep_updated_summary">自动刷新所有播客时包括此播客 </string>
@@ -673,18 +665,6 @@
   <string name="audiobook_finished">已听完</string>
   <string name="unable_to_start_system_file_manager">无法启动系统文件管理器</string>
   <string name="filter">过滤</string>
-  <string name="hide_is_favorite_label">喜爱的</string>
-  <string name="not_favorite">非喜爱的剧集</string>
-  <string name="hide_downloaded_episodes_label">已下载</string>
-  <string name="hide_not_downloaded_episodes_label">未下载</string>
-  <string name="queued_label">已在播放列表中</string>
-  <string name="not_queued_label">不在播放列表中</string>
-  <string name="has_media">包含媒体</string>
-  <string name="no_media">没有媒体</string>
-  <string name="hide_paused_episodes_label">已暂停</string>
-  <string name="not_paused">未暂停</string>
-  <string name="hide_played_episodes_label">已播放</string>
-  <string name="not_played">未播放</string>
   <!--Sort-->
   <string name="sort_title_a_z">标题 (A \u2192 Z)</string>
   <string name="sort_title_z_a">标题 (Z \u2192 A)</string>
@@ -882,5 +862,49 @@
   <string name="reset_dismissed_warnings_done">已忽略的警告将在下次刷新后重新显示</string>
   <plurals name="delete_played_confirm">
     <item quantity="other">删除 %1$d 个已播放的剧集 (%2$s)？</item>
+  </plurals>
+  <string name="sort_and_filter">排序和过滤</string>
+  <string name="filter_section_status">状态</string>
+  <string name="filter_section_downloaded">下载</string>
+  <string name="filter_section_favorite">喜爱</string>
+  <string name="filter_unplayed">未播放</string>
+  <string name="filter_in_progress">播放中</string>
+  <string name="filter_played">已播放</string>
+  <string name="filter_downloaded">已下载</string>
+  <string name="filter_not_downloaded">未下载</string>
+  <string name="filter_favorite">喜爱的</string>
+  <string name="filter_not_favorite">非喜爱的</string>
+  <string name="filter_section_new_episodes">新单集</string>
+  <string name="filter_has_new_episodes">有新单集</string>
+  <string name="filter_section_auto_download">自动下载</string>
+  <string name="filter_section_auto_refresh">自动刷新</string>
+  <string name="filter_section_notifications">新单集通知</string>
+  <string name="filter_on">开启</string>
+  <string name="filter_off">关闭</string>
+  <string name="filter_section_author">作者</string>
+  <string name="filter_section_length">时长</string>
+  <string name="audiobook_sort_recently_played">最近播放</string>
+  <string name="audiobook_sort_title">标题</string>
+  <string name="audiobook_sort_author">作者</string>
+  <string name="audiobook_sort_progress">进度</string>
+  <string name="audiobook_sort_date_added">添加日期</string>
+  <string name="audiobook_status_not_started">未开始</string>
+  <string name="audiobook_length_under_5h">5 小时以内</string>
+  <string name="audiobook_length_5_to_15h">5–15 小时</string>
+  <string name="audiobook_length_over_15h">超过 15 小时</string>
+  <string name="no_audiobooks_match_filter">没有符合过滤条件的有声书</string>
+  <string name="no_audiobooks_match_filter_msg">更改或清除过滤即可看到其他有声书</string>
+  <string name="episode_filters_min_duration">最短时长（分钟）</string>
+  <string name="episode_filters_add_term">添加词语</string>
+  <string name="episode_filters_remove_term">移除 %1$s</string>
+  <string name="save_label">保存</string>
+  <plurals name="filter_episodes_shown">
+    <item quantity="other">显示 %d 个单集</item>
+  </plurals>
+  <plurals name="filter_podcasts_shown">
+    <item quantity="other">显示 %d 个播客</item>
+  </plurals>
+  <plurals name="filter_audiobooks_shown">
+    <item quantity="other">显示 %d 本有声书</item>
   </plurals>
 </resources>

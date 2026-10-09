@@ -421,16 +421,9 @@
   <string name="double_tap_toast">Toca el botó \"endarrere\" un altra vegada per a eixir</string>
   <string name="pref_delete_removes_from_queue_title">\"Esborrar\" remou de la cua</string>
   <string name="pref_delete_removes_from_queue_sum">Remou automàticament un episodi de la cua quan siga esborrat</string>
-  <string name="pref_filter_feed_title">Filtre de subscripció</string>
   <string name="pref_filter_feed_sum">Filtra les teves subscripcions al calaix de navegació i a la pantalla de subscripcions.</string>
   <string name="subscriptions_are_filtered">Les subscripcions estan filtrades.</string>
-  <string name="subscriptions_counter_greater_zero">Comptador superior a zero</string>
-  <string name="auto_downloaded">Auto descarregat</string>
-  <string name="not_auto_downloaded">No auto descarregat</string>
   <string name="kept_updated">Mantingut actualitzat</string>
-  <string name="not_kept_updated">No mantingut actualitzat</string>
-  <string name="new_episode_notification_enabled">Notificació activada</string>
-  <string name="new_episode_notification_disabled">Notificació desactivada</string>
   <string name="pref_feed_settings_dialog_msg">Aquesta configuració és exclusiva de cada podcast. Podeu canviar-la obrint la pàgina del podcast.</string>
   <string name="pref_contribute">Contribueix</string>
   <!--About screen-->
@@ -575,18 +568,6 @@
   <string name="local_feed_description">Aquest podcast virtual es va crear afegint una carpeta a FocusPodcast.</string>
   <string name="unable_to_start_system_file_manager">No es pot iniciar el gestor de fitxers del sistema</string>
   <string name="filter">Filtra</string>
-  <string name="hide_is_favorite_label">És favorit</string>
-  <string name="not_favorite">No és favorit</string>
-  <string name="hide_downloaded_episodes_label">Baixat</string>
-  <string name="hide_not_downloaded_episodes_label">No baixat</string>
-  <string name="queued_label">En cua</string>
-  <string name="not_queued_label">No encuat</string>
-  <string name="has_media">Té mitjans</string>
-  <string name="no_media">No te multimèdia</string>
-  <string name="hide_paused_episodes_label">Pausat</string>
-  <string name="not_paused">No pausat</string>
-  <string name="hide_played_episodes_label">Reproduït</string>
-  <string name="not_played">No reproduït</string>
   <!--Sort-->
   <string name="sort_title_a_z">Títol (A \u2192 Z)</string>
   <string name="sort_title_z_a">Títol (Z \u2192 A)</string>

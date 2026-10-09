@@ -369,14 +369,9 @@
   <string name="double_tap_toast">뒤로 가기 버튼을 한 번 더 누르면 끝납니다</string>
   <string name="pref_delete_removes_from_queue_title">제거된 항목 대기열에서 삭제</string>
   <string name="pref_delete_removes_from_queue_sum">삭제된 항목을 대기열에서 자동으로 삭제합니다.</string>
-  <string name="pref_filter_feed_title">구독 필터</string>
   <string name="pref_filter_feed_sum">네비게이션 드로어 및 구독 화면의 구독 내용을 필터링합니다.</string>
   <string name="subscriptions_are_filtered">구독 필터 적용함.</string>
-  <string name="subscriptions_counter_greater_zero">0보다 큰 개수</string>
-  <string name="auto_downloaded">자동 다운로드</string>
-  <string name="not_auto_downloaded">자동 다운로드 아님</string>
   <string name="kept_updated">업데이트 상태로 유지</string>
-  <string name="not_kept_updated">업데이트 유지 아님</string>
   <!--About screen-->
   <string name="about_pref">정보</string>
   <string name="privacy_policy">개인 정보 정책</string>
@@ -511,18 +506,6 @@
   <string name="local_feed_description">이 가상 팟캐스트는 안테나팟에 폴더를 추가해 만들었습니다.</string>
   <string name="unable_to_start_system_file_manager">시스템 파일 관리자를 시작할 수 없습니다</string>
   <string name="filter">필터</string>
-  <string name="hide_is_favorite_label">즐겨찾기 포함</string>
-  <string name="not_favorite">즐겨찾기 아님</string>
-  <string name="hide_downloaded_episodes_label">다운로드함</string>
-  <string name="hide_not_downloaded_episodes_label">다운로드 안 함</string>
-  <string name="queued_label">대기열에 있음</string>
-  <string name="not_queued_label">대기열에 없음</string>
-  <string name="has_media">미디어 있음</string>
-  <string name="no_media">미디어 없음</string>
-  <string name="hide_paused_episodes_label">일시 중지함</string>
-  <string name="not_paused">일시 중지 아님</string>
-  <string name="hide_played_episodes_label">재생함</string>
-  <string name="not_played">재생함 아님</string>
   <!--Sort-->
   <string name="sort_title_a_z">제목 (A \u2192 Z)</string>
   <string name="sort_title_z_a">제목 (Z \u2192 A)</string>

@@ -444,14 +444,6 @@
   <string name="discover_more">さらに »</string>
   <!--Local feeds-->
   <string name="filter">フィルター</string>
-  <string name="hide_is_favorite_label">お気に入り</string>
-  <string name="hide_downloaded_episodes_label">ダウンロード済</string>
-  <string name="hide_not_downloaded_episodes_label">未ダウンロード</string>
-  <string name="queued_label">キューに入れました</string>
-  <string name="not_queued_label">キューに入っていません</string>
-  <string name="has_media">メディアあり</string>
-  <string name="hide_paused_episodes_label">一時停止中</string>
-  <string name="hide_played_episodes_label">再生済み</string>
   <!--Sort-->
   <string name="sort_title_a_z">タイトル (A \u2192 Z)</string>
   <string name="sort_title_z_a">タイトル (Z \u2192 A)</string>
@@ -572,4 +564,48 @@
   <string name="audiobook_percent">%1$d%%</string>
   <string name="audiobook_time_left">残り %1$s</string>
   <string name="audiobook_finished">聴き終わり</string>
+  <string name="sort_and_filter">並べ替えとフィルター</string>
+  <string name="filter_section_status">ステータス</string>
+  <string name="filter_section_downloaded">ダウンロード</string>
+  <string name="filter_section_favorite">お気に入り</string>
+  <string name="filter_unplayed">未再生</string>
+  <string name="filter_in_progress">再生途中</string>
+  <string name="filter_played">再生済み</string>
+  <string name="filter_downloaded">ダウンロード済</string>
+  <string name="filter_not_downloaded">未ダウンロード</string>
+  <string name="filter_favorite">お気に入り</string>
+  <string name="filter_not_favorite">お気に入り以外</string>
+  <string name="filter_section_new_episodes">新着エピソード</string>
+  <string name="filter_has_new_episodes">新着エピソードあり</string>
+  <string name="filter_section_auto_download">自動ダウンロード</string>
+  <string name="filter_section_auto_refresh">自動更新</string>
+  <string name="filter_section_notifications">新着エピソードの通知</string>
+  <string name="filter_on">オン</string>
+  <string name="filter_off">オフ</string>
+  <string name="filter_section_author">著者</string>
+  <string name="filter_section_length">長さ</string>
+  <string name="audiobook_sort_recently_played">最近再生した順</string>
+  <string name="audiobook_sort_title">タイトル</string>
+  <string name="audiobook_sort_author">著者</string>
+  <string name="audiobook_sort_progress">進み具合</string>
+  <string name="audiobook_sort_date_added">追加日</string>
+  <string name="audiobook_status_not_started">未開始</string>
+  <string name="audiobook_length_under_5h">5 時間未満</string>
+  <string name="audiobook_length_5_to_15h">5～15 時間</string>
+  <string name="audiobook_length_over_15h">15 時間超</string>
+  <string name="no_audiobooks_match_filter">フィルターに一致するオーディオブックはありません</string>
+  <string name="no_audiobooks_match_filter_msg">フィルターを変更または解除すると、ほかのオーディオブックが表示されます</string>
+  <string name="episode_filters_min_duration">最短の長さ（分）</string>
+  <string name="episode_filters_add_term">語句を追加</string>
+  <string name="episode_filters_remove_term">%1$s を削除</string>
+  <string name="save_label">保存</string>
+  <plurals name="filter_episodes_shown">
+    <item quantity="other">%d 件のエピソードを表示中</item>
+  </plurals>
+  <plurals name="filter_podcasts_shown">
+    <item quantity="other">%d 件のポッドキャストを表示中</item>
+  </plurals>
+  <plurals name="filter_audiobooks_shown">
+    <item quantity="other">%d 冊のオーディオブックを表示中</item>
+  </plurals>
 </resources>

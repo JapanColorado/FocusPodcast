@@ -441,16 +441,9 @@
   <string name="double_tap_toast">Taper encore une fois retour pour quitter</string>
   <string name="pref_delete_removes_from_queue_title">Supprimer retire de la liste de lecture</string>
   <string name="pref_delete_removes_from_queue_sum">Retirer de la liste de lecture un épisode quand son fichier est supprimé.</string>
-  <string name="pref_filter_feed_title">Filtre des abonnements</string>
   <string name="pref_filter_feed_sum">Filtrer les abonnements dans le volet de navigation et dans l\'écran des abonnements.</string>
   <string name="subscriptions_are_filtered">Les abonnements sont filtrés.</string>
-  <string name="subscriptions_counter_greater_zero">Compteur supérieur à zéro</string>
-  <string name="auto_downloaded">Avec téléchargement automatique</string>
-  <string name="not_auto_downloaded">Sans téléchargement automatique</string>
   <string name="kept_updated">Maintenu à jour</string>
-  <string name="not_kept_updated">Non maintenu à jour</string>
-  <string name="new_episode_notification_enabled">Notification activée</string>
-  <string name="new_episode_notification_disabled">Notification désactivée</string>
   <string name="pref_feed_settings_dialog_msg">Ce paramètre est spécifique à chaque podcast. Vous pouvez le changer en ouvrant la page du podcast.</string>
   <string name="pref_contribute">Contribuer</string>
   <string name="pref_show_subscription_title">Afficher les noms des podcasts</string>
@@ -579,7 +572,6 @@
   <string name="episode_filters_description">Liste de mots permettant de décider si un épisode est à inclure ou à exclure des téléchargements automatiques</string>
   <string name="episode_filters_include">Inclure</string>
   <string name="episode_filters_exclude">Exclure</string>
-  <string name="episode_filters_duration">Durée minimum (en minutes)</string>
   <string name="episode_filters_hint">Mots uniques \"Liste de mots\"</string>
   <string name="keep_updated">Maintenir à jour</string>
   <string name="keep_updated_summary">Inclure ce podcast lors de la mise à jour des podcasts</string>
@@ -602,18 +594,6 @@
   <string name="local_feed_description">Ce podcast a été crée à partir d\'un dossier ajouté à FocusPodcast.</string>
   <string name="unable_to_start_system_file_manager">Impossible d\'ouvrir le gestionnaire de fichier</string>
   <string name="filter">Filtrer</string>
-  <string name="hide_is_favorite_label">Favori</string>
-  <string name="not_favorite">Pas favori</string>
-  <string name="hide_downloaded_episodes_label">Téléchargé</string>
-  <string name="hide_not_downloaded_episodes_label">Non téléchargé</string>
-  <string name="queued_label">Dans la liste de lecture</string>
-  <string name="not_queued_label">Pas dans la liste de lecture</string>
-  <string name="has_media">Avec média</string>
-  <string name="no_media">Sans média</string>
-  <string name="hide_paused_episodes_label">En pause</string>
-  <string name="not_paused">Pas en en pause</string>
-  <string name="hide_played_episodes_label">Lu</string>
-  <string name="not_played">Non lu</string>
   <!--Sort-->
   <string name="sort_title_a_z">Titre (A \u2192 Z)</string>
   <string name="sort_title_z_a">Titre (Z \u2192 A)</string>

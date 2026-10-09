@@ -472,16 +472,9 @@
   <string name="double_tap_toast">Naciśnij ponownie przycisk \'Wstecz\' aby wyjść</string>
   <string name="pref_delete_removes_from_queue_title">Kasowanie usuwa z kolejki</string>
   <string name="pref_delete_removes_from_queue_sum">Automatycznie usuwaj odcinek z kolejki gdy go kasujesz.</string>
-  <string name="pref_filter_feed_title">Filtr subskrypcji</string>
   <string name="pref_filter_feed_sum">Filtruj subskrypcje w panelu nawigacyjnym i na ekranie subskrypcji.</string>
   <string name="subscriptions_are_filtered">Subskrypcje są wyfiltrowane.</string>
-  <string name="subscriptions_counter_greater_zero">Licznik większy niż zero</string>
-  <string name="auto_downloaded">Pobrane automatycznie</string>
-  <string name="not_auto_downloaded">Nie pobrane automatycznie</string>
   <string name="kept_updated">Kanały automatycznie aktualizowane</string>
-  <string name="not_kept_updated">Kanały nie będące automatycznie aktualizowane</string>
-  <string name="new_episode_notification_enabled">Powiadomienie włączone</string>
-  <string name="new_episode_notification_disabled">Powiadomienie wyłączone</string>
   <string name="pref_feed_settings_dialog_msg">To ustawienie jest unikalne dla każdego podcastu. Możesz je zmienić otwierając info podcastu.</string>
   <string name="pref_contribute">Przyczyń się do rozwoju</string>
   <string name="pref_show_subscription_title">Pokaż nazwę subskrypcji</string>
@@ -616,7 +609,6 @@
   <string name="episode_filters_description">Wykaz terminów używanych aby zdecydować, czy odcinek powinien być włączony lub wyłączony podczas automatycznego pobierania.</string>
   <string name="episode_filters_include">Włączając</string>
   <string name="episode_filters_exclude">Wyłączając</string>
-  <string name="episode_filters_duration">Minimalny czas trwania (w minutach)</string>
   <string name="episode_filters_hint">Pojedyncze słowa \"Kilka słów\"</string>
   <string name="keep_updated">Utrzymuj zaktualizowane</string>
   <string name="keep_updated_summary">Uwzględnij ten podcast przy (automatycznym) odświeżaniu wszystkich kanałów</string>
@@ -639,18 +631,6 @@
   <string name="local_feed_description">Ten wirtualny podcast został stworzony przez dodanie lokalnego folderu do FocusPodcast.</string>
   <string name="unable_to_start_system_file_manager">Nie można uruchomić menedżera plików</string>
   <string name="filter">Filtruj</string>
-  <string name="hide_is_favorite_label">Ulubione</string>
-  <string name="not_favorite">Nie oznaczone jako ulubione</string>
-  <string name="hide_downloaded_episodes_label">Pobrane</string>
-  <string name="hide_not_downloaded_episodes_label">Nie pobrane</string>
-  <string name="queued_label">W kolejce</string>
-  <string name="not_queued_label">Nie w kolejce</string>
-  <string name="has_media">Ma media</string>
-  <string name="no_media">Bez multimediów</string>
-  <string name="hide_paused_episodes_label">Zatrzymane</string>
-  <string name="not_paused">Nie pauzowane</string>
-  <string name="hide_played_episodes_label">Odtworzone</string>
-  <string name="not_played">Nie odtworzone</string>
   <!--Sort-->
   <string name="sort_title_a_z">Tytuł (A \u2192 Z)</string>
   <string name="sort_title_z_a">Tytuł (Z \u2192 A)</string>

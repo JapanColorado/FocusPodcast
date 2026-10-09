@@ -7,11 +7,12 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import androidx.annotation.NonNull;
+import androidx.fragment.app.FragmentActivity;
+import androidx.fragment.app.FragmentManager;
 
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.Collections;
-import java.util.Set;
 
 import allen.town.podcast.R;
 import allen.town.podcast.core.dialog.ConfirmationDialog;
@@ -19,7 +20,7 @@ import allen.town.podcast.core.storage.DBTasks;
 import allen.town.podcast.core.storage.DBWriter;
 import allen.town.podcast.core.util.IntentUtils;
 import allen.town.podcast.core.util.ShareUtils;
-import allen.town.podcast.dialog.FilterDialog;
+import allen.town.podcast.dialog.filter.EpisodeFilterSheet;
 import allen.town.podcast.dialog.BaseFeedSortDialog;
 import allen.town.podcast.model.feed.Feed;
 import allen.town.podcast.model.feed.SortOrder;
@@ -91,16 +92,21 @@ public class FeedMenuProcess {
         return true;
     }
 
+    /**
+     * Opens the episode filter sheet of the feed. It stores every change on the feed right away;
+     * the FILTER_CHANGED event that posts reloads the list.
+     */
     public static void showFilterDialog(Context context, Feed selectedFeed) {
-        FilterDialog filterDialog = new FilterDialog(context, selectedFeed.getItemFilter()) {
-            @Override
-            protected void updateFilter(Set<String> filterValues) {
-                selectedFeed.setItemFilter(filterValues.toArray(new String[0]));
-                DBWriter.setFeedItemsFilter(selectedFeed.getId(), filterValues);
-            }
-        };
-
-        filterDialog.openDialog();
+        if (!(context instanceof FragmentActivity)) {
+            Log.w(TAG, "showFilterDialog needs a FragmentActivity");
+            return;
+        }
+        FragmentManager fragmentManager = ((FragmentActivity) context).getSupportFragmentManager();
+        if (fragmentManager.findFragmentByTag(EpisodeFilterSheet.TAG) != null) {
+            return;
+        }
+        EpisodeFilterSheet.newFeedInstance(selectedFeed.getId(), selectedFeed.getItemFilter())
+                .show(fragmentManager, EpisodeFilterSheet.TAG);
     }
 
 

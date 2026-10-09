@@ -441,16 +441,9 @@
   <string name="double_tap_toast">Tryk på tilbageknappen igen for at afslutte</string>
   <string name="pref_delete_removes_from_queue_title">Slet fjerner fra kø</string>
   <string name="pref_delete_removes_from_queue_sum">Fjern automatisk afsnit fra køen, når det slettes.</string>
-  <string name="pref_filter_feed_title">Abonnementsfilter</string>
   <string name="pref_filter_feed_sum">Filtrer dine abonnementer i navigationspanelet og på abonnementsoversigten.</string>
   <string name="subscriptions_are_filtered">Abonnementer er filtreret.</string>
-  <string name="subscriptions_counter_greater_zero">Tæller større end 0</string>
-  <string name="auto_downloaded">Automatisk hentet</string>
-  <string name="not_auto_downloaded">Ikke automatisk hentet</string>
   <string name="kept_updated">Holdt opdateret</string>
-  <string name="not_kept_updated">Ikke holdt opdateret</string>
-  <string name="new_episode_notification_enabled">Notifikation aktiveret</string>
-  <string name="new_episode_notification_disabled">Notifikation deaktiveret</string>
   <string name="pref_feed_settings_dialog_msg">Denne indstilling er unik for hver podcast. Du kan ændre den ved at åbne podcast-siden.</string>
   <string name="pref_contribute">Bidrag</string>
   <string name="pref_show_subscription_title">Vis abonnementstitel</string>
@@ -579,7 +572,6 @@
   <string name="episode_filters_description">Liste af ord, der bliver brugt til at beslutte, om et afsnit skal medtages eller udelades ved automatisk overførsel</string>
   <string name="episode_filters_include">Medtag</string>
   <string name="episode_filters_exclude">Udelad</string>
-  <string name="episode_filters_duration">Minimumsvarighed (i minutter)</string>
   <string name="episode_filters_hint">Enkelte ord \"Flere ord\"</string>
   <string name="keep_updated">Hold opdateret</string>
   <string name="keep_updated_summary">Inkludere denne podcast når alle podcast genindlæses</string>
@@ -602,18 +594,6 @@
   <string name="local_feed_description">Denne virtuelle podcast blev oprettet ved at en mappe blev føjet til FocusPodcast.</string>
   <string name="unable_to_start_system_file_manager">Kunne ikke starte system filhåndtering</string>
   <string name="filter">Filtrér</string>
-  <string name="hide_is_favorite_label">Er favorit</string>
-  <string name="not_favorite">Ikke favorit</string>
-  <string name="hide_downloaded_episodes_label">Overførte</string>
-  <string name="hide_not_downloaded_episodes_label">Ikke overførte</string>
-  <string name="queued_label">Sat i kø</string>
-  <string name="not_queued_label">Ikke sat i kø</string>
-  <string name="has_media">Har medier</string>
-  <string name="no_media">Ingen medier</string>
-  <string name="hide_paused_episodes_label">Sat på pause</string>
-  <string name="not_paused">Ikke sat på pause</string>
-  <string name="hide_played_episodes_label">Afspillede</string>
-  <string name="not_played">Ikke afspillet</string>
   <!--Sort-->
   <string name="sort_title_a_z">Titel (A \u2192 Å)</string>
   <string name="sort_title_z_a">Titel (Å \u2192 A)</string>

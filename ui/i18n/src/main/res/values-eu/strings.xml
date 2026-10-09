@@ -423,16 +423,9 @@
   <string name="double_tap_toast">Sakatu botoia berriz irteteko</string>
   <string name="pref_delete_removes_from_queue_title">Ezabatu ilaratik kendutakoak</string>
   <string name="pref_delete_removes_from_queue_sum">Kendu saio bat automatikoki ilaratik ezabatzean.</string>
-  <string name="pref_filter_feed_title">Harpidetza iragazkia</string>
   <string name="pref_filter_feed_sum">Iragazi harpidetzak nabigazio-kutxan eta harpidetza-pantailetan.</string>
   <string name="subscriptions_are_filtered">Harpidetzak iragazita daude.</string>
-  <string name="subscriptions_counter_greater_zero">Kontagailua zero baino handiagoa</string>
-  <string name="auto_downloaded">Automatikoki deskargatuta</string>
-  <string name="not_auto_downloaded">Automatikoki deskargatu gabe</string>
   <string name="kept_updated">Eguneratuta dago</string>
-  <string name="not_kept_updated">Ez dago eguneratuta</string>
-  <string name="new_episode_notification_enabled">Jakinarazpenak gaiturik</string>
-  <string name="new_episode_notification_disabled">Jakinarazpenak desgaiturik</string>
   <string name="pref_feed_settings_dialog_msg">Ezarpen hau podcast bakoitzeko bakarra da. Podcast orria irekiz alda dezakezu.</string>
   <string name="pref_contribute">Lagundu</string>
   <!--About screen-->
@@ -577,18 +570,6 @@
   <string name="local_feed_description">Podcast birtual hau FocusPodcast-i karpeta bat gehituta sortu da</string>
   <string name="unable_to_start_system_file_manager">Ezin da sistemaren fitxategi kudeatzailea abiarazi</string>
   <string name="filter">Iragazia</string>
-  <string name="hide_is_favorite_label">Gogokoa da</string>
-  <string name="not_favorite">Ez da gogokoa</string>
-  <string name="hide_downloaded_episodes_label">Deskargatuta</string>
-  <string name="hide_not_downloaded_episodes_label">Deskargatu gabe</string>
-  <string name="queued_label">Ilaran</string>
-  <string name="not_queued_label">Ez dago ilaran</string>
-  <string name="has_media">Media du</string>
-  <string name="no_media">Bitartekorik gabe</string>
-  <string name="hide_paused_episodes_label">Geldirik</string>
-  <string name="not_paused">Gelditu gabea</string>
-  <string name="hide_played_episodes_label">Ikusita</string>
-  <string name="not_played">Erreproduzitu gabea</string>
   <!--Sort-->
   <string name="sort_title_a_z">Izenburua (A \u2192 Z)</string>
   <string name="sort_title_z_a">Izenburua (Z \u2192 A)</string>

@@ -441,16 +441,9 @@
   <string name="double_tap_toast">Napauta takaisin-painiketta sulkeaksesi</string>
   <string name="pref_delete_removes_from_queue_title">Deletointi poistaa jonosta</string>
   <string name="pref_delete_removes_from_queue_sum">Poista jakso automaattisesti jonosta kun se deletoidaan.</string>
-  <string name="pref_filter_feed_title">Tilaussuodin</string>
   <string name="pref_filter_feed_sum">Suodata navigointihyllyn ja tilausnäkymän tilauksiasi.</string>
   <string name="subscriptions_are_filtered">Tilauksia on suodatettu.</string>
-  <string name="subscriptions_counter_greater_zero">Laskurin arvo suurempi kuin nolla</string>
-  <string name="auto_downloaded">Automaattisesti ladattu</string>
-  <string name="not_auto_downloaded">Ei ladattu automaattisesti</string>
   <string name="kept_updated">Päivitettynä pidetyt</string>
-  <string name="not_kept_updated">Päivitettynä pitämättömät</string>
-  <string name="new_episode_notification_enabled">Ilmoitus käytössä</string>
-  <string name="new_episode_notification_disabled">Ilmoitus pois käytöstä</string>
   <string name="pref_feed_settings_dialog_msg">Tämä asetus on podcast-kohtainen. Voit muuttaa sitä avaamalla podcastin-sivun.</string>
   <string name="pref_contribute">Osallistu</string>
   <string name="pref_show_subscription_title">Näytä tilauksen nimi</string>
@@ -579,7 +572,6 @@
   <string name="episode_filters_description">Lista termeistä joilla valitaan jakso automaattiseen lataukseen</string>
   <string name="episode_filters_include">Sisällytä</string>
   <string name="episode_filters_exclude">Poista</string>
-  <string name="episode_filters_duration">Vähimmäiskesto (minuuttia)</string>
   <string name="episode_filters_hint">Yksittäiset sanat \"Monta sanaa\"</string>
   <string name="keep_updated">Pidä päivitettynä</string>
   <string name="keep_updated_summary">Sisällytä tämä podcast kun kaikki podcastit (auto)päivitetään</string>
@@ -602,18 +594,6 @@
   <string name="local_feed_description">Tämä virtuaalinen podcast luotiin lisäämällä kansio FocusPodcastiin.</string>
   <string name="unable_to_start_system_file_manager">Järjestelmän tiedostonhallintaa ei voi käynnistää</string>
   <string name="filter">Suodin</string>
-  <string name="hide_is_favorite_label">On suosikki</string>
-  <string name="not_favorite">Ei suosikki</string>
-  <string name="hide_downloaded_episodes_label">Ladattu</string>
-  <string name="hide_not_downloaded_episodes_label">Ei ladattu</string>
-  <string name="queued_label">Jonossa</string>
-  <string name="not_queued_label">Ei jonossa</string>
-  <string name="has_media">On media</string>
-  <string name="no_media">Ei mediaa</string>
-  <string name="hide_paused_episodes_label">Pause</string>
-  <string name="not_paused">Ei tauotettu</string>
-  <string name="hide_played_episodes_label">Soitettu</string>
-  <string name="not_played">Ei toistettu</string>
   <!--Sort-->
   <string name="sort_title_a_z">Otsikko (A \u2192 Z)</string>
   <string name="sort_title_z_a">Otsikko (Z \u2192 A)</string>

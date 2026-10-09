@@ -478,16 +478,9 @@
   <string name="double_tap_toast">انقر زر الرجوع للخروج</string>
   <string name="pref_delete_removes_from_queue_title">المسح يزيل الحلقة من لائحة الاستماع</string>
   <string name="pref_delete_removes_from_queue_sum">أزل الحلقة من لائحة الاستماع آليا عند مسحها.</string>
-  <string name="pref_filter_feed_title">مصفاة الإشتراكات</string>
   <string name="pref_filter_feed_sum">صفي إشتراكاتك في درج التنقل وشاشة الإشتراكات.</string>
   <string name="subscriptions_are_filtered">الإشتراكات مصففاة</string>
-  <string name="subscriptions_counter_greater_zero">العداد به رقم أكبر من صفر</string>
-  <string name="auto_downloaded">تنزيل تلقائي</string>
-  <string name="not_auto_downloaded">لم يتم التنزيل تلقائياً</string>
   <string name="kept_updated">محدث بإستمرار</string>
-  <string name="not_kept_updated">لا يتم تحديثه باستمرار</string>
-  <string name="new_episode_notification_enabled">الإشعارات مفعلة</string>
-  <string name="new_episode_notification_disabled">الإشعارات غير مفعلة</string>
   <string name="pref_feed_settings_dialog_msg">هذا الإعداد فريد لكل بودكاست. يمكنك تغييره بفتح صفحة البودكاست.</string>
   <string name="pref_contribute">ساهم</string>
   <!--About screen-->
@@ -644,18 +637,6 @@
   <string name="local_feed_description">هذا البودكاست الإفتراضي تم خلقه بإضافة مجلد محلي إلى FocusPodcast</string>
   <string name="unable_to_start_system_file_manager">غير قادر على تشغيل مدير ملفات النظام</string>
   <string name="filter">مصفى</string>
-  <string name="hide_is_favorite_label">في المفضلة</string>
-  <string name="not_favorite">ليست مفضلة</string>
-  <string name="hide_downloaded_episodes_label">تم التنزيل</string>
-  <string name="hide_not_downloaded_episodes_label">لم يتم التنزيل</string>
-  <string name="queued_label">ضمن لائحة الاستماع</string>
-  <string name="not_queued_label">ليست ضمن لائحة الاستماع</string>
-  <string name="has_media">فيها وسائط</string>
-  <string name="no_media">لا توجد وسائط</string>
-  <string name="hide_paused_episodes_label">ايقاف مؤقت</string>
-  <string name="not_paused">غيرمتوقف</string>
-  <string name="hide_played_episodes_label">تم تشغيلها</string>
-  <string name="not_played">لم يتم تشغيلها</string>
   <!--Sort-->
   <string name="sort_title_a_z">عنوان (أ \u2192 ي)</string>
   <string name="sort_title_z_a">عنوان (ي \u2192 أ)</string>

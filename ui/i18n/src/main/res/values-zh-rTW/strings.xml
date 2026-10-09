@@ -269,8 +269,6 @@
   <string name="no_fav_episodes_head_label">您還沒有收藏任何單集</string>
   <string name="no_subscriptions_head_label">是時候添加一些播客了</string>
   <string name="no_subscriptions_label">試試底部發現按鈕，將喜歡的播客收入囊中</string>
-  <string name="new_episode_notification_enabled">通知已啟用</string>
-  <string name="new_episode_notification_disabled">通知已禁用</string>
   <!--Preferences-->
   <string name="automation">自動化</string>
     <string name="import_export_pref">匯入/匯出</string>
@@ -427,14 +425,9 @@
   <string name="double_tap_toast">重按返回鍵以離開</string>
   <string name="pref_delete_removes_from_queue_title">从待播清單中移除</string>
   <string name="pref_delete_removes_from_queue_sum">刪除某單集後，自動將其從待播清單中移除</string>
-  <string name="pref_filter_feed_title">篩選訂閱內容</string>
   <string name="pref_filter_feed_sum">篩選側邊選單及訂閱畫面中顯示的訂閱清單</string>
   <string name="subscriptions_are_filtered">此為篩選過的訂閱清單</string>
-  <string name="subscriptions_counter_greater_zero">計數大於 0 的</string>
-  <string name="auto_downloaded">已自動下載</string>
-  <string name="not_auto_downloaded">未自動下載</string>
   <string name="kept_updated">已設定維持更新</string>
-  <string name="not_kept_updated">未設定維持更新</string>
   <string name="pref_title_now_playing_screen_appearance">現正播放佈景主題</string>
   <string name="pref_column_display_in_landscape_title">橫屏時使用分欄顯示</string>
   <string name="pref_column_display_in_landscape_sum">當手機橫屏時，顯示兩欄，左側是抽屜欄，右側是內容</string>
@@ -607,18 +600,6 @@
   <string name="audiobook_finished">已聽完</string>
   <string name="unable_to_start_system_file_manager">無法啟用系統的檔案管理工具</string>
   <string name="filter">篩選</string>
-  <string name="hide_is_favorite_label">為最愛</string>
-  <string name="not_favorite">未標記為最愛的</string>
-  <string name="hide_downloaded_episodes_label">已下載</string>
-  <string name="hide_not_downloaded_episodes_label">未下載</string>
-  <string name="queued_label">已列入待播清單</string>
-  <string name="not_queued_label">未列入待播清單</string>
-  <string name="has_media">有額外媒體檔</string>
-  <string name="no_media">無媒體的</string>
-  <string name="hide_paused_episodes_label">暫停</string>
-  <string name="not_paused">未暫停播放的</string>
-  <string name="hide_played_episodes_label">已播放</string>
-  <string name="not_played">未播放過的</string>
   <!--Sort-->
   <string name="sort_title_a_z">標題 (A \u2192 Z)</string>
   <string name="sort_title_z_a">標題 (Z \u2192 A)</string>
@@ -763,7 +744,6 @@
   <string name="free">免費</string>
 
   <string name="feed_volume_reduction_summary">調低音量：%1$s</string>
-  <string name="episode_filters_duration">最短持續時間（分鐘）</string>
   <string name="episode_filters_hint">單個單詞  “多個單詞”</string>
 
   <string name="feed_tags_label">標籤</string>
@@ -832,5 +812,49 @@
   <string name="reset_dismissed_warnings_done">已忽略的警告將在下次重新整理後重新顯示</string>
   <plurals name="delete_played_confirm">
     <item quantity="other">刪除 %1$d 個已播放的單集 (%2$s)？</item>
+  </plurals>
+  <string name="sort_and_filter">排序與篩選</string>
+  <string name="filter_section_status">狀態</string>
+  <string name="filter_section_downloaded">下載</string>
+  <string name="filter_section_favorite">最愛</string>
+  <string name="filter_unplayed">未播放</string>
+  <string name="filter_in_progress">播放中</string>
+  <string name="filter_played">已播放</string>
+  <string name="filter_downloaded">已下載</string>
+  <string name="filter_not_downloaded">未下載</string>
+  <string name="filter_favorite">最愛</string>
+  <string name="filter_not_favorite">非最愛</string>
+  <string name="filter_section_new_episodes">新單集</string>
+  <string name="filter_has_new_episodes">有新單集</string>
+  <string name="filter_section_auto_download">自動下載</string>
+  <string name="filter_section_auto_refresh">自動重新整理</string>
+  <string name="filter_section_notifications">新單集通知</string>
+  <string name="filter_on">開啟</string>
+  <string name="filter_off">關閉</string>
+  <string name="filter_section_author">作者</string>
+  <string name="filter_section_length">長度</string>
+  <string name="audiobook_sort_recently_played">最近播放</string>
+  <string name="audiobook_sort_title">標題</string>
+  <string name="audiobook_sort_author">作者</string>
+  <string name="audiobook_sort_progress">進度</string>
+  <string name="audiobook_sort_date_added">加入日期</string>
+  <string name="audiobook_status_not_started">未開始</string>
+  <string name="audiobook_length_under_5h">5 小時以內</string>
+  <string name="audiobook_length_5_to_15h">5–15 小時</string>
+  <string name="audiobook_length_over_15h">超過 15 小時</string>
+  <string name="no_audiobooks_match_filter">沒有符合篩選條件的有聲書</string>
+  <string name="no_audiobooks_match_filter_msg">變更或清除篩選即可看到其他有聲書</string>
+  <string name="episode_filters_min_duration">最短長度（分鐘）</string>
+  <string name="episode_filters_add_term">新增詞語</string>
+  <string name="episode_filters_remove_term">移除 %1$s</string>
+  <string name="save_label">儲存</string>
+  <plurals name="filter_episodes_shown">
+    <item quantity="other">顯示 %d 個單集</item>
+  </plurals>
+  <plurals name="filter_podcasts_shown">
+    <item quantity="other">顯示 %d 個播客</item>
+  </plurals>
+  <plurals name="filter_audiobooks_shown">
+    <item quantity="other">顯示 %d 本有聲書</item>
   </plurals>
 </resources>

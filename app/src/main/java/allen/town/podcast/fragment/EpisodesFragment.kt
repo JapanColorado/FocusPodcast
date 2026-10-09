@@ -1,25 +1,26 @@
 package allen.town.podcast.fragment
 
 import allen.town.podcast.R
+import allen.town.podcast.core.feed.EpisodeFilterOptions
 import allen.town.podcast.core.storage.DBReader
-import allen.town.podcast.dialog.FilterDialog
+import allen.town.podcast.dialog.filter.EpisodeFilterSheet
 import allen.town.podcast.model.feed.FeedItem
 import allen.town.podcast.model.feed.FeedItemFilter
 import android.content.Context
 import android.os.Bundle
 import android.view.*
-import org.apache.commons.lang3.StringUtils
 
 /**
  * Like 'EpisodesFragment' except that it only shows new episodes and
  * supports swiping to mark as read.
  */
-class EpisodesFragment : EpisodesListFragment() {
-    private var feedItemFilter = FeedItemFilter("")
+class EpisodesFragment : EpisodesListFragment(), EpisodeFilterSheet.Host {
+    private var feedItemFilter = FeedItemFilter.unfiltered()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val prefs = requireActivity().getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
-        feedItemFilter = FeedItemFilter(prefs.getString(PREF_FILTER, ""))
+        // a filter saved before the filter sheet may hold keys it no longer shows
+        feedItemFilter = EpisodeFilterOptions.sanitize(FeedItemFilter(prefs.getString(PREF_FILTER, "")))
     }
 
     override val swipeTag
@@ -69,24 +70,22 @@ class EpisodesFragment : EpisodesListFragment() {
     }
 
     private fun showFilterDialog() {
-        val filterDialog: FilterDialog = object : FilterDialog(requireContext(), feedItemFilter) {
-            override fun updateFilter(filterValues: Set<String>?) {
-                feedItemFilter = FeedItemFilter(filterValues.orEmpty().toTypedArray())
-                val prefs =
-                    requireActivity().getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
-                prefs.edit().putString(PREF_FILTER, StringUtils.join(filterValues, ",")).apply()
-                loadItems()
-            }
+        if (childFragmentManager.findFragmentByTag(EpisodeFilterSheet.TAG) == null) {
+            EpisodeFilterSheet.newAllEpisodesInstance(feedItemFilter)
+                .show(childFragmentManager, EpisodeFilterSheet.TAG)
         }
-        filterDialog.openDialog()
+    }
+
+    override fun onEpisodeFilterChanged(filter: FeedItemFilter) {
+        feedItemFilter = filter
+        requireActivity().getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE).edit()
+            .putString(PREF_FILTER, filter.values.joinToString(","))
+            .apply()
+        loadItems()
     }
 
     override fun shouldUpdatedItemRemainInList(item: FeedItem): Boolean {
-        val prefs = requireActivity().getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
-        val feedItemFilter = FeedItemFilter(prefs.getString(PREF_FILTER, ""))
-        return if (feedItemFilter.isShowDownloaded && (!item.hasMedia() || item.media?.isDownloaded != true)) {
-            false
-        } else true
+        return !(feedItemFilter.isShowDownloaded && (!item.hasMedia() || item.media?.isDownloaded != true))
     }
 
     override fun loadData(): MutableList<FeedItem> {

@@ -471,16 +471,9 @@
   <string name="double_tap_toast">Нажмите кнопку «Назад» еще раз, чтобы выйти</string>
   <string name="pref_delete_removes_from_queue_title">Убирать удаленные из очереди</string>
   <string name="pref_delete_removes_from_queue_sum">Автоматически убирать выпуск из очереди при его удалении.</string>
-  <string name="pref_filter_feed_title">Фильтр подписок</string>
   <string name="pref_filter_feed_sum">Фильтруйте свои подписки на панели навигации и экране подписок.</string>
   <string name="subscriptions_are_filtered">Подписки отфильтрованы.</string>
-  <string name="subscriptions_counter_greater_zero">Ненулевой счётчик подписок</string>
-  <string name="auto_downloaded">С автозагрузкой</string>
-  <string name="not_auto_downloaded">Без автозагрузки</string>
   <string name="kept_updated">Обновляемые</string>
-  <string name="not_kept_updated">Не обновляемые</string>
-  <string name="new_episode_notification_enabled">С уведомлением</string>
-  <string name="new_episode_notification_disabled">Без уведомления</string>
   <string name="pref_feed_settings_dialog_msg">Эта настройка у каждого подкаста своя. Изменить её можно открыв страницу подкаста.</string>
   <string name="pref_contribute">Поучаствовать</string>
   <string name="pref_show_subscription_title">Показать название подписки</string>
@@ -615,7 +608,6 @@
   <string name="episode_filters_description">Перечень условий по включению или исключению выпуска из списков автоматической загрузки</string>
   <string name="episode_filters_include">Включить</string>
   <string name="episode_filters_exclude">Исключить</string>
-  <string name="episode_filters_duration">Минимальная продолжительность (в минутах)</string>
   <string name="episode_filters_hint">По одному слову \"По фразе\"</string>
   <string name="keep_updated">Постоянно обновлять</string>
   <string name="keep_updated_summary">Обновлять подкаст при (авто)обновлении всех подкастов</string>
@@ -638,18 +630,6 @@
   <string name="local_feed_description">Этот виртуальный подкаст был создан путем добавления папки в FocusPodcast.</string>
   <string name="unable_to_start_system_file_manager">Невозможно запустить системный файловый менеджер</string>
   <string name="filter">Фильтровать</string>
-  <string name="hide_is_favorite_label">В Избранном</string>
-  <string name="not_favorite">Не в избранном</string>
-  <string name="hide_downloaded_episodes_label">Загружено</string>
-  <string name="hide_not_downloaded_episodes_label">Не загружено</string>
-  <string name="queued_label">В очереди</string>
-  <string name="not_queued_label">Не в очереди</string>
-  <string name="has_media">С файлами</string>
-  <string name="no_media">Нет медиа</string>
-  <string name="hide_paused_episodes_label">Приостановленное</string>
-  <string name="not_paused">Не на паузе</string>
-  <string name="hide_played_episodes_label">Прослушанное</string>
-  <string name="not_played">Непрослушанное</string>
   <!--Sort-->
   <string name="sort_title_a_z">от А к Я</string>
   <string name="sort_title_z_a">от Я к А</string>

@@ -441,16 +441,9 @@
   <string name="double_tap_toast">Tik nogmaals op de terugknop om af te sluiten</string>
   <string name="pref_delete_removes_from_queue_title">Afleveringen verwijderen uit wachtrij na wissen</string>
   <string name="pref_delete_removes_from_queue_sum">Verwijder een aflevering uit de wachtrij als de aflevering in kwestie is verwijderd.</string>
-  <string name="pref_filter_feed_title">Abonnementsfilter</string>
   <string name="pref_filter_feed_sum">Filter je abonnementen in de navigatielade en op het abonnementenscherm.</string>
   <string name="subscriptions_are_filtered">De abonnementen zijn gefilterd.</string>
-  <string name="subscriptions_counter_greater_zero">Teller hoger dan nul</string>
-  <string name="auto_downloaded">Automatisch gedownload</string>
-  <string name="not_auto_downloaded">Niet automatisch gedownload</string>
   <string name="kept_updated">Bijgehouden</string>
-  <string name="not_kept_updated">Niet bijgehouden</string>
-  <string name="new_episode_notification_enabled">Melding is ingeschakeld</string>
-  <string name="new_episode_notification_disabled">Melding is uitgeschakeld</string>
   <string name="pref_feed_settings_dialog_msg">Deze instelling wordt per podcast in- of uitgeschakeld. Daarvoor de podcastpagina openen.</string>
   <string name="pref_contribute">Bijdragen</string>
   <string name="pref_show_subscription_title">Abonnementsnaam tonen</string>
@@ -579,7 +572,6 @@
   <string name="episode_filters_description">Lijst van zoektermen die bepalen of een aflevering meegenomen of uitgesloten wordt bij automatisch downloaden</string>
   <string name="episode_filters_include">Meenemen</string>
   <string name="episode_filters_exclude">Uitsluiten</string>
-  <string name="episode_filters_duration">Minimale duur (in minuten)</string>
   <string name="episode_filters_hint">Losse woorden \"Meerdere tussen aanhalingstekens\"</string>
   <string name="keep_updated">Bijgewerkt houden</string>
   <string name="keep_updated_summary">Deze podcast meenemen bij het (automatisch) verversen van alle podcasts</string>
@@ -602,18 +594,6 @@
   <string name="local_feed_description">De virtuele podcast is aangemaakt door een aan FocusPodcast toegevoegde map.</string>
   <string name="unable_to_start_system_file_manager">De bestandsbeheerder-app kan niet worden geopend</string>
   <string name="filter">Filter</string>
-  <string name="hide_is_favorite_label">Gemarkeerd als favoriet</string>
-  <string name="not_favorite">Geen favoriet</string>
-  <string name="hide_downloaded_episodes_label">Gedownload</string>
-  <string name="hide_not_downloaded_episodes_label">Niet gedownload</string>
-  <string name="queued_label">In de wachtrij</string>
-  <string name="not_queued_label">Niet in de wachtrij</string>
-  <string name="has_media">Bevat media</string>
-  <string name="no_media">Geen media</string>
-  <string name="hide_paused_episodes_label">Gepauzeerd</string>
-  <string name="not_paused">Niet gepauzeerd</string>
-  <string name="hide_played_episodes_label">Afgespeeld</string>
-  <string name="not_played">Niet afgespeeld</string>
   <!--Sort-->
   <string name="sort_title_a_z">Titel (A \u2192 Z)</string>
   <string name="sort_title_z_a">Titel (A \u2192 A)</string>

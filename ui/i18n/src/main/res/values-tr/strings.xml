@@ -516,16 +516,9 @@
     <string name="double_tap_toast">Çıkmak için tekrar geri düğmesine basın</string>
     <string name="pref_delete_removes_from_queue_title">Oynatma Listesinden Kaldır</string>
     <string name="pref_delete_removes_from_queue_sum">Bölüm silindiğinde otomatik olarak kuyruktan kaldır</string>
-    <string name="pref_filter_feed_title">Abonelik Filtresi</string>
     <string name="pref_filter_feed_sum">Navigasyon çekmecesi ve abonelik ekranında aboneliklerinizi filtreleyin.</string>
     <string name="subscriptions_are_filtered">Abonelikler filtrelendi</string>
-    <string name="subscriptions_counter_greater_zero">Sayaç sıfırdan büyük</string>
-    <string name="auto_downloaded">Otomatik indirildi</string>
-    <string name="not_auto_downloaded">Otomatik indirilmeyen</string>
     <string name="kept_updated">Güncel tutuldu</string>
-    <string name="not_kept_updated">Güncel tutulmayan</string>
-    <string name="new_episode_notification_enabled">Bildirim etkin</string>
-    <string name="new_episode_notification_disabled">Bildirim devre dışı</string>
     <string name="pref_feed_settings_dialog_msg">Bu ayar her podcast\'e özeldir. Podcast sayfasını açarak değiştirebilirsiniz.</string>
     <string name="pref_contribute">Katkıda Bulunun</string>
     <string name="pref_show_subscription_title">Abonelik Başlığını Göster</string>
@@ -669,7 +662,6 @@
     <string name="episode_filters_description">Bölümleri otomatik indirirken dahil edin veya hariç tutun</string>
     <string name="episode_filters_include">Dahil et</string>
     <string name="episode_filters_exclude">Hariç tut</string>
-    <string name="episode_filters_duration">En Az Süre (dakika olarak)</string>
     <string name="episode_filters_hint">Tek kelimeler "Çok Kelimeler"</string>
     <string name="keep_updated">Güncel Tut</string>
     <string name="keep_updated_summary">Bu podcast\'i tüm podcast\'leri otomatik yenilerken dahil et</string>
@@ -696,18 +688,6 @@
     <string name="unable_to_start_system_file_manager">Sistem dosya yöneticisi başlatılamadı</string>
 
     <string name="filter">Filtre</string>
-    <string name="hide_is_favorite_label">Favori</string>
-    <string name="not_favorite">Favori değil</string>
-    <string name="hide_downloaded_episodes_label">İndirildi</string>
-    <string name="hide_not_downloaded_episodes_label">İndirilmedi</string>
-    <string name="queued_label">Çalma listesinde</string>
-    <string name="not_queued_label">Çalma listesinde değil</string>
-    <string name="has_media">Medya var</string>
-    <string name="no_media">Medya yok</string>
-    <string name="hide_paused_episodes_label">Durdurulmuş</string>
-    <string name="not_paused">Durdurulmamış</string>
-    <string name="hide_played_episodes_label">Oynatıldı</string>
-    <string name="not_played">Oynatılmadı</string>
 
     <!-- Sıralama -->
     <string name="sort_title_a_z">Başlık (A \u2192 Z)</string>
