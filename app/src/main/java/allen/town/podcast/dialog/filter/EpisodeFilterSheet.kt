@@ -30,9 +30,8 @@ class EpisodeFilterSheet : FilterSheet() {
     override fun buildSections(): List<FilterSection> = listOf(
         FilterSection(
             SECTION_STATUS, getString(R.string.filter_section_status), listOf(
-                FilterOption(EpisodeFilterOptions.Status.UNPLAYED.name, getString(R.string.filter_unplayed)),
-                FilterOption(EpisodeFilterOptions.Status.IN_PROGRESS.name, getString(R.string.filter_in_progress)),
-                FilterOption(EpisodeFilterOptions.Status.PLAYED.name, getString(R.string.filter_played))
+                FilterOption(EpisodeFilterOptions.Status.UNFINISHED.name, getString(R.string.filter_unfinished)),
+                FilterOption(EpisodeFilterOptions.Status.FINISHED.name, getString(R.string.filter_finished))
             )
         ),
         FilterSection(

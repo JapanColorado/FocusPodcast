@@ -80,14 +80,23 @@ public class AudiobookShelfFilterTest {
 
     @Test
     public void statusComesFromTheProgress() {
-        assertEquals(Status.NOT_STARTED, AudiobookShelfFilter.statusOf(null));
-        assertEquals(Status.NOT_STARTED, AudiobookShelfFilter.statusOf(notStarted(1, "A", null, HOUR).progress));
-        assertEquals(Status.IN_PROGRESS,
+        assertEquals(Status.UNFINISHED, AudiobookShelfFilter.statusOf(null));
+        assertEquals(Status.UNFINISHED, AudiobookShelfFilter.statusOf(notStarted(1, "A", null, HOUR).progress));
+        assertEquals(Status.UNFINISHED,
                 AudiobookShelfFilter.statusOf(inProgress(1, "A", null, HOUR, 10, 5).progress));
         assertEquals(Status.FINISHED, AudiobookShelfFilter.statusOf(finished(1, "A", null, HOUR, 5).progress));
-        // a position on a track of unknown duration still counts as started
-        assertEquals(Status.IN_PROGRESS,
+        assertEquals(Status.UNFINISHED,
                 AudiobookShelfFilter.statusOf(progress(1, 2, 0, 0, 0, true, 7)));
+    }
+
+    @Test
+    public void oldSavedStatusesReadAsUnfinished() {
+        assertEquals(Status.UNFINISHED, AudiobookShelfFilter.parseStatus("NOT_STARTED"));
+        assertEquals(Status.UNFINISHED, AudiobookShelfFilter.parseStatus("IN_PROGRESS"));
+        assertEquals(Status.UNFINISHED, AudiobookShelfFilter.parseStatus("UNFINISHED"));
+        assertEquals(Status.FINISHED, AudiobookShelfFilter.parseStatus("FINISHED"));
+        assertNull(AudiobookShelfFilter.parseStatus(null));
+        assertNull(AudiobookShelfFilter.parseStatus("bogus"));
     }
 
     @Test
@@ -97,10 +106,8 @@ public class AudiobookShelfFilterTest {
                 inProgress(2, "Reading", null, HOUR, 100, 10),
                 finished(3, "Done", null, HOUR, 20),
                 new Book(feed(4, "Empty", null), null));
-        assertEquals(Arrays.asList("Empty", "New"),
-                titles(new AudiobookShelfFilter(Sort.TITLE, Status.NOT_STARTED, null, null), books));
-        assertEquals(Collections.singletonList("Reading"),
-                titles(new AudiobookShelfFilter(Sort.TITLE, Status.IN_PROGRESS, null, null), books));
+        assertEquals(Arrays.asList("Empty", "New", "Reading"),
+                titles(new AudiobookShelfFilter(Sort.TITLE, Status.UNFINISHED, null, null), books));
         assertEquals(Collections.singletonList("Done"),
                 titles(new AudiobookShelfFilter(Sort.TITLE, Status.FINISHED, null, null), books));
     }
@@ -225,10 +232,11 @@ public class AudiobookShelfFilterTest {
                 inProgress(1, "Long Austen", "Austen", 20 * HOUR, 10, 1),
                 inProgress(2, "Short Austen", "Austen", HOUR, 10, 1),
                 inProgress(3, "Short Christie", "Christie", HOUR, 10, 1),
-                notStarted(4, "Short new Austen", "Austen", HOUR));
-        AudiobookShelfFilter filter = new AudiobookShelfFilter(Sort.TITLE, Status.IN_PROGRESS,
+                notStarted(4, "Short new Austen", "Austen", HOUR),
+                finished(5, "Short done Austen", "Austen", HOUR, 1));
+        AudiobookShelfFilter filter = new AudiobookShelfFilter(Sort.TITLE, Status.UNFINISHED,
                 Collections.singletonList("Austen"), Length.UNDER_5_HOURS);
-        assertEquals(Collections.singletonList("Short Austen"), titles(filter, books));
+        assertEquals(Arrays.asList("Short Austen", "Short new Austen"), titles(filter, books));
     }
 
     @Test

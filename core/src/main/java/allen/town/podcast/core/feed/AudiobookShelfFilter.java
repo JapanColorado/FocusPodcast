@@ -29,8 +29,8 @@ import allen.town.podcast.model.feed.Feed;
  * be finished are at the top. Date added is newest first, which is the feed id descending: feeds
  * have no "added" timestamp, and ids grow with every subscription. Ties go by title.
  *
- * <p>Filters combine with AND. Status comes from {@link AudiobookProgress}; a book without tracks
- * counts as not started. Author is OR across the chosen authors, and is ignored when fewer than two
+ * <p>Filters combine with AND. Status is Finished or Unfinished, from {@link AudiobookProgress}; a book
+ * without tracks is unfinished. Author is OR across the chosen authors, and is ignored when fewer than two
  * authors exist among the books (the page then hides the section) or none of the chosen ones is
  * among them any more, so a stale saved author never hides books invisibly. Length goes by the
  * total duration; a book whose duration is unknown matches no length.
@@ -39,7 +39,7 @@ public final class AudiobookShelfFilter {
 
     public enum Sort { RECENTLY_PLAYED, TITLE, AUTHOR, PROGRESS, DATE_ADDED }
 
-    public enum Status { NOT_STARTED, IN_PROGRESS, FINISHED }
+    public enum Status { UNFINISHED, FINISHED }
 
     public enum Length { UNDER_5_HOURS, FROM_5_TO_15_HOURS, OVER_15_HOURS }
 
@@ -97,10 +97,24 @@ public final class AudiobookShelfFilter {
 
     @NonNull
     public static Status statusOf(@Nullable AudiobookProgress progress) {
-        if (progress == null || !progress.isStarted()) {
-            return Status.NOT_STARTED;
+        return progress != null && progress.isFinished() ? Status.FINISHED : Status.UNFINISHED;
+    }
+
+    /**
+     * The saved status name; the old Not started / In progress choices read as Unfinished, anything
+     * else unknown as no status filter.
+     */
+    @Nullable
+    public static Status parseStatus(@Nullable String name) {
+        if ("NOT_STARTED".equals(name) || "IN_PROGRESS".equals(name)) {
+            return Status.UNFINISHED;
         }
-        return progress.isFinished() ? Status.FINISHED : Status.IN_PROGRESS;
+        for (Status status : Status.values()) {
+            if (status.name().equals(name)) {
+                return status;
+            }
+        }
+        return null;
     }
 
     /** The length bucket of the book, null when its total duration is unknown. */

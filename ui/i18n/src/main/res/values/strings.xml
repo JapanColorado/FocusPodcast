@@ -975,9 +975,8 @@
     <string name="filter_section_status">Status</string>
     <string name="filter_section_downloaded">Downloaded</string>
     <string name="filter_section_favorite">Favorite</string>
-    <string name="filter_unplayed">Unplayed</string>
-    <string name="filter_in_progress">In progress</string>
-    <string name="filter_played">Played</string>
+    <string name="filter_unfinished">Unfinished</string>
+    <string name="filter_finished">Finished</string>
     <string name="filter_downloaded">Downloaded</string>
     <string name="filter_not_downloaded">Not downloaded</string>
     <string name="filter_favorite">Favorite</string>
@@ -996,7 +995,6 @@
     <string name="audiobook_sort_author">Author</string>
     <string name="audiobook_sort_progress">Progress</string>
     <string name="audiobook_sort_date_added">Date added</string>
-    <string name="audiobook_status_not_started">Not started</string>
     <string name="audiobook_length_under_5h">Under 5 h</string>
     <string name="audiobook_length_5_to_15h">5–15 h</string>
     <string name="audiobook_length_over_15h">Over 15 h</string>

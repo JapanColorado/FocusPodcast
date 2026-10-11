@@ -10,28 +10,20 @@ import java.util.List;
 import allen.town.podcast.model.feed.FeedItemFilter;
 
 /**
- * The three choices the episode filter sheet offers (All Episodes and a podcast's episode list),
+ * The choices the episode filter sheet offers (All Episodes and a podcast's episode list),
  * translated to and from {@link FeedItemFilter} keys. Pure logic, no Android.
  *
- * <p>Status maps onto the played and paused keys, which the SQL in {@code FeedItemFilterQuery}
- * combines with AND:
- * <ul>
- *     <li>Unplayed = {@code unplayed,not_paused}: not marked played and no saved position, i.e.
- *     never started.</li>
- *     <li>In progress = {@code unplayed,paused}: a saved position on an episode that is not marked
- *     played.</li>
- *     <li>Played = {@code played}.</li>
- * </ul>
- * Downloaded and Favorite map onto their key pairs one to one.
+ * <p>Status is Unfinished ({@code unplayed}: not marked played, whether started or not) or
+ * Finished ({@code played}). Downloaded and Favorite map onto their key pairs one to one.
  *
  * <p>Filters saved before the sheet existed may hold keys it no longer offers (today, has media,
- * queued, new) or other combinations of the played and paused keys. {@link #parse} reads them
- * leniently (played wins over paused, paused over unplayed / not_paused) and drops the rest, so
+ * queued, new) or the paused keys of the old Unplayed / In progress split. {@link #parse} reads them
+ * leniently (played wins; unplayed, paused or not_paused mean Unfinished) and drops the rest, so
  * {@link #sanitize} never leaves a key in effect that the sheet cannot show.
  */
 public final class EpisodeFilterOptions {
 
-    public enum Status { UNPLAYED, IN_PROGRESS, PLAYED }
+    public enum Status { UNFINISHED, FINISHED }
 
     @Nullable
     public final Status status;
@@ -54,11 +46,10 @@ public final class EpisodeFilterOptions {
         List<String> keys = values != null ? Arrays.asList(values) : new ArrayList<>();
         Status status = null;
         if (keys.contains(FeedItemFilter.PLAYED)) {
-            status = Status.PLAYED;
-        } else if (keys.contains(FeedItemFilter.PAUSED)) {
-            status = Status.IN_PROGRESS;
-        } else if (keys.contains(FeedItemFilter.UNPLAYED) || keys.contains(FeedItemFilter.NOT_PAUSED)) {
-            status = Status.UNPLAYED;
+            status = Status.FINISHED;
+        } else if (keys.contains(FeedItemFilter.UNPLAYED) || keys.contains(FeedItemFilter.PAUSED)
+                || keys.contains(FeedItemFilter.NOT_PAUSED)) {
+            status = Status.UNFINISHED;
         }
         Boolean downloaded = null;
         if (keys.contains(FeedItemFilter.DOWNLOADED)) {
@@ -79,13 +70,9 @@ public final class EpisodeFilterOptions {
     @NonNull
     public String[] toValues() {
         List<String> keys = new ArrayList<>();
-        if (status == Status.UNPLAYED) {
+        if (status == Status.UNFINISHED) {
             keys.add(FeedItemFilter.UNPLAYED);
-            keys.add(FeedItemFilter.NOT_PAUSED);
-        } else if (status == Status.IN_PROGRESS) {
-            keys.add(FeedItemFilter.UNPLAYED);
-            keys.add(FeedItemFilter.PAUSED);
-        } else if (status == Status.PLAYED) {
+        } else if (status == Status.FINISHED) {
             keys.add(FeedItemFilter.PLAYED);
         }
         if (downloaded != null) {

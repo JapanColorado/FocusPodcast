@@ -568,9 +568,8 @@
   <string name="filter_section_status">ステータス</string>
   <string name="filter_section_downloaded">ダウンロード</string>
   <string name="filter_section_favorite">お気に入り</string>
-  <string name="filter_unplayed">未再生</string>
-  <string name="filter_in_progress">再生途中</string>
-  <string name="filter_played">再生済み</string>
+  <string name="filter_unfinished">未完了</string>
+  <string name="filter_finished">完了</string>
   <string name="filter_downloaded">ダウンロード済</string>
   <string name="filter_not_downloaded">未ダウンロード</string>
   <string name="filter_favorite">お気に入り</string>
@@ -589,7 +588,6 @@
   <string name="audiobook_sort_author">著者</string>
   <string name="audiobook_sort_progress">進み具合</string>
   <string name="audiobook_sort_date_added">追加日</string>
-  <string name="audiobook_status_not_started">未開始</string>
   <string name="audiobook_length_under_5h">5 時間未満</string>
   <string name="audiobook_length_5_to_15h">5～15 時間</string>
   <string name="audiobook_length_over_15h">15 時間超</string>

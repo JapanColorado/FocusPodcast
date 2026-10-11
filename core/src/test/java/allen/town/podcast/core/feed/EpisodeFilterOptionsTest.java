@@ -19,25 +19,19 @@ public class EpisodeFilterOptionsTest {
     }
 
     @Test
-    public void unplayedMeansNotPlayedAndNotStarted() {
-        String[] values = new EpisodeFilterOptions(Status.UNPLAYED, null, null).toValues();
-        assertArrayEquals(keys(FeedItemFilter.UNPLAYED, FeedItemFilter.NOT_PAUSED), values);
+    public void unfinishedMeansNotPlayedStartedOrNot() {
+        String[] values = new EpisodeFilterOptions(Status.UNFINISHED, null, null).toValues();
+        assertArrayEquals(keys(FeedItemFilter.UNPLAYED), values);
         FeedItemFilter filter = new FeedItemFilter(values);
         assertTrue(filter.showUnplayed);
-        assertTrue(filter.showNotPaused);
+        assertFalse(filter.showNotPaused);
         assertFalse(filter.showPaused);
     }
 
     @Test
-    public void inProgressMeansStartedButNotPlayed() {
-        String[] values = new EpisodeFilterOptions(Status.IN_PROGRESS, null, null).toValues();
-        assertArrayEquals(keys(FeedItemFilter.UNPLAYED, FeedItemFilter.PAUSED), values);
-    }
-
-    @Test
-    public void playedMapsToPlayed() {
+    public void finishedMapsToPlayed() {
         assertArrayEquals(keys(FeedItemFilter.PLAYED),
-                new EpisodeFilterOptions(Status.PLAYED, null, null).toValues());
+                new EpisodeFilterOptions(Status.FINISHED, null, null).toValues());
     }
 
     @Test
@@ -59,7 +53,7 @@ public class EpisodeFilterOptionsTest {
     @Test
     public void everyChoiceSurvivesTheRoundTrip() {
         Boolean[] tristate = {null, Boolean.TRUE, Boolean.FALSE};
-        Status[] statuses = {null, Status.UNPLAYED, Status.IN_PROGRESS, Status.PLAYED};
+        Status[] statuses = {null, Status.UNFINISHED, Status.FINISHED};
         for (Status status : statuses) {
             for (Boolean downloaded : tristate) {
                 for (Boolean favorite : tristate) {
@@ -85,13 +79,16 @@ public class EpisodeFilterOptionsTest {
 
     @Test
     public void oldStatusCombinationsMapToTheClosestChoice() {
-        // the old dialog stored the played and paused pairs separately
-        assertEquals(Status.UNPLAYED, EpisodeFilterOptions.parse(keys(FeedItemFilter.UNPLAYED)).status);
-        assertEquals(Status.UNPLAYED, EpisodeFilterOptions.parse(keys(FeedItemFilter.NOT_PAUSED)).status);
-        assertEquals(Status.IN_PROGRESS, EpisodeFilterOptions.parse(keys(FeedItemFilter.PAUSED)).status);
-        assertEquals(Status.PLAYED,
+        // the old dialog stored the played and paused pairs separately; the Unplayed / In progress
+        // split stored unplayed,not_paused and unplayed,paused
+        assertEquals(Status.UNFINISHED, EpisodeFilterOptions.parse(keys(FeedItemFilter.UNPLAYED)).status);
+        assertEquals(Status.UNFINISHED, EpisodeFilterOptions.parse(keys(FeedItemFilter.NOT_PAUSED)).status);
+        assertEquals(Status.UNFINISHED, EpisodeFilterOptions.parse(keys(FeedItemFilter.PAUSED)).status);
+        assertEquals(Status.FINISHED,
                 EpisodeFilterOptions.parse(keys(FeedItemFilter.PLAYED, FeedItemFilter.PAUSED)).status);
-        assertArrayEquals(keys(FeedItemFilter.UNPLAYED, FeedItemFilter.PAUSED),
+        assertArrayEquals(keys(FeedItemFilter.UNPLAYED),
+                EpisodeFilterOptions.sanitize(keys(FeedItemFilter.UNPLAYED, FeedItemFilter.NOT_PAUSED)));
+        assertArrayEquals(keys(FeedItemFilter.UNPLAYED),
                 EpisodeFilterOptions.sanitize(keys(FeedItemFilter.PAUSED, FeedItemFilter.HAS_MEDIA)));
     }
 

@@ -315,7 +315,7 @@ internal object UiPrefs {
     var audiobookShelfFilter: AudiobookShelfFilter
         get() = AudiobookShelfFilter(
             enumOrNull<AudiobookShelfFilter.Sort>(prefs.getString(PREF_AUDIOBOOKS_SORT, null)),
-            enumOrNull<AudiobookShelfFilter.Status>(prefs.getString(PREF_AUDIOBOOKS_STATUS, null)),
+            AudiobookShelfFilter.parseStatus(prefs.getString(PREF_AUDIOBOOKS_STATUS, null)),
             prefs.getStringSet(PREF_AUDIOBOOKS_AUTHORS, null),
             enumOrNull<AudiobookShelfFilter.Length>(prefs.getString(PREF_AUDIOBOOKS_LENGTH, null))
         )
