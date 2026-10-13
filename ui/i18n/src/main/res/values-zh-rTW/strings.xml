@@ -766,6 +766,12 @@
   <string name="podcast_own_settings_applied">正在使用此播客的專屬設定</string>
   <string name="use_default">使用預設值</string>
   <string name="default_playback_speed">預設播放速度</string>
+  <string name="clear_voice">清晰人聲</string>
+  <string name="clear_voice_hint">降低背景噪音並平衡音量</string>
+  <string name="clear_voice_off">關</string>
+  <string name="clear_voice_light">輕度</string>
+  <string name="clear_voice_strong">強</string>
+  <string name="pref_clear_voice_sum">%1$s。降低背景噪音並平衡音量</string>
   <string name="pref_default_effect_sum">適用於沒有專屬音效的播客</string>
   <string name="add_podcast_by_url_label">透過網址新增播客</string>
   <string name="feed_url_hint">RSS 訂閱網址</string>

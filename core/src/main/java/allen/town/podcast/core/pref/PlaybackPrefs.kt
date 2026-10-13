@@ -4,6 +4,7 @@ import allen.town.podcast.core.pref.PrefsStore.TAG
 import allen.town.podcast.core.pref.PrefsStore.getString
 import allen.town.podcast.core.pref.PrefsStore.prefs
 import allen.town.podcast.model.feed.SortOrder
+import allen.town.podcast.model.playback.ClearVoiceLevel
 import allen.town.podcast.model.playback.MediaType
 import android.util.Log
 import android.view.KeyEvent
@@ -261,13 +262,35 @@ internal object PlaybackPrefs {
             .apply()
     }
 
-    fun audioLoudness(): Boolean {
-        return prefs.getBoolean(Prefs.PREF_AUDIO_LOUDNESS, false)
+    /**
+     * The default Clear voice strength (a [ClearVoiceLevel]). Stored as a string because the
+     * Settings screen edits it with a ListPreference.
+     */
+    fun clearVoiceLevel(): Int {
+        val stored = prefs.getString(Prefs.PREF_CLEAR_VOICE, null)?.toIntOrNull() ?: ClearVoiceLevel.OFF
+        return ClearVoiceLevel.sanitize(stored)
     }
 
-    fun setAudioLoudness(enable: Boolean) {
+    fun setClearVoiceLevel(level: Int) {
         prefs.edit()
-            .putBoolean(Prefs.PREF_AUDIO_LOUDNESS, enable)
+            .putString(Prefs.PREF_CLEAR_VOICE, ClearVoiceLevel.sanitize(level).toString())
             .apply()
+    }
+
+    /**
+     * Replaces the old "vocal enhancement" switch (a fixed-gain LoudnessEnhancer) with the Clear
+     * voice strength: on becomes Light, unless a strength was already chosen. Idempotent: the old
+     * key is removed once read.
+     */
+    fun migrateLoudnessToClearVoice() {
+        if (!prefs.contains(Prefs.PREF_AUDIO_LOUDNESS_LEGACY)) {
+            return
+        }
+        val wasOn = prefs.getBoolean(Prefs.PREF_AUDIO_LOUDNESS_LEGACY, false)
+        val editor = prefs.edit().remove(Prefs.PREF_AUDIO_LOUDNESS_LEGACY)
+        if (wasOn && !prefs.contains(Prefs.PREF_CLEAR_VOICE)) {
+            editor.putString(Prefs.PREF_CLEAR_VOICE, ClearVoiceLevel.LIGHT.toString())
+        }
+        editor.apply()
     }
 }

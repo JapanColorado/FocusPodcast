@@ -763,7 +763,13 @@
     <string name="audio_effects">Audio Effects</string>
     <string name="stereo_to_mono">Downmix: Stereo to mono</string>
     <string name="player_switch_to_audio_only">Play as audio only</string>
-    <string name="vocal_enhancement">Vocal Enhancement</string>
+    <string name="clear_voice">Clear voice</string>
+    <string name="clear_voice_hint">Reduces background noise and evens out volume</string>
+    <string name="clear_voice_off">Off</string>
+    <string name="clear_voice_light">Light</string>
+    <string name="clear_voice_strong">Strong</string>
+    <!-- %1$s is Off, Light or Strong -->
+    <string name="pref_clear_voice_sum">%1$s. Reduces background noise and evens out volume</string>
 
 
     <!-- proxy settings -->

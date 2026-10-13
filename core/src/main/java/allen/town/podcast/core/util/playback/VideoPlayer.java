@@ -32,9 +32,9 @@ public class VideoPlayer extends MediaPlayer implements IPlayer {
     }
 
     @Override
-    public void setLoudness(boolean b) {
-        Log.e(TAG, "Setting loudness unsupported in video player");
-        throw new UnsupportedOperationException("Setting loudness unsupported in video player");
+    public void setClearVoiceLevel(int level) {
+        // The framework MediaPlayer has no audio processor hook; Clear voice is ExoPlayer only.
+        Log.d(TAG, "Clear voice is not supported in the video player, ignoring level " + level);
     }
 
 

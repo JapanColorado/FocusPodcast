@@ -1,4 +1,4 @@
-package allen.town.podcast.core.adskip;
+package allen.town.podcast.core.dsp;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -6,7 +6,7 @@ import static org.junit.Assert.assertTrue;
 import org.junit.Test;
 
 /**
- * Sanity checks for the hand-written radix-2 FFT. A pure sine sitting exactly on bin k must put
+ * Sanity checks for the hand-written radix-2 FFT shared by the ad detector and Clear voice. A pure sine sitting exactly on bin k must put
  * essentially all of its energy in bin k; if the twiddle table or the bit-reversal permutation is
  * wrong, the peak lands somewhere else.
  */
@@ -67,6 +67,26 @@ public class FftTest {
     public void spectrumLengthIsHalfSizePlusOne() {
         Fft fft = new Fft(256);
         assertEquals(129, fft.powerSpectrum(new float[256]).length);
+    }
+
+    @Test
+    public void inverseUndoesForward() {
+        Fft fft = new Fft(SIZE);
+        java.util.Random random = new java.util.Random(7);
+        float[] re = new float[SIZE];
+        float[] im = new float[SIZE];
+        float[] originalRe = new float[SIZE];
+        float[] originalIm = new float[SIZE];
+        for (int i = 0; i < SIZE; i++) {
+            re[i] = originalRe[i] = (float) random.nextGaussian();
+            im[i] = originalIm[i] = (float) random.nextGaussian();
+        }
+        fft.forward(re, im);
+        fft.inverse(re, im);
+        for (int i = 0; i < SIZE; i++) {
+            assertEquals(originalRe[i], re[i], 1e-4f);
+            assertEquals(originalIm[i], im[i], 1e-4f);
+        }
     }
 
     @Test(expected = IllegalArgumentException.class)

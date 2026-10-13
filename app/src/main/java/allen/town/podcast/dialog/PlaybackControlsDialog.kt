@@ -12,6 +12,7 @@ import allen.town.podcast.databinding.AudioControlsBinding
 import allen.town.podcast.event.settings.AudioEffectsChangedEvent
 import allen.town.podcast.model.feed.Feed
 import allen.town.podcast.model.feed.FeedPreferences
+import allen.town.podcast.model.playback.ClearVoiceLevel
 import allen.town.podcast.util.NavigationUtil
 import android.app.Dialog
 import android.os.Bundle
@@ -123,9 +124,7 @@ class PlaybackControlsDialog : DialogFragment() {
         bindSwitch(binding.stereoToMono, AudioEffectUtils.isMono(feedPreferences)) { checked ->
             changeEffect({ it.isMono = checked }, { Prefs.stereoToMono(checked) })
         }
-        bindSwitch(binding.vocalEnhancement, AudioEffectUtils.isLoudness(feedPreferences)) { checked ->
-            changeEffect({ it.isLoudness = checked }, { Prefs.setAudioLoudness(checked) })
-        }
+        bindClearVoice(binding, AudioEffectUtils.getClearVoiceLevel(feedPreferences))
 
         if (loadedFeed != null && feedPreferences != null) {
             binding.detectAdsRow.visibility = View.VISIBLE
@@ -139,6 +138,30 @@ class PlaybackControlsDialog : DialogFragment() {
         }
         updateOwnSettingsCard()
         binding.equalizer.setOnClickListener { NavigationUtil.openEqualizer(requireActivity()) }
+    }
+
+    /** Off / Light / Strong as a single-selection button row. */
+    private fun bindClearVoice(binding: AudioControlsBinding, level: Int) {
+        val group = binding.clearVoiceGroup
+        group.clearOnButtonCheckedListeners()
+        group.check(
+            when (level) {
+                ClearVoiceLevel.STRONG -> R.id.clear_voice_strong
+                ClearVoiceLevel.LIGHT -> R.id.clear_voice_light
+                else -> R.id.clear_voice_off
+            }
+        )
+        group.addOnButtonCheckedListener { _, checkedId, isChecked ->
+            if (!isChecked) {
+                return@addOnButtonCheckedListener
+            }
+            val chosen = when (checkedId) {
+                R.id.clear_voice_strong -> ClearVoiceLevel.STRONG
+                R.id.clear_voice_light -> ClearVoiceLevel.LIGHT
+                else -> ClearVoiceLevel.OFF
+            }
+            changeEffect({ it.clearVoiceLevel = chosen }, { Prefs.setClearVoiceLevel(chosen) })
+        }
     }
 
     private fun bindSwitch(switch: CompoundButton, checked: Boolean, onChange: (Boolean) -> Unit) {

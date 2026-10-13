@@ -4,6 +4,7 @@ import android.content.Context;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
+import androidx.preference.ListPreference;
 
 import org.greenrobot.eventbus.EventBus;
 
@@ -18,7 +19,7 @@ public class AudioEffectFragment extends AbsSettingsFragment {
     private static final String PREF_FEED_AUDIO_EFFECT = "feed_audio_effect_pref";
     private static final String PREF_FEED_SKIP_SILENCE = "feed_skip_silence";
     private static final String PREF_FEED_MONO = "feed_mono_pref";
-    private static final String PREF_FEED_LOUDNESS = "feed_loudness_pref";
+    private static final String PREF_FEED_CLEAR_VOICE = "feed_clear_voice_pref";
     private FeedPreferences feedPreferences;
     private Feed feed;
 
@@ -56,13 +57,13 @@ public class AudioEffectFragment extends AbsSettingsFragment {
     ATESwitchPreference audioEffectPreference;
     ATESwitchPreference skipSilencePreference;
     ATESwitchPreference monoPreference;
-    ATESwitchPreference loudnessPreference;
+    ListPreference clearVoicePreference;
 
     private void init() {
         audioEffectPreference = findPreference(PREF_FEED_AUDIO_EFFECT);
         skipSilencePreference = findPreference(PREF_FEED_SKIP_SILENCE);
         monoPreference = findPreference(PREF_FEED_MONO);
-        loudnessPreference = findPreference(PREF_FEED_LOUDNESS);
+        clearVoicePreference = findPreference(PREF_FEED_CLEAR_VOICE);
     }
 
     /**
@@ -95,9 +96,14 @@ public class AudioEffectFragment extends AbsSettingsFragment {
             return true;
         });
 
-        loudnessPreference.setOnPreferenceChangeListener((preference, newValue) -> {
-            feedPreferences.setLoudness((Boolean) newValue);
+        clearVoicePreference.setOnPreferenceChangeListener((preference, newValue) -> {
+            int level = ClearVoicePreferences.parse(newValue);
+            if (level < 0) {
+                return false;
+            }
+            feedPreferences.setClearVoiceLevel(level);
             saveEffects();
+            ClearVoicePreferences.updateSummary(clearVoicePreference, level);
             return true;
         });
         showEffectValues();
@@ -111,7 +117,7 @@ public class AudioEffectFragment extends AbsSettingsFragment {
     private void showEffectValues() {
         skipSilencePreference.setChecked(AudioEffectUtils.isSkipSilence(feedPreferences));
         monoPreference.setChecked(AudioEffectUtils.isMono(feedPreferences));
-        loudnessPreference.setChecked(AudioEffectUtils.isLoudness(feedPreferences));
+        ClearVoicePreferences.show(clearVoicePreference, AudioEffectUtils.getClearVoiceLevel(feedPreferences));
     }
 
     @Override

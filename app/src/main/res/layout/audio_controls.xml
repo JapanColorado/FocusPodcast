@@ -67,6 +67,7 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:gravity="center_vertical"
             android:orientation="horizontal">
 
             <allen.town.podcast.common.views.AccentImageView
@@ -76,14 +77,60 @@
                 android:layout_height="wrap_content"
                 android:src="@drawable/ic_vocal_enhancement" />
 
-            <allen.town.podcast.common.common.views.ATESwitch
-                android:id="@+id/vocal_enhancement"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/vocal_enhancement"
-                android:thumb="@drawable/switch_thumb"
-                app:track="@drawable/switch_track" />
+                android:orientation="vertical">
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/clear_voice"
+                    android:textColor="?android:textColorPrimary" />
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/clear_voice_hint"
+                    android:textAppearance="?attr/textAppearanceBodySmall"
+                    android:textColor="?android:textColorSecondary" />
+            </LinearLayout>
         </LinearLayout>
+
+        <com.google.android.material.button.MaterialButtonToggleGroup
+            android:id="@+id/clear_voice_group"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="48dp"
+            android:layout_marginBottom="8dp"
+            android:contentDescription="@string/clear_voice"
+            app:selectionRequired="true"
+            app:singleSelection="true">
+
+            <allen.town.podcast.common.views.AccentMaterialOutlineBackgroundStatusButton
+                android:id="@+id/clear_voice_off"
+                style="?attr/materialButtonOutlinedStyle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/clear_voice_off" />
+
+            <allen.town.podcast.common.views.AccentMaterialOutlineBackgroundStatusButton
+                android:id="@+id/clear_voice_light"
+                style="?attr/materialButtonOutlinedStyle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/clear_voice_light" />
+
+            <allen.town.podcast.common.views.AccentMaterialOutlineBackgroundStatusButton
+                android:id="@+id/clear_voice_strong"
+                style="?attr/materialButtonOutlinedStyle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/clear_voice_strong" />
+        </com.google.android.material.button.MaterialButtonToggleGroup>
 
         <LinearLayout
             android:id="@+id/detect_ads_row"

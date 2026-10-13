@@ -1,18 +1,19 @@
-package allen.town.podcast.core.adskip;
+package allen.town.podcast.core.dsp;
 
 /**
  * A minimal in-place radix-2 Cooley-Tukey FFT, sized once and reused.
  *
  * <p>This exists because the ad detector needs a power spectrum a few hundred thousand times per
- * episode and the app is not allowed to gain a new dependency for it (F-Droid build, no native
- * libraries, no DSP jar). It owns nothing but its twiddle tables, its bit-reversal permutation and
+ * episode, and the Clear voice enhancer needs a forward and an inverse transform every few
+ * milliseconds of playback, and the app is not allowed to gain a new dependency for it (F-Droid
+ * build, no native libraries, no DSP jar). It owns nothing but its twiddle tables, its bit-reversal permutation and
  * a pair of scratch buffers, so a single instance can be reused for every sub-window of an episode
  * without allocating.
  *
  * <p>It is deliberately not thread safe: the scratch buffers are instance state. One instance per
  * analysis thread.
  */
-final class Fft {
+public final class Fft {
 
     private final int size;
     private final int[] reverse;
@@ -24,7 +25,7 @@ final class Fft {
     /**
      * @param size transform length; must be a power of two and at least 2.
      */
-    Fft(int size) {
+    public Fft(int size) {
         if (size < 2 || Integer.bitCount(size) != 1) {
             throw new IllegalArgumentException("FFT size must be a power of two >= 2, was " + size);
         }
@@ -48,14 +49,14 @@ final class Fft {
         }
     }
 
-    int size() {
+    public int size() {
         return size;
     }
 
     /**
      * In-place forward complex transform. Both arrays must have exactly {@link #size()} entries.
      */
-    void forward(float[] re, float[] im) {
+    public void forward(float[] re, float[] im) {
         if (re.length != size || im.length != size) {
             throw new IllegalArgumentException("arrays must be of length " + size);
         }
@@ -95,12 +96,32 @@ final class Fft {
     }
 
     /**
+     * In-place inverse complex transform, scaled by 1/size so that {@code inverse(forward(x))}
+     * returns {@code x}. Computed as conj(forward(conj(X))) / size, which reuses the forward
+     * twiddles.
+     */
+    public void inverse(float[] re, float[] im) {
+        if (re.length != size || im.length != size) {
+            throw new IllegalArgumentException("arrays must be of length " + size);
+        }
+        for (int i = 0; i < size; i++) {
+            im[i] = -im[i];
+        }
+        forward(re, im);
+        float scale = 1f / size;
+        for (int i = 0; i < size; i++) {
+            re[i] *= scale;
+            im[i] = -im[i] * scale;
+        }
+    }
+
+    /**
      * Power spectrum |X[k]|^2 of a real signal, for k = 0 .. size/2 inclusive.
      *
      * @param samples source buffer, read from {@code offset} for {@link #size()} values.
      * @param out     destination of length {@code size/2 + 1}.
      */
-    void powerSpectrum(float[] samples, int offset, float[] out) {
+    public void powerSpectrum(float[] samples, int offset, float[] out) {
         if (out.length != size / 2 + 1) {
             throw new IllegalArgumentException("out must be of length " + (size / 2 + 1));
         }
@@ -113,14 +134,14 @@ final class Fft {
     }
 
     /** Allocating convenience wrapper; used by tests and one-off callers. */
-    float[] powerSpectrum(float[] samples) {
+    public float[] powerSpectrum(float[] samples) {
         float[] out = new float[size / 2 + 1];
         powerSpectrum(samples, 0, out);
         return out;
     }
 
     /** Periodic Hann window of the given length, the shape used for every analysis sub-window. */
-    static float[] hann(int length) {
+    public static float[] hann(int length) {
         float[] w = new float[length];
         for (int i = 0; i < length; i++) {
             w[i] = (float) (0.5 - 0.5 * Math.cos(2.0 * Math.PI * i / length));

@@ -104,7 +104,10 @@ object Prefs {
     // Global default audio effects; a podcast with its own effects ignores them.
     const val PREF_PLAYBACK_SKIP_SILENCE = "pref_global_skip_silence"
     const val PREF_STEREO_TO_MONO = "pref_stereo_to_mono"
-    const val PREF_AUDIO_LOUDNESS = "pref_audio_loudness"
+    const val PREF_CLEAR_VOICE = "pref_clear_voice"
+
+    /** The pre-Clear-voice "vocal enhancement" switch; only read by the migration. */
+    const val PREF_AUDIO_LOUDNESS_LEGACY = "pref_audio_loudness"
 
     // Constants
     const val FEED_ORDER_COUNTER = 0
@@ -494,11 +497,16 @@ object Prefs {
     @JvmStatic
     fun stereoToMono(enable: Boolean) = PlaybackPrefs.stereoToMono(enable)
 
+    /** The default Clear voice strength, a `ClearVoiceLevel`. */
     @JvmStatic
-    fun audioLoudness(): Boolean = PlaybackPrefs.audioLoudness()
+    fun getClearVoiceLevel(): Int = PlaybackPrefs.clearVoiceLevel()
 
     @JvmStatic
-    fun setAudioLoudness(enable: Boolean) = PlaybackPrefs.setAudioLoudness(enable)
+    fun setClearVoiceLevel(level: Int) = PlaybackPrefs.setClearVoiceLevel(level)
+
+    /** See [PlaybackPrefs.migrateLoudnessToClearVoice]. */
+    @JvmStatic
+    fun migrateLoudnessToClearVoice() = PlaybackPrefs.migrateLoudnessToClearVoice()
 
     @JvmStatic
     val episodeCleanupAlgorithm: EpisodeCleanupAlgorithm

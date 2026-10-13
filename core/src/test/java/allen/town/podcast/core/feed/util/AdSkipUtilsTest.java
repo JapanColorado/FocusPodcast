@@ -162,7 +162,7 @@ public class AdSkipUtilsTest {
         return new FeedPreferences(0, true, true,
                 FeedPreferences.AutoDeleteAction.GLOBAL, VolumeAdaptionSetting.OFF,
                 null, null, new FeedFilter(), FeedPreferences.SPEED_USE_GLOBAL,
-                0, 0, false, new HashSet<>(), false, false, false, false);
+                0, 0, false, new HashSet<>(), false, 0, false, false);
     }
 
     private static Feed feed() {

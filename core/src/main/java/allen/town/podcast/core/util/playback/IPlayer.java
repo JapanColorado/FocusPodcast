@@ -40,7 +40,8 @@ public interface IPlayer {
 
     void setDownmix(boolean enable);
 
-    void setLoudness(boolean enable);
+    /** Sets the Clear voice strength, a {@code ClearVoiceLevel}; applies to the playing stream. */
+    void setClearVoiceLevel(int level);
 
     void setVolume(float left, float right);
 

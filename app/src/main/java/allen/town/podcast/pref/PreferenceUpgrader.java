@@ -36,6 +36,7 @@ public class PreferenceUpgrader {
         // Not tied to a version code: debug builds reuse it, and the steps are idempotent and cheap.
         syncLibraryCategories();
         Prefs.migrateAudiobookShelfStatus();
+        Prefs.migrateLoudnessToClearVoice();
 
         if (oldVersion != newVersion) {
             AutoUpdateManager.restartUpdateAlarm(context);

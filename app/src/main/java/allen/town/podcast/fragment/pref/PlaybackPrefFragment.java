@@ -32,6 +32,23 @@ public class PlaybackPrefFragment extends AbsSettingsFragment implements SharedP
 
         setupPlaybackScreen();
         buildSmartMarkAsPlayedPreference();
+        buildClearVoicePreference();
+    }
+
+    private void buildClearVoicePreference() {
+        ListPreference pref = findPreference(Prefs.PREF_CLEAR_VOICE);
+        if (pref == null) {
+            return;
+        }
+        ClearVoicePreferences.updateSummary(pref, Prefs.getClearVoiceLevel());
+        pref.setOnPreferenceChangeListener((preference, newValue) -> {
+            int level = ClearVoicePreferences.parse(newValue);
+            if (level < 0) {
+                return false;
+            }
+            ClearVoicePreferences.updateSummary(pref, level);
+            return true;
+        });
     }
 
     @Override
@@ -133,7 +150,7 @@ public class PlaybackPrefFragment extends AbsSettingsFragment implements SharedP
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
         if (Prefs.PREF_PLAYBACK_SKIP_SILENCE.equals(key)
                 || Prefs.PREF_STEREO_TO_MONO.equals(key)
-                || Prefs.PREF_AUDIO_LOUDNESS.equals(key)) {
+                || Prefs.PREF_CLEAR_VOICE.equals(key)) {
             // The global default effects changed; a playing podcast without its own follows them.
             EventBus.getDefault().post(AudioEffectsChangedEvent.global());
         }

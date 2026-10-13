@@ -170,7 +170,11 @@ public abstract class PlaybackServiceMediaPlayer {
 
     public abstract void setDownmix(boolean enable);
 
-    public abstract void setLoudness(boolean enable);
+    /**
+     * Sets the strength of the Clear voice enhancer (0 off, 1 light, 2 strong, see
+     * {@code ClearVoiceLevel}). Takes effect without restarting playback.
+     */
+    public abstract void setClearVoiceLevel(int level);
 
     public abstract MediaType getCurrentMediaType();
 

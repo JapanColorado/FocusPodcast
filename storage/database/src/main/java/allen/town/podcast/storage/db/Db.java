@@ -94,7 +94,7 @@ public class Db {
     public static final String KEY_IS_SUBSCRIBED = DbSchema.KEY_IS_SUBSCRIBED;
     public static final String KEY_ITUNES_FEED_ID = DbSchema.KEY_ITUNES_FEED_ID;
     public static final String KEY_USE_FEED_EFFECT = DbSchema.KEY_USE_FEED_EFFECT;
-    public static final String KEY_LOUDNESS_ENABLED = DbSchema.KEY_LOUDNESS_ENABLED;
+    public static final String KEY_CLEAR_VOICE = DbSchema.KEY_CLEAR_VOICE;
     public static final String KEY_MONO_ENABLED = DbSchema.KEY_MONO_ENABLED;
     public static final String KEY_PLAYED_DURATION = DbSchema.KEY_PLAYED_DURATION;
     public static final String KEY_KEEP_UPDATED = DbSchema.KEY_KEEP_UPDATED;

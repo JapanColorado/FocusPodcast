@@ -497,6 +497,12 @@
   <string name="podcast_own_settings_applied">このポッドキャスト独自の設定を使用中</string>
   <string name="use_default">デフォルトを使用</string>
   <string name="default_playback_speed">デフォルトの再生速度</string>
+  <string name="clear_voice">クリアボイス</string>
+  <string name="clear_voice_hint">背景ノイズを抑え、音量を均一にします</string>
+  <string name="clear_voice_off">オフ</string>
+  <string name="clear_voice_light">弱</string>
+  <string name="clear_voice_strong">強</string>
+  <string name="pref_clear_voice_sum">%1$s。背景ノイズを抑え、音量を均一にします</string>
   <string name="pref_default_effect_sum">独自のエフェクトがないポッドキャストのデフォルト</string>
   <string name="pref_playback_speed_sum">独自の速度がないポッドキャストで使用されます。プレーヤーで速度を変更すると、そのポッドキャストだけに適用されます</string>
   <string name="pref_custom_for_podcast">このポッドキャスト用にカスタマイズ</string>

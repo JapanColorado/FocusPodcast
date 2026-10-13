@@ -16,7 +16,7 @@ import allen.town.podcast.playback.base.PlayerStatus;
 /**
  * Owns how loud, how fast and with which effects {@link LocalPSMP} plays: the playback speed and
  * skip-silence parameters (including the {@link SpeedChangedEvent} that announces a speed change),
- * the per-feed volume adaption applied to every volume change, and the loudness enhancement and
+ * the per-feed volume adaption applied to every volume change, and the Clear voice enhancer and
  * stereo-to-mono downmix effects. {@link LocalPSMP} keeps all the public entry points of
  * {@code PlaybackServiceMediaPlayer} and delegates their bodies here.
  */
@@ -42,16 +42,16 @@ class LocalPSMPAudioEffects {
     }
 
     /**
-     * Applies the loudness and downmix effects configured for the current media.
+     * Applies the Clear voice and downmix effects configured for the current media.
      * This method is executed on an internal executor service.
      */
     void setAudioEffect() {
         player.executor.submit(() -> {
             player.playerLock.lock();
-            boolean isLoudness = AudioEffectUtils.isLoudnessEnable(player.media);
+            int clearVoiceLevel = AudioEffectUtils.getClearVoiceLevel(player.media);
             boolean isMono = AudioEffectUtils.isMonoEnable(player.media);
-            Log.d(TAG, "set AudioEffect loudness -> " + isLoudness + " downmix ->" + isMono);
-            player.mediaPlayer.setLoudness(isLoudness);
+            Log.d(TAG, "set AudioEffect clear voice -> " + clearVoiceLevel + " downmix ->" + isMono);
+            player.mediaPlayer.setClearVoiceLevel(clearVoiceLevel);
             player.mediaPlayer.setDownmix(isMono);
             player.playerLock.unlock();
         });
@@ -134,11 +134,11 @@ class LocalPSMPAudioEffects {
         player.playerLock.unlock();
     }
 
-    void setLoudness(boolean enable) {
+    void setClearVoiceLevel(int level) {
         player.playerLock.lock();
         if (player.media != null && player.media.getMediaType() == MediaType.AUDIO) {
-            player.mediaPlayer.setLoudness(enable);
-            Log.d(TAG, "loudness was set to " + enable);
+            player.mediaPlayer.setClearVoiceLevel(level);
+            Log.d(TAG, "clear voice was set to " + level);
         }
         player.playerLock.unlock();
     }

@@ -537,8 +537,8 @@ public class LocalPSMP extends PlaybackServiceMediaPlayer {
     }
 
     @Override
-    public void setLoudness(boolean enable) {
-        audioEffects.setLoudness(enable);
+    public void setClearVoiceLevel(int level) {
+        audioEffects.setClearVoiceLevel(level);
     }
 
     @Override

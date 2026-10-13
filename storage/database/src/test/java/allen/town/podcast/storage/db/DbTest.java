@@ -33,6 +33,7 @@ import allen.town.podcast.model.feed.FeedItemFilter;
 import allen.town.podcast.model.feed.FeedMedia;
 import allen.town.podcast.model.feed.FeedPreferences;
 import allen.town.podcast.model.feed.VolumeAdaptionSetting;
+import allen.town.podcast.model.playback.ClearVoiceLevel;
 import allen.town.podcast.storage.db.mapper.DownloadStatusCursorMapper;
 import allen.town.podcast.storage.db.mapper.FeedCursorMapper;
 import allen.town.podcast.storage.db.mapper.FeedItemCursorMapper;
@@ -48,7 +49,7 @@ import allen.town.podcast.storage.db.mapper.FeedMediaCursorMapper;
  * stamp an older {@code user_version} onto it and assert that reopening runs {@code onUpgrade}
  * without error, leaves the rows intact and lands on {@link Db#VERSION}. That is what makes every
  * statement in {@link DBUpgrade} re-runnable against objects that already exist; the 3 -&gt; 4,
- * 4 -&gt; 5, 5 -&gt; 6 and 6 -&gt; 7 steps are additionally exercised directly against a database rebuilt in the old layout.</p>
+ * 4 -&gt; 5, 5 -&gt; 6, 6 -&gt; 7 and 7 -&gt; 8 steps are additionally exercised directly against a database rebuilt in the old layout.</p>
  */
 @RunWith(RobolectricTestRunner.class)
 public class DbTest {
@@ -70,8 +71,8 @@ public class DbTest {
     // ---------------------------------------------------------------- schema
 
     @Test
-    public void freshDatabaseIsAtSchemaVersion7() {
-        assertEquals(7, Db.VERSION);
+    public void freshDatabaseIsAtSchemaVersion8() {
+        assertEquals(8, Db.VERSION);
         assertEquals(Db.VERSION, Db.getInstance().getDb().getVersion());
     }
 
@@ -213,6 +214,57 @@ public class DbTest {
         // Running it again must not fail on the columns it just added.
         DBUpgrade.upgrade(db, 6, Db.VERSION);
         assertEquals(1, rowCount(db, Db.TABLE_NAME_FEED_ITEMS));
+    }
+
+    @Test
+    public void upgradeFromVersion7ReachesTheCurrentVersionAndKeepsRows() {
+        assertUpgradePreservesRows(7);
+    }
+
+    /**
+     * The real 7 -&gt; 8 step: rebuild the feeds table without the Clear voice column, with one
+     * feed that had the old vocal enhancement switch on and one that had it off. The first must
+     * come out Light, the second Off.
+     */
+    @Test
+    public void upgradeFromVersion7MapsVocalEnhancementOntoClearVoiceLight() {
+        SQLiteDatabase db = Db.getInstance().getDb();
+        String clearVoiceColumn = DbSchema.KEY_CLEAR_VOICE + " INTEGER DEFAULT 0,";
+        assertTrue(DbSchema.CREATE_TABLE_FEEDS.contains(clearVoiceColumn));
+        db.execSQL("DROP TABLE " + Db.TABLE_NAME_FEEDS);
+        db.execSQL(DbSchema.CREATE_TABLE_FEEDS.replace(clearVoiceColumn, ""));
+        assertFalse(columnNames(db, Db.TABLE_NAME_FEEDS).contains(Db.KEY_CLEAR_VOICE));
+        long enhanced = insertV7Feed(db, "Enhanced", 1);
+        long plain = insertV7Feed(db, "Plain", 0);
+
+        DBUpgrade.upgrade(db, 7, Db.VERSION);
+
+        assertTrue(columnNames(db, Db.TABLE_NAME_FEEDS).contains(Db.KEY_CLEAR_VOICE));
+        assertEquals(ClearVoiceLevel.LIGHT, mappedClearVoiceOf(enhanced));
+        assertEquals(ClearVoiceLevel.OFF, mappedClearVoiceOf(plain));
+
+        // A choice made after the upgrade survives the ladder being run again.
+        db.execSQL("UPDATE " + Db.TABLE_NAME_FEEDS + " SET " + Db.KEY_CLEAR_VOICE
+                + " = 2 WHERE " + Db.KEY_ID + " = " + enhanced);
+        db.execSQL("UPDATE " + Db.TABLE_NAME_FEEDS + " SET " + Db.KEY_CLEAR_VOICE
+                + " = 0 WHERE " + Db.KEY_ID + " = " + plain);
+        DBUpgrade.upgrade(db, 7, Db.VERSION);
+        assertEquals(ClearVoiceLevel.STRONG, mappedClearVoiceOf(enhanced));
+        assertEquals(ClearVoiceLevel.OFF, mappedClearVoiceOf(plain));
+    }
+
+    @Test
+    public void clearVoiceLevelRoundTripsThroughTheFeedPreferences() {
+        Db db = Db.getInstance();
+        Feed feed = newFeed("Noisy");
+        db.setCompleteFeed(feed);
+        assertEquals(ClearVoiceLevel.OFF, mappedClearVoiceOf(feed.getId()));
+
+        for (int level : new int[]{ClearVoiceLevel.STRONG, ClearVoiceLevel.LIGHT, ClearVoiceLevel.OFF}) {
+            feed.getPreferences().setClearVoiceLevel(level);
+            db.setFeedPreferences(feed.getPreferences());
+            assertEquals(level, mappedClearVoiceOf(feed.getId()));
+        }
     }
 
     @Test
@@ -446,6 +498,20 @@ public class DbTest {
         assertTrue(DbSchema.CREATE_TABLE_FEEDS.endsWith(current));
         db.execSQL("DROP TABLE " + Db.TABLE_NAME_FEEDS);
         db.execSQL(DbSchema.CREATE_TABLE_FEEDS.replace(current, tail));
+    }
+
+    private static long insertV7Feed(SQLiteDatabase db, String title, int loudness) {
+        db.execSQL("INSERT INTO " + Db.TABLE_NAME_FEEDS + " (" + Db.KEY_TITLE + ", "
+                + DbSchema.KEY_LOUDNESS_ENABLED + ") VALUES ('" + title + "', " + loudness + ")");
+        return lastInsertId(db);
+    }
+
+    /** Reads a feed's Clear voice level back through the real cursor mapper. */
+    private static int mappedClearVoiceOf(long feedId) {
+        try (Cursor cursor = Db.getInstance().getFeedCursor(feedId)) {
+            assertTrue(cursor.moveToFirst());
+            return FeedCursorMapper.convert(cursor).getPreferences().getClearVoiceLevel();
+        }
     }
 
     private static long insertV4Feed(SQLiteDatabase db, String title, int adSkip) {
@@ -923,7 +989,7 @@ public class DbTest {
         feed.setPreferences(new FeedPreferences(0, true, true,
                 FeedPreferences.AutoDeleteAction.GLOBAL, VolumeAdaptionSetting.OFF,
                 "user", "pass", new FeedFilter(), FeedPreferences.SPEED_USE_GLOBAL,
-                0, 0, false, new HashSet<>(), false, false, false, false));
+                0, 0, false, new HashSet<>(), false, 0, false, false));
         return feed;
     }
 

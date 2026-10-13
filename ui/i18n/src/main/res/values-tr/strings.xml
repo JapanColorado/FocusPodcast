@@ -722,7 +722,6 @@
     <string name="audio_effects">Ses Efektleri</string>
     <string name="stereo_to_mono">Downmix: Stereo\'yu mono\'ya dönüştür</string>
     <string name="player_switch_to_audio_only">Yalnızca ses olarak oynat</string>
-    <string name="vocal_enhancement">Vokal Geliştirme</string>
 
     <!-- Proxy ayarları -->
     <string name="proxy_type_label">Tür</string>

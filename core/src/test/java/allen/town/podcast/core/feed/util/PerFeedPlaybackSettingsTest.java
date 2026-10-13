@@ -36,6 +36,7 @@ import allen.town.podcast.model.feed.FeedItem;
 import allen.town.podcast.model.feed.FeedMedia;
 import allen.town.podcast.model.feed.FeedPreferences;
 import allen.town.podcast.model.feed.VolumeAdaptionSetting;
+import allen.town.podcast.model.playback.ClearVoiceLevel;
 import allen.town.podcast.model.playback.MediaType;
 import allen.town.podcast.storage.db.Db;
 
@@ -188,10 +189,10 @@ public class PerFeedPlaybackSettingsTest {
         FeedMedia media = mediaOf(feed(true));
         Prefs.setSkipSilence(true);
         Prefs.stereoToMono(true);
-        Prefs.setAudioLoudness(false);
+        Prefs.setClearVoiceLevel(ClearVoiceLevel.STRONG);
         assertTrue(AudioEffectUtils.isSkipEnable(media));
         assertTrue(AudioEffectUtils.isMonoEnable(media));
-        assertFalse(AudioEffectUtils.isLoudnessEnable(media));
+        assertEquals(ClearVoiceLevel.STRONG, AudioEffectUtils.getClearVoiceLevel(media));
         assertTrue(AudioEffectUtils.isSkipEnable(null));
     }
 
@@ -199,7 +200,7 @@ public class PerFeedPlaybackSettingsTest {
     public void customizeCopiesTheDefaultsSoNothingChangesAudibly() {
         Prefs.setSkipSilence(true);
         Prefs.stereoToMono(false);
-        Prefs.setAudioLoudness(true);
+        Prefs.setClearVoiceLevel(ClearVoiceLevel.LIGHT);
         FeedPreferences preferences = preferences();
 
         AudioEffectUtils.customize(preferences);
@@ -207,7 +208,7 @@ public class PerFeedPlaybackSettingsTest {
         assertTrue(AudioEffectUtils.hasOwnEffects(preferences));
         assertTrue(preferences.isSkipSilence());
         assertFalse(preferences.isMono());
-        assertTrue(preferences.isLoudness());
+        assertEquals(ClearVoiceLevel.LIGHT, preferences.getClearVoiceLevel());
 
         // later global changes no longer reach a podcast with its own effects
         Prefs.setSkipSilence(false);
@@ -236,14 +237,14 @@ public class PerFeedPlaybackSettingsTest {
         await(DBWriter.setFeedPreferences(settingsCopy));
 
         AudioEffectUtils.customize(stale);
-        stale.setLoudness(true);
+        stale.setClearVoiceLevel(ClearVoiceLevel.STRONG);
         AudioEffectUtils.saveFeedEffects(feed.getId(), stale);
         awaitDb();
 
         FeedPreferences stored = DBReader.getFeedPreferences(feed.getId());
         assertNotNull(stored);
         assertTrue(stored.isUseFeedEffect());
-        assertTrue(stored.isLoudness());
+        assertEquals(ClearVoiceLevel.STRONG, stored.getClearVoiceLevel());
         assertEquals(1.6f, stored.getFeedPlaybackSpeed(), 0.0001f);
     }
 

@@ -1,7 +1,6 @@
 package allen.town.podcast.core.service.playback;
 
 import android.content.Context;
-import android.media.audiofx.LoudnessEnhancer;
 import android.net.Uri;
 import android.text.TextUtils;
 import android.util.Log;
@@ -41,15 +40,16 @@ import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
 
 import com.google.android.exoplayer2.upstream.HttpDataSource;
 
-import allen.town.podcast.common.util.Timber;
 import allen.town.podcast.core.ClientConfig;
 import allen.town.podcast.core.R;
+import allen.town.podcast.core.dsp.ClearVoiceAudioProcessor;
 import allen.town.podcast.core.pref.Prefs;
 import allen.town.podcast.core.service.download.PodcastHttpClient;
 import allen.town.podcast.core.service.download.HttpCredentialEncoder;
 import allen.town.podcast.core.util.NetworkUtils;
 import allen.town.podcast.core.util.playback.DownMixAudioProcessor;
 import allen.town.podcast.core.util.playback.IPlayer;
+import allen.town.podcast.model.playback.ClearVoiceLevel;
 import allen.town.podcast.playback.base.PlaybackServiceMediaPlayer;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -77,6 +77,9 @@ public class ExoPlayerWrapper implements IPlayer {
     private MediaPlayer.OnInfoListener infoListener;
     private DefaultTrackSelector trackSelector;
     public DownMixAudioProcessor downMixAudioProcessor = null;
+    private ClearVoiceAudioProcessor clearVoiceAudioProcessor = null;
+    /** Kept here so that a player rebuilt by {@link #reset()} starts with the same level. */
+    private volatile int clearVoiceLevel = ClearVoiceLevel.OFF;
 
 
     ExoPlayerWrapper(Context context) {
@@ -94,6 +97,8 @@ public class ExoPlayerWrapper implements IPlayer {
 
     private void createPlayer() {
         downMixAudioProcessor = new DownMixAudioProcessor();
+        clearVoiceAudioProcessor = new ClearVoiceAudioProcessor();
+        clearVoiceAudioProcessor.setLevel(clearVoiceLevel);
         DefaultLoadControl.Builder loadControl = new DefaultLoadControl.Builder();
         loadControl.setBufferDurationsMs(30000, 120000,
                 DefaultLoadControl.DEFAULT_BUFFER_FOR_PLAYBACK_MS,
@@ -157,7 +162,9 @@ public class ExoPlayerWrapper implements IPlayer {
         public AudioSink buildAudioSink(Context context, boolean z, boolean z2, boolean z3) {
             return new DefaultAudioSink.Builder()
                     .setAudioCapabilities(AudioCapabilities.DEFAULT_AUDIO_CAPABILITIES)
-                    .setAudioProcessors(new AudioProcessor[]{ExoPlayerWrapper.this.downMixAudioProcessor})
+                    .setAudioProcessors(new AudioProcessor[]{
+                            ExoPlayerWrapper.this.downMixAudioProcessor,
+                            ExoPlayerWrapper.this.clearVoiceAudioProcessor})
                     .build();
         }
     }
@@ -284,8 +291,9 @@ public class ExoPlayerWrapper implements IPlayer {
     }
 
     @Override
-    public void setLoudness(boolean enable) {
-        updateLoudnessIfEnable(enable);
+    public void setClearVoiceLevel(int level) {
+        clearVoiceLevel = level;
+        clearVoiceAudioProcessor.setLevel(level);
     }
 
     @Override
@@ -403,39 +411,6 @@ public class ExoPlayerWrapper implements IPlayer {
 
     public void setOnInfoListener(MediaPlayer.OnInfoListener infoListener) {
         this.infoListener = infoListener;
-    }
-
-    private LoudnessEnhancer loudnessEnhancer;
-
-    public final void updateLoudnessIfEnable(boolean enableLoudNess) {
-        if (enableLoudNess) {
-            try {
-                LoudnessEnhancer loudnessEnhancer = this.loudnessEnhancer;
-                if (loudnessEnhancer != null) {
-                    if (!loudnessEnhancer.getEnabled()) {
-                        this.loudnessEnhancer.setEnabled(true);
-                        this.loudnessEnhancer.setTargetGain(4 * 300);
-                    }
-                } else if (getAudioSessionId() != 0) {
-                    LoudnessEnhancer loudnessEnhancer2 = new LoudnessEnhancer(getAudioSessionId());
-                    this.loudnessEnhancer = loudnessEnhancer2;
-                    loudnessEnhancer2.setEnabled(true);
-                    this.loudnessEnhancer.setTargetGain(4 * 300);
-                }
-            } catch (Throwable th) {
-                Timber.e(th, "setVolumeBoost - Failure");
-            }
-        } else {
-            LoudnessEnhancer loudnessEnhancer3 = this.loudnessEnhancer;
-            if (loudnessEnhancer3 != null) {
-                try {
-                    loudnessEnhancer3.setEnabled(false);
-                    this.loudnessEnhancer.setTargetGain(0);
-                } catch (Throwable th2) {
-                    Timber.e(th2, "setVolumeBoost - Failure1");
-                }
-            }
-        }
     }
 
     public int getAudioSessionId() {

@@ -14,4 +14,17 @@
         <item>high</item>
     </string-array>
 
+    <string-array name="clear_voice_options">
+        <item>@string/clear_voice_off</item>
+        <item>@string/clear_voice_light</item>
+        <item>@string/clear_voice_strong</item>
+    </string-array>
+
+    <!-- MUST stay in sync with ClearVoiceLevel in model -->
+    <string-array name="clear_voice_values" translatable="false">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+    </string-array>
+
 </resources>

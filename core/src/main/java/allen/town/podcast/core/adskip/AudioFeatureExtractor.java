@@ -2,6 +2,8 @@ package allen.town.podcast.core.adskip;
 
 import androidx.annotation.NonNull;
 
+import allen.town.podcast.core.dsp.Fft;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;

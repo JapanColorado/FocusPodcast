@@ -12,7 +12,7 @@ import static allen.town.podcast.model.feed.FeedPreferences.SPEED_USE_GLOBAL;
 final class DbSchema {
 
     public static final String DATABASE_NAME = "focusPodcastApp.db";
-    public static final int VERSION = 7;
+    public static final int VERSION = 8;
 
     /**
      * Maximum number of arguments for IN-operator.
@@ -61,7 +61,14 @@ final class DbSchema {
     public static final String KEY_IS_SUBSCRIBED = "is_subscribed";
     public static final String KEY_ITUNES_FEED_ID = "itunes_feed_id";
     public static final String KEY_USE_FEED_EFFECT = "use_feed_effect";
-    public static final String KEY_LOUDNESS_ENABLED = "loudness";
+    /**
+     * The version-1 "vocal enhancement" switch (1 = on). Replaced by {@link #KEY_CLEAR_VOICE} in
+     * version 8; only {@link DBUpgrade} still reads it, the column stays because SQLite on older
+     * API levels cannot drop it.
+     */
+    static final String KEY_LOUDNESS_ENABLED = "loudness";
+    /** A feed's own Clear voice strength (0 off, 1 light, 2 strong); added in version 8. */
+    public static final String KEY_CLEAR_VOICE = "clear_voice";
     public static final String KEY_MONO_ENABLED = "mono";
     public static final String KEY_PLAYED_DURATION = "played_duration";
     public static final String KEY_KEEP_UPDATED = "keep_updated";
@@ -162,6 +169,7 @@ final class DbSchema {
             + KEY_EPISODE_NOTIFICATION + " INTEGER DEFAULT 0,"
             + KEY_FEED_SKIP_INTRO + " INTEGER DEFAULT 0,"
             + KEY_AUDIOBOOK + " INTEGER DEFAULT 0,"
+            + KEY_CLEAR_VOICE + " INTEGER DEFAULT 0,"
             + KEY_FEED_AD_SKIP_OVERRIDE + " INTEGER)";
 
     static final String CREATE_TABLE_FEED_ITEMS = "CREATE TABLE "
@@ -283,7 +291,7 @@ final class DbSchema {
             TABLE_NAME_FEEDS + "." + KEY_USE_FEED_EFFECT,
             TABLE_NAME_FEEDS + "." + KEY_IS_SUBSCRIBED,
             TABLE_NAME_FEEDS + "." + KEY_IS_PAGED,
-            TABLE_NAME_FEEDS + "." + KEY_LOUDNESS_ENABLED,
+            TABLE_NAME_FEEDS + "." + KEY_CLEAR_VOICE,
             TABLE_NAME_FEEDS + "." + KEY_FEED_IDENTIFIER,
             TABLE_NAME_FEEDS + "." + KEY_KEEP_UPDATED,
             TABLE_NAME_FEEDS + "." + KEY_ITUNES_FEED_ID,

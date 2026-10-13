@@ -540,7 +540,12 @@
   <string name="extend_sleep_timer_label">+ %d 分钟</string>
   <string name="sleep_timer_label">睡眠定时器</string>
   <string name="player_switch_to_audio_only">仅作为音频播放</string>
-  <string name="vocal_enhancement">音量增强</string>
+  <string name="clear_voice">清晰人声</string>
+  <string name="clear_voice_hint">降低背景噪音并平衡音量</string>
+  <string name="clear_voice_off">关</string>
+  <string name="clear_voice_light">轻度</string>
+  <string name="clear_voice_strong">强</string>
+  <string name="pref_clear_voice_sum">%1$s。降低背景噪音并平衡音量</string>
   <string name="time_dialog_invalid_input">无效的输入, 时间是一个整数</string>
   <string name="shake_to_reset_label">即将结束时摇动以重置</string>
   <string name="timer_vibration_label">即将结束时短暂振动</string>

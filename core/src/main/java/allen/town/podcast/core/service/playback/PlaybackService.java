@@ -706,7 +706,7 @@ public class PlaybackService extends MediaBrowserServiceCompat {
             playingPreferences.setUseFeedEffect(event.isUseFeedEffect());
             playingPreferences.setSkipSilence(event.isSkipSilence());
             playingPreferences.setMono(event.isMono());
-            playingPreferences.setLoudness(event.isLoudness());
+            playingPreferences.setClearVoiceLevel(event.getClearVoiceLevel());
             applyAudioEffects();
         }
     }
@@ -800,7 +800,7 @@ public class PlaybackService extends MediaBrowserServiceCompat {
     }
 
     /**
-     * Re-applies skip silence, stereo to mono and vocal enhancement as configured for what is
+     * Re-applies skip silence, stereo to mono and Clear voice as configured for what is
      * playing (its podcast's own effects or the global defaults).
      */
     private void applyAudioEffects() {
@@ -808,7 +808,7 @@ public class PlaybackService extends MediaBrowserServiceCompat {
         mediaPlayer.setPlaybackParams(PlaybackSpeedUtils.getCurrentPlaybackSpeed(playable),
                 AudioEffectUtils.isSkipEnable(playable));
         mediaPlayer.setDownmix(AudioEffectUtils.isMonoEnable(playable));
-        mediaPlayer.setLoudness(AudioEffectUtils.isLoudnessEnable(playable));
+        mediaPlayer.setClearVoiceLevel(AudioEffectUtils.getClearVoiceLevel(playable));
     }
 
     public float getCurrentPlaybackSpeed() {

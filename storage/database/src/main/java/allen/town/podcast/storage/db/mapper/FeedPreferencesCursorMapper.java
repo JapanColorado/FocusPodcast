@@ -23,7 +23,6 @@ public abstract class FeedPreferencesCursorMapper {
         int indexId = cursor.getColumnIndex(Db.KEY_ID);
         int indexAutoDownload = cursor.getColumnIndex(Db.KEY_AUTO_DOWNLOAD_ENABLED);
         int indexSkipSilence = cursor.getColumnIndex(Db.KEY_SKIP_SILENCE_ENABLED);
-        int indexLoudness = cursor.getColumnIndex(Db.KEY_LOUDNESS_ENABLED);
         int indexMono = cursor.getColumnIndex(Db.KEY_MONO_ENABLED);
         int indexUseFeedEffect = cursor.getColumnIndex(Db.KEY_USE_FEED_EFFECT);
         int indexAutoRefresh = cursor.getColumnIndex(Db.KEY_KEEP_UPDATED);
@@ -44,7 +43,9 @@ public abstract class FeedPreferencesCursorMapper {
         boolean autoDownload = cursor.getInt(indexAutoDownload) > 0;
         boolean autoRefresh = cursor.getInt(indexAutoRefresh) > 0;
         boolean skipSilence = cursor.getInt(indexSkipSilence) > 0;
-        boolean loudness = cursor.getInt(indexLoudness) > 0;
+        // Version 8 column; a projection without it reads "off".
+        int indexClearVoice = cursor.getColumnIndex(Db.KEY_CLEAR_VOICE);
+        int clearVoiceLevel = indexClearVoice < 0 ? 0 : cursor.getInt(indexClearVoice);
         boolean mono = cursor.getInt(indexMono) > 0;
         boolean isUseFeedEffect = cursor.getInt(indexUseFeedEffect) > 0;
 
@@ -84,7 +85,7 @@ public abstract class FeedPreferencesCursorMapper {
                 feedAutoSkipIntro,
                 feedAutoSkipEnding,
                 showNotification,
-                new HashSet<>(Arrays.asList(tagsString.split(FeedPreferences.TAG_SEPARATOR))),skipSilence,loudness,mono,isUseFeedEffect);
+                new HashSet<>(Arrays.asList(tagsString.split(FeedPreferences.TAG_SEPARATOR))),skipSilence, clearVoiceLevel, mono, isUseFeedEffect);
         preferences.setAdSkipOverride(adSkipOverride);
         // Version 7 column; a projection without it reads "not an audiobook".
         int indexAudiobook = cursor.getColumnIndex(Db.KEY_AUDIOBOOK);

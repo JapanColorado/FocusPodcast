@@ -55,6 +55,29 @@ class DBUpgrade {
                         + DbSchema.KEY_TRACK_NUMBER + " INTEGER DEFAULT 0");
             }
         }
+        if (oldVersion < 8) {
+            upgradeLoudnessToClearVoice(db);
+        }
+    }
+
+    /**
+     * Version 8: the per-feed "vocal enhancement" switch ({@code loudness}, a fixed-gain Android
+     * LoudnessEnhancer) became the Clear voice strength ({@code clear_voice}: 0 off, 1 light,
+     * 2 strong). A feed that had vocal enhancement on gets Light, the closest equivalent. As with
+     * the version-5 step, the copy only runs when this step created the column, so re-running the
+     * ladder never overwrites a choice made after the upgrade. The old column is left unused.
+     */
+    static void upgradeLoudnessToClearVoice(final SQLiteDatabase db) {
+        if (hasColumn(db, DbSchema.TABLE_NAME_FEEDS, DbSchema.KEY_CLEAR_VOICE)) {
+            return;
+        }
+        db.execSQL("ALTER TABLE " + DbSchema.TABLE_NAME_FEEDS + " ADD COLUMN "
+                + DbSchema.KEY_CLEAR_VOICE + " INTEGER DEFAULT 0");
+        if (hasColumn(db, DbSchema.TABLE_NAME_FEEDS, DbSchema.KEY_LOUDNESS_ENABLED)) {
+            db.execSQL("UPDATE " + DbSchema.TABLE_NAME_FEEDS
+                    + " SET " + DbSchema.KEY_CLEAR_VOICE + " = 1"
+                    + " WHERE " + DbSchema.KEY_LOUDNESS_ENABLED + " = 1");
+        }
     }
 
     /**

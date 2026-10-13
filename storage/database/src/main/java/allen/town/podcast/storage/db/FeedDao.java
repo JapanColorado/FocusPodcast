@@ -38,7 +38,7 @@ import static allen.town.podcast.storage.db.DbSchema.KEY_LANGUAGE;
 import static allen.town.podcast.storage.db.DbSchema.KEY_LASTUPDATE;
 import static allen.town.podcast.storage.db.DbSchema.KEY_LAST_UPDATE_FAILED;
 import static allen.town.podcast.storage.db.DbSchema.KEY_LINK;
-import static allen.town.podcast.storage.db.DbSchema.KEY_LOUDNESS_ENABLED;
+import static allen.town.podcast.storage.db.DbSchema.KEY_CLEAR_VOICE;
 import static allen.town.podcast.storage.db.DbSchema.KEY_MINIMAL_DURATION_FILTER;
 import static allen.town.podcast.storage.db.DbSchema.KEY_MONO_ENABLED;
 import static allen.town.podcast.storage.db.DbSchema.KEY_NEXT_PAGE_LINK;
@@ -146,7 +146,7 @@ class FeedDao extends Dao {
         values.put(KEY_AUTO_DOWNLOAD_ENABLED, prefs.getAutoDownload());
         values.put(KEY_SKIP_SILENCE_ENABLED, prefs.isSkipSilence());
         values.put(KEY_USE_FEED_EFFECT, prefs.isUseFeedEffect());
-        values.put(KEY_LOUDNESS_ENABLED, prefs.isLoudness());
+        values.put(KEY_CLEAR_VOICE, prefs.getClearVoiceLevel());
         values.put(KEY_MONO_ENABLED, prefs.isMono());
         values.put(KEY_KEEP_UPDATED, prefs.getKeepUpdated());
         values.put(KEY_AUTO_DELETE_ACTION, prefs.getAutoDeleteAction().ordinal());

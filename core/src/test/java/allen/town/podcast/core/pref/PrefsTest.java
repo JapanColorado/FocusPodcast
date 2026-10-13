@@ -22,6 +22,7 @@ import org.robolectric.RobolectricTestRunner;
 import java.util.concurrent.TimeUnit;
 
 import allen.town.podcast.core.feed.AudiobookShelfFilter;
+import allen.town.podcast.model.playback.ClearVoiceLevel;
 import allen.town.podcast.model.playback.MediaType;
 
 /**
@@ -297,6 +298,38 @@ public class PrefsTest {
         prefs().edit().putString("pref_audiobooks_status", "FINISHED").commit();
         Prefs.migrateAudiobookShelfStatus();
         assertEquals(AudiobookShelfFilter.Status.FINISHED, Prefs.getAudiobookShelfFilter().status);
+    }
+
+    @Test
+    public void clearVoiceDefaultsToOffAndRoundTrips() {
+        assertEquals(ClearVoiceLevel.OFF, Prefs.getClearVoiceLevel());
+        Prefs.setClearVoiceLevel(ClearVoiceLevel.STRONG);
+        assertEquals(ClearVoiceLevel.STRONG, Prefs.getClearVoiceLevel());
+        // what the Settings ListPreference stores
+        assertEquals("2", prefs().getString(Prefs.PREF_CLEAR_VOICE, null));
+        prefs().edit().putString(Prefs.PREF_CLEAR_VOICE, "garbage").commit();
+        assertEquals(ClearVoiceLevel.OFF, Prefs.getClearVoiceLevel());
+    }
+
+    @Test
+    public void vocalEnhancementOnBecomesClearVoiceLight() {
+        prefs().edit().putBoolean(Prefs.PREF_AUDIO_LOUDNESS_LEGACY, true).commit();
+        Prefs.migrateLoudnessToClearVoice();
+        assertEquals(ClearVoiceLevel.LIGHT, Prefs.getClearVoiceLevel());
+        assertFalse(prefs().contains(Prefs.PREF_AUDIO_LOUDNESS_LEGACY));
+
+        // idempotent: a later choice survives another run
+        Prefs.setClearVoiceLevel(ClearVoiceLevel.OFF);
+        Prefs.migrateLoudnessToClearVoice();
+        assertEquals(ClearVoiceLevel.OFF, Prefs.getClearVoiceLevel());
+    }
+
+    @Test
+    public void vocalEnhancementOffLeavesClearVoiceOff() {
+        prefs().edit().putBoolean(Prefs.PREF_AUDIO_LOUDNESS_LEGACY, false).commit();
+        Prefs.migrateLoudnessToClearVoice();
+        assertEquals(ClearVoiceLevel.OFF, Prefs.getClearVoiceLevel());
+        assertFalse(prefs().contains(Prefs.PREF_AUDIO_LOUDNESS_LEGACY));
     }
 
     private SharedPreferences prefs() {

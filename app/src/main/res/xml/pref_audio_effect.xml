@@ -28,13 +28,15 @@
         android:key="feed_mono_pref"
         android:layout="@layout/list_item_view_switch_no_title"
         android:title="@string/stereo_to_mono" />
-    <allen.town.podcast.common.common.prefs.supportv7.ATESwitchPreference
-        android:defaultValue="false"
+    <allen.town.podcast.common.common.prefs.supportv7.ATEListPreference
+        android:defaultValue="0"
         android:persistent="false"
         android:dependency="feed_audio_effect_pref"
+        android:entries="@array/clear_voice_options"
+        android:entryValues="@array/clear_voice_values"
         android:icon="@drawable/ic_vocal_enhancement"
-        android:key="feed_loudness_pref"
-        android:layout="@layout/list_item_view_switch_no_title"
-        android:title="@string/vocal_enhancement" />
+        android:key="feed_clear_voice_pref"
+        android:layout="@layout/list_item_view"
+        android:title="@string/clear_voice" />
 
 </PreferenceScreen>

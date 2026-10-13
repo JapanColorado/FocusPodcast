@@ -1,7 +1,7 @@
 package allen.town.podcast.event.settings;
 
 /**
- * Posted when the audio effects (skip silence, stereo to mono, vocal enhancement) change, either
+ * Posted when the audio effects (skip silence, stereo to mono, Clear voice) change, either
  * the global defaults from Settings or one podcast's own values. The playback service re-applies
  * the effects of what is playing and, for a podcast event, copies the values into the in-memory
  * preferences of the playing episode's feed so a later re-prepare does not use stale ones.
@@ -12,20 +12,20 @@ public class AudioEffectsChangedEvent {
     private final boolean useFeedEffect;
     private final boolean skipSilence;
     private final boolean mono;
-    private final boolean loudness;
+    private final int clearVoiceLevel;
 
     private AudioEffectsChangedEvent(long feedId, boolean useFeedEffect, boolean skipSilence,
-                                     boolean mono, boolean loudness) {
+                                     boolean mono, int clearVoiceLevel) {
         this.feedId = feedId;
         this.useFeedEffect = useFeedEffect;
         this.skipSilence = skipSilence;
         this.mono = mono;
-        this.loudness = loudness;
+        this.clearVoiceLevel = clearVoiceLevel;
     }
 
     /** The global defaults in Settings changed; podcasts with their own effects are unaffected. */
     public static AudioEffectsChangedEvent global() {
-        return new AudioEffectsChangedEvent(0, false, false, false, false);
+        return new AudioEffectsChangedEvent(0, false, false, false, 0);
     }
 
     /**
@@ -33,8 +33,8 @@ public class AudioEffectsChangedEvent {
      * global defaults again, and the three values are then ignored.
      */
     public static AudioEffectsChangedEvent forFeed(long feedId, boolean useFeedEffect,
-                                                   boolean skipSilence, boolean mono, boolean loudness) {
-        return new AudioEffectsChangedEvent(feedId, useFeedEffect, skipSilence, mono, loudness);
+                                                   boolean skipSilence, boolean mono, int clearVoiceLevel) {
+        return new AudioEffectsChangedEvent(feedId, useFeedEffect, skipSilence, mono, clearVoiceLevel);
     }
 
     public boolean isGlobal() {
@@ -57,7 +57,7 @@ public class AudioEffectsChangedEvent {
         return mono;
     }
 
-    public boolean isLoudness() {
-        return loudness;
+    public int getClearVoiceLevel() {
+        return clearVoiceLevel;
     }
 }

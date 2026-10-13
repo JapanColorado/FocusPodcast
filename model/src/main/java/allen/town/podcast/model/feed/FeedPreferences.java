@@ -8,6 +8,8 @@ import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
+import allen.town.podcast.model.playback.ClearVoiceLevel;
+
 /**
  * Contains preferences for a single feed.
  */
@@ -35,12 +37,13 @@ public class FeedPreferences implements Serializable {
         this.skipSilence = skipSilence;
     }
 
-    public boolean isLoudness() {
-        return loudness;
+    /** This feed's own Clear voice strength (a {@code ClearVoiceLevel}); only used with {@link #isUseFeedEffect()}. */
+    public int getClearVoiceLevel() {
+        return clearVoiceLevel;
     }
 
-    public void setLoudness(boolean loudness) {
-        this.loudness = loudness;
+    public void setClearVoiceLevel(int clearVoiceLevel) {
+        this.clearVoiceLevel = ClearVoiceLevel.sanitize(clearVoiceLevel);
     }
 
     public boolean isMono() {
@@ -53,7 +56,7 @@ public class FeedPreferences implements Serializable {
 
     private boolean autoDownload;
     private boolean skipSilence;
-    private boolean loudness;
+    private int clearVoiceLevel;
     private boolean mono;
 
     public boolean isUseFeedEffect() {
@@ -113,14 +116,15 @@ public class FeedPreferences implements Serializable {
     public FeedPreferences(long feedID, boolean autoDownload, AutoDeleteAction autoDeleteAction,
                            VolumeAdaptionSetting volumeAdaptionSetting, String username, String password) {
         this(feedID, autoDownload, true, autoDeleteAction, volumeAdaptionSetting,
-                username, password, new FeedFilter(), SPEED_USE_GLOBAL, 0, 0, false, new HashSet<>(), false, false, false, false);
+                username, password, new FeedFilter(), SPEED_USE_GLOBAL, 0, 0, false, new HashSet<>(), false,
+                ClearVoiceLevel.OFF, false, false);
     }
 
     public FeedPreferences(long feedID, boolean autoDownload, boolean keepUpdated,
                             AutoDeleteAction autoDeleteAction, VolumeAdaptionSetting volumeAdaptionSetting,
                             String username, String password, @NonNull FeedFilter filter, float feedPlaybackSpeed,
                             int feedSkipIntro, int feedSkipEnding, boolean showEpisodeNotification,
-                            Set<String> tags, boolean skipSilence, boolean loudness, boolean mono, boolean isUseFeedEffect) {
+                            Set<String> tags, boolean skipSilence, int clearVoiceLevel, boolean mono, boolean isUseFeedEffect) {
         this.feedID = feedID;
         this.autoDownload = autoDownload;
         this.keepUpdated = keepUpdated;
@@ -134,7 +138,7 @@ public class FeedPreferences implements Serializable {
         this.feedSkipEnding = feedSkipEnding;
         this.showEpisodeNotification = showEpisodeNotification;
         this.skipSilence = skipSilence;
-        this.loudness = loudness;
+        this.clearVoiceLevel = ClearVoiceLevel.sanitize(clearVoiceLevel);
         this.mono = mono;
         this.useFeedEffect = isUseFeedEffect;
         this.tags.addAll(tags);
