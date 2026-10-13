@@ -8,14 +8,17 @@ import allen.town.podcast.adapter.FeedSearchResultAdapter
 import allen.town.podcast.adapter.SubFeedsAdapter.GridDividerItemDecorator
 import allen.town.podcast.core.event.DownloadEvent
 import allen.town.podcast.core.event.DownloaderUpdate
+import allen.town.podcast.core.pref.Prefs
 import allen.town.podcast.core.storage.FeedSearcher
 import allen.town.podcast.core.util.FeedItemUtil
 import allen.town.podcast.core.util.menuhandler.MenuItemUtils
+import allen.town.podcast.dialog.filter.EpisodeSearchFilterSheet
 import allen.town.podcast.event.FeedItemEvent
 import allen.town.podcast.event.PlayerStatusEvent
 import allen.town.podcast.event.UnreadItemsUpdateEvent
 import allen.town.podcast.event.playback.PlaybackPositionEvent
 import allen.town.podcast.menuprocess.FeedItemMenuProcess
+import allen.town.podcast.model.feed.EpisodeSearchOptions
 import allen.town.podcast.model.feed.Feed
 import allen.town.podcast.model.feed.FeedItem
 import allen.town.podcast.view.EmptyViewHandler
@@ -50,8 +53,13 @@ import java.util.concurrent.Callable
 
 /**
  * Performs a search operation on all feeds or one specific feed and displays the search result.
+ *
+ * Episode searches can be sorted, filtered and scoped to one podcast in [EpisodeSearchFilterSheet]
+ * ("Sort & filter" in the toolbar); the database does all of it ([FeedSearcher.searchFeedItems]).
+ * The choice except the podcast is kept in [Prefs.episodeSearchOptions]; the podcast comes from the
+ * arguments (a search started from a podcast's page) or the sheet's picker, for this search only.
  */
-class LocalSearchFragment constructor() : Fragment() {
+class LocalSearchFragment constructor() : Fragment(), EpisodeSearchFilterSheet.Host {
     private lateinit var adapter: EpisodeItemListAdapter
     private lateinit var adapterFeeds: FeedSearchResultAdapter
     private var disposable: Disposable? = null
@@ -63,10 +71,20 @@ class LocalSearchFragment constructor() : Fragment() {
     private var lastQueryChange: Long = 0
     private lateinit var prefs: SharedPreferences
     private var searchFeeds: Boolean = false
+    private lateinit var toolbar: Toolbar
+    override var searchOptions: EpisodeSearchOptions = EpisodeSearchOptions.defaults()
+        private set
+    override var searchScopeTitle: String? = null
+        private set
+    override val searchQuery: String
+        get() = searchView.getQuery().toString()
+
     public override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setRetainInstance(true)
         automaticSearchDebouncer = Handler(Looper.getMainLooper())
+        searchOptions = Prefs.episodeSearchOptions.withFeedId(requireArguments().getLong(ARG_FEED, 0))
+        searchScopeTitle = requireArguments().getString(ARG_FEED_NAME, null)
     }
 
     public override fun onStop() {
@@ -79,7 +97,8 @@ class LocalSearchFragment constructor() : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         val layout: View = inflater.inflate(R.layout.search_fragment, container, false)
-        setupToolbar(layout.findViewById<TopAppBarLayout>(R.id.appBarLayout).toolbar)
+        toolbar = layout.findViewById<TopAppBarLayout>(R.id.appBarLayout).toolbar
+        setupToolbar(toolbar)
         prefs = requireActivity().getSharedPreferences(SubFeedsFragment.PREFS, Context.MODE_PRIVATE)
         recyclerView = layout.findViewById(R.id.recyclerView)
         recyclerView.setLayoutManager(LinearLayoutManager(getActivity()))
@@ -118,6 +137,9 @@ class LocalSearchFragment constructor() : Fragment() {
         emptyViewHandler = EmptyViewHandler(getContext())
         emptyViewHandler.setIcon(R.drawable.ic_search)
         emptyViewHandler.setTitle(R.string.search_status_no_results)
+        searchFeeds = requireArguments().getBoolean(ARG_SEARCH_FEED, false)
+        toolbar.menu.findItem(R.id.action_search_filter)?.isVisible = !searchFeeds
+        updateFilterIndicator()
         EventBus.getDefault().register(this)
         if (requireArguments().getString(ARG_QUERY, null) != null) {
             searchView.setQuery(requireArguments().getString(ARG_QUERY, null), false)
@@ -139,7 +161,6 @@ class LocalSearchFragment constructor() : Fragment() {
                 }
             }
         })
-        searchFeeds = requireArguments().getBoolean(ARG_SEARCH_FEED, false)
         if (searchFeeds) {
             recyclerView.setVisibility(View.GONE)
             recyclerViewFeeds.setVisibility(View.VISIBLE)
@@ -165,7 +186,7 @@ class LocalSearchFragment constructor() : Fragment() {
         val item: MenuItem = toolbar.getMenu().findItem(R.id.action_search)
         item.expandActionView()
         searchView = item.getActionView() as SearchView
-        searchView.setQueryHint(getString(R.string.search_label))
+        updateQueryHint()
         searchView.requestFocus()
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             public override fun onQueryTextSubmit(s: String): Boolean {
@@ -189,6 +210,14 @@ class LocalSearchFragment constructor() : Fragment() {
                 return false
             }
         })
+        toolbar.setOnMenuItemClickListener { menuItem ->
+            if (menuItem.itemId == R.id.action_search_filter) {
+                showFilterSheet()
+                true
+            } else {
+                false
+            }
+        }
         item.setOnActionExpandListener(object : MenuItem.OnActionExpandListener {
             public override fun onMenuItemActionExpand(item: MenuItem): Boolean {
                 return true
@@ -272,9 +301,12 @@ class LocalSearchFragment constructor() : Fragment() {
     }
 
     private fun search() {
+        val query: String = searchView.getQuery().toString()
+        val options = searchOptions
+        val feedSearch = searchFeeds
         disposable?.dispose()
         disposable = Observable.fromCallable(
-            Callable({ performSearch() })
+            Callable({ performSearch(query, options, feedSearch) })
         )
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
@@ -282,38 +314,89 @@ class LocalSearchFragment constructor() : Fragment() {
                 @Suppress("UNCHECKED_CAST")
                 this.results = results.first as MutableList<FeedItem>
                 adapter.updateItems(results.first)
-                if (requireArguments().getLong(ARG_FEED, 0) == 0L) {
+                // a podcast scope hides the podcast results
+                if (options.feedId == 0L) {
                     adapterFeeds.updateData(results.second)
                 } else {
                     adapterFeeds.updateData(emptyList())
                 }
-                if (searchView.getQuery().toString().isEmpty()) {
-                    emptyViewHandler.setMessage(R.string.type_to_search)
-                } else {
-                    emptyViewHandler.setMessage(
-                        getString(
-                            R.string.no_results_for_query,
-                            searchView.getQuery()
-                        )
-                    )
-                }
+                updateEmptyView()
             }, { error: Throwable? -> Log.e(TAG, Log.getStackTraceString(error)) })
     }
 
-    private fun performSearch(): Pair<List<FeedItem>, List<Feed>> {
-        val query: String = searchView.getQuery().toString()
+    private fun performSearch(
+        query: String,
+        options: EpisodeSearchOptions,
+        feedSearch: Boolean
+    ): Pair<List<FeedItem>, List<Feed>> {
         if (query.isEmpty()) {
-            return Pair(emptyList(), emptyList<Feed>())
+            return Pair(ArrayList(), emptyList<Feed>())
         }
-        val feed: Long = requireArguments().getLong(ARG_FEED)
         var items: List<FeedItem> = ArrayList()
         var feeds: List<Feed> = ArrayList()
-        if (searchFeeds) {
+        if (feedSearch) {
             feeds = FeedSearcher.searchFeeds(query)
         } else {
-            items = FeedSearcher.searchFeedItems(query, feed)
+            items = FeedSearcher.searchFeedItems(query, options)
         }
         return Pair(items, feeds)
+    }
+
+    /** Says why the list is empty: nothing typed, nothing found, or the filters hide everything. */
+    private fun updateEmptyView() {
+        val query = searchView.getQuery()
+        emptyViewHandler.clearActions()
+        if (query.isEmpty()) {
+            emptyViewHandler.setMessage(R.string.type_to_search)
+        } else if (!searchFeeds && searchOptions.isFiltering) {
+            emptyViewHandler.setMessage(getString(R.string.search_no_results_filtered, query))
+            emptyViewHandler.addAction(R.string.clear_filter_label, R.drawable.ic_filter_disable) {
+                // keeps the sort order, the fields searched and the podcast
+                val cleared = EpisodeSearchOptions.defaults()
+                    .withSort(searchOptions.sort)
+                    .withFeedId(searchOptions.feedId)
+                onSearchOptionsChanged(cleared, searchScopeTitle)
+            }
+        } else {
+            emptyViewHandler.setMessage(getString(R.string.no_results_for_query, query))
+        }
+    }
+
+    private fun showFilterSheet() {
+        if (childFragmentManager.findFragmentByTag(EpisodeSearchFilterSheet.TAG) == null) {
+            EpisodeSearchFilterSheet().show(childFragmentManager, EpisodeSearchFilterSheet.TAG)
+        }
+    }
+
+    override fun onSearchOptionsChanged(options: EpisodeSearchOptions, scopeTitle: String?) {
+        searchOptions = options
+        searchScopeTitle = if (options.feedId != 0L) scopeTitle else null
+        // the arguments survive recreation, so the podcast scope does too
+        requireArguments().putLong(ARG_FEED, options.feedId)
+        requireArguments().putString(ARG_FEED_NAME, searchScopeTitle)
+        Prefs.episodeSearchOptions = options.withFeedId(0)
+        updateFilterIndicator()
+        updateQueryHint()
+        search()
+    }
+
+    /** The filter icon shows whether a filter or a podcast scope narrows the results. */
+    private fun updateFilterIndicator() {
+        val item = toolbar.menu.findItem(R.id.action_search_filter) ?: return
+        val narrowed = searchOptions.isFiltering || searchOptions.feedId != 0L
+        item.setIcon(if (narrowed) R.drawable.ic_filter_disable else R.drawable.ic_filter)
+        item.setTitle(if (narrowed) R.string.sort_and_filter_active else R.string.sort_and_filter)
+    }
+
+    private fun updateQueryHint() {
+        val title = searchScopeTitle
+        searchView.setQueryHint(
+            if (searchOptions.feedId != 0L && !title.isNullOrEmpty()) {
+                getString(R.string.search_in_feed_hint, title)
+            } else {
+                getString(R.string.search_label)
+            }
+        )
     }
 
     private fun showInputMethod(view: View) {

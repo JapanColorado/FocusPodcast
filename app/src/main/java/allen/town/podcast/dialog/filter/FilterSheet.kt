@@ -205,7 +205,8 @@ abstract class FilterSheet : BottomSheetDialogFragment() {
         binding.filterSheetReset.isEnabled = current != defaults
     }
 
-    private fun refreshCount() {
+    /** Recounts the footer, e.g. after a choice the sheet keeps outside its chips changed. */
+    protected fun refreshCount() {
         val selection = selection()
         countDisposable?.dispose()
         countDisposable = Single.fromCallable { countShown(selection) }

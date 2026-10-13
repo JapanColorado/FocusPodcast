@@ -19,9 +19,12 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
 
+import java.util.EnumSet;
 import java.util.concurrent.TimeUnit;
 
 import allen.town.podcast.core.feed.AudiobookShelfFilter;
+import allen.town.podcast.model.feed.EpisodeSearchOptions;
+import allen.town.podcast.model.feed.FeedItemFilter;
 import allen.town.podcast.model.playback.ClearVoiceLevel;
 import allen.town.podcast.model.playback.MediaType;
 
@@ -330,6 +333,38 @@ public class PrefsTest {
         Prefs.migrateLoudnessToClearVoice();
         assertEquals(ClearVoiceLevel.OFF, Prefs.getClearVoiceLevel());
         assertFalse(prefs().contains(Prefs.PREF_AUDIO_LOUDNESS_LEGACY));
+    }
+
+    // ------------------------------------------------------ episode search
+
+    @Test
+    public void episodeSearchOptionsDefaultToEverythingByRelevance() {
+        EpisodeSearchOptions options = Prefs.getEpisodeSearchOptions();
+        assertEquals(EpisodeSearchOptions.Sort.RELEVANCE, options.sort);
+        assertEquals(EnumSet.allOf(EpisodeSearchOptions.Field.class), options.fields);
+        assertFalse(options.isFiltering());
+        assertEquals(0, options.feedId);
+    }
+
+    @Test
+    public void episodeSearchOptionsRoundTripWithoutThePodcastScope() {
+        EpisodeSearchOptions chosen = EpisodeSearchOptions.defaults()
+                .withSort(EpisodeSearchOptions.Sort.OLDEST)
+                .withFields(EnumSet.of(EpisodeSearchOptions.Field.SHOW_NOTES))
+                .withDateRange(EpisodeSearchOptions.DateRange.PAST_MONTH)
+                .withDurationRange(EpisodeSearchOptions.DurationRange.OVER_60_MIN)
+                .withFilter(new FeedItemFilter(new String[]{FeedItemFilter.PLAYED, FeedItemFilter.IS_FAVORITE}))
+                .withFeedId(42);
+        Prefs.setEpisodeSearchOptions(chosen);
+
+        EpisodeSearchOptions stored = Prefs.getEpisodeSearchOptions();
+        assertEquals(EpisodeSearchOptions.Sort.OLDEST, stored.sort);
+        assertEquals(EnumSet.of(EpisodeSearchOptions.Field.SHOW_NOTES), stored.fields);
+        assertEquals(EpisodeSearchOptions.DateRange.PAST_MONTH, stored.dateRange);
+        assertEquals(EpisodeSearchOptions.DurationRange.OVER_60_MIN, stored.durationRange);
+        assertTrue(stored.filter.showPlayed);
+        assertTrue(stored.filter.showIsFavorite);
+        assertEquals("the podcast scope is per search", 0, stored.feedId);
     }
 
     private SharedPreferences prefs() {

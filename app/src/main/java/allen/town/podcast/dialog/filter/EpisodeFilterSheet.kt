@@ -6,6 +6,7 @@ import allen.town.podcast.core.storage.DBReader
 import allen.town.podcast.core.storage.DBWriter
 import allen.town.podcast.dialog.filter.FilterSheet.Companion.single
 import allen.town.podcast.model.feed.FeedItemFilter
+import android.content.Context
 import android.os.Bundle
 
 /**
@@ -27,26 +28,7 @@ class EpisodeFilterSheet : FilterSheet() {
     override val countPluralsRes: Int
         get() = R.plurals.filter_episodes_shown
 
-    override fun buildSections(): List<FilterSection> = listOf(
-        FilterSection(
-            SECTION_STATUS, getString(R.string.filter_section_status), listOf(
-                FilterOption(EpisodeFilterOptions.Status.UNFINISHED.name, getString(R.string.filter_unfinished)),
-                FilterOption(EpisodeFilterOptions.Status.FINISHED.name, getString(R.string.filter_finished))
-            )
-        ),
-        FilterSection(
-            SECTION_DOWNLOADED, getString(R.string.filter_section_downloaded), listOf(
-                FilterOption(YES, getString(R.string.filter_downloaded)),
-                FilterOption(NO, getString(R.string.filter_not_downloaded))
-            )
-        ),
-        FilterSection(
-            SECTION_FAVORITE, getString(R.string.filter_section_favorite), listOf(
-                FilterOption(YES, getString(R.string.filter_favorite)),
-                FilterOption(NO, getString(R.string.filter_not_favorite))
-            )
-        )
-    )
+    override fun buildSections(): List<FilterSection> = sections(requireContext())
 
     override fun currentSelection(): FilterSelection =
         toSelection(EpisodeFilterOptions.parse(arguments?.getStringArray(ARG_VALUES)))
@@ -96,7 +78,38 @@ class EpisodeFilterSheet : FilterSheet() {
             return sheet
         }
 
-        private fun toSelection(options: EpisodeFilterOptions): FilterSelection {
+        /**
+         * Status, Downloaded and Favorite; shared with the episode search's sheet
+         * ([EpisodeSearchFilterSheet]), which converts them with [toSelection] and [toOptions].
+         */
+        internal fun sections(context: Context): List<FilterSection> = listOf(
+            FilterSection(
+                SECTION_STATUS, context.getString(R.string.filter_section_status), listOf(
+                    FilterOption(
+                        EpisodeFilterOptions.Status.UNFINISHED.name,
+                        context.getString(R.string.filter_unfinished)
+                    ),
+                    FilterOption(
+                        EpisodeFilterOptions.Status.FINISHED.name,
+                        context.getString(R.string.filter_finished)
+                    )
+                )
+            ),
+            FilterSection(
+                SECTION_DOWNLOADED, context.getString(R.string.filter_section_downloaded), listOf(
+                    FilterOption(YES, context.getString(R.string.filter_downloaded)),
+                    FilterOption(NO, context.getString(R.string.filter_not_downloaded))
+                )
+            ),
+            FilterSection(
+                SECTION_FAVORITE, context.getString(R.string.filter_section_favorite), listOf(
+                    FilterOption(YES, context.getString(R.string.filter_favorite)),
+                    FilterOption(NO, context.getString(R.string.filter_not_favorite))
+                )
+            )
+        )
+
+        internal fun toSelection(options: EpisodeFilterOptions): FilterSelection {
             val result = HashMap<String, Set<String>>()
             options.status?.let { result[SECTION_STATUS] = setOf(it.name) }
             options.downloaded?.let { result[SECTION_DOWNLOADED] = setOf(if (it) YES else NO) }
@@ -104,7 +117,7 @@ class EpisodeFilterSheet : FilterSheet() {
             return result
         }
 
-        private fun toOptions(selection: FilterSelection): EpisodeFilterOptions {
+        internal fun toOptions(selection: FilterSelection): EpisodeFilterOptions {
             val status = EpisodeFilterOptions.Status.entries.firstOrNull { it.name == selection.single(SECTION_STATUS) }
             return EpisodeFilterOptions(
                 status,

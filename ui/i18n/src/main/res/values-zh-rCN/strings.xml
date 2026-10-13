@@ -910,4 +910,28 @@
   <plurals name="filter_audiobooks_shown">
     <item quantity="other">显示 %d 本有声书</item>
   </plurals>
+  <string name="search_section_search_in">搜索范围</string>
+  <string name="search_in_title">标题</string>
+  <string name="search_in_show_notes">节目简介</string>
+  <string name="search_section_podcast">播客</string>
+  <string name="search_scope_all">所有播客和有声书</string>
+  <string name="search_scope_choose">在其中搜索</string>
+  <string name="search_scope_choose_description">播客：%1$s。点按以选择其他播客</string>
+  <string name="search_scope_clear">搜索所有播客</string>
+  <string name="search_section_published">发布时间</string>
+  <string name="search_date_past_week">过去一周</string>
+  <string name="search_date_past_month">过去一个月</string>
+  <string name="search_date_past_year">过去一年</string>
+  <string name="search_section_duration">时长</string>
+  <string name="search_duration_under_20">20 分钟以内</string>
+  <string name="search_duration_20_to_60">20–60 分钟</string>
+  <string name="search_duration_over_60">60 分钟以上</string>
+  <string name="search_sort_relevance">相关性</string>
+  <string name="search_sort_newest">最新</string>
+  <string name="search_sort_oldest">最早</string>
+  <string name="search_sort_longest">最长</string>
+  <string name="search_sort_shortest">最短</string>
+  <string name="search_in_feed_hint">在 %1$s 中搜索</string>
+  <string name="search_no_results_filtered">在当前过滤条件下未找到关于 \"%1$s\" 的结果</string>
+  <string name="sort_and_filter_active">排序和过滤（已启用过滤）</string>
 </resources>

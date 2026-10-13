@@ -861,4 +861,28 @@
   <plurals name="filter_audiobooks_shown">
     <item quantity="other">顯示 %d 本有聲書</item>
   </plurals>
+  <string name="search_section_search_in">搜尋範圍</string>
+  <string name="search_in_title">標題</string>
+  <string name="search_in_show_notes">節目簡介</string>
+  <string name="search_section_podcast">Podcast</string>
+  <string name="search_scope_all">所有 Podcast 和有聲書</string>
+  <string name="search_scope_choose">在其中搜尋</string>
+  <string name="search_scope_choose_description">Podcast：%1$s。輕觸以選擇其他 Podcast</string>
+  <string name="search_scope_clear">搜尋所有 Podcast</string>
+  <string name="search_section_published">發布時間</string>
+  <string name="search_date_past_week">過去一週</string>
+  <string name="search_date_past_month">過去一個月</string>
+  <string name="search_date_past_year">過去一年</string>
+  <string name="search_section_duration">長度</string>
+  <string name="search_duration_under_20">20 分鐘以內</string>
+  <string name="search_duration_20_to_60">20–60 分鐘</string>
+  <string name="search_duration_over_60">60 分鐘以上</string>
+  <string name="search_sort_relevance">相關性</string>
+  <string name="search_sort_newest">最新</string>
+  <string name="search_sort_oldest">最舊</string>
+  <string name="search_sort_longest">最長</string>
+  <string name="search_sort_shortest">最短</string>
+  <string name="search_in_feed_hint">在 %1$s 中搜尋</string>
+  <string name="search_no_results_filtered">在目前的篩選條件下找不到「%1$s」</string>
+  <string name="sort_and_filter_active">排序與篩選（已套用篩選）</string>
 </resources>

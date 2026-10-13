@@ -612,4 +612,28 @@
   <plurals name="filter_audiobooks_shown">
     <item quantity="other">%d 冊のオーディオブックを表示中</item>
   </plurals>
+  <string name="search_section_search_in">検索対象</string>
+  <string name="search_in_title">タイトル</string>
+  <string name="search_in_show_notes">番組ノート</string>
+  <string name="search_section_podcast">ポッドキャスト</string>
+  <string name="search_scope_all">すべてのポッドキャストとオーディオブック</string>
+  <string name="search_scope_choose">検索する番組</string>
+  <string name="search_scope_choose_description">ポッドキャスト: %1$s。タップして変更</string>
+  <string name="search_scope_clear">すべてのポッドキャストを検索</string>
+  <string name="search_section_published">公開日</string>
+  <string name="search_date_past_week">過去 1 週間</string>
+  <string name="search_date_past_month">過去 1 か月</string>
+  <string name="search_date_past_year">過去 1 年</string>
+  <string name="search_section_duration">再生時間</string>
+  <string name="search_duration_under_20">20 分未満</string>
+  <string name="search_duration_20_to_60">20〜60 分</string>
+  <string name="search_duration_over_60">60 分超</string>
+  <string name="search_sort_relevance">関連度</string>
+  <string name="search_sort_newest">新しい順</string>
+  <string name="search_sort_oldest">古い順</string>
+  <string name="search_sort_longest">長い順</string>
+  <string name="search_sort_shortest">短い順</string>
+  <string name="search_in_feed_hint">%1$s 内を検索</string>
+  <string name="search_no_results_filtered">現在のフィルターでは \"%1$s\" の結果は見つかりませんでした</string>
+  <string name="sort_and_filter_active">並べ替えとフィルター（フィルター適用中）</string>
 </resources>

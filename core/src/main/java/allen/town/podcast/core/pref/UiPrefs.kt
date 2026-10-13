@@ -4,6 +4,7 @@ import allen.town.podcast.common.util.BasePreferenceUtil.materialYou
 import allen.town.podcast.common.util.ThemeUtils.generalThemeValue
 import allen.town.podcast.core.R
 import allen.town.podcast.core.feed.AudiobookShelfFilter
+import allen.town.podcast.core.feed.EpisodeFilterOptions
 import allen.town.podcast.core.feed.SubscriptionsFilter
 import allen.town.podcast.core.playback.AlbumCoverStyle
 import allen.town.podcast.core.playback.NowPlayingScreen
@@ -11,7 +12,9 @@ import allen.town.podcast.core.pref.PrefsStore.context
 import allen.town.podcast.core.pref.PrefsStore.getString
 import allen.town.podcast.core.pref.PrefsStore.prefs
 import allen.town.podcast.core.view.TopAppBarLayout.AppBarMode
+import allen.town.podcast.model.feed.EpisodeSearchOptions
 import allen.town.podcast.model.feed.FeedCounter
+import allen.town.podcast.model.feed.FeedItemFilter
 import android.os.Build
 import android.text.TextUtils
 import androidx.annotation.StyleRes
@@ -36,6 +39,11 @@ internal object UiPrefs {
     private const val PREF_AUDIOBOOKS_STATUS = "pref_audiobooks_status"
     private const val PREF_AUDIOBOOKS_AUTHORS = "pref_audiobooks_authors"
     private const val PREF_AUDIOBOOKS_LENGTH = "pref_audiobooks_length"
+    private const val PREF_SEARCH_FILTER = "pref_episode_search_filter"
+    private const val PREF_SEARCH_DATE = "pref_episode_search_date"
+    private const val PREF_SEARCH_DURATION = "pref_episode_search_duration"
+    private const val PREF_SEARCH_FIELDS = "pref_episode_search_fields"
+    private const val PREF_SEARCH_SORT = "pref_episode_search_sort"
 
     private const val NOTIFICATION_BUTTON_REWIND = 0
     private const val NOTIFICATION_BUTTON_FAST_FORWARD = 1
@@ -325,6 +333,30 @@ internal object UiPrefs {
                 .putString(PREF_AUDIOBOOKS_STATUS, value.status?.name)
                 .putStringSet(PREF_AUDIOBOOKS_AUTHORS, HashSet(value.authors))
                 .putString(PREF_AUDIOBOOKS_LENGTH, value.length?.name)
+                .apply()
+        }
+
+    /**
+     * Filters and sort of the episode search, kept from one search to the next. The podcast scope
+     * ([EpisodeSearchOptions.feedId]) is not stored: it is always 0 here.
+     */
+    var episodeSearchOptions: EpisodeSearchOptions
+        get() = EpisodeSearchOptions(
+            EpisodeFilterOptions.sanitize(FeedItemFilter(prefs.getString(PREF_SEARCH_FILTER, "").orEmpty())),
+            0,
+            enumOrNull<EpisodeSearchOptions.DateRange>(prefs.getString(PREF_SEARCH_DATE, null)),
+            enumOrNull<EpisodeSearchOptions.DurationRange>(prefs.getString(PREF_SEARCH_DURATION, null)),
+            prefs.getStringSet(PREF_SEARCH_FIELDS, null).orEmpty()
+                .mapNotNull { enumOrNull<EpisodeSearchOptions.Field>(it) },
+            enumOrNull<EpisodeSearchOptions.Sort>(prefs.getString(PREF_SEARCH_SORT, null))
+        )
+        set(value) {
+            prefs.edit()
+                .putString(PREF_SEARCH_FILTER, value.filter.values.joinToString(","))
+                .putString(PREF_SEARCH_DATE, value.dateRange.name)
+                .putString(PREF_SEARCH_DURATION, value.durationRange.name)
+                .putStringSet(PREF_SEARCH_FIELDS, value.fields.map { it.name }.toHashSet())
+                .putString(PREF_SEARCH_SORT, value.sort.name)
                 .apply()
         }
 

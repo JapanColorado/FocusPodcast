@@ -1022,4 +1022,28 @@
         <item quantity="one">%d audiobook shown</item>
         <item quantity="other">%d audiobooks shown</item>
     </plurals>
+    <string name="search_section_search_in">Search in</string>
+    <string name="search_in_title">Title</string>
+    <string name="search_in_show_notes">Show notes</string>
+    <string name="search_section_podcast">Podcast</string>
+    <string name="search_scope_all">All podcasts and audiobooks</string>
+    <string name="search_scope_choose">Search in</string>
+    <string name="search_scope_choose_description">Podcast: %1$s. Tap to choose another</string>
+    <string name="search_scope_clear">Search all podcasts</string>
+    <string name="search_section_published">Published</string>
+    <string name="search_date_past_week">Past week</string>
+    <string name="search_date_past_month">Past month</string>
+    <string name="search_date_past_year">Past year</string>
+    <string name="search_section_duration">Duration</string>
+    <string name="search_duration_under_20">Under 20 min</string>
+    <string name="search_duration_20_to_60">20–60 min</string>
+    <string name="search_duration_over_60">Over 60 min</string>
+    <string name="search_sort_relevance">Relevance</string>
+    <string name="search_sort_newest">Newest</string>
+    <string name="search_sort_oldest">Oldest</string>
+    <string name="search_sort_longest">Longest</string>
+    <string name="search_sort_shortest">Shortest</string>
+    <string name="search_in_feed_hint">Search in %1$s</string>
+    <string name="search_no_results_filtered">No results for \"%1$s\" with the current filters</string>
+    <string name="sort_and_filter_active">Sort &amp; filter (filters on)</string>
 </resources>

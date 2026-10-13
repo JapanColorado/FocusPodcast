@@ -1,6 +1,5 @@
 package allen.town.podcast.storage.db;
 
-import android.database.DatabaseUtils;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
@@ -42,20 +41,32 @@ abstract class Dao {
         }
     }
 
-    /**
-     * Uses DatabaseUtils to escape a search query and removes ' at the
-     * beginning and the end of the string returned by the escape method.
-     */
-    protected String[] prepareSearchQuery(String query) {
-        String[] queryWords = query.split("\\s+");
-        for (int i = 0; i < queryWords.length; ++i) {
-            StringBuilder builder = new StringBuilder();
-            DatabaseUtils.appendEscapedSQLString(builder, queryWords[i]);
-            builder.deleteCharAt(0);
-            builder.deleteCharAt(builder.length() - 1);
-            queryWords[i] = builder.toString();
-        }
+    /** Escape character of {@link #LIKE_ESCAPED}; see {@link #likeContains}. */
+    private static final char LIKE_ESCAPE = '\\';
 
-        return queryWords;
+    /** A bound "contains" match: {@code column + LIKE_ESCAPED} with {@link #likeContains} as its argument. */
+    protected static final String LIKE_ESCAPED = " LIKE ? ESCAPE '" + LIKE_ESCAPE + "'";
+
+    /** The words of a search query, split on whitespace; none for a blank query. */
+    protected static String[] searchWords(String query) {
+        String trimmed = query == null ? "" : query.trim();
+        return trimmed.isEmpty() ? new String[0] : trimmed.split("\\s+");
+    }
+
+    /**
+     * The LIKE pattern matching any text that contains {@code word} literally: {@code %} and
+     * {@code _} in the word are escaped (with {@link #LIKE_ESCAPE}, see {@link #LIKE_ESCAPED}) so
+     * they do not act as wildcards. Bind it as an argument; quotes need no escaping then.
+     */
+    protected static String likeContains(String word) {
+        StringBuilder builder = new StringBuilder(word.length() + 2).append('%');
+        for (int i = 0; i < word.length(); i++) {
+            char c = word.charAt(i);
+            if (c == '%' || c == '_' || c == LIKE_ESCAPE) {
+                builder.append(LIKE_ESCAPE);
+            }
+            builder.append(c);
+        }
+        return builder.append('%').toString();
     }
 }

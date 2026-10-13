@@ -8,6 +8,7 @@ import allen.town.podcast.core.playback.NowPlayingScreen
 import allen.town.podcast.core.storage.EpisodeCleanupAlgorithm
 import allen.town.podcast.core.view.TopAppBarLayout.AppBarMode
 import allen.town.podcast.model.download.ProxyConfig
+import allen.town.podcast.model.feed.EpisodeSearchOptions
 import allen.town.podcast.model.feed.FeedCounter
 import allen.town.podcast.model.feed.SortOrder
 import allen.town.podcast.model.playback.MediaType
@@ -569,6 +570,14 @@ object Prefs {
         get() = UiPrefs.audiobookShelfFilter
         set(value) {
             UiPrefs.audiobookShelfFilter = value
+        }
+
+    /** See [UiPrefs.episodeSearchOptions]. */
+    @JvmStatic
+    var episodeSearchOptions: EpisodeSearchOptions
+        get() = UiPrefs.episodeSearchOptions
+        set(value) {
+            UiPrefs.episodeSearchOptions = value
         }
 
     /** See [UiPrefs.migrateAudiobookShelfStatus]. */

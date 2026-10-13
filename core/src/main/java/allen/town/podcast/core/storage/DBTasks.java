@@ -46,6 +46,7 @@ import allen.town.podcast.model.download.DownloadError;
 import allen.town.podcast.core.util.LongList;
 import allen.town.podcast.core.util.comparator.FeedItemPubdateComparator;
 import allen.town.podcast.model.feed.Feed;
+import allen.town.podcast.model.feed.EpisodeSearchOptions;
 import allen.town.podcast.model.feed.FeedItem;
 import allen.town.podcast.model.feed.FeedMedia;
 import allen.town.podcast.sync.model.EpisodeAction;
@@ -664,6 +665,38 @@ public final class DBTasks {
                 DBReader.loadAdditionalFeedItemListData(items);
                 setResult(items);
                 searchResult.close();
+            }
+        });
+    }
+
+    /**
+     * Searches the FeedItems for a given string, filtered, scoped and sorted by {@code options}.
+     *
+     * @return A FutureTask object that executes the search request
+     *         and returns the search result as a List of FeedItems.
+     */
+    public static FutureTask<List<FeedItem>> searchFeedItems(final String query,
+                                                             final EpisodeSearchOptions options) {
+        final long now = System.currentTimeMillis();
+        return new FutureTask<>(new QueryTask<List<FeedItem>>() {
+            @Override
+            public void execute(Db adapter) {
+                try (Cursor searchResult = adapter.searchItems(query, options, now)) {
+                    List<FeedItem> items = DBReader.extractItemlistFromCursor(searchResult);
+                    DBReader.loadAdditionalFeedItemListData(items);
+                    setResult(items);
+                }
+            }
+        });
+    }
+
+    /** How many items {@link #searchFeedItems(String, EpisodeSearchOptions)} finds. */
+    public static FutureTask<Integer> countFeedItems(final String query, final EpisodeSearchOptions options) {
+        final long now = System.currentTimeMillis();
+        return new FutureTask<>(new QueryTask<Integer>() {
+            @Override
+            public void execute(Db adapter) {
+                setResult(adapter.countSearchItems(query, options, now));
             }
         });
     }

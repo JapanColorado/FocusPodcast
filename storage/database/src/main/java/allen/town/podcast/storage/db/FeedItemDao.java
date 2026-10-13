@@ -9,6 +9,7 @@ import static allen.town.podcast.storage.db.DbSchema.KEY_DISC_NUMBER;
 import static allen.town.podcast.storage.db.DbSchema.KEY_TRACK_NUMBER;
 import static allen.town.podcast.storage.db.DbSchema.KEY_DESCRIPTION;
 import static allen.town.podcast.storage.db.DbSchema.KEY_DOWNLOADED;
+import static allen.town.podcast.storage.db.DbSchema.KEY_DURATION;
 import static allen.town.podcast.storage.db.DbSchema.KEY_DOWNLOAD_URL;
 import static allen.town.podcast.storage.db.DbSchema.KEY_FEED;
 import static allen.town.podcast.storage.db.DbSchema.KEY_FEEDFILE;
@@ -49,10 +50,12 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 import allen.town.podcast.model.feed.Chapter;
+import allen.town.podcast.model.feed.EpisodeSearchOptions;
 import allen.town.podcast.model.feed.Feed;
 import allen.town.podcast.model.feed.FeedItem;
 import allen.town.podcast.model.feed.FeedItemFilter;
@@ -493,45 +496,141 @@ class FeedItemDao extends Dao {
         return result;
     }
 
+    /** At most this many search results are returned. */
+    static final int SEARCH_LIMIT = 300;
+
     /**
-     * Searches for the given query in various values of all items or the items
-     * of a specified feed.
+     * Searches for the given query in the title and show notes of all items or the items of a
+     * specified feed, newest first.
      *
      * @return A cursor with all search results in SEL_FI_EXTRA selection.
      */
     Cursor searchItems(long feedID, String searchQuery) {
-        String[] queryWords = prepareSearchQuery(searchQuery);
+        EpisodeSearchOptions options = EpisodeSearchOptions.defaults()
+                .withFeedId(feedID)
+                .withSort(EpisodeSearchOptions.Sort.NEWEST);
+        return searchItems(searchQuery, options, System.currentTimeMillis());
+    }
 
-        String queryFeedId;
-        if (feedID != 0) {
-            // search items in specific feed
-            queryFeedId = KEY_FEED + " = " + feedID;
-        } else {
-            // search through all items
-            queryFeedId = "1 = 1";
+    /**
+     * Items that contain every word of {@code searchQuery} in one of the {@link EpisodeSearchOptions#fields}
+     * and match the rest of the options, in their sort order, at most {@link #SEARCH_LIMIT}. A blank
+     * query matches every item that passes the options.
+     *
+     * @param nowMillis the current time, which the date range counts back from
+     * @return A cursor with all search results in SEL_FI_EXTRA selection.
+     */
+    Cursor searchItems(String searchQuery, EpisodeSearchOptions options, long nowMillis) {
+        List<String> args = new ArrayList<>();
+        String[] words = searchWords(searchQuery);
+        String query = SELECT_FEED_ITEMS_AND_MEDIA_WITH_DESCRIPTION
+                + searchWhereClause(words, options, nowMillis, args)
+                + searchOrderBy(words, options, args)
+                + " LIMIT " + SEARCH_LIMIT;
+        return db.rawQuery(query, args.toArray(new String[0]));
+    }
+
+    /** How many items {@link #searchItems(String, EpisodeSearchOptions, long)} returns. */
+    int countSearchItems(String searchQuery, EpisodeSearchOptions options, long nowMillis) {
+        List<String> args = new ArrayList<>();
+        String query = "SELECT COUNT(*) FROM (SELECT " + TABLE_NAME_FEED_ITEMS + "." + KEY_ID
+                + " FROM " + TABLE_NAME_FEED_ITEMS + JOIN_FEED_ITEM_AND_MEDIA
+                + searchWhereClause(searchWords(searchQuery), options, nowMillis, args)
+                + " LIMIT " + SEARCH_LIMIT + ")";
+        try (Cursor cursor = db.rawQuery(query, args.toArray(new String[0]))) {
+            return cursor.moveToFirst() ? cursor.getInt(0) : 0;
         }
-        StringBuilder descriptionStr = new StringBuilder();
+    }
 
-        String queryStart = SELECT_FEED_ITEMS_AND_MEDIA_WITH_DESCRIPTION
-                + " WHERE " + queryFeedId + " AND (";
-        StringBuilder sb = new StringBuilder(queryStart);
+    /** The WHERE clause of a search; appends its bound arguments to {@code args}. */
+    private static String searchWhereClause(String[] words, EpisodeSearchOptions options, long nowMillis,
+                                            List<String> args) {
+        List<String> conditions = new ArrayList<>();
+        List<String> columns = searchColumns(options);
+        for (String word : words) {
+            StringBuilder anyColumn = new StringBuilder("(");
+            for (int i = 0; i < columns.size(); i++) {
+                if (i > 0) {
+                    anyColumn.append(" OR ");
+                }
+                anyColumn.append(columns.get(i)).append(LIKE_ESCAPED);
+                args.add(likeContains(word));
+            }
+            conditions.add(anyColumn.append(")").toString());
+        }
+        if (options.feedId != 0) {
+            conditions.add(TABLE_NAME_FEED_ITEMS + "." + KEY_FEED + " = " + options.feedId);
+        }
+        long earliest = options.dateRange.earliestPubDate(nowMillis);
+        if (earliest > 0) {
+            conditions.add(TABLE_NAME_FEED_ITEMS + "." + KEY_PUBDATE + " >= " + earliest);
+        }
+        String duration = TABLE_NAME_FEED_MEDIA + "." + KEY_DURATION;
+        if (options.durationRange.minMillis > 0) {
+            conditions.add(duration + " >= " + options.durationRange.minMillis);
+        }
+        if (options.durationRange.maxMillis > 0) {
+            conditions.add(duration + " <= " + options.durationRange.maxMillis);
+        }
+        String filter = FeedItemFilterQuery.generateFrom(options.filter);
+        if (!filter.isEmpty()) {
+            conditions.add(filter);
+        }
+        return conditions.isEmpty() ? "" : " WHERE " + TextUtils.join(" AND ", conditions);
+    }
 
-        for (int i = 0; i < queryWords.length; i++) {
-            descriptionStr = descriptionStr
-                    .append(KEY_DESCRIPTION + " LIKE '%").append(queryWords[i])
-                    .append("%' OR ");
-            sb.append("(")
-                    .append(descriptionStr)
-                    .append(KEY_TITLE).append(" LIKE '%").append(queryWords[i])
-                    .append("%') ");
-
-            if (i != queryWords.length - 1) {
-                sb.append("AND ");
+    /** The searched columns, in the order of {@link EpisodeSearchOptions.Field}. */
+    private static List<String> searchColumns(EpisodeSearchOptions options) {
+        List<String> columns = new ArrayList<>();
+        for (EpisodeSearchOptions.Field field : options.fields) {
+            switch (field) {
+                case TITLE:
+                    columns.add(TABLE_NAME_FEED_ITEMS + "." + KEY_TITLE);
+                    break;
+                case SHOW_NOTES:
+                    columns.add(TABLE_NAME_FEED_ITEMS + "." + KEY_DESCRIPTION);
+                    break;
+                default:
+                    break;
             }
         }
+        return columns;
+    }
 
-        sb.append(") ORDER BY " + KEY_PUBDATE + " DESC LIMIT 300");
-
-        return db.rawQuery(sb.toString(), null);
+    /**
+     * The ORDER BY clause of a search; appends its bound arguments to {@code args}. Ties go newest
+     * first, then by id, so the order is stable.
+     */
+    private static String searchOrderBy(String[] words, EpisodeSearchOptions options, List<String> args) {
+        String pubDate = TABLE_NAME_FEED_ITEMS + "." + KEY_PUBDATE;
+        String duration = TABLE_NAME_FEED_MEDIA + "." + KEY_DURATION;
+        String newest = pubDate + " DESC, " + TABLE_NAME_FEED_ITEMS + "." + KEY_ID + " DESC";
+        switch (options.sort) {
+            case OLDEST:
+                return " ORDER BY " + pubDate + " ASC, " + TABLE_NAME_FEED_ITEMS + "." + KEY_ID + " ASC";
+            case LONGEST:
+                // NULL sorts last in descending order
+                return " ORDER BY " + duration + " DESC, " + newest;
+            case SHORTEST:
+                // unknown durations (NULL or 0) last rather than first
+                return " ORDER BY (" + duration + " IS NULL OR " + duration + " <= 0), "
+                        + duration + " ASC, " + newest;
+            case RELEVANCE:
+                if (words.length > 0 && options.fields.contains(EpisodeSearchOptions.Field.TITLE)) {
+                    StringBuilder titleHasAll = new StringBuilder(" ORDER BY CASE WHEN ");
+                    for (int i = 0; i < words.length; i++) {
+                        if (i > 0) {
+                            titleHasAll.append(" AND ");
+                        }
+                        titleHasAll.append(TABLE_NAME_FEED_ITEMS + "." + KEY_TITLE).append(LIKE_ESCAPED);
+                        args.add(likeContains(words[i]));
+                    }
+                    return titleHasAll.append(" THEN 0 ELSE 1 END, ").append(newest).toString();
+                }
+                return " ORDER BY " + newest;
+            case NEWEST:
+            default:
+                return " ORDER BY " + newest;
+        }
     }
 }

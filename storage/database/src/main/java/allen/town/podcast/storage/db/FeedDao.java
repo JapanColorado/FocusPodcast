@@ -438,30 +438,22 @@ class FeedDao extends Dao {
      * @return A cursor with all search results in SEL_FI_EXTRA selection.
      */
     Cursor searchFeeds(String searchQuery) {
-        String[] queryWords = prepareSearchQuery(searchQuery);
-
-        String queryStart = "SELECT * FROM " + TABLE_NAME_FEEDS + " WHERE ";
-        StringBuilder sb = new StringBuilder(queryStart);
-
+        String[] queryWords = searchWords(searchQuery);
+        String[] args = new String[queryWords.length * 4];
+        StringBuilder sb = new StringBuilder("SELECT * FROM " + TABLE_NAME_FEEDS
+                + " WHERE " + KEY_IS_SUBSCRIBED + " = 1");
         for (int i = 0; i < queryWords.length; i++) {
-            sb
-                    .append("(")
-                    .append(KEY_TITLE).append(" LIKE '%").append(queryWords[i])
-                    .append("%' OR ")
-                    .append(KEY_CUSTOM_TITLE).append(" LIKE '%").append(queryWords[i])
-                    .append("%' OR ")
-                    .append(KEY_AUTHOR).append(" LIKE '%").append(queryWords[i])
-                    .append("%' OR ")
-                    .append(KEY_DESCRIPTION).append(" LIKE '%").append(queryWords[i])
-                    .append("%') ");
-
-            if (i != queryWords.length - 1) {
-                sb.append("AND ");
+            String pattern = likeContains(queryWords[i]);
+            sb.append(" AND (")
+                    .append(KEY_TITLE).append(LIKE_ESCAPED).append(" OR ")
+                    .append(KEY_CUSTOM_TITLE).append(LIKE_ESCAPED).append(" OR ")
+                    .append(KEY_AUTHOR).append(LIKE_ESCAPED).append(" OR ")
+                    .append(KEY_DESCRIPTION).append(LIKE_ESCAPED).append(")");
+            for (int j = 0; j < 4; j++) {
+                args[i * 4 + j] = pattern;
             }
         }
-        sb.append(" AND " + KEY_IS_SUBSCRIBED + " =1 ");
-        sb.append("ORDER BY " + KEY_TITLE + " ASC LIMIT 300");
-
-        return db.rawQuery(sb.toString(), null);
+        sb.append(" ORDER BY " + KEY_TITLE + " ASC LIMIT 300");
+        return db.rawQuery(sb.toString(), args);
     }
 }

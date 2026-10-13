@@ -27,6 +27,7 @@ import allen.town.podcast.model.download.DownloadStatus;
 import allen.town.podcast.model.feed.AdSegment;
 import allen.town.podcast.model.feed.Feed;
 import allen.town.podcast.model.feed.FeedCounter;
+import allen.town.podcast.model.feed.EpisodeSearchOptions;
 import allen.town.podcast.model.feed.FeedItem;
 import allen.town.podcast.model.feed.FeedItemFilter;
 import allen.town.podcast.model.feed.FeedMedia;
@@ -581,6 +582,22 @@ public class Db {
      */
     public Cursor searchItems(long feedID, String searchQuery) {
         return itemDao.searchItems(feedID, searchQuery);
+    }
+
+    /**
+     * Searches the items for every word of the query in the fields the options name, filtered,
+     * scoped and sorted by the options (all in SQL), at most 300.
+     *
+     * @param nowMillis the current time, which the options' date range counts back from
+     * @return A cursor with all search results in SEL_FI_EXTRA selection.
+     */
+    public Cursor searchItems(String searchQuery, EpisodeSearchOptions options, long nowMillis) {
+        return itemDao.searchItems(searchQuery, options, nowMillis);
+    }
+
+    /** How many items {@link #searchItems(String, EpisodeSearchOptions, long)} returns. */
+    public int countSearchItems(String searchQuery, EpisodeSearchOptions options, long nowMillis) {
+        return itemDao.countSearchItems(searchQuery, options, nowMillis);
     }
 
     // ---------------------------------------------------------------------------------------
