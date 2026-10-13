@@ -29,6 +29,9 @@ import static allen.town.podcast.storage.db.DbSchema.KEY_PUBDATE;
 import static allen.town.podcast.storage.db.DbSchema.KEY_READ;
 import static allen.town.podcast.storage.db.DbSchema.KEY_START;
 import static allen.town.podcast.storage.db.DbSchema.KEY_TITLE;
+import static allen.town.podcast.storage.db.DbSchema.KEY_TRANSCRIPT_TEXT;
+import static allen.town.podcast.storage.db.DbSchema.KEY_TRANSCRIPT_TYPE;
+import static allen.town.podcast.storage.db.DbSchema.KEY_TRANSCRIPT_URL;
 import static allen.town.podcast.storage.db.DbSchema.SELECT_FEED_ITEMS_AND_MEDIA;
 import static allen.town.podcast.storage.db.DbSchema.SELECT_FEED_ITEMS_AND_MEDIA_WITH_DESCRIPTION;
 import static allen.town.podcast.storage.db.DbSchema.SELECT_KEY_ITEM_ID;
@@ -39,6 +42,7 @@ import static allen.town.podcast.storage.db.DbSchema.TABLE_NAME_FEED_ITEMS;
 import static allen.town.podcast.storage.db.DbSchema.TABLE_NAME_FEED_MEDIA;
 import static allen.town.podcast.storage.db.DbSchema.TABLE_NAME_QUEUE;
 import static allen.town.podcast.storage.db.DbSchema.TABLE_NAME_SIMPLECHAPTERS;
+import static allen.town.podcast.storage.db.DbSchema.TABLE_NAME_TRANSCRIPTS;
 
 import android.content.ContentValues;
 import android.database.Cursor;
@@ -66,7 +70,7 @@ import allen.town.podcast.storage.db.mapper.FeedItemFilterQuery;
  * Owns every statement against the {@code episodes} table and the {@code chapters} rows that hang
  * off it: inserting or updating an item (delegating the feed row to {@link FeedDao} and the media
  * row to {@link FeedMediaDao}), the bulk and single-item stores, the played/unplayed state updates,
- * the cascade that removes items together with their chapters, ad segments, media and download log
+ * the cascade that removes items together with their chapters, ad segments, transcripts, media and download log
  * entries, the item search, and all the cursors that read episodes joined with their media.
  */
 class FeedItemDao extends Dao {
@@ -74,12 +78,15 @@ class FeedItemDao extends Dao {
     private final FeedDao feedDao;
     private final FeedMediaDao mediaDao;
     private final AdSegmentDao adSegmentDao;
+    private final TranscriptDao transcriptDao;
 
-    FeedItemDao(SQLiteDatabase db, FeedDao feedDao, FeedMediaDao mediaDao, AdSegmentDao adSegmentDao) {
+    FeedItemDao(SQLiteDatabase db, FeedDao feedDao, FeedMediaDao mediaDao, AdSegmentDao adSegmentDao,
+                TranscriptDao transcriptDao) {
         super(db);
         this.feedDao = feedDao;
         this.mediaDao = mediaDao;
         this.adSegmentDao = adSegmentDao;
+        this.transcriptDao = transcriptDao;
     }
 
     void storeFeedItemlist(List<FeedItem> items) {
@@ -176,6 +183,8 @@ class FeedItemDao extends Dao {
         }
         values.put(KEY_IMAGE_URL, item.getImageUrl());
         values.put(KEY_PODCASTINDEX_CHAPTER_URL, item.getPodcastIndexChapterUrl());
+        values.put(KEY_TRANSCRIPT_URL, item.getTranscriptUrl());
+        values.put(KEY_TRANSCRIPT_TYPE, item.getTranscriptType());
         values.put(KEY_DISC_NUMBER, item.getDiscNumber());
         values.put(KEY_TRACK_NUMBER, item.getTrackNumber());
 
@@ -274,6 +283,7 @@ class FeedItemDao extends Dao {
             db.beginTransactionNonExclusive();
             db.delete(TABLE_NAME_SIMPLECHAPTERS, KEY_FEEDITEM + " IN (" + itemIds + ")", null);
             adSegmentDao.deleteAdSegmentsOfItems(itemIdArray);
+            transcriptDao.deleteTranscriptsOfItems(itemIdArray);
             db.delete(TABLE_NAME_DOWNLOAD_LOG, KEY_FEEDFILETYPE + "=" + FeedMedia.FEEDFILETYPE_FEEDMEDIA
                             + " AND " + KEY_FEEDFILE + " IN (" + mediaIds + ")", null);
             db.delete(TABLE_NAME_FEED_MEDIA, KEY_ID + " IN (" + mediaIds + ")", null);
@@ -589,6 +599,13 @@ class FeedItemDao extends Dao {
                     break;
                 case SHOW_NOTES:
                     columns.add(TABLE_NAME_FEED_ITEMS + "." + KEY_DESCRIPTION);
+                    break;
+                case TRANSCRIPT:
+                    // only cached transcripts; an episode without one yields NULL, which never matches
+                    columns.add("(SELECT " + TABLE_NAME_TRANSCRIPTS + "." + KEY_TRANSCRIPT_TEXT
+                            + " FROM " + TABLE_NAME_TRANSCRIPTS
+                            + " WHERE " + TABLE_NAME_TRANSCRIPTS + "." + KEY_FEEDITEM
+                            + " = " + TABLE_NAME_FEED_ITEMS + "." + KEY_ID + ")");
                     break;
                 default:
                     break;

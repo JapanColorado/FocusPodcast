@@ -213,7 +213,8 @@ public class FeedItemMenuProcess {
             ShareDialog shareDialog = ShareDialog.newInstance(selectedItem);
             shareDialog.show((fragment.getActivity().getSupportFragmentManager()), "ShareEpisodeDialog");
         }  else if (menuItemId == R.id.extra_info_item) {
-            new FeedItemExtraInfoFragment().show((fragment.getActivity().getSupportFragmentManager()), "FeedItemExtraInfoFragment");
+            FeedItemExtraInfoFragment.newInstance(selectedItem.hasTranscript())
+                    .show((fragment.getActivity().getSupportFragmentManager()), "FeedItemExtraInfoFragment");
         } else if (menuItemId == R.id.download) {
             List<DownloadRequest> requests = new ArrayList<>();
             if (selectedItem.hasMedia() && !selectedItem.getFeed().isLocalFeed()) {

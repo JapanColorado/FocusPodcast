@@ -51,13 +51,17 @@ class FeedItemExtraInfoFragment
 //        root.findViewById<View>(R.id.toolbar).visibility = View.GONE
         viewPager = root.findViewById(R.id.viewpager)
         viewPager.setOffscreenPageLimit(2)
-        viewPager.setAdapter(PagerAdapter(this))
+        val showTranscript = arguments?.getBoolean(ARG_SHOW_TRANSCRIPT, false) == true
+        viewPager.setAdapter(PagerAdapter(this, showTranscript))
 
         //without this only the first item scrolls correctly, unless every scrollable child of every item has isNestedScrollingEnabled set to false
         viewPager.children.find { it is RecyclerView }?.let {
             (it as RecyclerView).isNestedScrollingEnabled = false
         }
 
+        if (selectedPosition == TRANSCRIPT_POS && !showTranscript) {
+            selectedPosition = DESC_POS
+        }
         if(selectedPosition > 0){
             viewPager.setCurrentItem(selectedPosition,false)
         }
@@ -69,6 +73,7 @@ class FeedItemExtraInfoFragment
                 when (position) {
                     0 -> tab.setText(R.string.description_label)
                     1 -> tab.setText(R.string.chapters_label)
+                    TRANSCRIPT_POS -> tab.setText(R.string.transcript_label)
                     else -> {}
                 }
             }).attach()
@@ -85,22 +90,38 @@ class FeedItemExtraInfoFragment
         super.onDestroy()
     }
 
-    class PagerAdapter internal constructor(fragment: Fragment) : FragmentStateAdapter(fragment) {
+    class PagerAdapter internal constructor(fragment: Fragment, private val showTranscript: Boolean) :
+        FragmentStateAdapter(fragment) {
         override fun createFragment(position: Int): Fragment {
             return when (position) {
                 DESC_POS -> FeedItemDescriptionFragment()
                 CHAPTERS_POS -> ChaptersFragment()
+                TRANSCRIPT_POS -> TranscriptFragment()
                 else -> FeedItemDescriptionFragment()
             }
         }
 
         override fun getItemCount(): Int {
-            return 2
+            return if (showTranscript) 3 else 2
         }
     }
 
     companion object {
         const val DESC_POS = 0
         const val CHAPTERS_POS = 1
+        /** Only present when the sheet was created with a transcript ([newInstance]). */
+        const val TRANSCRIPT_POS = 2
+        private const val ARG_SHOW_TRANSCRIPT = "show_transcript"
+
+        /**
+         * The sheet for the episode that is playing, with a Transcript tab when [showTranscript]
+         * (the episode offers one, see [allen.town.podcast.model.feed.FeedItem.hasTranscript]).
+         */
+        @JvmStatic
+        fun newInstance(showTranscript: Boolean): FeedItemExtraInfoFragment {
+            val fragment = FeedItemExtraInfoFragment()
+            fragment.arguments = Bundle().apply { putBoolean(ARG_SHOW_TRANSCRIPT, showTranscript) }
+            return fragment
+        }
     }
 }

@@ -105,13 +105,61 @@ public class EpisodeSearchQueryTest {
     }
 
     @Test
-    public void emptyFieldChoiceMeansEveryField() {
-        assertEquals(EnumSet.allOf(Field.class),
+    public void emptyFieldChoiceMeansTheDefaultFields() {
+        assertEquals(EnumSet.of(Field.TITLE, Field.SHOW_NOTES),
                 EpisodeSearchOptions.defaults().withFields(Collections.emptySet()).fields);
+        assertFalse(EpisodeSearchOptions.defaults().fields.contains(Field.TRANSCRIPT));
         assertFalse(EpisodeSearchOptions.defaults().isFiltering());
         assertTrue(EpisodeSearchOptions.defaults().withFields(EnumSet.of(Field.TITLE)).isFiltering());
         assertFalse("the podcast scope is not a filter",
                 EpisodeSearchOptions.defaults().withFeedId(5).isFiltering());
+        assertFalse("adding the transcript only widens the search",
+                EpisodeSearchOptions.defaults().withFields(EnumSet.allOf(Field.class)).isFiltering());
+    }
+
+    // ----------------------------------------------------------- transcripts
+
+    @Test
+    public void transcriptFieldSearchesTheCachedTranscriptText() {
+        seed();
+        cacheTranscript(space.getItems().get(1), "Host: today we discuss photosynthesis at length");
+
+        assertEquals("not searched by default", Collections.emptyList(),
+                titles("photosynthesis", byNewest()));
+        assertEquals(Collections.singletonList("Gardening"),
+                titles("photosynthesis", byNewest().withFields(EnumSet.of(Field.TRANSCRIPT))));
+        assertEquals(Collections.singletonList("Gardening"),
+                titles("photosynthesis", byNewest().withFields(EnumSet.allOf(Field.class))));
+        assertEquals(1, Db.getInstance().countSearchItems("photosynthesis",
+                byNewest().withFields(EnumSet.of(Field.TRANSCRIPT)), NOW));
+        assertEquals("the markup of the raw download is not searched", Collections.emptyList(),
+                titles("WEBVTT", byNewest().withFields(EnumSet.of(Field.TRANSCRIPT))));
+    }
+
+    @Test
+    public void transcriptFieldCombinesWithTheOtherFieldsWordByWord() {
+        seed();
+        cacheTranscript(space.getItems().get(0), "we talk about thrust and fuel");
+
+        // "launch" in the title, "thrust" only in the transcript
+        assertEquals(Collections.singletonList("Rocket launch"),
+                titles("launch thrust", byNewest().withFields(EnumSet.allOf(Field.class))));
+        assertEquals(Collections.emptyList(), titles("launch thrust", byNewest()));
+    }
+
+    @Test
+    public void episodesWithoutACachedTranscriptNeverMatchTheTranscriptField() {
+        seed();
+        assertEquals(Collections.emptyList(),
+                titles("rocket", byNewest().withFields(EnumSet.of(Field.TRANSCRIPT))));
+    }
+
+    @Test
+    public void transcriptSearchEscapesWildcards() {
+        seed();
+        cacheTranscript(space.getItems().get(0), "nothing special here");
+        assertEquals(Collections.emptyList(),
+                titles("%", byNewest().withFields(EnumSet.of(Field.TRANSCRIPT))));
     }
 
     @Test
@@ -351,6 +399,11 @@ public class EpisodeSearchQueryTest {
     }
 
     // -------------------------------------------------------------- helpers
+
+    private static void cacheTranscript(FeedItem item, String text) {
+        Db.getInstance().setTranscript(item.getId(), "https://example.com/t.vtt", "text/vtt",
+                "WEBVTT\n\n00:00.000 --> 00:01.000\n" + text, text, NOW);
+    }
 
     private static EpisodeSearchOptions byNewest() {
         return EpisodeSearchOptions.defaults().withSort(Sort.NEWEST);

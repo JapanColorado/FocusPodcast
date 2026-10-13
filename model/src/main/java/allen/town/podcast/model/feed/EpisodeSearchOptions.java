@@ -19,7 +19,7 @@ import java.util.Set;
  *     <li>{@link #dateRange}: published within the last week / month (30 days) / year (365 days).</li>
  *     <li>{@link #durationRange}: by media duration; an episode whose duration is unknown matches no range.</li>
  *     <li>{@link #fields}: where each word is looked for. Every word must match in at least one of them.
- *     New sources (a transcript) are added as a {@link Field}.</li>
+ *     {@link Field#TRANSCRIPT} (the cached transcript text) is off unless chosen.</li>
  *     <li>{@link #sort}: {@link Sort#RELEVANCE} puts episodes whose title holds every word before the
  *     ones matched only elsewhere, newest first within each group.</li>
  * </ul>
@@ -29,8 +29,19 @@ public final class EpisodeSearchOptions {
     private static final long MINUTE_MS = 60L * 1000L;
     private static final long DAY_MS = 24L * 60L * MINUTE_MS;
 
-    /** Where the words are looked for. */
-    public enum Field { TITLE, SHOW_NOTES }
+    /**
+     * Where the words are looked for. {@link #TRANSCRIPT} only reaches episodes whose transcript
+     * has been fetched (on download or when it was opened), so it is not searched by default.
+     */
+    public enum Field {
+        TITLE, SHOW_NOTES, TRANSCRIPT;
+
+        /** The fields searched when nothing was chosen. */
+        @NonNull
+        public static Set<Field> defaults() {
+            return EnumSet.of(TITLE, SHOW_NOTES);
+        }
+    }
 
     public enum Sort { RELEVANCE, NEWEST, OLDEST, LONGEST, SHORTEST }
 
@@ -71,7 +82,7 @@ public final class EpisodeSearchOptions {
     public final DateRange dateRange;
     @NonNull
     public final DurationRange durationRange;
-    /** Never empty: an empty choice means every field. */
+    /** Never empty: an empty choice means {@link Field#defaults()}. */
     @NonNull
     public final Set<Field> fields;
     @NonNull
@@ -85,11 +96,11 @@ public final class EpisodeSearchOptions {
         this.dateRange = dateRange != null ? dateRange : DateRange.ANY;
         this.durationRange = durationRange != null ? durationRange : DurationRange.ANY;
         this.fields = Collections.unmodifiableSet(fields == null || fields.isEmpty()
-                ? EnumSet.allOf(Field.class) : EnumSet.copyOf(fields));
+                ? Field.defaults() : EnumSet.copyOf(fields));
         this.sort = sort != null ? sort : Sort.RELEVANCE;
     }
 
-    /** Everything, every field, by relevance. */
+    /** Everything, the default fields, by relevance. */
     @NonNull
     public static EpisodeSearchOptions defaults() {
         return new EpisodeSearchOptions(null, 0, null, null, null, null);
@@ -127,10 +138,11 @@ public final class EpisodeSearchOptions {
 
     /**
      * True when anything other than the sort and the podcast scope narrows the results: an episode
-     * filter, a date or duration range, or fewer than every field.
+     * filter, a date or duration range, or leaving out one of the default fields. Adding the
+     * transcript only widens the search, so it does not count.
      */
     public boolean isFiltering() {
         return filter.getValues().length > 0 || dateRange != DateRange.ANY
-                || durationRange != DurationRange.ANY || !fields.containsAll(EnumSet.allOf(Field.class));
+                || durationRange != DurationRange.ANY || !fields.containsAll(Field.defaults());
     }
 }

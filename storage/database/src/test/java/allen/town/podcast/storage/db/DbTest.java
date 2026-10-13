@@ -71,8 +71,8 @@ public class DbTest {
     // ---------------------------------------------------------------- schema
 
     @Test
-    public void freshDatabaseIsAtSchemaVersion8() {
-        assertEquals(8, Db.VERSION);
+    public void freshDatabaseIsAtSchemaVersion9() {
+        assertEquals(9, Db.VERSION);
         assertEquals(Db.VERSION, Db.getInstance().getDb().getVersion());
     }
 
@@ -88,7 +88,8 @@ public class DbTest {
                 Db.TABLE_NAME_SIMPLECHAPTERS,
                 Db.TABLE_NAME_FAVORITES,
                 Db.TABLE_NAME_AD_SEGMENTS,
-                Db.TABLE_NAME_DISMISSED_FEED_WARNINGS)));
+                Db.TABLE_NAME_DISMISSED_FEED_WARNINGS,
+                Db.TABLE_NAME_TRANSCRIPTS)));
         assertTrue(columnNames(Db.getInstance().getDb(), Db.TABLE_NAME_DOWNLOAD_LOG)
                 .contains(Db.KEY_WARNING_KEY));
     }
@@ -183,11 +184,11 @@ public class DbTest {
         assertTrue(DbSchema.CREATE_TABLE_FEEDS.contains(audiobookColumn));
         db.execSQL("DROP TABLE " + Db.TABLE_NAME_FEEDS);
         db.execSQL(DbSchema.CREATE_TABLE_FEEDS.replace(audiobookColumn, ""));
-        String trackColumns = "," + DbSchema.KEY_DISC_NUMBER + " INTEGER DEFAULT 0,"
-                + DbSchema.KEY_TRACK_NUMBER + " INTEGER DEFAULT 0)";
-        assertTrue(DbSchema.CREATE_TABLE_FEED_ITEMS.endsWith(trackColumns));
+        String trackColumns = DbSchema.KEY_DISC_NUMBER + " INTEGER DEFAULT 0,"
+                + DbSchema.KEY_TRACK_NUMBER + " INTEGER DEFAULT 0,";
+        assertTrue(DbSchema.CREATE_TABLE_FEED_ITEMS.contains(trackColumns));
         db.execSQL("DROP TABLE " + Db.TABLE_NAME_FEED_ITEMS);
-        db.execSQL(DbSchema.CREATE_TABLE_FEED_ITEMS.replace(trackColumns, ")"));
+        db.execSQL(DbSchema.CREATE_TABLE_FEED_ITEMS.replace(trackColumns, ""));
         db.execSQL("INSERT INTO " + Db.TABLE_NAME_FEEDS + " (" + Db.KEY_TITLE + ") VALUES ('Old feed')");
         long feedId = lastInsertId(db);
         db.execSQL("INSERT INTO " + Db.TABLE_NAME_FEED_ITEMS + " (" + Db.KEY_TITLE + ", " + Db.KEY_FEED

@@ -906,4 +906,15 @@
   <string name="custom_action_speed_label">速度 %1$s</string>
   <string name="custom_action_sleep_extend">睡眠定時 +15 分鐘</string>
   <string name="custom_action_skip_ad">略過廣告</string>
+  <string name="transcript_label">逐字稿</string>
+  <string name="transcript_loading">正在載入逐字稿</string>
+  <string name="transcript_error">無法載入逐字稿</string>
+  <string name="transcript_empty">此逐字稿為空</string>
+  <string name="transcript_none">此單集沒有逐字稿</string>
+  <string name="transcript_seek_action">從這裡播放</string>
+  <string name="transcript_line_description">%1$s，%2$s</string>
+  <string name="transcript_speaker_line">%1$s：%2$s</string>
+  <string name="transcript_available">有逐字稿</string>
+  <string name="search_in_transcript">逐字稿</string>
+  <string name="search_in_transcript_hint">只能搜尋已取得的逐字稿：下載單集或開啟其逐字稿時會取得。</string>
 </resources>

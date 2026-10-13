@@ -22,6 +22,7 @@ import allen.town.podcast.core.storage.DBReader;
 import allen.town.podcast.core.storage.DBWriter;
 import allen.town.podcast.core.sync.queue.SynchronizationQueueSink;
 import allen.town.podcast.core.util.ChapterUtils;
+import allen.town.podcast.core.util.TranscriptUtils;
 import allen.town.podcast.model.download.DownloadError;
 import allen.town.podcast.model.feed.FeedItem;
 import allen.town.podcast.model.feed.FeedMedia;
@@ -119,6 +120,9 @@ public class MediaDownloadedHandler implements Runnable {
             updatedStatus = new DownloadStatus(media, media.getEpisodeTitle(),
                     DownloadError.ERROR_DB_ACCESS_ERROR, false, e.getMessage(), request.isInitiatedByUser());
         }
+
+        // Best effort, never fails the download: the transcript is fetched again when opened.
+        TranscriptUtils.cacheQuietly(item);
 
         if (item != null && Prefs.isAdSkipAnalyzeOnDownload()) {
             // Best effort: enqueue is a no-op when ad skipping is off for the app or this feed.

@@ -1267,6 +1267,23 @@ public class DBWriter {
     }
 
     /**
+     * Caches the downloaded transcript of an episode, replacing any earlier copy.
+     *
+     * @param raw  the download as received
+     * @param text the parsed transcript as plain text, for the episode search
+     */
+    public static Future<?> setTranscript(final long feedItemId, @Nullable final String url,
+                                          @Nullable final String type, @NonNull final String raw,
+                                          @NonNull final String text) {
+        return dbExec.submit(() -> {
+            Db adapter = Db.getInstance();
+            adapter.open();
+            adapter.setTranscript(feedItemId, url, type, raw, text, System.currentTimeMillis());
+            adapter.close();
+        });
+    }
+
+    /**
      * Stores a single ad segment, typically one the user marked by hand in the player.
      */
     public static Future<?> addAdSegment(@NonNull final AdSegment segment) {

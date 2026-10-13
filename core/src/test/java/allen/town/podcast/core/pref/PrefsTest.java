@@ -341,7 +341,7 @@ public class PrefsTest {
     public void episodeSearchOptionsDefaultToEverythingByRelevance() {
         EpisodeSearchOptions options = Prefs.getEpisodeSearchOptions();
         assertEquals(EpisodeSearchOptions.Sort.RELEVANCE, options.sort);
-        assertEquals(EnumSet.allOf(EpisodeSearchOptions.Field.class), options.fields);
+        assertEquals(EpisodeSearchOptions.Field.defaults(), options.fields);
         assertFalse(options.isFiltering());
         assertEquals(0, options.feedId);
     }

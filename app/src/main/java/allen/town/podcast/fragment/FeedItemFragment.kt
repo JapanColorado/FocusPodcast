@@ -237,6 +237,7 @@ class FeedItemFragment : Fragment() {
                 item.pubDate
             )
         }
+        binding.txtvTranscriptAvailable.visibility = if (item.hasTranscript()) View.VISIBLE else View.GONE
         val options = RequestOptions()
             .error(R.drawable.ic_podcast_background_round)
             .diskCacheStrategy(ApGlideSettings.AP_DISK_CACHE_STRATEGY)

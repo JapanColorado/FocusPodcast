@@ -57,6 +57,18 @@
                     tools:background="@android:color/holo_green_dark"
                     tools:text="Jan 23" />
 
+                <com.google.android.material.textview.MaterialTextView
+                    android:id="@+id/txtvTranscriptAvailable"
+                    style="@style/FocusPodcast.TextView.ListItemSecondaryTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:drawablePadding="4dp"
+                    android:gravity="center_vertical"
+                    android:text="@string/transcript_available"
+                    android:visibility="gone"
+                    app:drawableStartCompat="@drawable/ic_transcript" />
+
                 <LinearLayout
                     android:id="@+id/txtvPodcast_l"
                     android:layout_width="wrap_content"

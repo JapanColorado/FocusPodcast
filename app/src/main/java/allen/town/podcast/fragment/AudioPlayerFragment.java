@@ -874,6 +874,9 @@ public class AudioPlayerFragment extends Fragment implements
         }
         boolean isFeedMedia = media instanceof FeedMedia;
         toolbar.getMenu().findItem(R.id.open_feed_item).setVisible(isFeedMedia);
+        FeedItem playingItem = isFeedMedia ? ((FeedMedia) media).getItem() : null;
+        toolbar.getMenu().findItem(R.id.transcript_item)
+                .setVisible(playingItem != null && playingItem.hasTranscript());
         if (isFeedMedia) {
             FeedItemMenuProcess.onPrepareMenu(toolbar.getMenu(), ((FeedMedia) media).getItem());
         }
@@ -922,6 +925,13 @@ public class AudioPlayerFragment extends Fragment implements
         } else if (itemId == R.id.audio_controls) {
             PlaybackControlsDialog dialog = PlaybackControlsDialog.newInstance(feedItem != null ? feedItem.getFeedId() : 0);
             dialog.show(getChildFragmentManager(), "playback_controls");
+            return true;
+        } else if (itemId == R.id.transcript_item) {
+            if (feedItem != null) {
+                FeedItemExtraInfoFragment.newInstance(feedItem.hasTranscript())
+                        .scrollToPage(FeedItemExtraInfoFragment.TRANSCRIPT_POS)
+                        .show(requireActivity().getSupportFragmentManager(), "FeedItemExtraInfoFragment");
+            }
             return true;
         } else if (itemId == R.id.open_feed_item) {
             if (feedItem != null) {

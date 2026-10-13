@@ -64,6 +64,14 @@
     </item>
 
     <item
+        android:id="@+id/transcript_item"
+        android:icon="@drawable/ic_transcript"
+        custom:showAsAction="collapseActionView"
+        android:title="@string/transcript_label"
+        android:visible="false">
+    </item>
+
+    <item
         android:id="@+id/open_feed_item"
         android:icon="@drawable/ic_episodes"
         custom:showAsAction="collapseActionView"

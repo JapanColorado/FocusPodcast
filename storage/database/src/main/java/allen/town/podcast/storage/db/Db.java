@@ -42,7 +42,8 @@ import allen.town.podcast.model.feed.SortOrder;
  * re-exports the column and table names that other modules refer to as {@code Db.KEY_*} and
  * {@code Db.TABLE_NAME_*}. The statements themselves live in the per-table helpers of this package
  * ({@link FeedDao}, {@link FeedItemDao}, {@link FeedMediaDao}, {@link QueueDao},
- * {@link FavoritesDao}, {@link DownloadLogDao}, {@link DismissedWarningDao}, {@link AdSegmentDao}); every method below delegates
+ * {@link FavoritesDao}, {@link DownloadLogDao}, {@link DismissedWarningDao}, {@link AdSegmentDao},
+ * {@link TranscriptDao}); every method below delegates
  * to one of them,
  * except the two writes that span several tables and therefore keep their transaction here.</p>
  */
@@ -129,6 +130,11 @@ public class Db {
     public static final String KEY_AD_CONFIDENCE = DbSchema.KEY_AD_CONFIDENCE;
     public static final String KEY_AD_ENABLED = DbSchema.KEY_AD_ENABLED;
     public static final String KEY_WARNING_KEY = DbSchema.KEY_WARNING_KEY;
+    public static final String KEY_TRANSCRIPT_URL = DbSchema.KEY_TRANSCRIPT_URL;
+    public static final String KEY_TRANSCRIPT_TYPE = DbSchema.KEY_TRANSCRIPT_TYPE;
+    public static final String KEY_TRANSCRIPT_RAW = DbSchema.KEY_TRANSCRIPT_RAW;
+    public static final String KEY_TRANSCRIPT_TEXT = DbSchema.KEY_TRANSCRIPT_TEXT;
+    public static final String KEY_TRANSCRIPT_FETCHED_AT = DbSchema.KEY_TRANSCRIPT_FETCHED_AT;
 
     // Table names
     public static final String TABLE_NAME_FEEDS = DbSchema.TABLE_NAME_FEEDS;
@@ -140,6 +146,7 @@ public class Db {
     public static final String TABLE_NAME_FAVORITES = DbSchema.TABLE_NAME_FAVORITES;
     public static final String TABLE_NAME_AD_SEGMENTS = DbSchema.TABLE_NAME_AD_SEGMENTS;
     public static final String TABLE_NAME_DISMISSED_FEED_WARNINGS = DbSchema.TABLE_NAME_DISMISSED_FEED_WARNINGS;
+    public static final String TABLE_NAME_TRANSCRIPTS = DbSchema.TABLE_NAME_TRANSCRIPTS;
 
     public static final String SELECT_KEY_ITEM_ID = DbSchema.SELECT_KEY_ITEM_ID;
     public static final String SELECT_KEY_MEDIA_ID = DbSchema.SELECT_KEY_MEDIA_ID;
@@ -157,6 +164,7 @@ public class Db {
     private final DownloadLogDao downloadLogDao;
     private final DismissedWarningDao dismissedWarningDao;
     private final AdSegmentDao adSegmentDao;
+    private final TranscriptDao transcriptDao;
 
     public static void init(Context context) {
         if (context == null) {
@@ -182,7 +190,8 @@ public class Db {
         feedDao = new FeedDao(db);
         mediaDao = new FeedMediaDao(db);
         adSegmentDao = new AdSegmentDao(db);
-        itemDao = new FeedItemDao(db, feedDao, mediaDao, adSegmentDao);
+        transcriptDao = new TranscriptDao(db);
+        itemDao = new FeedItemDao(db, feedDao, mediaDao, adSegmentDao, transcriptDao);
         queueDao = new QueueDao(db);
         favoritesDao = new FavoritesDao(db);
         dismissedWarningDao = new DismissedWarningDao(db);
@@ -775,6 +784,32 @@ public class Db {
     }
 
     // ---------------------------------------------------------------------------------------
+    // Transcripts
+    // ---------------------------------------------------------------------------------------
+
+    /**
+     * The cached transcript of one episode (columns {@link #KEY_TRANSCRIPT_URL},
+     * {@link #KEY_TRANSCRIPT_TYPE}, {@link #KEY_TRANSCRIPT_RAW}, {@link #KEY_TRANSCRIPT_TEXT},
+     * {@link #KEY_TRANSCRIPT_FETCHED_AT}); empty when none is cached.
+     */
+    public final Cursor getTranscriptCursor(final long feedItemId) {
+        return transcriptDao.getTranscriptCursor(feedItemId);
+    }
+
+    /**
+     * Caches the transcript of one episode, replacing any earlier one.
+     *
+     * @param url  the address it was downloaded from
+     * @param type the MIME type the feed gave for it
+     * @param raw  the download as received
+     * @param text the parsed transcript as plain text, which the episode search looks through
+     */
+    public void setTranscript(final long feedItemId, @Nullable final String url, @Nullable final String type,
+                              @NonNull final String raw, @NonNull final String text, final long fetchedAt) {
+        transcriptDao.setTranscript(feedItemId, url, type, raw, text, fetchedAt);
+    }
+
+    // ---------------------------------------------------------------------------------------
     // Download log
     // ---------------------------------------------------------------------------------------
 
@@ -877,6 +912,7 @@ public class Db {
             db.execSQL(DbSchema.CREATE_TABLE_FAVORITES);
             db.execSQL(DbSchema.CREATE_TABLE_AD_SEGMENTS);
             db.execSQL(DbSchema.CREATE_TABLE_DISMISSED_FEED_WARNINGS);
+            db.execSQL(DbSchema.CREATE_TABLE_TRANSCRIPTS);
             db.execSQL(DbSchema.CREATE_TABLE_FEEDS);
 
             db.execSQL(DbSchema.CREATE_INDEX_FEEDITEMS_PUBDATE);

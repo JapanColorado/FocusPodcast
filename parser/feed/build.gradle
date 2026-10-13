@@ -21,6 +21,8 @@ dependencies {
 
     implementation "org.apache.commons:commons-lang3:$commonslangVersion"
     implementation "commons-io:commons-io:$commonsioVersion"
+    // HTML transcripts; core already ships jsoup, so this adds nothing to the APK
+    implementation "org.jsoup:jsoup:$jsoupVersion"
 
     testImplementation "junit:junit:$junitVersion"
     testImplementation "org.robolectric:robolectric:$robolectricVersion"

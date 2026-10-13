@@ -1,0 +1,45 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<rss version="2.0" xmlns:podcast="https://podcastindex.org/namespace/1.0">
+    <channel>
+        <title>title</title>
+        <item>
+            <title>One transcript</title>
+            <guid>one</guid>
+            <podcast:transcript url="https://example.com/one.vtt" type="text/vtt" />
+        </item>
+        <item>
+            <title>Several transcripts</title>
+            <guid>several</guid>
+            <podcast:transcript url="https://example.com/several.txt" type="text/plain" />
+            <podcast:transcript url="https://example.com/several.html" type="text/html" />
+            <podcast:transcript url="https://example.com/several.json" type="application/json" language="en" />
+            <podcast:transcript url="https://example.com/several.srt" type="application/x-subrip" rel="captions" />
+        </item>
+        <item>
+            <title>SRT before VTT</title>
+            <guid>srt-vtt</guid>
+            <podcast:transcript url="https://example.com/b.srt" type="application/srt" />
+            <podcast:transcript url="https://example.com/b.vtt" type="text/vtt" rel="captions" />
+        </item>
+        <item>
+            <title>Unknown type</title>
+            <guid>unknown</guid>
+            <podcast:transcript url="https://example.com/unknown.bin" type="application/x-something" />
+        </item>
+        <item>
+            <title>Unknown then known</title>
+            <guid>unknown-known</guid>
+            <podcast:transcript url="https://example.com/u.bin" />
+            <podcast:transcript url="https://example.com/u.txt" type="text/plain" />
+        </item>
+        <item>
+            <title>No url</title>
+            <guid>no-url</guid>
+            <podcast:transcript type="text/vtt" />
+        </item>
+        <item>
+            <title>None</title>
+            <guid>none</guid>
+        </item>
+    </channel>
+</rss>

@@ -97,8 +97,10 @@ class EpisodeSearchFilterSheet : FilterSheet() {
             FilterSection(
                 SECTION_FIELDS, getString(R.string.search_section_search_in), listOf(
                     option(EpisodeSearchOptions.Field.TITLE, R.string.search_in_title),
-                    option(EpisodeSearchOptions.Field.SHOW_NOTES, R.string.search_in_show_notes)
-                ), multiSelect = true, selectionRequired = true
+                    option(EpisodeSearchOptions.Field.SHOW_NOTES, R.string.search_in_show_notes),
+                    option(EpisodeSearchOptions.Field.TRANSCRIPT, R.string.search_in_transcript)
+                ), multiSelect = true, selectionRequired = true,
+                hint = getString(R.string.search_in_transcript_hint)
             ),
             FilterSection(
                 SECTION_DATE, getString(R.string.search_section_published), listOf(

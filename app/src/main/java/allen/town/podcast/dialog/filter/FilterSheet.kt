@@ -30,14 +30,16 @@ data class FilterOption(val key: String, val label: CharSequence)
 
 /**
  * A labelled row of chips. Single-select sections may be left empty (tapping the checked chip
- * clears it) unless [selectionRequired]; [multiSelect] sections allow any number of chips.
+ * clears it) unless [selectionRequired]; [multiSelect] sections allow any number of chips. A [hint]
+ * is shown in small print under the chips.
  */
 data class FilterSection(
     val key: String,
     val title: CharSequence,
     val options: List<FilterOption>,
     val multiSelect: Boolean = false,
-    val selectionRequired: Boolean = false
+    val selectionRequired: Boolean = false,
+    val hint: CharSequence? = null
 )
 
 /** Section key to the keys of its checked options; sections with nothing checked may be absent. */
@@ -122,6 +124,10 @@ abstract class FilterSheet : BottomSheetDialogFragment() {
     private fun addSection(inflater: LayoutInflater, binding: FilterSheetBinding, section: FilterSection) {
         val view = inflater.inflate(R.layout.filter_sheet_section, binding.filterSheetSections, false)
         view.findViewById<TextView>(R.id.filterSectionTitle).text = section.title
+        view.findViewById<TextView>(R.id.filterSectionHint).apply {
+            text = section.hint
+            visibility = if (section.hint.isNullOrEmpty()) View.GONE else View.VISIBLE
+        }
         val group = view.findViewById<ChipGroup>(R.id.filterSectionChips)
         group.isSingleSelection = !section.multiSelect
         group.isSelectionRequired = section.selectionRequired

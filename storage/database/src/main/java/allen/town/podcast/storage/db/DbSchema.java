@@ -12,7 +12,7 @@ import static allen.town.podcast.model.feed.FeedPreferences.SPEED_USE_GLOBAL;
 final class DbSchema {
 
     public static final String DATABASE_NAME = "focusPodcastApp.db";
-    public static final int VERSION = 8;
+    public static final int VERSION = 9;
 
     /**
      * Maximum number of arguments for IN-operator.
@@ -120,6 +120,16 @@ final class DbSchema {
      */
     public static final String KEY_WARNING_KEY = "warning_key";
     public static final String KEY_DISMISSED_AT = "dismissed_at";
+    /**
+     * The Podcasting 2.0 transcript an episode offers: its URL and MIME type; added in version 9.
+     * The downloaded text lives in {@link #TABLE_NAME_TRANSCRIPTS}.
+     */
+    public static final String KEY_TRANSCRIPT_URL = "transcript_url";
+    public static final String KEY_TRANSCRIPT_TYPE = "transcript_type";
+    /** Transcript cache: the raw download, its searchable text, and the URL it came from. */
+    public static final String KEY_TRANSCRIPT_RAW = "raw";
+    public static final String KEY_TRANSCRIPT_TEXT = "text";
+    public static final String KEY_TRANSCRIPT_FETCHED_AT = "fetched_at";
 
     // Table names
     public static final String TABLE_NAME_FEEDS = "feeds";
@@ -131,6 +141,7 @@ final class DbSchema {
     public static final String TABLE_NAME_FAVORITES = "favorites";
     public static final String TABLE_NAME_AD_SEGMENTS = "ad_segments";
     public static final String TABLE_NAME_DISMISSED_FEED_WARNINGS = "dismissed_feed_warnings";
+    public static final String TABLE_NAME_TRANSCRIPTS = "transcripts";
 
     // SQL Statements for creating new tables
     static final String TABLE_PRIMARY_KEY = KEY_ID
@@ -183,7 +194,9 @@ final class DbSchema {
             + KEY_HAS_CHAPTERS + " INTEGER," + KEY_ITEM_IDENTIFIER + " TEXT,"
             + KEY_PODCASTINDEX_CHAPTER_URL + " TEXT,"
             + KEY_DISC_NUMBER + " INTEGER DEFAULT 0,"
-            + KEY_TRACK_NUMBER + " INTEGER DEFAULT 0)";
+            + KEY_TRACK_NUMBER + " INTEGER DEFAULT 0,"
+            + KEY_TRANSCRIPT_URL + " TEXT,"
+            + KEY_TRANSCRIPT_TYPE + " TEXT)";
 
     static final String CREATE_TABLE_FEED_MEDIA = "CREATE TABLE "
             + TABLE_NAME_FEED_MEDIA + " (" + TABLE_PRIMARY_KEY + KEY_DURATION
@@ -235,6 +248,22 @@ final class DbSchema {
             + KEY_WARNING_KEY + " TEXT," + KEY_TITLE + " TEXT,"
             + KEY_DISMISSED_AT + " INTEGER,"
             + "UNIQUE(" + KEY_FEED + "," + KEY_REASON + "," + KEY_WARNING_KEY + "))";
+
+    /**
+     * At most one cached transcript per episode, kept apart from {@code episodes} so that the
+     * item rows every list reads stay small. {@code text} is the parsed transcript as plain text
+     * (what the episode search looks through), {@code raw} the download as received, parsed again
+     * for display, and {@code transcript_url} the address it came from: when the feed later
+     * points somewhere else, the cache is stale.
+     */
+    static final String CREATE_TABLE_TRANSCRIPTS = "CREATE TABLE IF NOT EXISTS "
+            + TABLE_NAME_TRANSCRIPTS + " (" + TABLE_PRIMARY_KEY
+            + KEY_FEEDITEM + " INTEGER UNIQUE,"
+            + KEY_TRANSCRIPT_URL + " TEXT,"
+            + KEY_TRANSCRIPT_TYPE + " TEXT,"
+            + KEY_TRANSCRIPT_RAW + " TEXT,"
+            + KEY_TRANSCRIPT_TEXT + " TEXT,"
+            + KEY_TRANSCRIPT_FETCHED_AT + " INTEGER)";
 
     // SQL Statements for creating indexes
     static final String CREATE_INDEX_FEEDITEMS_FEED = "CREATE INDEX "
@@ -328,7 +357,8 @@ final class DbSchema {
             TABLE_NAME_SIMPLECHAPTERS,
             TABLE_NAME_FAVORITES,
             TABLE_NAME_AD_SEGMENTS,
-            TABLE_NAME_DISMISSED_FEED_WARNINGS
+            TABLE_NAME_DISMISSED_FEED_WARNINGS,
+            TABLE_NAME_TRANSCRIPTS
     };
 
     public static final String SELECT_KEY_ITEM_ID = "item_id";
@@ -349,6 +379,8 @@ final class DbSchema {
                     + TABLE_NAME_FEED_ITEMS + "." + KEY_IMAGE_URL + ", "
                     + TABLE_NAME_FEED_ITEMS + "." + KEY_DISC_NUMBER + ", "
                     + TABLE_NAME_FEED_ITEMS + "." + KEY_TRACK_NUMBER + ", "
+                    + TABLE_NAME_FEED_ITEMS + "." + KEY_TRANSCRIPT_URL + ", "
+                    + TABLE_NAME_FEED_ITEMS + "." + KEY_TRANSCRIPT_TYPE + ", "
             + TABLE_NAME_FEED_ITEMS + "." + KEY_PODCASTINDEX_CHAPTER_URL;
 
     static final String KEYS_FEED_MEDIA =

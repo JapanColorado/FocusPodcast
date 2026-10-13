@@ -42,6 +42,12 @@ public class FeedItem extends FeedComponent implements Serializable {
     private transient Feed feed;
     private long feedId;
     private String podcastIndexChapterUrl;
+    /**
+     * The Podcasting 2.0 {@code <podcast:transcript>} chosen for this item (the best of the
+     * formats the feed offers) and its MIME type; null when the feed lists none.
+     */
+    private String transcriptUrl;
+    private String transcriptType;
 
     /**
      * Disc and track number from the file's tags (local feeds only); 0 when unknown. Used by
@@ -168,6 +174,10 @@ public class FeedItem extends FeedComponent implements Serializable {
         }
         if (other.podcastIndexChapterUrl != null) {
             podcastIndexChapterUrl = other.podcastIndexChapterUrl;
+        }
+        if (other.transcriptUrl != null) {
+            transcriptUrl = other.transcriptUrl;
+            transcriptType = other.transcriptType;
         }
         if (other.discNumber > 0) {
             discNumber = other.discNumber;
@@ -469,6 +479,28 @@ public class FeedItem extends FeedComponent implements Serializable {
 
     public void setPodcastIndexChapterUrl(String url) {
         podcastIndexChapterUrl = url;
+    }
+
+    /** URL of the episode's transcript, null when the feed offers none. */
+    @Nullable
+    public String getTranscriptUrl() {
+        return transcriptUrl;
+    }
+
+    /** MIME type the feed gave for {@link #getTranscriptUrl()}, null when unknown. */
+    @Nullable
+    public String getTranscriptType() {
+        return transcriptType;
+    }
+
+    public void setTranscript(@Nullable String url, @Nullable String type) {
+        transcriptUrl = url;
+        transcriptType = type;
+    }
+
+    /** Whether the feed offers a transcript for this episode. */
+    public boolean hasTranscript() {
+        return transcriptUrl != null && !transcriptUrl.isEmpty();
     }
 
     @NonNull

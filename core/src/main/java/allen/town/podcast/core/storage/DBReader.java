@@ -33,6 +33,7 @@ import allen.town.podcast.model.feed.FeedItem;
 import allen.town.podcast.model.feed.FeedItemFilter;
 import allen.town.podcast.model.feed.FeedMedia;
 import allen.town.podcast.model.feed.FeedPreferences;
+import allen.town.podcast.model.transcript.CachedTranscript;
 import allen.town.podcast.storage.db.Db;
 import allen.town.podcast.storage.db.LongIntMap;
 import allen.town.podcast.storage.db.mapper.AdSegmentCursorMapper;
@@ -928,6 +929,31 @@ public final class DBReader {
                 chapters.add(ChapterCursorMapper.convert(cursor));
             }
             return chapters;
+        }
+    }
+
+    /**
+     * The cached transcript of one episode, or null when none has been downloaded.
+     */
+    @Nullable
+    public static CachedTranscript loadCachedTranscript(final long feedItemId) {
+        Db adapter = Db.getInstance();
+        adapter.open();
+        try (Cursor cursor = adapter.getTranscriptCursor(feedItemId)) {
+            if (!cursor.moveToFirst()) {
+                return null;
+            }
+            String raw = cursor.getString(cursor.getColumnIndexOrThrow(Db.KEY_TRANSCRIPT_RAW));
+            if (raw == null) {
+                return null;
+            }
+            return new CachedTranscript(
+                    cursor.getString(cursor.getColumnIndexOrThrow(Db.KEY_TRANSCRIPT_URL)),
+                    cursor.getString(cursor.getColumnIndexOrThrow(Db.KEY_TRANSCRIPT_TYPE)),
+                    raw,
+                    cursor.getLong(cursor.getColumnIndexOrThrow(Db.KEY_TRANSCRIPT_FETCHED_AT)));
+        } finally {
+            adapter.close();
         }
     }
 

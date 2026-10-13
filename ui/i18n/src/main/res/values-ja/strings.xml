@@ -657,4 +657,15 @@
   <string name="custom_action_speed_label">速度 %1$s</string>
   <string name="custom_action_sleep_extend">スリープタイマー +15 分</string>
   <string name="custom_action_skip_ad">広告をスキップ</string>
+  <string name="transcript_label">文字起こし</string>
+  <string name="transcript_loading">文字起こしを読み込み中</string>
+  <string name="transcript_error">文字起こしを読み込めませんでした</string>
+  <string name="transcript_empty">この文字起こしは空です</string>
+  <string name="transcript_none">このエピソードには文字起こしがありません</string>
+  <string name="transcript_seek_action">ここから再生</string>
+  <string name="transcript_line_description">%1$s、%2$s</string>
+  <string name="transcript_speaker_line">%1$s：%2$s</string>
+  <string name="transcript_available">文字起こしあり</string>
+  <string name="search_in_transcript">文字起こし</string>
+  <string name="search_in_transcript_hint">検索できるのは取得済みの文字起こしのみです。エピソードのダウンロード時、または文字起こしを開いたときに取得されます。</string>
 </resources>

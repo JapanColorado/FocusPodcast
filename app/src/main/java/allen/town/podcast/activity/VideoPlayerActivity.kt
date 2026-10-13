@@ -599,7 +599,8 @@ class VideoPlayerActivity : ToolbarBaseActivity(), OnSeekBarChangeListener {
         } else if (item.itemId == R.id.playback_speed) {
             PlaySpeedDialog().show(supportFragmentManager, null)
         } else if (item.itemId == R.id.extra_info_item) {
-            FeedItemExtraInfoFragment().show(supportFragmentManager, "FeedItemExtraInfoFragment")
+            FeedItemExtraInfoFragment.newInstance(feedItem?.hasTranscript() == true)
+                .show(supportFragmentManager, "FeedItemExtraInfoFragment")
         } else {
             return false
         }

@@ -53,6 +53,13 @@ public abstract class FeedItemCursorMapper {
         if (indexTrack >= 0) {
             item.setTrackNumber(cursor.getInt(indexTrack));
         }
+        // Version 9 columns, likewise optional.
+        int indexTranscriptUrl = cursor.getColumnIndex(Db.KEY_TRANSCRIPT_URL);
+        int indexTranscriptType = cursor.getColumnIndex(Db.KEY_TRANSCRIPT_TYPE);
+        if (indexTranscriptUrl >= 0) {
+            item.setTranscript(cursor.getString(indexTranscriptUrl),
+                    indexTranscriptType >= 0 ? cursor.getString(indexTranscriptType) : null);
+        }
         return item;
     }
 }

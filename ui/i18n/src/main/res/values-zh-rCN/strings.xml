@@ -955,4 +955,15 @@
   <string name="custom_action_speed_label">速度 %1$s</string>
   <string name="custom_action_sleep_extend">睡眠定时 +15 分钟</string>
   <string name="custom_action_skip_ad">跳过广告</string>
+  <string name="transcript_label">文字稿</string>
+  <string name="transcript_loading">正在加载文字稿</string>
+  <string name="transcript_error">无法加载文字稿</string>
+  <string name="transcript_empty">此文字稿为空</string>
+  <string name="transcript_none">此单集没有文字稿</string>
+  <string name="transcript_seek_action">从这里播放</string>
+  <string name="transcript_line_description">%1$s，%2$s</string>
+  <string name="transcript_speaker_line">%1$s：%2$s</string>
+  <string name="transcript_available">有文字稿</string>
+  <string name="search_in_transcript">文字稿</string>
+  <string name="search_in_transcript_hint">只能搜索已获取的文字稿：下载单集或打开其文字稿时会获取。</string>
 </resources>

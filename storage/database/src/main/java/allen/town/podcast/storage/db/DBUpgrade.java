@@ -58,6 +58,19 @@ class DBUpgrade {
         if (oldVersion < 8) {
             upgradeLoudnessToClearVoice(db);
         }
+        if (oldVersion < 9) {
+            // Transcripts: the URL and type an episode offers, and the cache of downloaded ones.
+            // Existing rows read NULL (no transcript) until the next refresh of their feed.
+            if (!hasColumn(db, DbSchema.TABLE_NAME_FEED_ITEMS, DbSchema.KEY_TRANSCRIPT_URL)) {
+                db.execSQL("ALTER TABLE " + DbSchema.TABLE_NAME_FEED_ITEMS + " ADD COLUMN "
+                        + DbSchema.KEY_TRANSCRIPT_URL + " TEXT");
+            }
+            if (!hasColumn(db, DbSchema.TABLE_NAME_FEED_ITEMS, DbSchema.KEY_TRANSCRIPT_TYPE)) {
+                db.execSQL("ALTER TABLE " + DbSchema.TABLE_NAME_FEED_ITEMS + " ADD COLUMN "
+                        + DbSchema.KEY_TRANSCRIPT_TYPE + " TEXT");
+            }
+            db.execSQL(DbSchema.CREATE_TABLE_TRANSCRIPTS);
+        }
     }
 
     /**

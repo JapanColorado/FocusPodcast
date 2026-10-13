@@ -111,7 +111,9 @@ class CoverFragment : Fragment {
         coverViewHolder.podcastTv = txtvPodcastTitle
         imgvCover.setOnClickListener({ v: View? -> onPlayPause() })
         val scrollToDesc: View.OnClickListener = View.OnClickListener { view: View? ->
-            FeedItemExtraInfoFragment().scrollToPage(FeedItemExtraInfoFragment.CHAPTERS_POS)
+            val hasTranscript = (media as? FeedMedia)?.getItem()?.hasTranscript() == true
+            FeedItemExtraInfoFragment.newInstance(hasTranscript)
+                .scrollToPage(FeedItemExtraInfoFragment.CHAPTERS_POS)
                 .show(getParentFragmentManager(), "FeedItemExtraInfoFragment")
         }
         chapterTitleTv.setOnClickListener(scrollToDesc)

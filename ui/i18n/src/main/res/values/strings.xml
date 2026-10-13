@@ -1069,4 +1069,15 @@
     <string name="custom_action_speed_label">Speed %1$s</string>
     <string name="custom_action_sleep_extend">Sleep timer +15 min</string>
     <string name="custom_action_skip_ad">Skip ad</string>
+    <string name="transcript_label">Transcript</string>
+    <string name="transcript_loading">Loading transcript</string>
+    <string name="transcript_error">Couldn\'t load transcript</string>
+    <string name="transcript_empty">This transcript is empty</string>
+    <string name="transcript_none">No transcript for this episode</string>
+    <string name="transcript_seek_action">Play from here</string>
+    <string name="transcript_line_description">%1$s, %2$s</string>
+    <string name="transcript_speaker_line">%1$s: %2$s</string>
+    <string name="transcript_available">Transcript available</string>
+    <string name="search_in_transcript">Transcript</string>
+    <string name="search_in_transcript_hint">Only transcripts already fetched can be searched: they are fetched when an episode is downloaded or its transcript is opened.</string>
 </resources>
