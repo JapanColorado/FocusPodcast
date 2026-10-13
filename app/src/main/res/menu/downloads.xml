@@ -15,4 +15,9 @@
         android:visible="false"
         app:showAsAction="ifRoom"
         android:icon="@drawable/ic_refresh"/>
+    <item
+        android:id="@+id/storage_usage_item"
+        android:title="@string/storage_usage_title"
+        android:menuCategory="container"
+        app:showAsAction="never" />
 </menu>

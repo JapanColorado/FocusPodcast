@@ -3,6 +3,9 @@ package allen.town.podcast.fragment
 import allen.town.podcast.core.view.TopAppBarLayout
 import allen.town.podcast.R
 import allen.town.podcast.activity.MainActivity
+import allen.town.podcast.activity.SettingsActivity
+import android.content.Intent
+import android.view.MenuItem
 import allen.town.podcast.ui.common.PagedToolbarFragment
 import android.content.Context
 import android.content.SharedPreferences
@@ -66,6 +69,16 @@ class DownloadPagerFragment constructor() : PagedToolbarFragment() {
         val lastPosition: Int = prefs.getInt(PREF_LAST_TAB_POSITION, 0)
         viewPager.setCurrentItem(lastPosition, false)
         return root
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        if (item.itemId == R.id.storage_usage_item) {
+            val intent = Intent(requireContext(), SettingsActivity::class.java)
+            intent.putExtra(SettingsActivity.OPEN_STORAGE, true)
+            startActivity(intent)
+            return true
+        }
+        return super.onOptionsItemSelected(item)
     }
 
     public override fun onSaveInstanceState(outState: Bundle) {

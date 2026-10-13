@@ -51,6 +51,12 @@
     <allen.town.podcast.common.common.prefs.supportv7.ATEPreferenceCategory
         android:layout="@layout/preference_category_title"
         android:title="@string/pref_deleting_episodes_category">
+        <allen.town.podcast.common.common.prefs.supportv7.ATEPreference
+            android:icon="@drawable/ic_data_usage"
+            android:key="prefStorageUsage"
+            android:layout="@layout/list_item_view"
+            android:summary="@string/storage_usage_summary_loading"
+            android:title="@string/storage_usage_title" />
         <allen.town.podcast.common.common.prefs.supportv7.ATESwitchPreference
             android:defaultValue="false"
             android:enabled="true"

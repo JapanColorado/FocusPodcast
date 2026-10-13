@@ -932,4 +932,26 @@
   <string name="no_bookmarks_head_label">沒有書籤</string>
   <string name="no_bookmarks_label">在播放器中輕觸書籤按鈕即可標記目前時刻，長按還可以新增備註。</string>
   <string name="no_bookmarks_episode">這一集還沒有書籤</string>
+    <string name="storage_usage_title">儲存空間使用情況</string>
+    <string name="storage_usage_summary">已用 %1$s · 可用 %2$s</string>
+    <string name="storage_usage_summary_loading">正在計算…</string>
+    <plurals name="storage_used_by_episodes">
+        <item quantity="other">%d 個已下載的單集佔用</item>
+    </plurals>
+    <string name="storage_free_of_total">共 %2$s，可用 %1$s</string>
+    <string name="storage_legend_downloads">下載</string>
+    <string name="storage_legend_other">其他</string>
+    <string name="storage_legend_free">可用</string>
+    <string name="storage_bar_description">下載 %1$s，其他檔案 %2$s，可用 %3$s</string>
+    <string name="storage_unsubscribed_title">不在訂閱中</string>
+    <string name="storage_delete_played">刪除已播放的下載（%1$d 個，%2$s）</string>
+    <string name="storage_delete_all">刪除全部下載（%1$d 個，%2$s）</string>
+    <string name="storage_open_podcast">開啟播客</string>
+    <string name="storage_show_downloads">查看下載</string>
+    <string name="storage_delete_played_confirm_msg_favorites_too">由於「%1$s」已關閉，已播放的收藏單集也會被刪除。播放器中的單集會保留。</string>
+    <plurals name="storage_delete_all_confirm">
+        <item quantity="other">刪除全部 %1$d 個下載（%2$s）？</item>
+    </plurals>
+    <string name="storage_delete_all_confirm_msg">這包括收藏的單集。播放器中的單集會保留。</string>
+    <string name="storage_cleanup_link_sum">選擇何時自動刪除已播放的單集</string>
 </resources>

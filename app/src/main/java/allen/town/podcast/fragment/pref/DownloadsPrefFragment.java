@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.os.Bundle;
+import android.text.format.Formatter;
 import android.util.Log;
 
 import androidx.preference.ListPreference;
@@ -19,7 +20,11 @@ import allen.town.podcast.core.storage.DBTasks;
 import allen.town.podcast.core.util.download.AutoUpdateManager;
 import allen.town.podcast.dialog.ChooseStorageFolderDialog;
 import allen.town.podcast.dialog.ProxyDialog;
+import allen.town.podcast.fragment.storage.StorageSnapshot;
 import io.reactivex.Completable;
+import io.reactivex.Single;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 
 /** Automatic downloads, what may use mobile data, when episodes are deleted and where they live. */
@@ -29,6 +34,9 @@ public class DownloadsPrefFragment extends AbsSettingsFragment
     private static final String PREF_MOBILE_UPDATE_TYPES = "pref_mobile_update_types";
     private static final String PREF_PROXY = "prefProxy";
     private static final String PREF_CHOOSE_DATA_DIR = "prefChooseDataDir";
+    private static final String PREF_STORAGE_USAGE = "prefStorageUsage";
+
+    private Disposable storageDisposable;
 
     @Override
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
@@ -56,6 +64,34 @@ public class DownloadsPrefFragment extends AbsSettingsFragment
         checkAutodownloadItemVisibility(Prefs.isEnableAutodownload());
         setParallelDownloadsText(Prefs.getParallelDownloads());
         setDataFolderText();
+        loadStorageSummary();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        if (storageDisposable != null) {
+            storageDisposable.dispose();
+        }
+    }
+
+    /** "1.8 GB used · 23 GB free" under Storage usage; measuring the files needs a background thread. */
+    private void loadStorageSummary() {
+        if (storageDisposable != null) {
+            storageDisposable.dispose();
+        }
+        storageDisposable = Single.fromCallable(StorageSnapshot::load)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(snapshot -> {
+                    Context context = getContext();
+                    if (context == null) {
+                        return;
+                    }
+                    findPreference(PREF_STORAGE_USAGE).setSummary(getString(R.string.storage_usage_summary,
+                            Formatter.formatShortFileSize(context, snapshot.getOverview().bytes),
+                            Formatter.formatShortFileSize(context, snapshot.getFreeBytes())));
+                }, error -> Log.e(TAG, Log.getStackTraceString(error)));
     }
 
     private void setupAutoDownloadPreferences() {
@@ -114,6 +150,10 @@ public class DownloadsPrefFragment extends AbsSettingsFragment
                             return true;
                         }
                 );
+        findPreference(PREF_STORAGE_USAGE).setOnPreferenceClickListener(preference -> {
+            ((SettingsActivity) requireActivity()).openStorage();
+            return true;
+        });
         findPreference(PREF_PROXY).setOnPreferenceClickListener(preference -> {
             ProxyDialog dialog = new ProxyDialog(getActivity());
             dialog.show();

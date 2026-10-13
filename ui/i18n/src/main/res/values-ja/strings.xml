@@ -683,4 +683,26 @@
   <string name="no_bookmarks_head_label">ブックマークはありません</string>
   <string name="no_bookmarks_label">プレーヤーのブックマークボタンをタップすると、その瞬間を記録できます。長押しするとメモも追加できます。</string>
   <string name="no_bookmarks_episode">このエピソードにはまだブックマークがありません</string>
+    <string name="storage_usage_title">ストレージ使用量</string>
+    <string name="storage_usage_summary">%1$s 使用中 · 空き %2$s</string>
+    <string name="storage_usage_summary_loading">計算中…</string>
+    <plurals name="storage_used_by_episodes">
+        <item quantity="other">ダウンロード済みの %d 件のエピソードが使用</item>
+    </plurals>
+    <string name="storage_free_of_total">%2$s 中 %1$s 空き</string>
+    <string name="storage_legend_downloads">ダウンロード</string>
+    <string name="storage_legend_other">その他</string>
+    <string name="storage_legend_free">空き</string>
+    <string name="storage_bar_description">ダウンロード %1$s、その他のファイル %2$s、空き %3$s</string>
+    <string name="storage_unsubscribed_title">購読していないポッドキャスト</string>
+    <string name="storage_delete_played">再生済みのダウンロードを削除（%1$d 件、%2$s）</string>
+    <string name="storage_delete_all">すべてのダウンロードを削除（%1$d 件、%2$s）</string>
+    <string name="storage_open_podcast">ポッドキャストを開く</string>
+    <string name="storage_show_downloads">ダウンロードを表示</string>
+    <string name="storage_delete_played_confirm_msg_favorites_too">「%1$s」がオフのため、再生済みのお気に入りエピソードも削除されます。プレーヤーのエピソードは残ります。</string>
+    <plurals name="storage_delete_all_confirm">
+        <item quantity="other">%1$d 件のダウンロードをすべて削除しますか（%2$s）？</item>
+    </plurals>
+    <string name="storage_delete_all_confirm_msg">お気に入りのエピソードも含まれます。プレーヤーのエピソードは残ります。</string>
+    <string name="storage_cleanup_link_sum">再生済みエピソードを自動的に削除するタイミングを選択</string>
 </resources>

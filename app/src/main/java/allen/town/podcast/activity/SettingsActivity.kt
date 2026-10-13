@@ -5,6 +5,7 @@ import allen.town.podcast.R
 import allen.town.podcast.core.pref.Prefs
 import allen.town.podcast.databinding.SettingsActivityBinding
 import allen.town.podcast.fragment.pref.*
+import allen.town.podcast.fragment.storage.StorageFragment
 import android.os.Bundle
 import android.view.View
 import android.view.inputmethod.InputMethodManager
@@ -29,9 +30,10 @@ open class SettingsActivity : SimpleToolbarActivity(), SearchPreferenceResultLis
         applyToolbar(binding.toolbar)
         binding.toolbar.setNavigationOnClickListener { v -> onOptionsItemSelected() }
         if (supportFragmentManager.findFragmentByTag(FRAGMENT_TAG) == null) {
+            // Opened straight onto Storage usage (from the Downloads screen), back leaves settings.
+            val root = if (intent.getBooleanExtra(OPEN_STORAGE, false)) StorageFragment() else MainPrefFragment()
             supportFragmentManager.beginTransaction()
-                .replace(R.id.settingsContainer,
-                    MainPrefFragment(), FRAGMENT_TAG)
+                .replace(R.id.settingsContainer, root, FRAGMENT_TAG)
                 .commit()
         }
         // Only on a fresh start: after a recreate (theme, language) the back stack is restored.
@@ -63,6 +65,16 @@ open class SettingsActivity : SimpleToolbarActivity(), SearchPreferenceResultLis
                 .addToBackStack(getString(getTitleOfPage(screen))).commit()
         }
         return fragment
+    }
+
+    /** Settings > Downloads > Storage usage, on top of the current page. */
+    fun openStorage() {
+        supportFragmentManager.beginTransaction().setCustomAnimations(
+                R.anim.retro_fragment_open_enter,
+                R.anim.retro_fragment_open_exit,
+                R.anim.retro_fragment_close_enter,
+                R.anim.retro_fragment_close_exit).replace(R.id.settingsContainer, StorageFragment())
+            .addToBackStack(getString(R.string.storage_usage_title)).commit()
     }
 
     fun onOptionsItemSelected(): Boolean {
@@ -102,6 +114,7 @@ open class SettingsActivity : SimpleToolbarActivity(), SearchPreferenceResultLis
     companion object {
         private const val FRAGMENT_TAG = "tag_preferences"
         const val OPEN_AUTO_DOWNLOAD_SETTINGS = "OpenAutoDownloadSettings"
+        const val OPEN_STORAGE = "OpenStorage"
 
         @JvmStatic
         fun getTitleOfPage(preferences: Int): Int =

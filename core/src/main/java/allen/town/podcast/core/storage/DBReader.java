@@ -1059,6 +1059,48 @@ public final class DBReader {
      * @return The number of downloaded episodes.
      */
 
+    /**
+     * Every downloaded media with its episode's played and favourite state and its feed's title,
+     * cover and flags, for the storage overview. One query; the files are not touched.
+     */
+    @NonNull
+    public static List<DownloadedMedia> getDownloadedMediaWithFeed() {
+        Db adapter = Db.getInstance();
+        adapter.open();
+        try (Cursor cursor = adapter.getDownloadedMediaWithFeedCursor()) {
+            int indexMediaId = cursor.getColumnIndexOrThrow(Db.STORAGE_MEDIA_ID);
+            int indexFileUrl = cursor.getColumnIndexOrThrow(Db.STORAGE_FILE_URL);
+            int indexSize = cursor.getColumnIndexOrThrow(Db.STORAGE_SIZE);
+            int indexRead = cursor.getColumnIndexOrThrow(Db.STORAGE_READ);
+            int indexFavorite = cursor.getColumnIndexOrThrow(Db.STORAGE_FAVORITE);
+            int indexFeedId = cursor.getColumnIndexOrThrow(Db.STORAGE_FEED_ID);
+            int indexTitle = cursor.getColumnIndexOrThrow(Db.STORAGE_FEED_TITLE);
+            int indexCustomTitle = cursor.getColumnIndexOrThrow(Db.STORAGE_FEED_CUSTOM_TITLE);
+            int indexImageUrl = cursor.getColumnIndexOrThrow(Db.STORAGE_FEED_IMAGE_URL);
+            int indexSubscribed = cursor.getColumnIndexOrThrow(Db.STORAGE_FEED_SUBSCRIBED);
+            int indexAudiobook = cursor.getColumnIndexOrThrow(Db.STORAGE_FEED_AUDIOBOOK);
+            List<DownloadedMedia> result = new ArrayList<>(cursor.getCount());
+            while (cursor.moveToNext()) {
+                String customTitle = cursor.getString(indexCustomTitle);
+                String title = TextUtils.isEmpty(customTitle) ? cursor.getString(indexTitle) : customTitle;
+                result.add(new DownloadedMedia(
+                        cursor.getLong(indexMediaId),
+                        cursor.getString(indexFileUrl),
+                        cursor.getLong(indexSize),
+                        cursor.getInt(indexRead) == FeedItem.PLAYED,
+                        cursor.getInt(indexFavorite) != 0,
+                        cursor.getLong(indexFeedId),
+                        title,
+                        cursor.getString(indexImageUrl),
+                        cursor.getInt(indexSubscribed) != 0,
+                        cursor.getInt(indexAudiobook) != 0));
+            }
+            return result;
+        } finally {
+            adapter.close();
+        }
+    }
+
     public static int getNumberOfDownloadedEpisodes() {
 
         Db adapter = Db.getInstance();

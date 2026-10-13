@@ -700,6 +700,27 @@ public class Db {
         return mediaDao.getNumberOfDownloadedEpisodes();
     }
 
+    /** Column aliases of {@link #getDownloadedMediaWithFeedCursor()}. */
+    public static final String STORAGE_MEDIA_ID = FeedMediaDao.STORAGE_MEDIA_ID;
+    public static final String STORAGE_FILE_URL = FeedMediaDao.STORAGE_FILE_URL;
+    public static final String STORAGE_SIZE = FeedMediaDao.STORAGE_SIZE;
+    public static final String STORAGE_READ = FeedMediaDao.STORAGE_READ;
+    public static final String STORAGE_FAVORITE = FeedMediaDao.STORAGE_FAVORITE;
+    public static final String STORAGE_FEED_ID = FeedMediaDao.STORAGE_FEED_ID;
+    public static final String STORAGE_FEED_TITLE = FeedMediaDao.STORAGE_FEED_TITLE;
+    public static final String STORAGE_FEED_CUSTOM_TITLE = FeedMediaDao.STORAGE_FEED_CUSTOM_TITLE;
+    public static final String STORAGE_FEED_IMAGE_URL = FeedMediaDao.STORAGE_FEED_IMAGE_URL;
+    public static final String STORAGE_FEED_SUBSCRIBED = FeedMediaDao.STORAGE_FEED_SUBSCRIBED;
+    public static final String STORAGE_FEED_AUDIOBOOK = FeedMediaDao.STORAGE_FEED_AUDIOBOOK;
+
+    /**
+     * Every downloaded media row with its episode's played and favourite state and its feed's
+     * title, cover, subscription and audiobook flags, for the storage overview. One query.
+     */
+    public final Cursor getDownloadedMediaWithFeedCursor() {
+        return mediaDao.getDownloadedMediaWithFeedCursor();
+    }
+
     // ---------------------------------------------------------------------------------------
     // Queue
     // ---------------------------------------------------------------------------------------

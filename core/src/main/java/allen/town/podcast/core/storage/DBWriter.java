@@ -148,6 +148,48 @@ public class DBWriter {
         });
     }
 
+    /**
+     * Deletes the downloads of one row of the storage overview: a podcast, or with
+     * {@link StorageUsage#UNSUBSCRIBED_BUCKET} every podcast the user is not subscribed to. The
+     * candidates are picked by {@link StorageUsage#selectForDeletion} from the current state, so
+     * they match the counts the overview showed: missing files and local folder files are not
+     * touched, the episode loaded in the player is kept, and "played only" keeps favourites when
+     * the "favourites keep episodes" preference is on. Deleting everything includes favourites.
+     *
+     * @return the number of episodes whose file was deleted
+     */
+    @NonNull
+    public static Future<Integer> deleteStorageBucket(@NonNull final Context context,
+                                                      final long bucketId,
+                                                      final boolean playedOnly) {
+        return dbExec.submit(() -> {
+            List<StorageUsage.Entry> entries = StorageUsage.measure(DBReader.getDownloadedMediaWithFeed());
+            List<Long> mediaIds = StorageUsage.selectForDeletion(entries, bucketId, playedOnly,
+                    Prefs.shouldFavoriteKeepEpisode(),
+                    PlaybackPreferences.getCurrentlyPlayingFeedMediaId());
+            List<Long> dequeue = new ArrayList<>();
+            int deleted = 0;
+            for (long mediaId : mediaIds) {
+                FeedMedia media = DBReader.getFeedMedia(mediaId);
+                if (media != null && deleteFeedMediaSynchronous(context, media)) {
+                    deleted++;
+                    FeedItem item = media.getItem();
+                    if (item != null) {
+                        dequeue.add(item.getId());
+                    }
+                }
+            }
+            if (!dequeue.isEmpty() && Prefs.shouldDeleteRemoveFromQueue()) {
+                long[] ids = new long[dequeue.size()];
+                for (int i = 0; i < ids.length; i++) {
+                    ids[i] = dequeue.get(i);
+                }
+                removeQueueItemSynchronous(context, false, ids);
+            }
+            return deleted;
+        });
+    }
+
     private static boolean deleteFeedMediaSynchronous(
             @NonNull Context context, @NonNull FeedMedia media) {
         Log.d(TAG, String.format(Locale.US, "requested to delete FeedMedia %d, %s, %s",

@@ -15,6 +15,14 @@ import static allen.town.podcast.storage.db.DbSchema.KEY_PLAYBACK_COMPLETION_DAT
 import static allen.town.podcast.storage.db.DbSchema.KEY_PLAYED_DURATION;
 import static allen.town.podcast.storage.db.DbSchema.KEY_POSITION;
 import static allen.town.podcast.storage.db.DbSchema.KEY_SIZE;
+import static allen.town.podcast.storage.db.DbSchema.KEY_AUDIOBOOK;
+import static allen.town.podcast.storage.db.DbSchema.KEY_CUSTOM_TITLE;
+import static allen.town.podcast.storage.db.DbSchema.KEY_IMAGE_URL;
+import static allen.town.podcast.storage.db.DbSchema.KEY_IS_SUBSCRIBED;
+import static allen.town.podcast.storage.db.DbSchema.KEY_READ;
+import static allen.town.podcast.storage.db.DbSchema.KEY_TITLE;
+import static allen.town.podcast.storage.db.DbSchema.TABLE_NAME_FAVORITES;
+import static allen.town.podcast.storage.db.DbSchema.TABLE_NAME_FEEDS;
 import static allen.town.podcast.storage.db.DbSchema.TABLE_NAME_FEED_ITEMS;
 import static allen.town.podcast.storage.db.DbSchema.TABLE_NAME_FEED_MEDIA;
 
@@ -236,5 +244,46 @@ class FeedMediaDao extends Dao {
         }
         c.close();
         return result;
+    }
+
+    /** Column aliases of {@link #getDownloadedMediaWithFeedCursor()}. */
+    static final String STORAGE_MEDIA_ID = "media_id";
+    static final String STORAGE_FILE_URL = "media_file_url";
+    static final String STORAGE_SIZE = "media_size";
+    static final String STORAGE_READ = "item_read";
+    static final String STORAGE_FAVORITE = "item_favorite";
+    static final String STORAGE_FEED_ID = "feed_id";
+    static final String STORAGE_FEED_TITLE = "feed_title";
+    static final String STORAGE_FEED_CUSTOM_TITLE = "feed_custom_title";
+    static final String STORAGE_FEED_IMAGE_URL = "feed_image_url";
+    static final String STORAGE_FEED_SUBSCRIBED = "feed_subscribed";
+    static final String STORAGE_FEED_AUDIOBOOK = "feed_audiobook";
+
+    /**
+     * Every downloaded media row together with the little the storage overview needs about its
+     * episode (played, favourite) and feed (title, cover, subscribed, audiobook), in one query.
+     */
+    final Cursor getDownloadedMediaWithFeedCursor() {
+        final String query = "SELECT "
+                + TABLE_NAME_FEED_MEDIA + "." + KEY_ID + " AS " + STORAGE_MEDIA_ID + ", "
+                + TABLE_NAME_FEED_MEDIA + "." + KEY_FILE_URL + " AS " + STORAGE_FILE_URL + ", "
+                + TABLE_NAME_FEED_MEDIA + "." + KEY_SIZE + " AS " + STORAGE_SIZE + ", "
+                + TABLE_NAME_FEED_ITEMS + "." + KEY_READ + " AS " + STORAGE_READ + ", "
+                + "EXISTS (SELECT 1 FROM " + TABLE_NAME_FAVORITES + " WHERE "
+                + TABLE_NAME_FAVORITES + "." + KEY_FEEDITEM + " = " + TABLE_NAME_FEED_ITEMS + "." + KEY_ID
+                + ") AS " + STORAGE_FAVORITE + ", "
+                + TABLE_NAME_FEEDS + "." + KEY_ID + " AS " + STORAGE_FEED_ID + ", "
+                + TABLE_NAME_FEEDS + "." + KEY_TITLE + " AS " + STORAGE_FEED_TITLE + ", "
+                + TABLE_NAME_FEEDS + "." + KEY_CUSTOM_TITLE + " AS " + STORAGE_FEED_CUSTOM_TITLE + ", "
+                + TABLE_NAME_FEEDS + "." + KEY_IMAGE_URL + " AS " + STORAGE_FEED_IMAGE_URL + ", "
+                + TABLE_NAME_FEEDS + "." + KEY_IS_SUBSCRIBED + " AS " + STORAGE_FEED_SUBSCRIBED + ", "
+                + TABLE_NAME_FEEDS + "." + KEY_AUDIOBOOK + " AS " + STORAGE_FEED_AUDIOBOOK
+                + " FROM " + TABLE_NAME_FEED_MEDIA
+                + " INNER JOIN " + TABLE_NAME_FEED_ITEMS + " ON "
+                + TABLE_NAME_FEED_ITEMS + "." + KEY_ID + " = " + TABLE_NAME_FEED_MEDIA + "." + KEY_FEEDITEM
+                + " INNER JOIN " + TABLE_NAME_FEEDS + " ON "
+                + TABLE_NAME_FEEDS + "." + KEY_ID + " = " + TABLE_NAME_FEED_ITEMS + "." + KEY_FEED
+                + " WHERE " + TABLE_NAME_FEED_MEDIA + "." + KEY_DOWNLOADED + " > 0";
+        return db.rawQuery(query, null);
     }
 }

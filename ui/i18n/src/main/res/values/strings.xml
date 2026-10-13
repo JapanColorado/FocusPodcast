@@ -1095,4 +1095,28 @@
     <string name="no_bookmarks_head_label">No bookmarks</string>
     <string name="no_bookmarks_label">Tap the bookmark button in the player to mark a moment. Long-press it to add a note too.</string>
     <string name="no_bookmarks_episode">No bookmarks in this episode yet</string>
+    <string name="storage_usage_title">Storage usage</string>
+    <string name="storage_usage_summary">%1$s used · %2$s free</string>
+    <string name="storage_usage_summary_loading">Calculating…</string>
+    <plurals name="storage_used_by_episodes">
+        <item quantity="one">Used by %d downloaded episode</item>
+        <item quantity="other">Used by %d downloaded episodes</item>
+    </plurals>
+    <string name="storage_free_of_total">%1$s free of %2$s</string>
+    <string name="storage_legend_downloads">Downloads</string>
+    <string name="storage_legend_other">Other</string>
+    <string name="storage_legend_free">Free</string>
+    <string name="storage_bar_description">Downloads %1$s, other files %2$s, free %3$s</string>
+    <string name="storage_unsubscribed_title">Not in your subscriptions</string>
+    <string name="storage_delete_played">Delete played downloads (%1$d, %2$s)</string>
+    <string name="storage_delete_all">Delete all downloads (%1$d, %2$s)</string>
+    <string name="storage_open_podcast">Open podcast</string>
+    <string name="storage_show_downloads">Show downloads</string>
+    <string name="storage_delete_played_confirm_msg_favorites_too">Played favorite episodes are deleted too, because \"%1$s\" is off. The episode in the player is kept.</string>
+    <plurals name="storage_delete_all_confirm">
+        <item quantity="one">Delete %1$d download (%2$s)?</item>
+        <item quantity="other">Delete all %1$d downloads (%2$s)?</item>
+    </plurals>
+    <string name="storage_delete_all_confirm_msg">This includes favorite episodes. The episode in the player is kept.</string>
+    <string name="storage_cleanup_link_sum">Choose when played episodes are deleted automatically</string>
 </resources>
