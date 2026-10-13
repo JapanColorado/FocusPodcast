@@ -89,6 +89,7 @@ import allen.town.podcast.event.UnreadItemsUpdateEvent;
 import allen.town.podcast.event.playback.BufferUpdateEvent;
 import allen.town.podcast.event.playback.PlaybackPositionEvent;
 import allen.town.podcast.event.playback.PlaybackServiceEvent;
+import allen.town.podcast.event.playback.SleepTimerMode;
 import allen.town.podcast.event.playback.SleepTimerUpdatedEvent;
 import allen.town.podcast.event.playback.SpeedChangedEvent;
 import allen.town.podcast.menuprocess.FeedItemMenuProcess;
@@ -154,6 +155,8 @@ public class AudioPlayerFragment extends Fragment implements
     private static final String KEY_PENDING_AD_START = "allen.town.podcast.pendingAdStartMs";
     /** {@link #sleepTimerShownMinutes} while the sleep timer button shows its idle icon. */
     private static final long SLEEP_TIMER_IDLE = -1;
+    /** {@link #sleepTimerShownMinutes} while a boundary timer runs whose time left is unknown. */
+    private static final long SLEEP_TIMER_UNKNOWN = -2;
     private static final long MINUTE_MS = 60_000;
     /** Moon icon edge as a multiple of the text size while it stands alone. */
     private static final float SLEEP_ICON_SCALE_IDLE = 1.6f;
@@ -178,6 +181,9 @@ public class AudioPlayerFragment extends Fragment implements
     private long sleepTimerShownMinutes = SLEEP_TIMER_IDLE;
     /** Time left that the sleep timer button shows while the timer runs. */
     private long sleepTimerLeftMs;
+    /** The running timer's mode the content description was built for. */
+    @Nullable
+    private SleepTimerMode sleepTimerShownMode;
     protected boolean showTimeLeft;
     protected boolean seekedToChapterStart = false;
     protected int currentChapterIndex = -1;
@@ -475,7 +481,8 @@ public class AudioPlayerFragment extends Fragment implements
         setupOptionsMenu(media);
         loadAdSegments(media);
         // The timer events are not sticky, so the button learns the current state here.
-        updateSleepTimerButton(controller.sleepTimerActive(), controller.getSleepTimerTimeLeft());
+        updateSleepTimerButton(controller.sleepTimerActive(), controller.getSleepTimerTimeLeft(),
+                controller.getSleepTimerMode());
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
@@ -484,7 +491,8 @@ public class AudioPlayerFragment extends Fragment implements
         if (event.isCancelled() || event.wasJustEnabled()) {
             AudioPlayerFragment.this.loadMediaInfo(false,false);
         }
-        updateSleepTimerButton(!event.isCancelled() && !event.isOver(), event.getTimeLeft());
+        updateSleepTimerButton(!event.isCancelled() && !event.isOver(), event.getTimeLeft(),
+                event.getMode());
     }
 
     private void showSleepTimerDialog() {
@@ -493,27 +501,40 @@ public class AudioPlayerFragment extends Fragment implements
 
     /**
      * Shows the time left on the sleep timer button while the timer runs, and the moon icon
-     * otherwise.
+     * otherwise. For "end of episode" / "end of chapter" the time left is the wall-clock time to
+     * that point (already divided by the speed); "--:--" while it is unknown.
      */
-    private void updateSleepTimerButton(boolean active, long timeLeftMs) {
+    private void updateSleepTimerButton(boolean active, long timeLeftMs, @Nullable SleepTimerMode mode) {
         if (butSleepTimer == null) {
             return;
         }
-        if (!active || timeLeftMs <= 0) {
+        boolean unknown = timeLeftMs == SleepTimerUpdatedEvent.TIME_LEFT_UNKNOWN
+                && mode != null && mode != SleepTimerMode.DURATION;
+        if (!active || (timeLeftMs <= 0 && !unknown)) {
             if (sleepTimerShownMinutes != SLEEP_TIMER_IDLE) {
                 sleepTimerShownMinutes = SLEEP_TIMER_IDLE;
+                sleepTimerShownMode = null;
                 butSleepTimer.setContentDescription(getString(R.string.sleep_timer_label));
                 renderSleepTimerButton();
             }
             return;
         }
         sleepTimerLeftMs = timeLeftMs;
-        long minutes = (timeLeftMs + MINUTE_MS - 1) / MINUTE_MS;
-        if (minutes != sleepTimerShownMinutes) {
+        long minutes = unknown ? SLEEP_TIMER_UNKNOWN : (timeLeftMs + MINUTE_MS - 1) / MINUTE_MS;
+        if (minutes != sleepTimerShownMinutes || mode != sleepTimerShownMode) {
             sleepTimerShownMinutes = minutes;
-            butSleepTimer.setContentDescription(getString(R.string.sleep_timer_label) + ", "
-                    + getResources().getQuantityString(R.plurals.time_minutes_quantified,
-                    (int) minutes, (int) minutes));
+            sleepTimerShownMode = mode;
+            StringBuilder description = new StringBuilder(getString(R.string.sleep_timer_label));
+            if (mode == SleepTimerMode.END_OF_EPISODE) {
+                description.append(", ").append(getString(R.string.sleep_timer_stops_end_of_episode));
+            } else if (mode == SleepTimerMode.END_OF_CHAPTER) {
+                description.append(", ").append(getString(R.string.sleep_timer_stops_end_of_chapter));
+            }
+            if (!unknown) {
+                description.append(", ").append(getResources().getQuantityString(
+                        R.plurals.time_minutes_quantified, (int) minutes, (int) minutes));
+            }
+            butSleepTimer.setContentDescription(description);
         }
         renderSleepTimerButton();
     }
@@ -556,7 +577,8 @@ public class AudioPlayerFragment extends Fragment implements
             if (text.length() > 0) {
                 text.append(' ');
             }
-            text.append(formatSleepTimeLeft(sleepTimerLeftMs));
+            text.append(sleepTimerShownMinutes == SLEEP_TIMER_UNKNOWN
+                    ? "--:--" : formatSleepTimeLeft(sleepTimerLeftMs));
         }
         button.setText(text);
     }

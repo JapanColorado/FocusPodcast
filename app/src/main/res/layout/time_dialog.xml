@@ -59,6 +59,18 @@
                 android:textColor="?android:attr/textColorPrimary"
                 android:textSize="32sp" />
 
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/timeMode"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:gravity="center"
+                android:textAppearance="?attr/textAppearanceBodyMedium"
+                android:textColor="?android:attr/textColorSecondary"
+                android:visibility="gone"
+                tools:text="Stops at end of chapter"
+                tools:visibility="visible" />
+
             <allen.town.podcast.common.views.AccentMaterialButton
                 android:id="@+id/disableSleeptimerButton"
                 style="@style/Widget.Material3.Button"
@@ -67,6 +79,7 @@
                 android:text="@string/disable_sleeptimer_label" />
 
             <LinearLayout
+                android:id="@+id/extendButtons"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center_vertical"

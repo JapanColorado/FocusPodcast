@@ -52,7 +52,7 @@ class LocalPSMPPlaybackEnder {
                 // Load next episode if previous episode was in the queue and if there
                 // is an episode in the queue left.
                 // Start playback immediately if continuous playback is enabled
-                nextMedia = player.playerCallback().getNextInQueue(currentMedia);
+                nextMedia = player.playerCallback().getNextInQueue(currentMedia, hasEnded);
                 boolean playNextEpisode = isPlaying && nextMedia != null;
                 if (playNextEpisode) {
                     Log.d(TAG, "next episode will start later");

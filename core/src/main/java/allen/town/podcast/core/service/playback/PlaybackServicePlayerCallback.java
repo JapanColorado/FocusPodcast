@@ -97,6 +97,7 @@ class PlaybackServicePlayerCallback implements PlaybackServiceMediaPlayer.PSMPCa
                 service.recreateMediaSessionIfNeeded();
                 service.updateNotificationAndMediaSession(newInfo.playable);
                 service.setupPositionObserver();
+                service.boundarySleepTimer.onPlaybackStartedOrMediaChanged();
                 service.stateManager.validStartCommandWasReceived();
                 service.stateManager.startForeground(R.id.notification_playing,
                         service.notificationUpdater.build());
@@ -141,6 +142,7 @@ class PlaybackServicePlayerCallback implements PlaybackServiceMediaPlayer.PSMPCa
     public void onMediaChanged(boolean reloadUI) {
         Log.d(TAG, "reloadUI callback reached");
         service.adSkipper.onMediaChanged(service.getPlayable());
+        service.boundarySleepTimer.onPlaybackStartedOrMediaChanged();
         if (reloadUI) {
             service.sendNotificationBroadcast(PlaybackService.NOTIFICATION_TYPE_RELOAD, 0);
         }
@@ -190,8 +192,20 @@ class PlaybackServicePlayerCallback implements PlaybackServiceMediaPlayer.PSMPCa
         }
     }
 
+    /**
+     * {@inheritDoc}
+     * <p>
+     * A running "end of episode" or "end of chapter" sleep timer is used up when an episode ends
+     * (played to the end, or skipped automatically at its configured ending or a closing ad):
+     * the episode has already gone through the normal completion path (so it is marked played,
+     * leaves the queue and is auto-deleted as usual by post-playback), and the next episode is
+     * then only remembered as the current one, exactly as when "follow queue" is off, instead of
+     * being started.
+     */
     @Override
-    public Playable getNextInQueue(final Playable currentMedia) {
+    public Playable getNextInQueue(final Playable currentMedia, boolean completed) {
+        boolean stopForSleepTimer = (completed || wasAutoSkipped(currentMedia))
+                && service.boundarySleepTimer.consumeAtEpisodeEnd();
         if (!(currentMedia instanceof FeedMedia)) {
             Log.d(TAG, "getNextInQueue(), but playable not an instance of FeedMedia, so not proceeding");
             PlaybackPreferences.writeNoMediaPlaying();
@@ -209,7 +223,7 @@ class PlaybackServicePlayerCallback implements PlaybackServiceMediaPlayer.PSMPCa
             return null;
         }
         if (item.getFeed() != null && item.getFeed().isAudiobook()) {
-            return getNextAudiobookTrack(item, item.getFeed());
+            return getNextAudiobookTrack(item, item.getFeed(), stopForSleepTimer);
         }
         FeedItem nextItem;
         nextItem = DBReader.getNextInQueue(item);
@@ -219,11 +233,9 @@ class PlaybackServicePlayerCallback implements PlaybackServiceMediaPlayer.PSMPCa
             return null;
         }
 
-        if (!Prefs.isFollowQueue()) {
-            Log.d(TAG, "getNextInQueue(), but follow queue is not enabled.");
-            PlaybackPreferences.writeMediaPlaying(nextItem.getMedia(), PlayerStatus.STOPPED);
-            service.updateNotificationAndMediaSession(nextItem.getMedia());
-            return null;
+        if (!Prefs.isFollowQueue() || stopForSleepTimer) {
+            Log.d(TAG, "getNextInQueue(), but follow queue is not enabled or the sleep timer stops here.");
+            return parkNext(nextItem.getMedia());
         }
 
         if (!nextItem.getMedia().localFileAvailable() && !NetworkUtils.isStreamingAllowed()
@@ -244,7 +256,8 @@ class PlaybackServicePlayerCallback implements PlaybackServiceMediaPlayer.PSMPCa
      * queue" is on. At the end of the book playback stops instead of falling through to the queue.
      */
     @Nullable
-    private Playable getNextAudiobookTrack(@NonNull FeedItem item, @NonNull Feed feed) {
+    private Playable getNextAudiobookTrack(@NonNull FeedItem item, @NonNull Feed feed,
+                                           boolean stopForSleepTimer) {
         List<FeedItem> tracks = DBReader.getFeedItemList(feed);
         FeedItem nextItem = AudiobookUtils.nextTrack(tracks, AudiobookUtils.playbackOrder(feed), item.getId());
         if (nextItem == null || nextItem.getMedia() == null) {
@@ -254,6 +267,10 @@ class PlaybackServicePlayerCallback implements PlaybackServiceMediaPlayer.PSMPCa
         }
         // queue and favourite tags, so that post-playback treats the track like any other
         DBReader.loadAdditionalFeedItemListData(Collections.singletonList(nextItem));
+        if (stopForSleepTimer) {
+            Log.d(TAG, "getNextInQueue(): the sleep timer stops before the next track");
+            return parkNext(nextItem.getMedia());
+        }
         if (!nextItem.getMedia().localFileAvailable() && !NetworkUtils.isStreamingAllowed()
                 && !feed.isLocalFeed()) {
             service.notificationUpdater.displayStreamingNotAllowedNotification(
@@ -263,6 +280,23 @@ class PlaybackServicePlayerCallback implements PlaybackServiceMediaPlayer.PSMPCa
             return null;
         }
         return nextItem.getMedia();
+    }
+
+    /**
+     * Remembers {@code next} as the media to play, without playing it, and returns null so that
+     * the player stops.
+     */
+    @Nullable
+    private Playable parkNext(@NonNull Playable next) {
+        PlaybackPreferences.writeMediaPlaying(next, PlayerStatus.STOPPED);
+        service.updateNotificationAndMediaSession(next);
+        return null;
+    }
+
+    /** True if the app (not the user) skipped {@code media}, at its ending or a closing ad. */
+    private boolean wasAutoSkipped(Playable media) {
+        return media instanceof FeedMedia && ((FeedMedia) media).getItem() != null
+                && service.autoSkipper.isAutoSkipped(((FeedMedia) media).getItem());
     }
 
     /**

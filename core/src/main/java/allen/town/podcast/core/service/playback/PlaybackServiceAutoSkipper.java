@@ -91,6 +91,11 @@ class PlaybackServiceAutoSkipper {
         }
     }
 
+    /** True if the given item is the one this class auto-skipped, without clearing the marker. */
+    boolean isAutoSkipped(FeedItem item) {
+        return autoSkippedFeedMediaId != null && autoSkippedFeedMediaId.equals(item.getIdentifyingValue());
+    }
+
     /**
      * @return true if the given item is the one this class auto-skipped, clearing the marker so
      *         that it is only reported once.

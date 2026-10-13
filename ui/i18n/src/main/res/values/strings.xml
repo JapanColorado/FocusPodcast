@@ -596,6 +596,10 @@
     <string name="disable_sleeptimer_label">Disable sleep timer</string>
     <string name="extend_sleep_timer_label">+%d min</string>
     <string name="sleep_timer_label">Sleep timer</string>
+    <string name="sleep_timer_end_of_episode">End of episode</string>
+    <string name="sleep_timer_end_of_chapter">End of chapter</string>
+    <string name="sleep_timer_stops_end_of_episode">Stops at end of episode</string>
+    <string name="sleep_timer_stops_end_of_chapter">Stops at end of chapter</string>
     <string name="time_dialog_invalid_input">Invalid input, time has to be an integer</string>
     <string name="shake_to_reset_label">Shake to reset before end</string>
     <string name="timer_vibration_label">Vibrate shortly before end</string>

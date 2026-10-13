@@ -539,6 +539,10 @@
   <string name="disable_sleeptimer_label">禁用睡眠计时器</string>
   <string name="extend_sleep_timer_label">+ %d 分钟</string>
   <string name="sleep_timer_label">睡眠定时器</string>
+  <string name="sleep_timer_end_of_episode">本集结束时</string>
+  <string name="sleep_timer_end_of_chapter">本章结束时</string>
+  <string name="sleep_timer_stops_end_of_episode">在本集结束时停止</string>
+  <string name="sleep_timer_stops_end_of_chapter">在本章结束时停止</string>
   <string name="player_switch_to_audio_only">仅作为音频播放</string>
   <string name="clear_voice">清晰人声</string>
   <string name="clear_voice_hint">降低背景噪音并平衡音量</string>

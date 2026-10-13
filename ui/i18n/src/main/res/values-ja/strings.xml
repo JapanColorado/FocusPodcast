@@ -376,6 +376,10 @@
   <string name="set_sleeptimer_label">スリープタイマーをセット</string>
   <string name="disable_sleeptimer_label">スリープタイマーを無効にする</string>
   <string name="sleep_timer_label">スリープタイマー</string>
+  <string name="sleep_timer_end_of_episode">エピソードの終わり</string>
+  <string name="sleep_timer_end_of_chapter">チャプターの終わり</string>
+  <string name="sleep_timer_stops_end_of_episode">エピソードの終わりで停止</string>
+  <string name="sleep_timer_stops_end_of_chapter">チャプターの終わりで停止</string>
   <string name="time_dialog_invalid_input">入力が正しくありません、時間は数字で入力してください</string>
   <string name="shake_to_reset_label">振ってリセット</string>
   <string name="timer_vibration_label">終了前に短く振動</string>

@@ -484,6 +484,10 @@
   <string name="disable_sleeptimer_label">停用睡眠定時</string>
   <string name="extend_sleep_timer_label">+%d 分鐘</string>
   <string name="sleep_timer_label">睡眠定時</string>
+  <string name="sleep_timer_end_of_episode">本集結束時</string>
+  <string name="sleep_timer_end_of_chapter">本章結束時</string>
+  <string name="sleep_timer_stops_end_of_episode">在本集結束時停止</string>
+  <string name="sleep_timer_stops_end_of_chapter">在本章結束時停止</string>
   <string name="time_dialog_invalid_input">輸入無效，請輸入數值</string>
   <string name="shake_to_reset_label">在時間到之前晃動手機以重置計時</string>
   <string name="timer_vibration_label">在時間到之前短暫震動手機</string>

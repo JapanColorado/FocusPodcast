@@ -363,7 +363,13 @@ public abstract class PlaybackServiceMediaPlayer {
 
         void onPlaybackPause(Playable playable, int position);
 
-        Playable getNextInQueue(Playable currentMedia);
+        /**
+         * The media to play after {@code currentMedia}, or null to stop.
+         *
+         * @param completed true if {@code currentMedia} played to its end (as opposed to being
+         *                  skipped), which is when an "end of episode" sleep timer stops playback
+         */
+        Playable getNextInQueue(Playable currentMedia, boolean completed);
 
         @Nullable
         Playable findMedia(@NonNull String url);

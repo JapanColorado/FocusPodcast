@@ -37,6 +37,7 @@ import allen.town.podcast.core.feed.util.PlayableFeedPreferences;
 import allen.town.podcast.core.feed.util.PlaybackSpeedUtils;
 import allen.town.podcast.core.pref.PlaybackPreferences;
 import allen.town.podcast.core.pref.Prefs;
+import allen.town.podcast.core.pref.SleepTimerPreferences;
 import allen.town.podcast.core.receiver.MediaButtonReceiver;
 import allen.town.podcast.core.storage.DBReader;
 import allen.town.podcast.core.storage.DBWriter;
@@ -50,6 +51,7 @@ import allen.town.podcast.event.adskip.AdSkipUndoEvent;
 import allen.town.podcast.event.playback.BufferUpdateEvent;
 import allen.town.podcast.event.playback.PlaybackPositionEvent;
 import allen.town.podcast.event.playback.PlaybackServiceEvent;
+import allen.town.podcast.event.playback.SleepTimerMode;
 import allen.town.podcast.event.playback.SleepTimerUpdatedEvent;
 import allen.town.podcast.event.settings.AdSkipChangedEvent;
 import allen.town.podcast.event.settings.AudioEffectsChangedEvent;
@@ -162,6 +164,10 @@ public class PlaybackService extends MediaBrowserServiceCompat {
     final PlaybackServiceAutoSkipper autoSkipper = new PlaybackServiceAutoSkipper(this);
     /** Skips the stored ad segments of the episode being played. */
     final PlaybackServiceAdSkipper adSkipper = new PlaybackServiceAdSkipper(this);
+    /** The "end of episode" / "end of chapter" sleep timer; the duration one is in the task manager. */
+    final PlaybackServiceBoundarySleepTimer boundarySleepTimer = new PlaybackServiceBoundarySleepTimer(this);
+    /** True while the sleep timer's fade has lowered the volume. */
+    private boolean sleepTimerFadeActive = false;
     /** Owns the headset / bluetooth / shutdown / skip broadcast receivers. */
     private final PlaybackServiceReceivers receivers = new PlaybackServiceReceivers(this);
     /** Answers the Android Auto media browser tree. */
@@ -274,6 +280,8 @@ public class PlaybackService extends MediaBrowserServiceCompat {
         PreferenceManager.getDefaultSharedPreferences(this).unregisterOnSharedPreferenceChangeListener(prefListener);
         mediaSessionHolder.release();
         receivers.unregister();
+        // before the player shuts down: the "cancelled" event restores the volume through it
+        boundarySleepTimer.cancel();
         if (mediaPlayer != null) {
             mediaPlayer.shutdown();
         }
@@ -580,25 +588,63 @@ public class PlaybackService extends MediaBrowserServiceCompat {
     @SuppressWarnings("unused")
     public void sleepTimerUpdate(SleepTimerUpdatedEvent event) {
         if (event.isOver()) {
-            mediaPlayer.pause(true, true);
+            // The boundary modes stop playback themselves: at a chapter start the boundary timer
+            // pauses, at the end of an episode the episode completes and the next one is not started.
+            if (event.getMode() == SleepTimerMode.DURATION) {
+                mediaPlayer.pause(true, true);
+            }
             mediaPlayer.setVolume(1.0f, 1.0f);
-        } else if (event.getTimeLeft() < PlaybackServiceTaskManager.SleepTimer.NOTIFICATION_THRESHOLD) {
+            sleepTimerFadeActive = false;
+        } else if (event.isCancelled()) {
+            mediaPlayer.setVolume(1.0f, 1.0f);
+            sleepTimerFadeActive = false;
+        } else if (event.isTimeLeftKnown()
+                && event.getTimeLeft() < PlaybackServiceTaskManager.SleepTimer.NOTIFICATION_THRESHOLD) {
             final float[] multiplicators = {0.1f, 0.2f, 0.3f, 0.3f, 0.3f, 0.4f, 0.4f, 0.4f, 0.6f, 0.8f};
             float multiplicator = multiplicators[Math.max(0, (int) event.getTimeLeft() / 1000)];
             Log.d(TAG, "onSleepTimerAlmostExpired: " + multiplicator);
             mediaPlayer.setVolume(multiplicator, multiplicator);
-        } else if (event.isCancelled()) {
+            sleepTimerFadeActive = true;
+        } else if (sleepTimerFadeActive) {
+            // Moved away from the end again (extended, or sought back before a boundary).
             mediaPlayer.setVolume(1.0f, 1.0f);
+            sleepTimerFadeActive = false;
         }
     }
 
+    /** Starts a sleep timer that pauses after {@code waitingTime} ms, replacing any running one. */
     public void setSleepTimer(long waitingTime) {
         Log.d(TAG, "Setting sleep timer to " + waitingTime + " milliseconds");
+        boundarySleepTimer.cancel();
         taskManager.setSleepTimer(waitingTime);
+    }
+
+    /**
+     * Starts a sleep timer in {@code mode}, replacing any running one. {@link SleepTimerMode#DURATION}
+     * uses the last chosen duration ({@link SleepTimerPreferences#timerMillis()}).
+     */
+    public void setSleepTimer(SleepTimerMode mode) {
+        if (mode == SleepTimerMode.DURATION) {
+            setSleepTimer(SleepTimerPreferences.timerMillis());
+            return;
+        }
+        Log.d(TAG, "Setting sleep timer to " + mode);
+        taskManager.disableSleepTimer();
+        boundarySleepTimer.start(mode);
     }
 
     public void disableSleepTimer() {
         taskManager.disableSleepTimer();
+        boundarySleepTimer.cancel();
+    }
+
+    /** The running sleep timer's mode, or null if none runs. */
+    @Nullable
+    public SleepTimerMode getSleepTimerMode() {
+        if (taskManager.isSleepTimerActive()) {
+            return SleepTimerMode.DURATION;
+        }
+        return boundarySleepTimer.getMode();
     }
 
     void sendNotificationBroadcast(int type, int code) {
@@ -645,10 +691,18 @@ public class PlaybackService extends MediaBrowserServiceCompat {
     }
 
     public boolean sleepTimerActive() {
-        return taskManager.isSleepTimerActive();
+        return taskManager.isSleepTimerActive() || boundarySleepTimer.isActive();
     }
 
+    /**
+     * Wall-clock milliseconds until the sleep timer stops playback; 0 if no timer runs, and
+     * {@link SleepTimerUpdatedEvent#TIME_LEFT_UNKNOWN} for a boundary timer whose target is not
+     * known yet.
+     */
     public long getSleepTimerTimeLeft() {
+        if (boundarySleepTimer.isActive()) {
+            return boundarySleepTimer.getTimeLeft();
+        }
         return taskManager.getSleepTimerTimeLeft();
     }
 
@@ -939,6 +993,7 @@ public class PlaybackService extends MediaBrowserServiceCompat {
                     }
                     autoSkipper.skipEndingIfNecessary();
                     adSkipper.skipIfNecessary();
+                    boundarySleepTimer.tick();
                 }, error -> Log.e(TAG, "Position observer failed", error));
     }
 

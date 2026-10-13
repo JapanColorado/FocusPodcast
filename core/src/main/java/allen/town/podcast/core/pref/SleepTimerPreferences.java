@@ -7,6 +7,8 @@ import android.util.Log;
 
 import java.util.concurrent.TimeUnit;
 
+import allen.town.podcast.event.playback.SleepTimerMode;
+
 public class SleepTimerPreferences {
 
     private static final String TAG = "SleepTimerPreferences";
@@ -17,6 +19,7 @@ public class SleepTimerPreferences {
     private static final String PREF_VIBRATE = "Vibrate";
     private static final String PREF_SHAKE_TO_RESET = "ShakeToReset";
     private static final String PREF_AUTO_ENABLE = "AutoEnable";
+    private static final String PREF_MODE = "LastMode";
 
 
     private static final String DEFAULT_VALUE = "15";
@@ -48,6 +51,19 @@ public class SleepTimerPreferences {
     public static long timerMillis() {
         long value = Long.parseLong(lastTimerValue());
         return TimeUnit.MINUTES.toMillis(value);
+    }
+
+    /**
+     * Remembers the mode last chosen in the sleep timer dialog. Auto-enable ignores it and always
+     * starts a duration timer.
+     */
+    public static void setLastTimerMode(@NonNull SleepTimerMode mode) {
+        prefs.edit().putString(PREF_MODE, mode.name()).apply();
+    }
+
+    @NonNull
+    public static SleepTimerMode lastTimerMode() {
+        return SleepTimerMode.fromName(prefs.getString(PREF_MODE, null));
     }
 
     public static void setVibrate(boolean vibrate) {

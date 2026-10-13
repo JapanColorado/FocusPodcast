@@ -18,6 +18,7 @@ import android.util.Pair;
 import android.view.SurfaceHolder;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -32,6 +33,7 @@ import allen.town.podcast.core.service.playback.PlaybackService;
 import allen.town.podcast.core.storage.DBWriter;
 import allen.town.podcast.event.playback.PlaybackPositionEvent;
 import allen.town.podcast.event.playback.PlaybackServiceEvent;
+import allen.town.podcast.event.playback.SleepTimerMode;
 import allen.town.podcast.event.playback.SpeedChangedEvent;
 import allen.town.podcast.event.settings.SpeedPresetChangedEvent;
 import allen.town.podcast.model.feed.FeedMedia;
@@ -430,9 +432,11 @@ public abstract class PlaybackController {
         }
     }
 
+    /** Adds {@code extendTime} to a running duration timer; the boundary modes cannot be extended. */
     public void extendSleepTimer(long extendTime) {
         long timeLeft = getSleepTimerTimeLeft();
-        if (playbackService != null && timeLeft != INVALID_TIME) {
+        if (playbackService != null && timeLeft != INVALID_TIME
+                && playbackService.getSleepTimerMode() == SleepTimerMode.DURATION) {
             setSleepTimer(timeLeft + extendTime);
         }
     }
@@ -441,6 +445,19 @@ public abstract class PlaybackController {
         if (playbackService != null) {
             playbackService.setSleepTimer(time);
         }
+    }
+
+    /** Starts a sleep timer in {@code mode}; see {@link PlaybackService#setSleepTimer(SleepTimerMode)}. */
+    public void setSleepTimer(SleepTimerMode mode) {
+        if (playbackService != null) {
+            playbackService.setSleepTimer(mode);
+        }
+    }
+
+    /** The running sleep timer's mode, or null if none runs (or the service is not bound). */
+    @Nullable
+    public SleepTimerMode getSleepTimerMode() {
+        return playbackService != null ? playbackService.getSleepTimerMode() : null;
     }
 
     /** Restarts the episode, or goes back to the previously played one; see PlaybackService. */
