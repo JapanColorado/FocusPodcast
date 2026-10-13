@@ -315,7 +315,7 @@ internal object UiPrefs {
     var audiobookShelfFilter: AudiobookShelfFilter
         get() = AudiobookShelfFilter(
             enumOrNull<AudiobookShelfFilter.Sort>(prefs.getString(PREF_AUDIOBOOKS_SORT, null)),
-            AudiobookShelfFilter.parseStatus(prefs.getString(PREF_AUDIOBOOKS_STATUS, null)),
+            enumOrNull<AudiobookShelfFilter.Status>(prefs.getString(PREF_AUDIOBOOKS_STATUS, null)),
             prefs.getStringSet(PREF_AUDIOBOOKS_AUTHORS, null),
             enumOrNull<AudiobookShelfFilter.Length>(prefs.getString(PREF_AUDIOBOOKS_LENGTH, null))
         )
@@ -327,6 +327,18 @@ internal object UiPrefs {
                 .putString(PREF_AUDIOBOOKS_LENGTH, value.length?.name)
                 .apply()
         }
+
+    /**
+     * Rewrites the Audiobooks status saved before it became Unfinished / Finished: Not started and
+     * In progress both become Unfinished. Idempotent.
+     */
+    fun migrateAudiobookShelfStatus() {
+        when (prefs.getString(PREF_AUDIOBOOKS_STATUS, null)) {
+            "NOT_STARTED", "IN_PROGRESS" -> prefs.edit()
+                .putString(PREF_AUDIOBOOKS_STATUS, AudiobookShelfFilter.Status.UNFINISHED.name)
+                .apply()
+        }
+    }
 
     private inline fun <reified E : Enum<E>> enumOrNull(name: String?): E? =
         enumValues<E>().firstOrNull { it.name == name }

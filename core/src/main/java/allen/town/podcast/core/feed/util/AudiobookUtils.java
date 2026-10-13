@@ -66,7 +66,6 @@ public final class AudiobookUtils {
         long total = 0;
         long listened = 0;
         int played = 0;
-        boolean started = false;
         long lastPlayed = 0;
         FeedItem inProgress = null;
         long inProgressLastPlayed = Long.MIN_VALUE;
@@ -76,9 +75,7 @@ public final class AudiobookUtils {
             total += duration;
             if (media != null) {
                 lastPlayed = Math.max(lastPlayed, media.getLastPlayedTime());
-                started |= media.getPosition() > 0;
             }
-            started |= item.isPlayed();
             if (item.isPlayed()) {
                 played++;
                 listened += duration;
@@ -102,7 +99,6 @@ public final class AudiobookUtils {
                 }
             }
         }
-        return new AudiobookProgress(feedId, items.size(), played, total, listened, resume, started,
-                lastPlayed);
+        return new AudiobookProgress(feedId, items.size(), played, total, listened, resume, lastPlayed);
     }
 }

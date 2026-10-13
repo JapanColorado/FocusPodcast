@@ -3,6 +3,7 @@ package allen.town.podcast.core.pref;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -20,6 +21,7 @@ import org.robolectric.RobolectricTestRunner;
 
 import java.util.concurrent.TimeUnit;
 
+import allen.town.podcast.core.feed.AudiobookShelfFilter;
 import allen.town.podcast.model.playback.MediaType;
 
 /**
@@ -282,6 +284,19 @@ public class PrefsTest {
         Prefs.resetForTests();
         Prefs.init(context);
         assertEquals(4, Prefs.getParallelDownloads());
+    }
+
+    @Test
+    public void oldAudiobookStatusesAreRewrittenAsUnfinished() {
+        for (String old : new String[]{"NOT_STARTED", "IN_PROGRESS"}) {
+            prefs().edit().putString("pref_audiobooks_status", old).commit();
+            assertNull(Prefs.getAudiobookShelfFilter().status);
+            Prefs.migrateAudiobookShelfStatus();
+            assertEquals(AudiobookShelfFilter.Status.UNFINISHED, Prefs.getAudiobookShelfFilter().status);
+        }
+        prefs().edit().putString("pref_audiobooks_status", "FINISHED").commit();
+        Prefs.migrateAudiobookShelfStatus();
+        assertEquals(AudiobookShelfFilter.Status.FINISHED, Prefs.getAudiobookShelfFilter().status);
     }
 
     private SharedPreferences prefs() {

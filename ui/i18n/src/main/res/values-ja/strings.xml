@@ -568,8 +568,8 @@
   <string name="filter_section_status">ステータス</string>
   <string name="filter_section_downloaded">ダウンロード</string>
   <string name="filter_section_favorite">お気に入り</string>
-  <string name="filter_unfinished">未完了</string>
-  <string name="filter_finished">完了</string>
+  <string name="filter_unfinished">聴き終わっていない</string>
+  <string name="filter_finished">聴き終わり</string>
   <string name="filter_downloaded">ダウンロード済</string>
   <string name="filter_not_downloaded">未ダウンロード</string>
   <string name="filter_favorite">お気に入り</string>

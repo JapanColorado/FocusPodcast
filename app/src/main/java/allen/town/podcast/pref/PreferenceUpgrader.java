@@ -15,6 +15,7 @@ import java.util.Set;
 import allen.town.podcast.BuildConfig;
 import allen.town.podcast.common.model.CategoryInfo;
 import allen.town.podcast.common.util.BasePreferenceUtil;
+import allen.town.podcast.core.pref.Prefs;
 import allen.town.podcast.core.util.download.AutoUpdateManager;
 
 /**
@@ -32,8 +33,9 @@ public class PreferenceUpgrader {
         int oldVersion = upgraderPrefs.getInt(PREF_CONFIGURED_VERSION, -1);
         int newVersion = BuildConfig.VERSION_CODE;
 
-        // Not tied to a version code: debug builds reuse it, and the step is idempotent and cheap.
+        // Not tied to a version code: debug builds reuse it, and the steps are idempotent and cheap.
         syncLibraryCategories();
+        Prefs.migrateAudiobookShelfStatus();
 
         if (oldVersion != newVersion) {
             AutoUpdateManager.restartUpdateAlarm(context);

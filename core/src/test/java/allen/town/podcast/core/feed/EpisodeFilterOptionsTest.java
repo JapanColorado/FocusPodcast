@@ -89,6 +89,8 @@ public class EpisodeFilterOptionsTest {
         assertArrayEquals(keys(FeedItemFilter.UNPLAYED),
                 EpisodeFilterOptions.sanitize(keys(FeedItemFilter.UNPLAYED, FeedItemFilter.NOT_PAUSED)));
         assertArrayEquals(keys(FeedItemFilter.UNPLAYED),
+                EpisodeFilterOptions.sanitize(keys(FeedItemFilter.UNPLAYED, FeedItemFilter.PAUSED)));
+        assertArrayEquals(keys(FeedItemFilter.UNPLAYED),
                 EpisodeFilterOptions.sanitize(keys(FeedItemFilter.PAUSED, FeedItemFilter.HAS_MEDIA)));
     }
 

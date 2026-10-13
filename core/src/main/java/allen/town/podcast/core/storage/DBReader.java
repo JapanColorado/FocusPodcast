@@ -244,7 +244,7 @@ public final class DBReader {
         return result;
     }
 
-    private static Feed extractFeedFromCursorRow(Cursor cursor) {
+    static Feed extractFeedFromCursorRow(Cursor cursor) {
         Feed feed = FeedCursorMapper.convert(cursor);
         FeedPreferences preferences = FeedPreferencesCursorMapper.convert(cursor);
         feed.setPreferences(preferences);

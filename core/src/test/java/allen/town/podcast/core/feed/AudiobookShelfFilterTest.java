@@ -47,23 +47,23 @@ public class AudiobookShelfFilterTest {
         return feed;
     }
 
-    /** tracks/played tracks, total and listened in ms, started flag, last played time. */
+    /** tracks/played tracks, total and listened in ms, last played time. */
     private static AudiobookProgress progress(long feedId, int tracks, int played, long total,
-                                              long listened, boolean started, long lastPlayed) {
-        return new AudiobookProgress(feedId, tracks, played, total, listened, null, started, lastPlayed);
+                                              long listened, long lastPlayed) {
+        return new AudiobookProgress(feedId, tracks, played, total, listened, null, lastPlayed);
     }
 
     private static Book notStarted(long id, String title, String author, long total) {
-        return new Book(feed(id, title, author), progress(id, 3, 0, total, 0, false, 0));
+        return new Book(feed(id, title, author), progress(id, 3, 0, total, 0, 0));
     }
 
     private static Book inProgress(long id, String title, String author, long total, long listened,
                                    long lastPlayed) {
-        return new Book(feed(id, title, author), progress(id, 3, 1, total, listened, true, lastPlayed));
+        return new Book(feed(id, title, author), progress(id, 3, 1, total, listened, lastPlayed));
     }
 
     private static Book finished(long id, String title, String author, long total, long lastPlayed) {
-        return new Book(feed(id, title, author), progress(id, 3, 3, total, total, true, lastPlayed));
+        return new Book(feed(id, title, author), progress(id, 3, 3, total, total, lastPlayed));
     }
 
     private static List<String> titles(AudiobookShelfFilter filter, List<Book> books) {
@@ -86,17 +86,7 @@ public class AudiobookShelfFilterTest {
                 AudiobookShelfFilter.statusOf(inProgress(1, "A", null, HOUR, 10, 5).progress));
         assertEquals(Status.FINISHED, AudiobookShelfFilter.statusOf(finished(1, "A", null, HOUR, 5).progress));
         assertEquals(Status.UNFINISHED,
-                AudiobookShelfFilter.statusOf(progress(1, 2, 0, 0, 0, true, 7)));
-    }
-
-    @Test
-    public void oldSavedStatusesReadAsUnfinished() {
-        assertEquals(Status.UNFINISHED, AudiobookShelfFilter.parseStatus("NOT_STARTED"));
-        assertEquals(Status.UNFINISHED, AudiobookShelfFilter.parseStatus("IN_PROGRESS"));
-        assertEquals(Status.UNFINISHED, AudiobookShelfFilter.parseStatus("UNFINISHED"));
-        assertEquals(Status.FINISHED, AudiobookShelfFilter.parseStatus("FINISHED"));
-        assertNull(AudiobookShelfFilter.parseStatus(null));
-        assertNull(AudiobookShelfFilter.parseStatus("bogus"));
+                AudiobookShelfFilter.statusOf(progress(1, 2, 0, 0, 0, 7)));
     }
 
     @Test

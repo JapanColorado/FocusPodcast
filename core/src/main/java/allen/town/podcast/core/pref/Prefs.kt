@@ -563,6 +563,10 @@ object Prefs {
             UiPrefs.audiobookShelfFilter = value
         }
 
+    /** See [UiPrefs.migrateAudiobookShelfStatus]. */
+    @JvmStatic
+    fun migrateAudiobookShelfStatus() = UiPrefs.migrateAudiobookShelfStatus()
+
     @JvmStatic
     fun shouldShowSubscriptionTitle(): Boolean = UiPrefs.shouldShowSubscriptionTitle()
 

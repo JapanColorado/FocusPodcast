@@ -100,23 +100,6 @@ public final class AudiobookShelfFilter {
         return progress != null && progress.isFinished() ? Status.FINISHED : Status.UNFINISHED;
     }
 
-    /**
-     * The saved status name; the old Not started / In progress choices read as Unfinished, anything
-     * else unknown as no status filter.
-     */
-    @Nullable
-    public static Status parseStatus(@Nullable String name) {
-        if ("NOT_STARTED".equals(name) || "IN_PROGRESS".equals(name)) {
-            return Status.UNFINISHED;
-        }
-        for (Status status : Status.values()) {
-            if (status.name().equals(name)) {
-                return status;
-            }
-        }
-        return null;
-    }
-
     /** The length bucket of the book, null when its total duration is unknown. */
     @Nullable
     public static Length lengthOf(@Nullable AudiobookProgress progress) {

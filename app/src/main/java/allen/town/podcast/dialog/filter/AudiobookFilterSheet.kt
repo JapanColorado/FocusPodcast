@@ -45,7 +45,7 @@ class AudiobookFilterSheet : FilterSheet() {
             FilterSection(
                 SECTION_STATUS, getString(R.string.filter_section_status), listOf(
                     option(AudiobookShelfFilter.Status.UNFINISHED, R.string.filter_unfinished),
-                    option(AudiobookShelfFilter.Status.FINISHED, R.string.filter_finished)
+                    option(AudiobookShelfFilter.Status.FINISHED, R.string.audiobook_finished)
                 )
             )
         )

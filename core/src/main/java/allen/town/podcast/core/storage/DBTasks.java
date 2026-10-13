@@ -19,7 +19,6 @@ import allen.town.podcast.core.service.download.DownloadRequest;
 import allen.town.podcast.core.service.download.DownloadRequestCreator;
 import allen.town.podcast.core.service.download.DownloadService;
 import allen.town.podcast.storage.db.Db;
-import allen.town.podcast.storage.db.mapper.FeedCursorMapper;
 import org.greenrobot.eventbus.EventBus;
 
 import java.io.File;
@@ -677,7 +676,7 @@ public final class DBTasks {
                 List<Feed> items = new ArrayList<>();
                 if (cursor.moveToFirst()) {
                     do {
-                        items.add(FeedCursorMapper.convert(cursor));
+                        items.add(DBReader.extractFeedFromCursorRow(cursor));
                     } while (cursor.moveToNext());
                 }
                 setResult(items);
