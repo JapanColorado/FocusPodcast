@@ -668,4 +668,19 @@
   <string name="transcript_available">文字起こしあり</string>
   <string name="search_in_transcript">文字起こし</string>
   <string name="search_in_transcript_hint">検索できるのは取得済みの文字起こしのみです。エピソードのダウンロード時、または文字起こしを開いたときに取得されます。</string>
+  <string name="bookmarks_label">ブックマーク</string>
+  <string name="bookmark_add">ブックマークを追加</string>
+  <string name="bookmark_added">ブックマークを追加しました</string>
+  <string name="bookmark_add_note">メモを追加</string>
+  <string name="bookmark_edit_note">メモを編集</string>
+  <string name="bookmark_note_hint">メモ</string>
+  <string name="bookmark_at_position">%1$s の位置</string>
+  <string name="bookmark_deleted">ブックマークを削除しました</string>
+  <string name="bookmark_options">ブックマークのオプション</string>
+  <string name="bookmark_unavailable">ブックマークはポッドキャストのエピソードでのみ使えます</string>
+  <string name="bookmark_share_headline">%1$s — %2$s（%3$s）</string>
+  <string name="bookmark_row_description">%1$s、%2$s</string>
+  <string name="no_bookmarks_head_label">ブックマークはありません</string>
+  <string name="no_bookmarks_label">プレーヤーのブックマークボタンをタップすると、その瞬間を記録できます。長押しするとメモも追加できます。</string>
+  <string name="no_bookmarks_episode">このエピソードにはまだブックマークがありません</string>
 </resources>

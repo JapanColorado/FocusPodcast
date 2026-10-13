@@ -71,8 +71,8 @@ public class DbTest {
     // ---------------------------------------------------------------- schema
 
     @Test
-    public void freshDatabaseIsAtSchemaVersion9() {
-        assertEquals(9, Db.VERSION);
+    public void freshDatabaseIsAtSchemaVersion10() {
+        assertEquals(10, Db.VERSION);
         assertEquals(Db.VERSION, Db.getInstance().getDb().getVersion());
     }
 
@@ -89,7 +89,8 @@ public class DbTest {
                 Db.TABLE_NAME_FAVORITES,
                 Db.TABLE_NAME_AD_SEGMENTS,
                 Db.TABLE_NAME_DISMISSED_FEED_WARNINGS,
-                Db.TABLE_NAME_TRANSCRIPTS)));
+                Db.TABLE_NAME_TRANSCRIPTS,
+                Db.TABLE_NAME_BOOKMARKS)));
         assertTrue(columnNames(Db.getInstance().getDb(), Db.TABLE_NAME_DOWNLOAD_LOG)
                 .contains(Db.KEY_WARNING_KEY));
     }
@@ -110,7 +111,8 @@ public class DbTest {
                 Db.TABLE_NAME_QUEUE + "_" + Db.KEY_FEEDITEM,
                 Db.TABLE_NAME_FEED_MEDIA + "_" + Db.KEY_FEEDITEM,
                 Db.TABLE_NAME_SIMPLECHAPTERS + "_" + Db.KEY_FEEDITEM,
-                Db.TABLE_NAME_AD_SEGMENTS + "_" + Db.KEY_FEEDITEM)));
+                Db.TABLE_NAME_AD_SEGMENTS + "_" + Db.KEY_FEEDITEM,
+                Db.TABLE_NAME_BOOKMARKS + "_" + Db.KEY_FEEDITEM)));
     }
 
     // --------------------------------------------------------------- upgrade

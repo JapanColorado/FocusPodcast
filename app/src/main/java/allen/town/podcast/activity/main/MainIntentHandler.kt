@@ -5,6 +5,7 @@ import allen.town.podcast.R
 import allen.town.podcast.activity.MainActivity
 import allen.town.podcast.fragment.DownloadPagerFragment
 import allen.town.podcast.fragment.EpisodesFragment
+import allen.town.podcast.fragment.BookmarksFragment
 import allen.town.podcast.fragment.FavoriteEpisodesFragment
 import allen.town.podcast.fragment.FeedItemlistFragment
 import allen.town.podcast.fragment.LocalSearchFragment
@@ -105,6 +106,7 @@ internal class MainIntentHandler(
                         loadChild(AudiobooksFragment())
                     }
                     "favorite" -> navigator.loadFragment(FavoriteEpisodesFragment.TAG, null)
+                    "bookmarks" -> navigator.loadFragment(BookmarksFragment.TAG, null)
                     else -> {
                         showSnack(
                             activity, activity.getString(R.string.app_action_not_found, feature),

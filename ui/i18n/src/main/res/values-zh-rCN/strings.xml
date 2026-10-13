@@ -966,4 +966,19 @@
   <string name="transcript_available">有文字稿</string>
   <string name="search_in_transcript">文字稿</string>
   <string name="search_in_transcript_hint">只能搜索已获取的文字稿：下载单集或打开其文字稿时会获取。</string>
+  <string name="bookmarks_label">书签</string>
+  <string name="bookmark_add">添加书签</string>
+  <string name="bookmark_added">已添加书签</string>
+  <string name="bookmark_add_note">添加备注</string>
+  <string name="bookmark_edit_note">编辑备注</string>
+  <string name="bookmark_note_hint">备注</string>
+  <string name="bookmark_at_position">位于 %1$s</string>
+  <string name="bookmark_deleted">已删除书签</string>
+  <string name="bookmark_options">书签选项</string>
+  <string name="bookmark_unavailable">只有播客单集可以添加书签</string>
+  <string name="bookmark_share_headline">%1$s — %2$s，%3$s 处</string>
+  <string name="bookmark_row_description">%1$s，%2$s</string>
+  <string name="no_bookmarks_head_label">没有书签</string>
+  <string name="no_bookmarks_label">在播放器中点按书签按钮即可标记当前时刻，长按还可以添加备注。</string>
+  <string name="no_bookmarks_episode">这一集还没有书签</string>
 </resources>

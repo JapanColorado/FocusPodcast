@@ -25,6 +25,7 @@ import java.util.Set;
 
 import allen.town.podcast.model.download.DownloadStatus;
 import allen.town.podcast.model.feed.AdSegment;
+import allen.town.podcast.model.feed.Bookmark;
 import allen.town.podcast.model.feed.Feed;
 import allen.town.podcast.model.feed.FeedCounter;
 import allen.town.podcast.model.feed.EpisodeSearchOptions;
@@ -43,7 +44,7 @@ import allen.town.podcast.model.feed.SortOrder;
  * {@code Db.TABLE_NAME_*}. The statements themselves live in the per-table helpers of this package
  * ({@link FeedDao}, {@link FeedItemDao}, {@link FeedMediaDao}, {@link QueueDao},
  * {@link FavoritesDao}, {@link DownloadLogDao}, {@link DismissedWarningDao}, {@link AdSegmentDao},
- * {@link TranscriptDao}); every method below delegates
+ * {@link TranscriptDao}, {@link BookmarkDao}); every method below delegates
  * to one of them,
  * except the two writes that span several tables and therefore keep their transaction here.</p>
  */
@@ -135,6 +136,9 @@ public class Db {
     public static final String KEY_TRANSCRIPT_RAW = DbSchema.KEY_TRANSCRIPT_RAW;
     public static final String KEY_TRANSCRIPT_TEXT = DbSchema.KEY_TRANSCRIPT_TEXT;
     public static final String KEY_TRANSCRIPT_FETCHED_AT = DbSchema.KEY_TRANSCRIPT_FETCHED_AT;
+    public static final String KEY_BOOKMARK_POSITION_MS = DbSchema.KEY_BOOKMARK_POSITION_MS;
+    public static final String KEY_BOOKMARK_NOTE = DbSchema.KEY_BOOKMARK_NOTE;
+    public static final String KEY_BOOKMARK_CREATED_AT = DbSchema.KEY_BOOKMARK_CREATED_AT;
 
     // Table names
     public static final String TABLE_NAME_FEEDS = DbSchema.TABLE_NAME_FEEDS;
@@ -147,6 +151,7 @@ public class Db {
     public static final String TABLE_NAME_AD_SEGMENTS = DbSchema.TABLE_NAME_AD_SEGMENTS;
     public static final String TABLE_NAME_DISMISSED_FEED_WARNINGS = DbSchema.TABLE_NAME_DISMISSED_FEED_WARNINGS;
     public static final String TABLE_NAME_TRANSCRIPTS = DbSchema.TABLE_NAME_TRANSCRIPTS;
+    public static final String TABLE_NAME_BOOKMARKS = DbSchema.TABLE_NAME_BOOKMARKS;
 
     public static final String SELECT_KEY_ITEM_ID = DbSchema.SELECT_KEY_ITEM_ID;
     public static final String SELECT_KEY_MEDIA_ID = DbSchema.SELECT_KEY_MEDIA_ID;
@@ -165,6 +170,7 @@ public class Db {
     private final DismissedWarningDao dismissedWarningDao;
     private final AdSegmentDao adSegmentDao;
     private final TranscriptDao transcriptDao;
+    private final BookmarkDao bookmarkDao;
 
     public static void init(Context context) {
         if (context == null) {
@@ -191,7 +197,8 @@ public class Db {
         mediaDao = new FeedMediaDao(db);
         adSegmentDao = new AdSegmentDao(db);
         transcriptDao = new TranscriptDao(db);
-        itemDao = new FeedItemDao(db, feedDao, mediaDao, adSegmentDao, transcriptDao);
+        bookmarkDao = new BookmarkDao(db);
+        itemDao = new FeedItemDao(db, feedDao, mediaDao, adSegmentDao, transcriptDao, bookmarkDao);
         queueDao = new QueueDao(db);
         favoritesDao = new FavoritesDao(db);
         dismissedWarningDao = new DismissedWarningDao(db);
@@ -810,6 +817,37 @@ public class Db {
     }
 
     // ---------------------------------------------------------------------------------------
+    // Bookmarks
+    // ---------------------------------------------------------------------------------------
+
+    /** The bookmarks of one episode, earliest position first. */
+    public final Cursor getBookmarksOfItemCursor(final long feedItemId) {
+        return bookmarkDao.getBookmarksOfItemCursor(feedItemId);
+    }
+
+    /** Every bookmark, most recently made first. */
+    public final Cursor getAllBookmarksCursor() {
+        return bookmarkDao.getAllBookmarksCursor();
+    }
+
+    /**
+     * Stores one bookmark and returns its row id, which is also set on the object. A bookmark that
+     * already has an id keeps it, so a deleted one can be put back.
+     */
+    public long insertBookmark(@NonNull final Bookmark bookmark) {
+        return bookmarkDao.insertBookmark(bookmark);
+    }
+
+    /** Replaces the note of one bookmark; null removes it. */
+    public void setBookmarkNote(final long id, @Nullable final String note) {
+        bookmarkDao.setBookmarkNote(id, note);
+    }
+
+    public void deleteBookmark(final long id) {
+        bookmarkDao.deleteBookmark(id);
+    }
+
+    // ---------------------------------------------------------------------------------------
     // Download log
     // ---------------------------------------------------------------------------------------
 
@@ -913,6 +951,7 @@ public class Db {
             db.execSQL(DbSchema.CREATE_TABLE_AD_SEGMENTS);
             db.execSQL(DbSchema.CREATE_TABLE_DISMISSED_FEED_WARNINGS);
             db.execSQL(DbSchema.CREATE_TABLE_TRANSCRIPTS);
+            db.execSQL(DbSchema.CREATE_TABLE_BOOKMARKS);
             db.execSQL(DbSchema.CREATE_TABLE_FEEDS);
 
             db.execSQL(DbSchema.CREATE_INDEX_FEEDITEMS_PUBDATE);
@@ -922,6 +961,7 @@ public class Db {
             db.execSQL(DbSchema.CREATE_INDEX_QUEUE_FEEDITEM);
             db.execSQL(DbSchema.CREATE_INDEX_FEEDITEMS_FEED);
             db.execSQL(DbSchema.CREATE_INDEX_AD_SEGMENTS_FEEDITEM);
+            db.execSQL(DbSchema.CREATE_INDEX_BOOKMARKS_FEEDITEM);
         }
 
         @Override

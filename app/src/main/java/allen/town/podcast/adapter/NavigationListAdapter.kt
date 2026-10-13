@@ -66,6 +66,7 @@ class NavigationListAdapter(private val itemAccess: ItemAccess, context: Activit
             DownloadPagerFragment.TAG -> context.getString(R.string.downloads_label)
             SubFeedsFragment.TAG -> context.getString(R.string.library_label)
             FavoriteEpisodesFragment.TAG -> context.getString(R.string.favorite_episodes_label)
+            BookmarksFragment.TAG -> context.getString(R.string.bookmarks_label)
             else -> ""
         }
     }
@@ -78,6 +79,7 @@ class NavigationListAdapter(private val itemAccess: ItemAccess, context: Activit
             DownloadPagerFragment.TAG -> R.drawable.ic_download
             SubFeedsFragment.TAG -> R.drawable.ic_my_subs
             FavoriteEpisodesFragment.TAG -> R.drawable.ic_star
+            BookmarksFragment.TAG -> R.drawable.ic_bookmark
             else -> 0
         }
     }

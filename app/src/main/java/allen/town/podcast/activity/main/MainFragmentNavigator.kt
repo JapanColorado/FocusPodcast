@@ -2,6 +2,7 @@ package allen.town.podcast.activity.main
 
 import allen.town.podcast.R
 import allen.town.podcast.activity.MainActivity
+import allen.town.podcast.fragment.BookmarksFragment
 import allen.town.podcast.fragment.DownloadPagerFragment
 import allen.town.podcast.fragment.EpisodesFragment
 import allen.town.podcast.fragment.FavoriteEpisodesFragment
@@ -48,6 +49,7 @@ internal class MainFragmentNavigator(
             SubFeedsFragment.TAG -> fragment =
                 SubFeedsFragment()
             FavoriteEpisodesFragment.TAG -> fragment = FavoriteEpisodesFragment()
+            BookmarksFragment.TAG -> fragment = BookmarksFragment()
             else -> {
                 // default to the queue
                 fragment = PlaylistFragment()

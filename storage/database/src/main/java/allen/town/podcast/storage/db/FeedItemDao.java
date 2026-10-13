@@ -70,7 +70,7 @@ import allen.town.podcast.storage.db.mapper.FeedItemFilterQuery;
  * Owns every statement against the {@code episodes} table and the {@code chapters} rows that hang
  * off it: inserting or updating an item (delegating the feed row to {@link FeedDao} and the media
  * row to {@link FeedMediaDao}), the bulk and single-item stores, the played/unplayed state updates,
- * the cascade that removes items together with their chapters, ad segments, transcripts, media and download log
+ * the cascade that removes items together with their chapters, ad segments, transcripts, bookmarks, media and download log
  * entries, the item search, and all the cursors that read episodes joined with their media.
  */
 class FeedItemDao extends Dao {
@@ -79,14 +79,16 @@ class FeedItemDao extends Dao {
     private final FeedMediaDao mediaDao;
     private final AdSegmentDao adSegmentDao;
     private final TranscriptDao transcriptDao;
+    private final BookmarkDao bookmarkDao;
 
     FeedItemDao(SQLiteDatabase db, FeedDao feedDao, FeedMediaDao mediaDao, AdSegmentDao adSegmentDao,
-                TranscriptDao transcriptDao) {
+                TranscriptDao transcriptDao, BookmarkDao bookmarkDao) {
         super(db);
         this.feedDao = feedDao;
         this.mediaDao = mediaDao;
         this.adSegmentDao = adSegmentDao;
         this.transcriptDao = transcriptDao;
+        this.bookmarkDao = bookmarkDao;
     }
 
     void storeFeedItemlist(List<FeedItem> items) {
@@ -284,6 +286,7 @@ class FeedItemDao extends Dao {
             db.delete(TABLE_NAME_SIMPLECHAPTERS, KEY_FEEDITEM + " IN (" + itemIds + ")", null);
             adSegmentDao.deleteAdSegmentsOfItems(itemIdArray);
             transcriptDao.deleteTranscriptsOfItems(itemIdArray);
+            bookmarkDao.deleteBookmarksOfItems(itemIdArray);
             db.delete(TABLE_NAME_DOWNLOAD_LOG, KEY_FEEDFILETYPE + "=" + FeedMedia.FEEDFILETYPE_FEEDMEDIA
                             + " AND " + KEY_FEEDFILE + " IN (" + mediaIds + ")", null);
             db.delete(TABLE_NAME_FEED_MEDIA, KEY_ID + " IN (" + mediaIds + ")", null);

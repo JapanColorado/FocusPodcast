@@ -50,7 +50,7 @@ class FeedItemExtraInfoFragment
         val root = inflater.inflate(R.layout.feed_into_extra_layout_bottom_sheet, container, false)
 //        root.findViewById<View>(R.id.toolbar).visibility = View.GONE
         viewPager = root.findViewById(R.id.viewpager)
-        viewPager.setOffscreenPageLimit(2)
+        viewPager.setOffscreenPageLimit(3)
         val showTranscript = arguments?.getBoolean(ARG_SHOW_TRANSCRIPT, false) == true
         viewPager.setAdapter(PagerAdapter(this, showTranscript))
 
@@ -73,6 +73,7 @@ class FeedItemExtraInfoFragment
                 when (position) {
                     0 -> tab.setText(R.string.description_label)
                     1 -> tab.setText(R.string.chapters_label)
+                    BOOKMARKS_POS -> tab.setText(R.string.bookmarks_label)
                     TRANSCRIPT_POS -> tab.setText(R.string.transcript_label)
                     else -> {}
                 }
@@ -96,21 +97,23 @@ class FeedItemExtraInfoFragment
             return when (position) {
                 DESC_POS -> FeedItemDescriptionFragment()
                 CHAPTERS_POS -> ChaptersFragment()
+                BOOKMARKS_POS -> EpisodeBookmarksFragment()
                 TRANSCRIPT_POS -> TranscriptFragment()
                 else -> FeedItemDescriptionFragment()
             }
         }
 
         override fun getItemCount(): Int {
-            return if (showTranscript) 3 else 2
+            return if (showTranscript) 4 else 3
         }
     }
 
     companion object {
         const val DESC_POS = 0
         const val CHAPTERS_POS = 1
+        const val BOOKMARKS_POS = 2
         /** Only present when the sheet was created with a transcript ([newInstance]). */
-        const val TRANSCRIPT_POS = 2
+        const val TRANSCRIPT_POS = 3
         private const val ARG_SHOW_TRANSCRIPT = "show_transcript"
 
         /**

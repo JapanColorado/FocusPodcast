@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The overflow menu of one bookmark row. -->
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/bookmark_edit_note"
+        android:title="@string/bookmark_edit_note" />
+    <item
+        android:id="@+id/bookmark_share"
+        android:title="@string/share_label" />
+    <item
+        android:id="@+id/bookmark_delete"
+        android:title="@string/delete_label" />
+</menu>

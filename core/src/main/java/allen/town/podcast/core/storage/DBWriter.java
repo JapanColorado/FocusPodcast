@@ -38,6 +38,7 @@ import allen.town.podcast.core.util.IntentUtils;
 import allen.town.podcast.core.util.LongList;
 import allen.town.podcast.core.util.Permutor;
 import allen.town.podcast.core.util.playback.PlayableUtils;
+import allen.town.podcast.event.BookmarksChangedEvent;
 import allen.town.podcast.event.FavoritesEvent;
 import allen.town.podcast.event.FeedItemEvent;
 import allen.town.podcast.event.FeedListUpdateEvent;
@@ -47,6 +48,7 @@ import allen.town.podcast.event.adskip.AdSegmentsChangedEvent;
 import allen.town.podcast.event.playback.PlaybackHistoryEvent;
 import allen.town.podcast.model.download.DownloadStatus;
 import allen.town.podcast.model.feed.AdSegment;
+import allen.town.podcast.model.feed.Bookmark;
 import allen.town.podcast.model.feed.Feed;
 import allen.town.podcast.model.feed.FeedItem;
 import allen.town.podcast.model.feed.FeedMedia;
@@ -1323,6 +1325,50 @@ public class DBWriter {
             adapter.deleteAdSegment(id);
             adapter.close();
             EventBus.getDefault().post(new AdSegmentsChangedEvent(feedItemId));
+        });
+    }
+
+    /**
+     * Stores a bookmark. Its id is set on the object once stored; a bookmark that already has an
+     * id (one being restored after a delete) keeps it.
+     */
+    public static Future<?> addBookmark(@NonNull final Bookmark bookmark) {
+        return dbExec.submit(() -> {
+            Db adapter = Db.getInstance();
+            adapter.open();
+            adapter.insertBookmark(bookmark);
+            adapter.close();
+            EventBus.getDefault().post(new BookmarksChangedEvent(bookmark.getFeedItemId()));
+        });
+    }
+
+    /**
+     * Replaces the note of a bookmark; a blank note removes it. The id is read on the database
+     * thread, so this may follow {@link #addBookmark} for the same object at once.
+     */
+    public static Future<?> setBookmarkNote(@NonNull final Bookmark bookmark, @Nullable final String note) {
+        final String cleaned = note == null || note.trim().isEmpty() ? null : note.trim();
+        return dbExec.submit(() -> {
+            bookmark.setNote(cleaned);
+            if (bookmark.getId() <= 0) {
+                return;
+            }
+            Db adapter = Db.getInstance();
+            adapter.open();
+            adapter.setBookmarkNote(bookmark.getId(), cleaned);
+            adapter.close();
+            EventBus.getDefault().post(new BookmarksChangedEvent(bookmark.getFeedItemId()));
+        });
+    }
+
+    /** Removes one bookmark; {@link #addBookmark} with the same object puts it back. */
+    public static Future<?> deleteBookmark(@NonNull final Bookmark bookmark) {
+        return dbExec.submit(() -> {
+            Db adapter = Db.getInstance();
+            adapter.open();
+            adapter.deleteBookmark(bookmark.getId());
+            adapter.close();
+            EventBus.getDefault().post(new BookmarksChangedEvent(bookmark.getFeedItemId()));
         });
     }
 

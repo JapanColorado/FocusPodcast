@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-    The playback speed and sleep timer buttons that sit centred between the elapsed and the
-    total time labels. Hosts place it inside the time row with toEndOf txtvPosition and
+    The playback speed, sleep timer and bookmark buttons that sit centred between the elapsed
+    and the total time labels. Hosts place it inside the time row with toEndOf txtvPosition and
     toStartOf txtvLength, so it can never overlap the times: when the room between them runs
     short the buttons narrow and their text shrinks instead. Both are 48dp tall for touch;
     the time row gives up that height with negative margins.
@@ -48,9 +48,23 @@
         app:autoSizeMinTextSize="8sp"
         app:autoSizeStepGranularity="1sp"
         app:autoSizeTextType="uniform"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/butBookmark"
         app:layout_constraintStart_toEndOf="@id/txtvPlaybackSpeed"
         app:layout_constraintWidth_max="84dp"
         tools:text="12:34" />
+
+    <!-- Tap: bookmark the current position. Long-press: bookmark it with a note. -->
+    <androidx.appcompat.widget.AppCompatImageButton
+        android:id="@+id/butBookmark"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:background="?roundSelector"
+        android:contentDescription="@string/bookmark_add"
+        android:scaleType="center"
+        android:src="@drawable/ic_bookmark_add"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/butSleepTimer"
+        app:layout_constraintWidth_max="48dp"
+        app:tint="?android:attr/textColorSecondary" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

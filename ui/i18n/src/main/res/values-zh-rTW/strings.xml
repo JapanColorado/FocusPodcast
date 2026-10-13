@@ -917,4 +917,19 @@
   <string name="transcript_available">有逐字稿</string>
   <string name="search_in_transcript">逐字稿</string>
   <string name="search_in_transcript_hint">只能搜尋已取得的逐字稿：下載單集或開啟其逐字稿時會取得。</string>
+  <string name="bookmarks_label">書籤</string>
+  <string name="bookmark_add">新增書籤</string>
+  <string name="bookmark_added">已新增書籤</string>
+  <string name="bookmark_add_note">新增備註</string>
+  <string name="bookmark_edit_note">編輯備註</string>
+  <string name="bookmark_note_hint">備註</string>
+  <string name="bookmark_at_position">位於 %1$s</string>
+  <string name="bookmark_deleted">已刪除書籤</string>
+  <string name="bookmark_options">書籤選項</string>
+  <string name="bookmark_unavailable">只有 Podcast 單集可以新增書籤</string>
+  <string name="bookmark_share_headline">%1$s — %2$s，%3$s 處</string>
+  <string name="bookmark_row_description">%1$s，%2$s</string>
+  <string name="no_bookmarks_head_label">沒有書籤</string>
+  <string name="no_bookmarks_label">在播放器中輕觸書籤按鈕即可標記目前時刻，長按還可以新增備註。</string>
+  <string name="no_bookmarks_episode">這一集還沒有書籤</string>
 </resources>

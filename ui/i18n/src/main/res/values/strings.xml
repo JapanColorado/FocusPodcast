@@ -1080,4 +1080,19 @@
     <string name="transcript_available">Transcript available</string>
     <string name="search_in_transcript">Transcript</string>
     <string name="search_in_transcript_hint">Only transcripts already fetched can be searched: they are fetched when an episode is downloaded or its transcript is opened.</string>
+    <string name="bookmarks_label">Bookmarks</string>
+    <string name="bookmark_add">Add bookmark</string>
+    <string name="bookmark_added">Bookmark added</string>
+    <string name="bookmark_add_note">Add note</string>
+    <string name="bookmark_edit_note">Edit note</string>
+    <string name="bookmark_note_hint">Note</string>
+    <string name="bookmark_at_position">At %1$s</string>
+    <string name="bookmark_deleted">Bookmark deleted</string>
+    <string name="bookmark_options">Bookmark options</string>
+    <string name="bookmark_unavailable">Bookmarks are only available for podcast episodes</string>
+    <string name="bookmark_share_headline">%1$s — %2$s at %3$s</string>
+    <string name="bookmark_row_description">%1$s, %2$s</string>
+    <string name="no_bookmarks_head_label">No bookmarks</string>
+    <string name="no_bookmarks_label">Tap the bookmark button in the player to mark a moment. Long-press it to add a note too.</string>
+    <string name="no_bookmarks_episode">No bookmarks in this episode yet</string>
 </resources>

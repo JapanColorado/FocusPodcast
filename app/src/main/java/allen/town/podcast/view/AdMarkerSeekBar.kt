@@ -1,5 +1,6 @@
 package allen.town.podcast.view
 
+import allen.town.podcast.core.util.BookmarkUtils
 import allen.town.podcast.model.feed.AdSegment
 import allen.town.podcast.theme.ThemeStore
 import allen.town.podcast.theme.util.ATHUtil
@@ -13,15 +14,19 @@ import androidx.appcompat.widget.AppCompatSeekBar
 import androidx.core.graphics.ColorUtils
 
 /**
- * The player position bar with the ad segments of the current episode painted onto the track.
+ * The player position bar with the ad segments and the bookmarks of the current episode painted
+ * onto the track.
  *
  * Enabled segments get a solid translucent band, segments the user switched off get a fainter
  * band with a hairline outline so they are still findable without suggesting they will be
  * skipped. The colour comes from the theme (its error colour, falling back to the accent), never
  * from a literal, so it follows the app's palette and both light and dark themes.
  *
+ * Bookmarks are thin ticks in the accent colour that stand out above and below the track, so they
+ * read differently from the ad bands and stay visible over the played part of the bar.
+ *
  * The view holds no subscriptions and does no loading: the player fragment hands it the segments
- * it has already loaded, and hands it an empty list when ad skipping is off.
+ * and bookmarks it has already loaded, and hands it an empty list when ad skipping is off.
  */
 class AdMarkerSeekBar @JvmOverloads constructor(
     context: Context,
@@ -39,6 +44,14 @@ class AdMarkerSeekBar @JvmOverloads constructor(
     }
     private val band = RectF()
 
+    private var bookmarkPositionsMs: LongArray = LongArray(0)
+    private var bookmarkDurationMs: Long = 0
+    private val tickPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        style = Paint.Style.FILL
+        color = ThemeStore.accentColor(context)
+    }
+    private val tick = RectF()
+
     /** Cached so onDraw does not resolve theme attributes on every frame. */
     private var bandColor: Int = resolveBandColor()
 
@@ -52,11 +65,18 @@ class AdMarkerSeekBar @JvmOverloads constructor(
         invalidate()
     }
 
+    /**
+     * Replaces the bookmark ticks. [durationMs] is the length of the episode they belong to; a
+     * non-positive duration or an empty list paints none.
+     */
+    fun setBookmarks(positionsMs: List<Long>, durationMs: Long) {
+        this.bookmarkPositionsMs = positionsMs.toLongArray()
+        this.bookmarkDurationMs = durationMs
+        invalidate()
+    }
+
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
-        if (segments.isEmpty() || durationMs <= 0) {
-            return
-        }
         // The track drawable spans the padded width, and AbsSeekBar adds the thumb offset back
         // into the thumb's travel, so the thumb reaches both of these edges too.
         val left = paddingLeft.toFloat()
@@ -67,6 +87,35 @@ class AdMarkerSeekBar @JvmOverloads constructor(
         }
         val bandHeight = bandHeight()
         val centerY = paddingTop + (height - paddingTop - paddingBottom) / 2f
+        drawAdSegments(canvas, left, usableWidth, centerY, bandHeight)
+        drawBookmarkTicks(canvas, left, usableWidth, centerY, bandHeight)
+    }
+
+    private fun drawBookmarkTicks(canvas: Canvas, left: Float, usableWidth: Float, centerY: Float,
+                                  bandHeight: Float) {
+        if (bookmarkPositionsMs.isEmpty() || bookmarkDurationMs <= 0) {
+            return
+        }
+        val tickWidth = dp(TICK_WIDTH_DP)
+        val paddedHeight = (height - paddingTop - paddingBottom).toFloat()
+        val tickHeight = minOf(bandHeight + dp(TICK_OVERHANG_DP) * 2, paddedHeight)
+        val radius = tickWidth / 2f
+        for (positionMs in bookmarkPositionsMs) {
+            val fraction = BookmarkUtils.tickFraction(positionMs, bookmarkDurationMs)
+            if (fraction < 0f) {
+                continue
+            }
+            val x = left + fraction * usableWidth
+            tick.set(x - tickWidth / 2f, centerY - tickHeight / 2f, x + tickWidth / 2f, centerY + tickHeight / 2f)
+            canvas.drawRoundRect(tick, radius, radius, tickPaint)
+        }
+    }
+
+    private fun drawAdSegments(canvas: Canvas, left: Float, usableWidth: Float, centerY: Float,
+                               bandHeight: Float) {
+        if (segments.isEmpty() || durationMs <= 0) {
+            return
+        }
         val radius = bandHeight / 2f
 
         for (segment in segments) {
@@ -132,5 +181,9 @@ class AdMarkerSeekBar @JvmOverloads constructor(
         const val DEFAULT_BAND_HEIGHT_DP = 4f
         const val MIN_BAND_HEIGHT_DP = 3f
         const val MAX_BAND_HEIGHT_DP = 8f
+
+        /** A bookmark tick: this wide, and standing this far out above and below the track. */
+        const val TICK_WIDTH_DP = 2f
+        const val TICK_OVERHANG_DP = 4f
     }
 }

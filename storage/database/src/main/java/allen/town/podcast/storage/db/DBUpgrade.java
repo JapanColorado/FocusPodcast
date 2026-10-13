@@ -71,6 +71,11 @@ class DBUpgrade {
             }
             db.execSQL(DbSchema.CREATE_TABLE_TRANSCRIPTS);
         }
+        if (oldVersion < 10) {
+            // Bookmarks: positions the user marked in an episode, each with an optional note.
+            db.execSQL(DbSchema.CREATE_TABLE_BOOKMARKS);
+            db.execSQL(DbSchema.CREATE_INDEX_BOOKMARKS_FEEDITEM);
+        }
     }
 
     /**

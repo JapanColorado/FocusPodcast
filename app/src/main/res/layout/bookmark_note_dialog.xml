@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The note field of the add-bookmark / edit-note dialog; the position is the dialog's message. -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:paddingHorizontal="20dp"
+    android:paddingTop="8dp">
+
+    <allen.town.podcast.common.views.AccentTextInputLayout
+        android:id="@+id/bookmarkNoteLayout"
+        style="?attr/textInputOutlinedDenseStyle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/bookmark_note_hint"
+        app:hintEnabled="true">
+
+        <allen.town.podcast.common.views.CursorAccentTextInputEditText
+            android:id="@+id/bookmarkNote"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="top|start"
+            android:inputType="textMultiLine|textCapSentences"
+            android:maxLines="6"
+            android:minLines="2" />
+    </allen.town.podcast.common.views.AccentTextInputLayout>
+
+</LinearLayout>

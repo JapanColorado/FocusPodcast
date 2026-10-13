@@ -29,6 +29,8 @@ import androidx.appcompat.content.res.AppCompatResources;
 import androidx.appcompat.widget.Toolbar;
 import androidx.cardview.widget.CardView;
 import androidx.core.graphics.drawable.DrawableCompat;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.accessibility.AccessibilityNodeInfoCompat;
 import androidx.fragment.app.Fragment;
 import androidx.interpolator.view.animation.FastOutSlowInInterpolator;
 import androidx.lifecycle.ViewModelProvider;
@@ -46,6 +48,7 @@ import org.greenrobot.eventbus.ThreadMode;
 
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
@@ -73,10 +76,12 @@ import allen.town.podcast.core.util.IntentUtils;
 import allen.town.podcast.core.util.TimeSpeedConverter;
 import allen.town.podcast.core.util.playback.PlaybackController;
 import allen.town.podcast.dialog.AdSegmentsDialog;
+import allen.town.podcast.dialog.BookmarkNoteDialog;
 import allen.town.podcast.dialog.PlaySpeedDialog;
 import allen.town.podcast.dialog.PlaybackControlsDialog;
 import allen.town.podcast.dialog.SkipPrefDialog;
 import allen.town.podcast.dialog.SleepTimerDialog;
+import allen.town.podcast.event.BookmarksChangedEvent;
 import allen.town.podcast.event.CoverColorChangeEvent;
 import allen.town.podcast.event.adskip.AdSegmentsChangedEvent;
 import allen.town.podcast.event.adskip.AdSkipUndoEvent;
@@ -94,6 +99,7 @@ import allen.town.podcast.event.playback.SleepTimerUpdatedEvent;
 import allen.town.podcast.event.playback.SpeedChangedEvent;
 import allen.town.podcast.menuprocess.FeedItemMenuProcess;
 import allen.town.podcast.model.feed.AdSegment;
+import allen.town.podcast.model.feed.Bookmark;
 import allen.town.podcast.model.feed.Chapter;
 import allen.town.podcast.model.feed.FeedItem;
 import allen.town.podcast.model.feed.FeedMedia;
@@ -143,6 +149,9 @@ public class AudioPlayerFragment extends Fragment implements
     /** Opens the sleep timer dialog and shows the time left; null where a layout has no room for it. */
     @Nullable
     protected TextView butSleepTimer;
+    /** Bookmarks the current position (long-press: with a note); null in a layout without it. */
+    @Nullable
+    protected ImageButton butBookmark;
     protected Toolbar toolbar;
     protected ProgressBar progressIndicator;
     protected CardView cardViewSeek;
@@ -167,6 +176,10 @@ public class AudioPlayerFragment extends Fragment implements
     protected Disposable disposable;
     /** Loads the ad segments of the episode currently shown; replaced on every media change. */
     private Disposable adSegmentsDisposable;
+    /** Loads the bookmarks of the episode currently shown, for the seek bar ticks. */
+    private Disposable bookmarksDisposable;
+    /** The episode the seek bar is currently showing bookmark ticks for, or 0 for none. */
+    private long bookmarksItemId;
     /** Runs the chapter-only analysis a streamed episode can get. */
     private Disposable adAnalysisDisposable;
     /** The episode the seek bar is currently showing segments for, or 0 for none. */
@@ -262,6 +275,7 @@ public class AudioPlayerFragment extends Fragment implements
         butSkip = root.findViewById(R.id.butSkip);
         butPrev = root.findViewById(R.id.butPrev);
         butSleepTimer = root.findViewById(R.id.butSleepTimer);
+        butBookmark = root.findViewById(R.id.butBookmark);
         progressIndicator = root.findViewById(R.id.progLoading);
         cardViewSeek = root.findViewById(R.id.cardViewSeek);
         txtvSeek = root.findViewById(R.id.txtvSeek);
@@ -281,6 +295,16 @@ public class AudioPlayerFragment extends Fragment implements
         txtvPlaybackSpeed.setOnClickListener(v -> new PlaySpeedDialog().show(getChildFragmentManager(), null));
         if (butSleepTimer != null) {
             butSleepTimer.setOnClickListener(v -> showSleepTimerDialog());
+        }
+        if (butBookmark != null) {
+            butBookmark.setOnClickListener(v -> addBookmark(false));
+            butBookmark.setOnLongClickListener(v -> {
+                addBookmark(true);
+                return true;
+            });
+            ViewCompat.replaceAccessibilityAction(butBookmark,
+                    AccessibilityNodeInfoCompat.AccessibilityActionCompat.ACTION_LONG_CLICK,
+                    getString(R.string.bookmark_add_note), null);
         }
         sleepTimerShownMinutes = SLEEP_TIMER_IDLE;
         renderSleepTimerButton();
@@ -480,6 +504,7 @@ public class AudioPlayerFragment extends Fragment implements
         setChapterDividers(media);
         setupOptionsMenu(media);
         loadAdSegments(media);
+        loadBookmarkTicks(media);
         // The timer events are not sticky, so the button learns the current state here.
         updateSleepTimerButton(controller.sleepTimerActive(), controller.getSleepTimerTimeLeft(),
                 controller.getSleepTimerMode());
@@ -593,6 +618,9 @@ public class AudioPlayerFragment extends Fragment implements
         if (butSleepTimer != null) {
             butSleepTimer.setTextColor(color);
             renderSleepTimerButton();
+        }
+        if (butBookmark != null) {
+            butBookmark.setColorFilter(color, PorterDuff.Mode.SRC_IN);
         }
     }
 
@@ -736,6 +764,10 @@ public class AudioPlayerFragment extends Fragment implements
         if (adAnalysisDisposable != null) {
             adAnalysisDisposable.dispose();
             adAnalysisDisposable = null;
+        }
+        if (bookmarksDisposable != null) {
+            bookmarksDisposable.dispose();
+            bookmarksDisposable = null;
         }
     }
 
@@ -1068,6 +1100,101 @@ public class AudioPlayerFragment extends Fragment implements
             return;
         }
         loadAdSegments(controller.getMedia());
+    }
+
+    /**
+     * Bookmarks the position being played, at once or (with {@code withNote}) through the note
+     * dialog. An instant bookmark offers "Add note" on its confirmation snackbar.
+     */
+    private void addBookmark(boolean withNote) {
+        if (controller == null) {
+            return;
+        }
+        Playable media = controller.getMedia();
+        if (!(media instanceof FeedMedia) || ((FeedMedia) media).getItemId() <= 0) {
+            showShortMessage(getString(R.string.bookmark_unavailable));
+            return;
+        }
+        long itemId = ((FeedMedia) media).getItemId();
+        long position = Math.max(0, controller.getPosition());
+        if (withNote) {
+            BookmarkNoteDialog.show(requireContext(), R.string.bookmark_add, position, null,
+                    note -> {
+                        DBWriter.addBookmark(new Bookmark(itemId, position, note, System.currentTimeMillis()));
+                        showBookmarkSnackbar(getString(R.string.bookmark_added), null);
+                    });
+            return;
+        }
+        Bookmark bookmark = new Bookmark(itemId, position, null, System.currentTimeMillis());
+        DBWriter.addBookmark(bookmark);
+        showBookmarkSnackbar(getString(R.string.bookmark_added), v -> {
+            Context context = getContext();
+            if (context != null) {
+                BookmarkNoteDialog.show(context, R.string.bookmark_add_note, position, null,
+                        note -> DBWriter.setBookmarkNote(bookmark, note));
+            }
+        });
+    }
+
+    private void showBookmarkSnackbar(String text, @Nullable View.OnClickListener addNote) {
+        if (!isAdded()) {
+            return;
+        }
+        Snackbar snackbar;
+        if (getActivity() instanceof MainActivity) {
+            snackbar = ((MainActivity) getActivity()).showSnackbarAbovePlayer(text, Snackbar.LENGTH_LONG);
+        } else {
+            View root = getView();
+            if (root == null) {
+                return;
+            }
+            snackbar = Snackbar.make(root, text, Snackbar.LENGTH_LONG);
+            snackbar.show();
+        }
+        if (addNote != null) {
+            snackbar.setAction(getString(R.string.bookmark_add_note), addNote);
+        }
+    }
+
+    /** Paints the bookmarks of the episode onto the position bar as ticks. */
+    private void loadBookmarkTicks(@Nullable Playable media) {
+        if (bookmarksDisposable != null) {
+            bookmarksDisposable.dispose();
+            bookmarksDisposable = null;
+        }
+        if (sbPosition == null) {
+            return;
+        }
+        long itemId = (media instanceof FeedMedia) ? ((FeedMedia) media).getItemId() : 0;
+        if (itemId <= 0) {
+            bookmarksItemId = 0;
+            sbPosition.setBookmarks(Collections.emptyList(), 0);
+            return;
+        }
+        final long mediaDuration = media.getDuration();
+        bookmarksItemId = itemId;
+        bookmarksDisposable = Single.fromCallable(() -> {
+                    List<Long> positions = new ArrayList<>();
+                    for (Bookmark bookmark : DBReader.loadBookmarksOfFeedItem(itemId)) {
+                        positions.add(bookmark.getPositionMs());
+                    }
+                    return positions;
+                })
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(positions -> {
+                    if (sbPosition != null) {
+                        sbPosition.setBookmarks(positions, mediaDuration);
+                    }
+                }, error -> Log.e(TAG, "could not load the bookmarks of item " + itemId, error));
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onBookmarksChanged(BookmarksChangedEvent event) {
+        if (controller == null || event.getFeedItemId() != bookmarksItemId) {
+            return;
+        }
+        loadBookmarkTicks(controller.getMedia());
     }
 
     /** Ad skipping was switched on or off, globally or for a feed: redraw or clear the bands. */

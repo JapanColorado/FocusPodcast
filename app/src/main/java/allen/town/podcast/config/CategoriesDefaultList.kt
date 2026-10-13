@@ -10,6 +10,7 @@ object CategoriesDefaultList {
             CategoryInfo(EpisodesFragment.TAG,true,true),
             CategoryInfo(PlaylistFragment.TAG,true,true),
             CategoryInfo(FavoriteEpisodesFragment.TAG,true,true),
+            CategoryInfo(BookmarksFragment.TAG,true,true),
             CategoryInfo(DownloadPagerFragment.TAG,true,true)
         )
 }

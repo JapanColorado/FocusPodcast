@@ -12,7 +12,7 @@ import static allen.town.podcast.model.feed.FeedPreferences.SPEED_USE_GLOBAL;
 final class DbSchema {
 
     public static final String DATABASE_NAME = "focusPodcastApp.db";
-    public static final int VERSION = 9;
+    public static final int VERSION = 10;
 
     /**
      * Maximum number of arguments for IN-operator.
@@ -130,6 +130,10 @@ final class DbSchema {
     public static final String KEY_TRANSCRIPT_RAW = "raw";
     public static final String KEY_TRANSCRIPT_TEXT = "text";
     public static final String KEY_TRANSCRIPT_FETCHED_AT = "fetched_at";
+    /** Bookmarks (version 10): the marked position, the optional note and when it was made. */
+    public static final String KEY_BOOKMARK_POSITION_MS = "position_ms";
+    public static final String KEY_BOOKMARK_NOTE = "note";
+    public static final String KEY_BOOKMARK_CREATED_AT = "created_at";
 
     // Table names
     public static final String TABLE_NAME_FEEDS = "feeds";
@@ -142,6 +146,7 @@ final class DbSchema {
     public static final String TABLE_NAME_AD_SEGMENTS = "ad_segments";
     public static final String TABLE_NAME_DISMISSED_FEED_WARNINGS = "dismissed_feed_warnings";
     public static final String TABLE_NAME_TRANSCRIPTS = "transcripts";
+    public static final String TABLE_NAME_BOOKMARKS = "bookmarks";
 
     // SQL Statements for creating new tables
     static final String TABLE_PRIMARY_KEY = KEY_ID
@@ -265,6 +270,17 @@ final class DbSchema {
             + KEY_TRANSCRIPT_TEXT + " TEXT,"
             + KEY_TRANSCRIPT_FETCHED_AT + " INTEGER)";
 
+    /**
+     * Positions inside an episode the user marked, any number per episode, each with an optional
+     * note. Removed together with their episode.
+     */
+    static final String CREATE_TABLE_BOOKMARKS = "CREATE TABLE IF NOT EXISTS "
+            + TABLE_NAME_BOOKMARKS + " (" + TABLE_PRIMARY_KEY
+            + KEY_FEEDITEM + " INTEGER,"
+            + KEY_BOOKMARK_POSITION_MS + " INTEGER,"
+            + KEY_BOOKMARK_NOTE + " TEXT,"
+            + KEY_BOOKMARK_CREATED_AT + " INTEGER)";
+
     // SQL Statements for creating indexes
     static final String CREATE_INDEX_FEEDITEMS_FEED = "CREATE INDEX "
             + TABLE_NAME_FEED_ITEMS + "_" + KEY_FEED + " ON " + TABLE_NAME_FEED_ITEMS + " ("
@@ -292,6 +308,10 @@ final class DbSchema {
 
     static final String CREATE_INDEX_AD_SEGMENTS_FEEDITEM = "CREATE INDEX IF NOT EXISTS "
             + TABLE_NAME_AD_SEGMENTS + "_" + KEY_FEEDITEM + " ON " + TABLE_NAME_AD_SEGMENTS + " ("
+            + KEY_FEEDITEM + ")";
+
+    static final String CREATE_INDEX_BOOKMARKS_FEEDITEM = "CREATE INDEX IF NOT EXISTS "
+            + TABLE_NAME_BOOKMARKS + "_" + KEY_FEEDITEM + " ON " + TABLE_NAME_BOOKMARKS + " ("
             + KEY_FEEDITEM + ")";
 
     static final String CREATE_TABLE_FAVORITES = "CREATE TABLE "
@@ -358,7 +378,8 @@ final class DbSchema {
             TABLE_NAME_FAVORITES,
             TABLE_NAME_AD_SEGMENTS,
             TABLE_NAME_DISMISSED_FEED_WARNINGS,
-            TABLE_NAME_TRANSCRIPTS
+            TABLE_NAME_TRANSCRIPTS,
+            TABLE_NAME_BOOKMARKS
     };
 
     public static final String SELECT_KEY_ITEM_ID = "item_id";

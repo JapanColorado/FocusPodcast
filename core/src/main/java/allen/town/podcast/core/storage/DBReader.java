@@ -27,6 +27,7 @@ import allen.town.podcast.core.util.comparator.PlaybackCompletionDateComparator;
 import allen.town.podcast.model.download.DownloadStatus;
 import allen.town.podcast.model.feed.AdSegment;
 import allen.town.podcast.model.feed.AudiobookProgress;
+import allen.town.podcast.model.feed.Bookmark;
 import allen.town.podcast.model.feed.Chapter;
 import allen.town.podcast.model.feed.Feed;
 import allen.town.podcast.model.feed.FeedItem;
@@ -37,6 +38,7 @@ import allen.town.podcast.model.transcript.CachedTranscript;
 import allen.town.podcast.storage.db.Db;
 import allen.town.podcast.storage.db.LongIntMap;
 import allen.town.podcast.storage.db.mapper.AdSegmentCursorMapper;
+import allen.town.podcast.storage.db.mapper.BookmarkCursorMapper;
 import allen.town.podcast.storage.db.mapper.ChapterCursorMapper;
 import allen.town.podcast.storage.db.mapper.DownloadStatusCursorMapper;
 import allen.town.podcast.storage.db.mapper.FeedCursorMapper;
@@ -58,6 +60,9 @@ public final class DBReader {
      * Maximum size of the list returned by {@link #getDownloadLog()}.
      */
     private static final int DOWNLOAD_LOG_SIZE = 200;
+
+    /** Episodes looked up per query by {@link #getAllBookmarksWithItems()}, under SQLite's IN limit. */
+    private static final int BOOKMARK_ITEM_CHUNK = 500;
 
 
     private DBReader() {
@@ -973,6 +978,76 @@ public final class DBReader {
                 segments.add(AdSegmentCursorMapper.convert(cursor));
             }
             return segments;
+        } finally {
+            adapter.close();
+        }
+    }
+
+    /**
+     * Loads the bookmarks of one episode, earliest position first.
+     *
+     * @param feedItemId the id of the episode
+     * @return the bookmarks; an empty list when the episode has none
+     */
+    @NonNull
+    public static List<Bookmark> loadBookmarksOfFeedItem(final long feedItemId) {
+        Db adapter = Db.getInstance();
+        adapter.open();
+        try (Cursor cursor = adapter.getBookmarksOfItemCursor(feedItemId)) {
+            List<Bookmark> bookmarks = new ArrayList<>(cursor.getCount());
+            while (cursor.moveToNext()) {
+                bookmarks.add(BookmarkCursorMapper.convert(cursor));
+            }
+            return bookmarks;
+        } finally {
+            adapter.close();
+        }
+    }
+
+    /**
+     * Loads every bookmark, most recently made first, each with its episode (and the episode's
+     * feed) set through {@link Bookmark#setItem}. Bookmarks whose episode no longer exists are
+     * left out.
+     */
+    @NonNull
+    public static List<Bookmark> getAllBookmarksWithItems() {
+        Db adapter = Db.getInstance();
+        adapter.open();
+        try {
+            List<Bookmark> bookmarks = new ArrayList<>();
+            try (Cursor cursor = adapter.getAllBookmarksCursor()) {
+                while (cursor.moveToNext()) {
+                    bookmarks.add(BookmarkCursorMapper.convert(cursor));
+                }
+            }
+            List<String> itemIds = new ArrayList<>();
+            for (Bookmark bookmark : bookmarks) {
+                String id = String.valueOf(bookmark.getFeedItemId());
+                if (!itemIds.contains(id)) {
+                    itemIds.add(id);
+                }
+            }
+            List<FeedItem> items = new ArrayList<>(itemIds.size());
+            for (int from = 0; from < itemIds.size(); from += BOOKMARK_ITEM_CHUNK) {
+                List<String> chunk = itemIds.subList(from, Math.min(itemIds.size(), from + BOOKMARK_ITEM_CHUNK));
+                try (Cursor cursor = adapter.getFeedItemCursor(chunk.toArray(new String[0]))) {
+                    items.addAll(extractItemlistFromCursor(adapter, cursor));
+                }
+            }
+            loadAdditionalFeedItemListData(items);
+            Map<Long, FeedItem> itemIndex = new HashMap<>(items.size());
+            for (FeedItem item : items) {
+                itemIndex.put(item.getId(), item);
+            }
+            List<Bookmark> result = new ArrayList<>(bookmarks.size());
+            for (Bookmark bookmark : bookmarks) {
+                FeedItem item = itemIndex.get(bookmark.getFeedItemId());
+                if (item != null) {
+                    bookmark.setItem(item);
+                    result.add(bookmark);
+                }
+            }
+            return result;
         } finally {
             adapter.close();
         }

@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The Bookmarks page of the player's episode sheet: the episode's bookmarks, or a message. -->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="?colorSurface">
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/bookmarkList"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clipToPadding="false"
+        android:nestedScrollingEnabled="false"
+        android:paddingHorizontal="@dimen/additional_horizontal_spacing"
+        android:paddingBottom="48dp"
+        android:visibility="gone" />
+
+    <LinearLayout
+        android:id="@+id/bookmarkMessageContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:gravity="center_horizontal"
+        android:orientation="vertical"
+        android:padding="32dp"
+        android:visibility="gone">
+
+        <ImageView
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_marginBottom="12dp"
+            android:importantForAccessibility="no"
+            android:src="@drawable/ic_bookmark" />
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/bookmarkMessage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="@string/no_bookmarks_episode"
+            android:textAppearance="?attr/textAppearanceBodyLarge" />
+    </LinearLayout>
+</FrameLayout>

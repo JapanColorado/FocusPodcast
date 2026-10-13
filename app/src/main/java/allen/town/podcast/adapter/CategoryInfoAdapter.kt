@@ -65,6 +65,9 @@ class CategoryInfoAdapter : RecyclerView.Adapter<CategoryInfoAdapter.ViewHolder>
                 FavoriteEpisodesFragment.TAG -> {
                     R.string.favorite_episodes_label
                 }
+                BookmarksFragment.TAG -> {
+                    R.string.bookmarks_label
+                }
                 DownloadPagerFragment.TAG -> {
                     R.string.downloads_label
                 }
