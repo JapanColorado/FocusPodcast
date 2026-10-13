@@ -16,6 +16,7 @@ import allen.town.podcast.core.service.download.DownloadRequestCreator;
 import allen.town.podcast.core.service.download.DownloadService;
 import allen.town.podcast.core.storage.DBWriter;
 import allen.town.podcast.core.util.LongList;
+import allen.town.podcast.menuprocess.QueuePlacementUi;
 import allen.town.podcast.model.feed.FeedItem;
 
 public class EpisodeMultiSelectActionHandler {
@@ -31,6 +32,10 @@ public class EpisodeMultiSelectActionHandler {
     public void handleAction(int id) {
         if (id == R.id.add_to_queue_batch) {
             queueChecked();
+        } else if (id == R.id.play_next_batch) {
+            QueuePlacementUi.place(activity, selectedItems, true);
+        } else if (id == R.id.play_last_batch) {
+            QueuePlacementUi.place(activity, selectedItems, false);
         } else if (id == R.id.remove_from_queue_batch) {
             removeFromQueueChecked();
         } else if (id == R.id.mark_read_batch) {

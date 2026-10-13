@@ -160,6 +160,16 @@
   <plurals name="added_to_queue_batch_label">
     <item quantity="other">%d エピソードをキューに追加しました</item>
   </plurals>
+  <string name="play_next_label">次に再生</string>
+  <string name="play_last_label">最後に再生</string>
+  <string name="playing_next_label">次に再生します</string>
+  <string name="added_to_end_of_queue_label">キューの最後に追加しました</string>
+  <plurals name="play_next_batch_label">
+    <item quantity="other">%d エピソードを次に再生します</item>
+  </plurals>
+  <plurals name="play_last_batch_label">
+    <item quantity="other">%d エピソードをキューの最後に追加しました</item>
+  </plurals>
   <string name="remove_from_queue_label">キューから削除</string>
   <plurals name="removed_from_queue_batch_label">
     <item quantity="other">%d エピソードをキューから削除しました</item>

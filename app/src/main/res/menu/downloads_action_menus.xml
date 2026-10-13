@@ -13,6 +13,14 @@
         android:title="@string/add_to_queue_label"
         app:showAsAction="always" />
     <item
+        android:id="@+id/play_next_batch"
+        android:icon="@drawable/ic_round_play_next_24"
+        android:title="@string/play_next_label" />
+    <item
+        android:id="@+id/play_last_batch"
+        android:icon="@drawable/ic_round_play_last_24"
+        android:title="@string/play_last_label" />
+    <item
         android:id="@+id/delete_batch"
         android:icon="@drawable/ic_delete"
         android:title="@string/delete_episode_label"

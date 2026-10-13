@@ -72,6 +72,9 @@ public class FeedItemMenuProcess {
         setItemVisibility(menu, R.id.skip_episode_item, isPlaying);
         setItemVisibility(menu, R.id.remove_from_queue_item, isInQueue);
         setItemVisibility(menu, R.id.add_to_queue_item, !isInQueue && selectedItem.getMedia() != null);
+        final boolean canPlace = QueuePlacementUi.canPlace(selectedItem);
+        setItemVisibility(menu, R.id.play_next_item, canPlace);
+        setItemVisibility(menu, R.id.play_last_item, canPlace);
         setItemVisibility(menu, R.id.visit_website_item, !selectedItem.getFeed().isLocalFeed()
                 && ShareUtils.hasLinkToShare(selectedItem));
         setItemVisibility(menu, R.id.share_item, !selectedItem.getFeed().isLocalFeed());
@@ -187,6 +190,10 @@ public class FeedItemMenuProcess {
             }
         } else if (menuItemId == R.id.add_to_queue_item) {
             DBWriter.addQueueItem(context, selectedItem);
+        } else if (menuItemId == R.id.play_next_item) {
+            QueuePlacementUi.playNext(fragment.requireActivity(), selectedItem);
+        } else if (menuItemId == R.id.play_last_item) {
+            QueuePlacementUi.playLast(fragment.requireActivity(), selectedItem);
         } else if (menuItemId == R.id.remove_from_queue_item) {
             DBWriter.removeQueueItem(context, true, selectedItem);
         } else if (menuItemId == R.id.add_to_favorites_item) {

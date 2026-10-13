@@ -19,6 +19,19 @@
 
 
     <item
+        android:id="@+id/play_next_item"
+        android:icon="@drawable/ic_round_play_next_24"
+        custom:showAsAction="collapseActionView"
+        android:title="@string/play_next_label">
+    </item>
+    <item
+        android:id="@+id/play_last_item"
+        android:icon="@drawable/ic_round_play_last_24"
+        custom:showAsAction="collapseActionView"
+        android:title="@string/play_last_label">
+    </item>
+
+    <item
         android:id="@id/skip_episode_item"
         android:title="@string/skip_episode_label"
         android:icon="@drawable/ic_skip_24dp"

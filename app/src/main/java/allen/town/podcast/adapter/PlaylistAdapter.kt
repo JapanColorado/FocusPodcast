@@ -62,6 +62,8 @@ open class PlaylistAdapter(
         val inflater = hostActivity.menuInflater
         inflater.inflate(R.menu.queue_context, menu)
         super.onCreateContextMenu(menu, v, menuInfo)
+        // "Play last" is "Move to bottom" here; the queue keeps its own item for it
+        menu.findItem(R.id.play_last_item)?.isVisible = false
         val pressed = longPressedItem
         if (pressed == null || itemCount == 0) {
             // super already bailed out; nothing sensible to show for a vanished row

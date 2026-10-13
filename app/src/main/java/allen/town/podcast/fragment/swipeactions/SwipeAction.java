@@ -12,6 +12,8 @@ import allen.town.podcast.model.feed.FeedItemFilter;
 public interface SwipeAction {
 
     String ADD_TO_QUEUE = "ADD_TO_QUEUE";
+    String PLAY_NEXT = "PLAY_NEXT";
+    String PLAY_LAST = "PLAY_LAST";
     String START_DOWNLOAD = "START_DOWNLOAD";
     String MARK_FAV = "MARK_FAV";
     String MARK_PLAYED = "MARK_PLAYED";

@@ -230,6 +230,18 @@
         <item quantity="one">%d episode added to playlist</item>
         <item quantity="other">%d episodes added to playlist</item>
     </plurals>
+    <string name="play_next_label">Play next</string>
+    <string name="play_last_label">Play last</string>
+    <string name="playing_next_label">Playing next</string>
+    <string name="added_to_end_of_queue_label">Added to end of playlist</string>
+    <plurals name="play_next_batch_label">
+        <item quantity="one">%d episode will play next</item>
+        <item quantity="other">%d episodes will play next</item>
+    </plurals>
+    <plurals name="play_last_batch_label">
+        <item quantity="one">%d episode added to end of playlist</item>
+        <item quantity="other">%d episodes added to end of playlist</item>
+    </plurals>
     <string name="remove_from_queue_label">Remove from Playlist</string>
     <plurals name="removed_from_queue_batch_label">
         <item quantity="one">%d episode removed from playlist</item>

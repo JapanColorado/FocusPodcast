@@ -447,6 +447,17 @@ class PlaylistFragment : Fragment(), Toolbar.OnMenuItemClickListener, OnSelectMo
                         currentAdapter.endSelectMode()
                     }
                 })
+                adapter.setonPrepareActionListener(object :
+                    MultiSelectAdapter.OnPrepareActionModeListener {
+                    override fun onPrepareActionMode(
+                        mode: androidx.appcompat.view.ActionMode?,
+                        item: Menu?
+                    ) {
+                        // a sorted queue puts the episodes back where they were
+                        item?.findItem(R.id.play_next_batch)?.isVisible =
+                            !DBWriter.isQueueOrderAutomatic()
+                    }
+                })
                 adapter.setOnSelectModeListener(this)
                 recyclerView.adapter = adapter
                 emptyView.updateAdapter(adapter)

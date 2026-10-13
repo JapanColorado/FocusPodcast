@@ -556,6 +556,129 @@ public class DBWriter {
     }
 
     /**
+     * "Play next": puts the items, in the given order, right after the episode that is currently
+     * loaded in the player, or at the front of the queue when nothing is loaded or the current
+     * episode is not queued. Unlike {@link #addQueueItem}, this ignores the enqueue-location
+     * preference, and items that are already queued are moved rather than left where they are.
+     * The currently loaded episode itself is skipped. When the queue is kept sorted
+     * ({@link #isQueueOrderAutomatic()}) the sort still wins, exactly as it does for
+     * {@link #addQueueItem}, so the call then only enqueues.
+     *
+     * @param performAutoDownload true if an auto-download process should be started afterwards
+     */
+    public static Future<?> playNext(final Context context, final boolean performAutoDownload,
+                                     final long... itemIds) {
+        return dbExec.submit(() -> placeInQueueSynchronous(context, true, performAutoDownload, itemIds));
+    }
+
+    /**
+     * "Play last": puts the items, in the given order, at the end of the queue, moving any that
+     * are already queued. Same rules as {@link #playNext} otherwise.
+     */
+    public static Future<?> playLast(final Context context, final boolean performAutoDownload,
+                                     final long... itemIds) {
+        return dbExec.submit(() -> placeInQueueSynchronous(context, false, performAutoDownload, itemIds));
+    }
+
+    private static void placeInQueueSynchronous(final Context context, final boolean next,
+                                                final boolean performAutoDownload,
+                                                final long... itemIds) {
+        if (itemIds.length < 1) {
+            return;
+        }
+        final Db adapter = Db.getInstance();
+        adapter.open();
+        final List<FeedItem> queue = DBReader.getQueue(adapter);
+        final long currentMediaId = PlaybackPreferences.getCurrentlyPlayingFeedMediaId();
+
+        List<FeedItem> placed = new ArrayList<>();
+        List<FeedItem> added = new ArrayList<>();
+        LongList markAsUnplayedIds = new LongList();
+        boolean movedExisting = false;
+        for (long itemId : itemIds) {
+            if (itemListContains(placed, itemId)) {
+                continue;
+            }
+            final int index = indexInItemList(queue, itemId);
+            final FeedItem item = index >= 0 ? queue.get(index) : DBReader.getFeedItem(itemId);
+            if (item == null || item.getMedia() == null) {
+                continue;
+            }
+            if (currentMediaId != PlaybackPreferences.NO_MEDIA_PLAYING
+                    && item.getMedia().getId() == currentMediaId) {
+                // the episode in the player can be neither after itself nor behind the rest
+                continue;
+            }
+            if (index >= 0) {
+                queue.remove(index);
+                movedExisting = true;
+            } else {
+                item.addTag(FeedItem.TAG_QUEUE);
+                added.add(item);
+                if (item.isNew()) {
+                    markAsUnplayedIds.add(item.getId());
+                }
+            }
+            placed.add(item);
+        }
+        if (placed.isEmpty()) {
+            adapter.close();
+            return;
+        }
+
+        int insertPosition = queue.size();
+        if (next) {
+            insertPosition = 0;
+            for (int i = 0; i < queue.size(); i++) {
+                FeedMedia media = queue.get(i).getMedia();
+                if (media != null && media.getId() == currentMediaId) {
+                    insertPosition = i + 1;
+                    break;
+                }
+            }
+        }
+        queue.addAll(insertPosition, placed);
+
+        List<QueueEvent> events = new ArrayList<>();
+        if (movedExisting) {
+            // a mix of moves and inserts is simplest to show as the new queue as a whole
+            events.add(QueueEvent.sorted(queue));
+        } else {
+            for (int i = 0; i < placed.size(); i++) {
+                events.add(QueueEvent.added(placed.get(i), insertPosition + i));
+            }
+        }
+        applySortOrder(queue, events);
+        adapter.setQueue(queue);
+        adapter.close();
+        for (QueueEvent event : events) {
+            EventBus.getDefault().post(event);
+        }
+        if (!added.isEmpty()) {
+            EventBus.getDefault().post(FeedItemEvent.updated(added));
+        }
+        if (markAsUnplayedIds.size() > 0) {
+            DBWriter.markItemPlayed(FeedItem.UNPLAYED, markAsUnplayedIds.toArray());
+        }
+        if (performAutoDownload && !added.isEmpty()) {
+            DBTasks.autodownloadUndownloadedItems(context);
+        }
+    }
+
+    /**
+     * True when the queue is kept sorted by a fixed order, so every change to it is re-sorted and
+     * neither the enqueue location nor "play next" / "play last" decides where an episode lands.
+     * A random keep-sorted order is not re-applied on every change, so it does not count.
+     */
+    public static boolean isQueueOrderAutomatic() {
+        if (!Prefs.isPlaylistKeepSorted()) {
+            return false;
+        }
+        SortOrder sortOrder = Prefs.getQueueKeepSortedOrder();
+        return sortOrder != SortOrder.RANDOM && sortOrder != SortOrder.RANDOM_FAKE;
+    }
+
+    /**
      * Sorts the queue depending on the configured sort order.
      * If the queue is not in keep sorted mode, nothing happens.
      *
@@ -563,17 +686,13 @@ public class DBWriter {
      * @param events Replaces the events by a single SORT event if the list has to be sorted automatically.
      */
     private static void applySortOrder(List<FeedItem> queue, List<QueueEvent> events) {
-        if (!Prefs.isPlaylistKeepSorted()) {
-            // queue is not in keep sorted mode, there's nothing to do
+        if (!isQueueOrderAutomatic()) {
+            // queue is not in keep sorted mode (or shuffled once), there's nothing to do
             return;
         }
 
         // Sort queue by configured sort order
         SortOrder sortOrder = Prefs.getQueueKeepSortedOrder();
-        if (sortOrder == SortOrder.RANDOM || sortOrder == SortOrder.RANDOM_FAKE) {
-            // do not shuffle the list on every change
-            return;
-        }
         Permutor<FeedItem> permutor = FeedItemPermutors.getPermutor(sortOrder);
         permutor.reorder(queue);
 
