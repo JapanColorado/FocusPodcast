@@ -11,6 +11,7 @@ import allen.town.podcast.core.playback.NowPlayingScreen
 import allen.town.podcast.core.pref.PrefsStore.context
 import allen.town.podcast.core.pref.PrefsStore.getString
 import allen.town.podcast.core.pref.PrefsStore.prefs
+import allen.town.podcast.core.service.playback.NotificationCustomAction
 import allen.town.podcast.core.view.TopAppBarLayout.AppBarMode
 import allen.town.podcast.model.feed.EpisodeSearchOptions
 import allen.town.podcast.model.feed.FeedCounter
@@ -92,6 +93,16 @@ internal object UiPrefs {
             val str = TextUtils.join(",", items)
             prefs.edit()
                 .putString(Prefs.PREF_COMPACT_NOTIFICATION_BUTTONS, str)
+                .apply()
+        }
+
+    var notificationCustomButtons: List<NotificationCustomAction>
+        get() = NotificationCustomAction.parse(
+            prefs.getString(Prefs.PREF_NOTIFICATION_CUSTOM_BUTTONS, null)
+        )
+        set(items) {
+            prefs.edit()
+                .putString(Prefs.PREF_NOTIFICATION_CUSTOM_BUTTONS, NotificationCustomAction.serialize(items))
                 .apply()
         }
 

@@ -53,6 +53,7 @@ import allen.town.podcast.event.playback.PlaybackPositionEvent;
 import allen.town.podcast.event.playback.PlaybackServiceEvent;
 import allen.town.podcast.event.playback.SleepTimerMode;
 import allen.town.podcast.event.playback.SleepTimerUpdatedEvent;
+import allen.town.podcast.event.playback.SpeedChangedEvent;
 import allen.town.podcast.event.settings.AdSkipChangedEvent;
 import allen.town.podcast.event.settings.AudioEffectsChangedEvent;
 import allen.town.podcast.event.settings.SkipIntroEndingChangedEvent;
@@ -85,6 +86,8 @@ public class PlaybackService extends MediaBrowserServiceCompat {
     public static final String EXTRA_PLAYABLE = "PlaybackService.PlayableExtra";
     public static final String EXTRA_ALLOW_STREAM_THIS_TIME = "extra.allen.town.podcast.core.service.allowStream";
     public static final String EXTRA_ALLOW_STREAM_ALWAYS = "extra.allen.town.podcast.core.service.allowStreamAlways";
+    /** One of the user's extra notification buttons, see {@link NotificationCustomAction#getSessionAction()}. */
+    static final String EXTRA_CUSTOM_ACTION = "extra.allen.town.podcast.core.service.customAction";
 
     public static final String ACTION_PLAYER_STATUS_CHANGED = "action.allen.town.podcast.core.service.playerStatusChanged";
 
@@ -164,6 +167,8 @@ public class PlaybackService extends MediaBrowserServiceCompat {
     final PlaybackServiceAutoSkipper autoSkipper = new PlaybackServiceAutoSkipper(this);
     /** Skips the stored ad segments of the episode being played. */
     final PlaybackServiceAdSkipper adSkipper = new PlaybackServiceAdSkipper(this);
+    /** The user's extra notification / media session buttons. */
+    final PlaybackServiceCustomActions customActions = new PlaybackServiceCustomActions(this);
     /** The "end of episode" / "end of chapter" sleep timer; the duration one is in the task manager. */
     final PlaybackServiceBoundarySleepTimer boundarySleepTimer = new PlaybackServiceBoundarySleepTimer(this);
     /** True while the sleep timer's fade has lowered the volume. */
@@ -343,6 +348,15 @@ public class PlaybackService extends MediaBrowserServiceCompat {
             return Service.START_NOT_STICKY;
         }
         notificationUpdater.cancelStreamingConfirmation();
+
+        final String customAction = intent.getStringExtra(EXTRA_CUSTOM_ACTION);
+        if (customAction != null) {
+            boolean handled = customActions.perform(customAction);
+            if (!handled && !stateManager.hasReceivedValidStartCommand()) {
+                stateManager.stopService();
+            }
+            return Service.START_NOT_STICKY;
+        }
 
         final int keycode = intent.getIntExtra(MediaButtonReceiver.EXTRA_KEYCODE, -1);
         final boolean hardwareButton = intent.getBooleanExtra(MediaButtonReceiver.EXTRA_HARDWAREBUTTON, false);
@@ -557,6 +571,7 @@ public class PlaybackService extends MediaBrowserServiceCompat {
         @Override
         public void onChapterLoaded(Playable media) {
             sendNotificationBroadcast(NOTIFICATION_TYPE_RELOAD, 0);
+            customActions.refreshIfChanged();
         }
     };
 
@@ -610,6 +625,15 @@ public class PlaybackService extends MediaBrowserServiceCompat {
             mediaPlayer.setVolume(1.0f, 1.0f);
             sleepTimerFadeActive = false;
         }
+        // Starting or ending an end-of-episode / end-of-chapter timer shows or hides "+15 min".
+        customActions.refreshIfChanged();
+    }
+
+    /** The speed button shows the current speed. */
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    @SuppressWarnings("unused")
+    public void speedChanged(SpeedChangedEvent event) {
+        customActions.refreshIfChanged();
     }
 
     /** Starts a sleep timer that pauses after {@code waitingTime} ms, replacing any running one. */
@@ -665,6 +689,11 @@ public class PlaybackService extends MediaBrowserServiceCompat {
      */
     private synchronized void setupNotification(final Playable playable) {
         notificationUpdater.setupNotification(playable);
+    }
+
+    /** Re-posts the playback notification, e.g. because its extra buttons changed. */
+    void refreshNotification(final Playable playable) {
+        setupNotification(playable);
     }
 
     /**
@@ -994,6 +1023,7 @@ public class PlaybackService extends MediaBrowserServiceCompat {
                     autoSkipper.skipEndingIfNecessary();
                     adSkipper.skipIfNecessary();
                     boundarySleepTimer.tick();
+                    customActions.refreshIfChanged();
                 }, error -> Log.e(TAG, "Position observer failed", error));
     }
 
@@ -1014,6 +1044,8 @@ public class PlaybackService extends MediaBrowserServiceCompat {
             (sharedPreferences, key) -> {
                 if (Prefs.PREF_LOCKSCREEN_BACKGROUND.equals(key)) {
                     updateNotificationAndMediaSession(getPlayable());
+                } else if (Prefs.PREF_NOTIFICATION_CUSTOM_BUTTONS.equals(key)) {
+                    customActions.republish();
                 }
             };
 }

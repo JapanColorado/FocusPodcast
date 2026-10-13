@@ -24,6 +24,11 @@
             android:key="pref_compact_noti_buttons"
             android:summary="@string/pref_compact_notification_buttons_sum"
             android:title="@string/pref_compact_notification_buttons_title" />
+        <allen.town.podcast.common.common.prefs.supportv7.ATEPreference
+            android:layout="@layout/list_item_view_no_title"
+            android:key="pref_notification_custom_buttons"
+            android:summary="@string/pref_custom_notification_buttons_sum"
+            android:title="@string/pref_custom_notification_buttons_title" />
         <!-- Android 8+ always shows the playback buttons, so this is hidden there -->
         <allen.town.podcast.common.common.prefs.supportv7.ATESwitchPreference
             android:layout="@layout/list_item_view_switch"

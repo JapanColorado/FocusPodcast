@@ -948,4 +948,11 @@
   <string name="search_in_feed_hint">在 %1$s 中搜索</string>
   <string name="search_no_results_filtered">在当前过滤条件下未找到关于 \"%1$s\" 的结果</string>
   <string name="sort_and_filter_active">排序和过滤（已启用过滤）</string>
+  <string name="pref_custom_notification_buttons_title">额外播放按钮</string>
+  <string name="pref_custom_notification_buttons_sum">在通知、锁屏和车载控制中最多添加两个按钮</string>
+  <string name="custom_action_next_chapter">下一章</string>
+  <string name="custom_action_cycle_speed">切换播放速度</string>
+  <string name="custom_action_speed_label">速度 %1$s</string>
+  <string name="custom_action_sleep_extend">睡眠定时 +15 分钟</string>
+  <string name="custom_action_skip_ad">跳过广告</string>
 </resources>

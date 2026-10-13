@@ -223,6 +223,80 @@ class PlaybackServiceAdSkipper {
     }
 
     /**
+     * True while playback is inside an enabled segment of the playing episode that the "skip ad"
+     * button can skip. Unlike the automatic skip this ignores where playback entered the segment
+     * and whether it was suppressed: the button is the listener asking for it.
+     */
+    boolean isInSkippableSegment() {
+        return currentSkippableSegment() != null;
+    }
+
+    /**
+     * Skips the segment playback is in, exactly as the automatic skip would (including the Undo
+     * offer). Does nothing outside a segment.
+     */
+    void skipCurrentSegment() {
+        AdSegment segment = currentSkippableSegment();
+        Playable playable = service.getPlayable();
+        if (segment == null || playable == null) {
+            return;
+        }
+        int position = service.getCurrentPosition();
+        int duration = service.getDuration();
+        suppressed.add(segment.getId());
+        if (runsToEndOfEpisode(segment, duration)) {
+            service.autoSkipper.markAutoSkipped(itemOf(playable));
+            EventBus.getDefault().post(
+                    new AdSkippedEvent(segmentsItemId, segment.getId(), position, segment.getEndMs()));
+            service.mediaPlayer.skip();
+            return;
+        }
+        long target = skipTarget(segment, duration);
+        if (target <= position) {
+            return;
+        }
+        Log.d(TAG, "Skipping ad segment " + segment + " on request");
+        service.seekTo((int) target);
+        EventBus.getDefault().post(new AdSkippedEvent(segmentsItemId, segment.getId(), position, target));
+    }
+
+    @Nullable
+    private AdSegment currentSkippableSegment() {
+        Playable playable = service.getPlayable();
+        long itemId = itemIdOf(playable);
+        if (itemId == 0 || itemId != segmentsItemId || segments.isEmpty()
+                || !AdSkipUtils.isAdSkipEnabled(playable)) {
+            return null;
+        }
+        int position = service.getCurrentPosition();
+        if (position == PlaybackService.INVALID_TIME) {
+            return null;
+        }
+        return findSegmentAt(segments, position, Prefs.getAdSkipMinConfidence());
+    }
+
+    /**
+     * The enabled segment containing {@code positionMs} that is confident enough to count as an
+     * ad, or null. Suppression and the entry window do not matter here.
+     */
+    @Nullable
+    @VisibleForTesting
+    static AdSegment findSegmentAt(@NonNull List<AdSegment> segments, long positionMs,
+                                   float minConfidence) {
+        for (AdSegment segment : segments) {
+            if (!segment.isEnabled() || !segment.contains(positionMs)) {
+                continue;
+            }
+            if (segment.getSource() == AdSegment.Source.DETECTED
+                    && segment.getConfidence() < minConfidence) {
+                continue;
+            }
+            return segment;
+        }
+        return null;
+    }
+
+    /**
      * The whole decision of {@link #skipIfNecessary()}, without any player or database access.
      *
      * @param segments      the episode's segments
@@ -292,6 +366,7 @@ class PlaybackServiceAdSkipper {
                 .subscribe(loaded -> {
                     if (itemId == segmentsItemId) {
                         segments = loaded;
+                        service.customActions.refreshIfChanged();
                     }
                 }, error -> Log.e(TAG, "Could not load the ad segments of episode " + itemId, error));
         service.addServiceDisposable(segmentLoader);

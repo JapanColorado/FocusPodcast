@@ -29,6 +29,8 @@ import allen.town.podcast.core.util.TimeSpeedConverter;
 import allen.town.podcast.core.util.ui.NotificationUtils;
 import allen.town.podcast.model.playback.Playable;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 import allen.town.podcast.playback.base.PlayerStatus;
@@ -37,6 +39,10 @@ import org.apache.commons.lang3.ArrayUtils;
 public class PlaybackServiceNotificationBuilder {
     private static final String TAG = "PlaybackSrvNotification";
     private static Bitmap defaultIcon = null;
+    /** MediaStyle shows at most this many actions in the expanded notification. */
+    private static final int MAX_EXPANDED_ACTIONS = 5;
+    /** Rewind, play/pause and fast forward are always shown. */
+    private static final int STANDARD_ACTIONS = 3;
 
     private final Context context;
     private Playable playable;
@@ -44,6 +50,8 @@ public class PlaybackServiceNotificationBuilder {
     private PlayerStatus playerStatus;
     private Bitmap icon;
     private String position;
+    private List<NotificationCustomAction> customActions = Collections.emptyList();
+    private float speed = 1.0f;
 
     public PlaybackServiceNotificationBuilder(@NonNull Context context) {
         this.context = context;
@@ -206,7 +214,7 @@ public class PlaybackServiceNotificationBuilder {
         }
         compactActionList.add(numActions++);
 
-        // ff follows play, then we have skip (if it's present)
+        // ff follows play, then the user's extra buttons, then skip (if there is room for it)
         PendingIntent ffButtonPendingIntent = getPendingIntentForMediaAction(
                 KeyEvent.KEYCODE_MEDIA_FAST_FORWARD, numActions);
         notification.addAction(R.drawable.ic_notification_fast_forward, context.getString(R.string.fast_forward_label),
@@ -216,14 +224,29 @@ public class PlaybackServiceNotificationBuilder {
         }
         numActions++;
 
-        PendingIntent skipButtonPendingIntent = getPendingIntentForMediaAction(
-                KeyEvent.KEYCODE_MEDIA_NEXT, numActions);
-        notification.addAction(R.drawable.ic_notification_skip, context.getString(R.string.skip_episode_label),
-                skipButtonPendingIntent);
-        if (Prefs.showSkipOnCompactNotification()) {
-            compactActionList.add(numActions);
+        // MediaStyle drops every action after the fifth. Skip episode gives way to the extra
+        // buttons, unless the user put it in the compact view, where it must stay.
+        boolean skipInCompact = Prefs.showSkipOnCompactNotification();
+        int customCount = Math.min(customActions.size(),
+                MAX_EXPANDED_ACTIONS - STANDARD_ACTIONS - (skipInCompact ? 1 : 0));
+        for (int i = 0; i < customCount; i++) {
+            NotificationCustomAction action = customActions.get(i);
+            notification.addAction(PlaybackServiceCustomActions.getIcon(action),
+                    PlaybackServiceCustomActions.getTitle(context, action, speed),
+                    getPendingIntentForCustomAction(action, numActions));
+            numActions++;
         }
-        numActions++;
+
+        if (skipInCompact || STANDARD_ACTIONS + customCount < MAX_EXPANDED_ACTIONS) {
+            PendingIntent skipButtonPendingIntent = getPendingIntentForMediaAction(
+                    KeyEvent.KEYCODE_MEDIA_NEXT, numActions);
+            notification.addAction(R.drawable.ic_notification_skip, context.getString(R.string.skip_episode_label),
+                    skipButtonPendingIntent);
+            if (skipInCompact) {
+                compactActionList.add(numActions);
+            }
+            numActions++;
+        }
 
         PendingIntent stopButtonPendingIntent = getPendingIntentForMediaAction(
                 KeyEvent.KEYCODE_MEDIA_STOP, numActions);
@@ -246,6 +269,28 @@ public class PlaybackServiceNotificationBuilder {
             return PendingIntent.getService(context, requestCode, intent, PendingIntent.FLAG_UPDATE_CURRENT
                     | (Build.VERSION.SDK_INT >= 23 ? PendingIntent.FLAG_IMMUTABLE : 0));
         }
+    }
+
+    private PendingIntent getPendingIntentForCustomAction(NotificationCustomAction action, int requestCode) {
+        Intent intent = new Intent(context, PlaybackService.class);
+        intent.setAction(action.getSessionAction());
+        intent.putExtra(PlaybackService.EXTRA_CUSTOM_ACTION, action.getSessionAction());
+
+        if (Build.VERSION.SDK_INT >= 26) {
+            return PendingIntent.getForegroundService(context, requestCode, intent,
+                    PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+        } else {
+            return PendingIntent.getService(context, requestCode, intent, PendingIntent.FLAG_UPDATE_CURRENT
+                    | (Build.VERSION.SDK_INT >= 23 ? PendingIntent.FLAG_IMMUTABLE : 0));
+        }
+    }
+
+    /**
+     * The user's extra buttons that apply now, in order, and the speed the speed button shows.
+     */
+    public void setCustomActions(List<NotificationCustomAction> customActions, float speed) {
+        this.customActions = customActions;
+        this.speed = speed;
     }
 
     public void setMediaSessionToken(MediaSessionCompat.Token mediaSessionToken) {

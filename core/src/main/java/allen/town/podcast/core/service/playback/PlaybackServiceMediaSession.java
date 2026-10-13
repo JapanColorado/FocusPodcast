@@ -37,7 +37,8 @@ import io.reactivex.schedulers.Schedulers;
  * (creating it, re-activating an existing one and releasing it), the transport control callback
  * that hardware media buttons, the lock screen, Android Auto and Android Wear dispatch into, and
  * everything the service publishes through the session: the {@link PlaybackStateCompat} with its
- * capabilities and car/watch custom actions, the {@link MediaMetadataCompat} of the currently
+ * capabilities and custom actions (car/watch rewind and fast forward plus the user's extra
+ * buttons from {@link PlaybackServiceCustomActions}), the {@link MediaMetadataCompat} of the currently
  * playing episode and the queue. The service keeps every public entry point and simply delegates
  * to this class, which calls back into the service for playback operations.
  */
@@ -129,6 +130,9 @@ class PlaybackServiceMediaSession {
      * @param playerStatus the current {@link PlayerStatus}
      */
     void updatePlaybackState(final PlayerStatus playerStatus) {
+        if (mediaSession == null) {
+            return;
+        }
         PlaybackStateCompat.Builder sessionState = new PlaybackStateCompat.Builder();
 
         int state;
@@ -199,6 +203,7 @@ class PlaybackServiceMediaSession {
                         CUSTOM_ACTION_FAST_FORWARD,
                         service.getString(R.string.fast_forward_label), R.drawable.ic_notification_fast_forward)
                         .build());
+            service.customActions.addTo(sessionState, false);
         } else {
             // This would give the PIP of videos a play button
             capabilities = capabilities | PlaybackStateCompat.ACTION_PLAY;
@@ -212,6 +217,11 @@ class PlaybackServiceMediaSession {
                         service.getString(R.string.fast_forward_label),
                         android.R.drawable.ic_media_ff);
                 WearMediaSession.mediaSessionSetExtraForWear(mediaSession);
+                service.customActions.addTo(sessionState, true);
+            } else {
+                // The lock screen and the Android 13+ media controls take their extra buttons
+                // from these custom actions, not from the notification's actions.
+                service.customActions.addTo(sessionState, false);
             }
         }
 
@@ -386,6 +396,8 @@ class PlaybackServiceMediaSession {
                 onFastForward();
             } else if (CUSTOM_ACTION_REWIND.equals(action)) {
                 onRewind();
+            } else if (!service.customActions.perform(action)) {
+                Log.d(TAG, "Unknown custom action " + action);
             }
         }
     };

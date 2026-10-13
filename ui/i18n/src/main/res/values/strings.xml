@@ -1062,4 +1062,11 @@
     <string name="search_in_feed_hint">Search in %1$s</string>
     <string name="search_no_results_filtered">No results for \"%1$s\" with the current filters</string>
     <string name="sort_and_filter_active">Sort &amp; filter (filters on)</string>
+    <string name="pref_custom_notification_buttons_title">Extra playback buttons</string>
+    <string name="pref_custom_notification_buttons_sum">Add up to two buttons to the notification, lock screen and car controls</string>
+    <string name="custom_action_next_chapter">Next chapter</string>
+    <string name="custom_action_cycle_speed">Cycle playback speed</string>
+    <string name="custom_action_speed_label">Speed %1$s</string>
+    <string name="custom_action_sleep_extend">Sleep timer +15 min</string>
+    <string name="custom_action_skip_ad">Skip ad</string>
 </resources>

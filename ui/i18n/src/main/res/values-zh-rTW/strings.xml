@@ -899,4 +899,11 @@
   <string name="search_in_feed_hint">在 %1$s 中搜尋</string>
   <string name="search_no_results_filtered">在目前的篩選條件下找不到「%1$s」</string>
   <string name="sort_and_filter_active">排序與篩選（已套用篩選）</string>
+  <string name="pref_custom_notification_buttons_title">額外播放按鈕</string>
+  <string name="pref_custom_notification_buttons_sum">在通知、鎖定畫面和車用控制中最多加入兩個按鈕</string>
+  <string name="custom_action_next_chapter">下一章</string>
+  <string name="custom_action_cycle_speed">切換播放速度</string>
+  <string name="custom_action_speed_label">速度 %1$s</string>
+  <string name="custom_action_sleep_extend">睡眠定時 +15 分鐘</string>
+  <string name="custom_action_skip_ad">略過廣告</string>
 </resources>

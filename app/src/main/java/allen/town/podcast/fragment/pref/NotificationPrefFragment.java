@@ -15,6 +15,7 @@ import android.widget.Toast;
 import androidx.appcompat.app.AlertDialog;
 import androidx.preference.Preference;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import allen.town.podcast.R;
@@ -22,6 +23,7 @@ import allen.town.podcast.activity.SettingsActivity;
 import allen.town.podcast.common.util.TopSnackbarUtil;
 import allen.town.podcast.common.views.AccentMaterialDialog;
 import allen.town.podcast.core.pref.Prefs;
+import allen.town.podcast.core.service.playback.NotificationCustomAction;
 import allen.town.podcast.core.sync.SynchronizationSettings;
 
 /**
@@ -64,6 +66,84 @@ public class NotificationPrefFragment extends AbsSettingsFragment {
             showNotificationButtonsDialog();
             return true;
         });
+        findPreference(Prefs.PREF_NOTIFICATION_CUSTOM_BUTTONS).setOnPreferenceClickListener(preference -> {
+            showCustomButtonsDialog();
+            return true;
+        });
+        updateCustomButtonsSummary();
+    }
+
+    private static int customButtonLabel(NotificationCustomAction action) {
+        switch (action) {
+            case NEXT_CHAPTER:
+                return R.string.custom_action_next_chapter;
+            case CYCLE_SPEED:
+                return R.string.custom_action_cycle_speed;
+            case SLEEP_TIMER_EXTEND:
+                return R.string.custom_action_sleep_extend;
+            case SKIP_AD:
+            default:
+                return R.string.custom_action_skip_ad;
+        }
+    }
+
+    /** Lists the chosen extra buttons in their order, or explains the setting when none is. */
+    private void updateCustomButtonsSummary() {
+        Preference preference = findPreference(Prefs.PREF_NOTIFICATION_CUSTOM_BUTTONS);
+        if (preference == null) {
+            return;
+        }
+        List<NotificationCustomAction> selected = Prefs.getNotificationCustomButtons();
+        if (selected.isEmpty()) {
+            preference.setSummary(R.string.pref_custom_notification_buttons_sum);
+            return;
+        }
+        List<String> names = new ArrayList<>();
+        for (NotificationCustomAction action : selected) {
+            names.add(getString(customButtonLabel(action)));
+        }
+        preference.setSummary(android.text.TextUtils.join(", ", names));
+    }
+
+    /**
+     * Picks up to {@link NotificationCustomAction#MAX_SELECTED} extra buttons. They appear in the
+     * order they were ticked.
+     */
+    private void showCustomButtonsDialog() {
+        final Context context = requireContext();
+        final NotificationCustomAction[] all = NotificationCustomAction.values();
+        final List<NotificationCustomAction> selected = new ArrayList<>(Prefs.getNotificationCustomButtons());
+        final String[] names = new String[all.length];
+        final boolean[] checked = new boolean[all.length];
+        for (int i = 0; i < all.length; i++) {
+            names[i] = context.getString(customButtonLabel(all[i]));
+            checked[i] = selected.contains(all[i]);
+        }
+        final int max = NotificationCustomAction.MAX_SELECTED;
+
+        AlertDialog.Builder builder = new AccentMaterialDialog(context, R.style.MaterialAlertDialogTheme);
+        builder.setTitle(context.getString(R.string.pref_compact_notification_buttons_dialog_title, max));
+        builder.setMultiChoiceItems(names, checked, (dialog, which, isChecked) -> {
+            if (!isChecked) {
+                checked[which] = false;
+                selected.remove(all[which]);
+            } else if (selected.size() < max) {
+                checked[which] = true;
+                selected.add(all[which]);
+            } else {
+                checked[which] = false;
+                ((AlertDialog) dialog).getListView().setItemChecked(which, false);
+                TopSnackbarUtil.showSnack(getActivity(),
+                        context.getString(R.string.pref_compact_notification_buttons_dialog_error, max),
+                        Toast.LENGTH_SHORT);
+            }
+        });
+        builder.setPositiveButton(R.string.confirm_label, (dialog, which) -> {
+            Prefs.setNotificationCustomButtons(selected);
+            updateCustomButtonsSummary();
+        });
+        builder.setNegativeButton(R.string.cancel_label, null);
+        builder.create().show();
     }
 
     private void openSystemNotificationSettings() {

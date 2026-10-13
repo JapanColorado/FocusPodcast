@@ -121,6 +121,8 @@ class PlaybackServiceNotificationUpdater {
         notificationBuilder.setPlayable(playable);
         notificationBuilder.setMediaSessionToken(service.mediaSessionHolder.getSessionToken());
         notificationBuilder.setPlayerStatus(playerStatus);
+        notificationBuilder.setCustomActions(service.customActions.getVisible(),
+                service.getCurrentPlaybackSpeed());
         notificationBuilder.updatePosition(service.getCurrentPosition(), service.getCurrentPlaybackSpeed());
 
         NotificationManagerCompat notificationManager = NotificationManagerCompat.from(service);

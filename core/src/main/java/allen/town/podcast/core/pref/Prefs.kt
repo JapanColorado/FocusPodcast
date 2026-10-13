@@ -5,6 +5,7 @@ import allen.town.podcast.core.feed.AudiobookShelfFilter
 import allen.town.podcast.core.feed.SubscriptionsFilter
 import allen.town.podcast.core.playback.AlbumCoverStyle
 import allen.town.podcast.core.playback.NowPlayingScreen
+import allen.town.podcast.core.service.playback.NotificationCustomAction
 import allen.town.podcast.core.storage.EpisodeCleanupAlgorithm
 import allen.town.podcast.core.view.TopAppBarLayout.AppBarMode
 import allen.town.podcast.model.download.ProxyConfig
@@ -44,6 +45,7 @@ object Prefs {
     const val PREF_EXPANDED_NOTIFICATION = "pref_expand_notification"
     const val PREF_SHOW_TIME_LEFT = "pref_show_left_time" //show remaining time
     const val PREF_COMPACT_NOTIFICATION_BUTTONS = "pref_compact_noti_buttons"
+    const val PREF_NOTIFICATION_CUSTOM_BUTTONS = "pref_notification_custom_buttons"
     const val PREF_LOCKSCREEN_BACKGROUND = "pref_lock_screen_backgound"
     const val PREF_COLUMN_IN_LANDSCAPE = "prefColumnDisplayInLandscape"
     const val PREF_BACK_BUTTON_BEHAVIOR = "pref_backbutton_behavior"
@@ -135,6 +137,17 @@ object Prefs {
         get() = UiPrefs.compactNotificationButtons
         set(items) {
             UiPrefs.compactNotificationButtons = items
+        }
+
+    /**
+     * The extra buttons (next chapter, speed, sleep timer, skip ad) the user added to the
+     * notification and media controls, in order; at most [NotificationCustomAction.MAX_SELECTED].
+     */
+    @JvmStatic
+    var notificationCustomButtons: List<NotificationCustomAction>
+        get() = UiPrefs.notificationCustomButtons
+        set(items) {
+            UiPrefs.notificationCustomButtons = items
         }
 
     @JvmStatic
