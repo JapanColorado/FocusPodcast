@@ -7,6 +7,8 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -48,6 +50,15 @@ public class FeedItem extends FeedComponent implements Serializable {
      */
     private String transcriptUrl;
     private String transcriptType;
+    /**
+     * The Podcasting 2.0 {@code <podcast:person>} and {@code <podcast:soundbite>} tags of this item;
+     * null when the feed lists none or, for items read by the list queries, when they were not
+     * loaded (see {@code DBReader.loadPodcastingExtrasOfFeedItem}).
+     */
+    @Nullable
+    private ArrayList<Person> persons;
+    @Nullable
+    private ArrayList<Soundbite> soundbites;
 
     /**
      * Disc and track number from the file's tags (local feeds only); 0 when unknown. Used by
@@ -178,6 +189,12 @@ public class FeedItem extends FeedComponent implements Serializable {
         if (other.transcriptUrl != null) {
             transcriptUrl = other.transcriptUrl;
             transcriptType = other.transcriptType;
+        }
+        if (other.persons != null) {
+            persons = other.persons;
+        }
+        if (other.soundbites != null) {
+            soundbites = other.soundbites;
         }
         if (other.discNumber > 0) {
             discNumber = other.discNumber;
@@ -471,6 +488,55 @@ public class FeedItem extends FeedComponent implements Serializable {
      */
     public void removeTag(String tag) {
         tags.remove(tag);
+    }
+
+    /** The item's own {@code <podcast:person>} tags; null when it has none or they were not loaded. */
+    @Nullable
+    public List<Person> getPersons() {
+        return persons;
+    }
+
+    public void setPersons(@Nullable List<Person> persons) {
+        this.persons = persons == null || persons.isEmpty() ? null : new ArrayList<>(persons);
+    }
+
+    public void addPerson(@NonNull Person person) {
+        if (persons == null) {
+            persons = new ArrayList<>();
+        }
+        persons.add(person);
+    }
+
+    /**
+     * The people credited for this episode: its own {@code <podcast:person>} tags when it has any,
+     * otherwise those of its podcast, as the namespace specifies. Empty when there are none.
+     */
+    @NonNull
+    public List<Person> getEffectivePersons() {
+        if (persons != null && !persons.isEmpty()) {
+            return persons;
+        }
+        if (feed != null && feed.getPersons() != null) {
+            return feed.getPersons();
+        }
+        return Collections.emptyList();
+    }
+
+    /** The item's {@code <podcast:soundbite>} highlights; null when it has none or they were not loaded. */
+    @Nullable
+    public List<Soundbite> getSoundbites() {
+        return soundbites;
+    }
+
+    public void setSoundbites(@Nullable List<Soundbite> soundbites) {
+        this.soundbites = soundbites == null || soundbites.isEmpty() ? null : new ArrayList<>(soundbites);
+    }
+
+    public void addSoundbite(@NonNull Soundbite soundbite) {
+        if (soundbites == null) {
+            soundbites = new ArrayList<>();
+        }
+        soundbites.add(soundbite);
     }
 
     public String getPodcastIndexChapterUrl() {

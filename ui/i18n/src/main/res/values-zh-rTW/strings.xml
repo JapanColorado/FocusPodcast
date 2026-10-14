@@ -925,6 +925,17 @@
   <string name="bookmark_note_hint">備註</string>
   <string name="bookmark_at_position">位於 %1$s</string>
   <string name="bookmark_deleted">已刪除書籤</string>
+  <string name="people_label">人物</string>
+  <string name="hosts_label">主持人</string>
+  <string name="person_role_host">主持人</string>
+  <string name="person_role_cohost">共同主持人</string>
+  <string name="person_role_guest">來賓</string>
+  <string name="person_chip_description">%1$s，%2$s</string>
+  <string name="person_chip_open_description">%1$s，%2$s。開啟其頁面</string>
+  <string name="highlights_label">精彩片段</string>
+  <string name="highlight_at">%1$s 處的精彩片段</string>
+  <string name="highlight_play_description">播放精彩片段 %1$s，從 %2$s 開始，長度 %3$s</string>
+  <string name="play_a_highlight">播放精彩片段</string>
   <string name="bookmark_options">書籤選項</string>
   <string name="bookmark_unavailable">只有 Podcast 單集可以新增書籤</string>
   <string name="bookmark_share_headline">%1$s — %2$s，%3$s 處</string>

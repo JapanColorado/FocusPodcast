@@ -676,6 +676,17 @@
   <string name="bookmark_note_hint">メモ</string>
   <string name="bookmark_at_position">%1$s の位置</string>
   <string name="bookmark_deleted">ブックマークを削除しました</string>
+  <string name="people_label">出演者</string>
+  <string name="hosts_label">ホスト</string>
+  <string name="person_role_host">ホスト</string>
+  <string name="person_role_cohost">共同ホスト</string>
+  <string name="person_role_guest">ゲスト</string>
+  <string name="person_chip_description">%1$s、%2$s</string>
+  <string name="person_chip_open_description">%1$s、%2$s。ページを開きます</string>
+  <string name="highlights_label">ハイライト</string>
+  <string name="highlight_at">%1$s のハイライト</string>
+  <string name="highlight_play_description">ハイライト「%1$s」を %2$s から再生（%3$s）</string>
+  <string name="play_a_highlight">ハイライトを再生</string>
   <string name="bookmark_options">ブックマークのオプション</string>
   <string name="bookmark_unavailable">ブックマークはポッドキャストのエピソードでのみ使えます</string>
   <string name="bookmark_share_headline">%1$s — %2$s（%3$s）</string>

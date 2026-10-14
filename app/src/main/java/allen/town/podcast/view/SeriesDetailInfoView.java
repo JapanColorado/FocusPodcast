@@ -28,6 +28,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 
 import allen.town.podcast.common.util.ImageUtils;
 import allen.town.podcast.common.util.TopSnackbarUtil;
@@ -35,9 +36,13 @@ import allen.town.podcast.common.util.Util;
 import allen.town.podcast.theme.ThemeStore;
 import allen.town.podcast.theme.util.ATHUtil;
 import allen.town.podcast.R;
+import allen.town.podcast.core.util.BookmarkUtils;
+import allen.town.podcast.core.util.Converter;
 import allen.town.podcast.databinding.ViewSeriesDetailInfoBinding;
 import allen.town.podcast.model.feed.Feed;
 import allen.town.podcast.model.feed.FeedFunding;
+import allen.town.podcast.model.feed.Person;
+import allen.town.podcast.model.feed.Soundbite;
 import allen.town.podcast.util.AnimationsUtils;
 import allen.town.podcast.util.MovementCheck;
 
@@ -184,7 +189,45 @@ public class SeriesDetailInfoView extends FrameLayout {
                 binding.txtvFundingUrl.setText(str.toString());
             }
 
+            bindHosts(feed);
 
+
+    }
+
+    /** The podcast's hosts and co-hosts from its channel-level {@code <podcast:person>} tags. */
+    private void bindHosts(Feed feed) {
+        List<Person> hosts = new ArrayList<>();
+        if (feed.getPersons() != null) {
+            for (Person person : feed.getPersons()) {
+                if (person.isHost()) {
+                    hosts.add(person);
+                }
+            }
+        }
+        int visibility = hosts.isEmpty() ? View.GONE : View.VISIBLE;
+        binding.lblHosts.setVisibility(visibility);
+        binding.hostsScroll.setVisibility(visibility);
+        PodcastingViews.bindPeople(binding.hostsRow, hosts);
+    }
+
+    /**
+     * Shows the "Play a highlight" button for {@code soundbite}, or hides it when null.
+     * {@code onPlay} runs when it is tapped.
+     */
+    public void setHighlight(@Nullable Soundbite soundbite, @Nullable Runnable onPlay) {
+        if (soundbite == null || onPlay == null) {
+            binding.playHighlightButton.setVisibility(View.GONE);
+            binding.playHighlightButton.setOnClickListener(null);
+            return;
+        }
+        String title = PodcastingViews.highlightTitle(getContext(), soundbite);
+        binding.playHighlightButton.setContentDescription(getContext().getString(
+                R.string.highlight_play_description, title,
+                BookmarkUtils.formatPosition(soundbite.getStartMs()),
+                Converter.getDurationStringLocalized(
+                        getContext(), soundbite.getDurationMs())));
+        binding.playHighlightButton.setOnClickListener(v -> onPlay.run());
+        binding.playHighlightButton.setVisibility(View.VISIBLE);
     }
 
     private void checkAllLoaded(String str) {

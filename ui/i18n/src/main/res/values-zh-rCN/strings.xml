@@ -974,6 +974,17 @@
   <string name="bookmark_note_hint">备注</string>
   <string name="bookmark_at_position">位于 %1$s</string>
   <string name="bookmark_deleted">已删除书签</string>
+  <string name="people_label">人物</string>
+  <string name="hosts_label">主播</string>
+  <string name="person_role_host">主播</string>
+  <string name="person_role_cohost">联合主播</string>
+  <string name="person_role_guest">嘉宾</string>
+  <string name="person_chip_description">%1$s，%2$s</string>
+  <string name="person_chip_open_description">%1$s，%2$s。打开其主页</string>
+  <string name="highlights_label">精彩片段</string>
+  <string name="highlight_at">%1$s 处的精彩片段</string>
+  <string name="highlight_play_description">播放精彩片段 %1$s，从 %2$s 开始，时长 %3$s</string>
+  <string name="play_a_highlight">播放精彩片段</string>
   <string name="bookmark_options">书签选项</string>
   <string name="bookmark_unavailable">只有播客单集可以添加书签</string>
   <string name="bookmark_share_headline">%1$s — %2$s，%3$s 处</string>

@@ -25,6 +25,10 @@ import allen.town.podcast.event.UnreadItemsUpdateEvent
 import allen.town.podcast.event.playback.PlaybackPositionEvent
 import allen.town.podcast.model.feed.FeedItem
 import allen.town.podcast.model.feed.FeedMedia
+import allen.town.podcast.model.feed.Person
+import allen.town.podcast.model.feed.Soundbite
+import allen.town.podcast.util.PlayAtPosition
+import allen.town.podcast.view.PodcastingViews
 import allen.town.podcast.viewholder.EpisodeItemViewHolder
 import android.os.Build
 import android.os.Bundle
@@ -48,6 +52,7 @@ import com.bumptech.glide.request.RequestOptions
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import org.apache.commons.lang3.ArrayUtils
@@ -70,6 +75,10 @@ class FeedItemFragment : Fragment() {
     private var disposable: Disposable? = null
     private var sizeDisposable: Disposable? = null
     private var controller: PlaybackController? = null
+    private val playDisposables = CompositeDisposable()
+    /** What the people row and highlights list currently show, so a reload only rebuilds on change. */
+    private var boundPersons: List<Person>? = null
+    private var boundSoundbites: List<Soundbite>? = null
     private lateinit var floatingPlayActionButton: ExtendedFloatingActionButton
 
     /** Kept so the pending post can be cancelled when the view goes away. */
@@ -205,6 +214,13 @@ class FeedItemFragment : Fragment() {
             binding.webvDescription.destroy()
         }
         _binding = null
+        boundPersons = null
+        boundSoundbites = null
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        playDisposables.dispose()
     }
 
     private fun onFragmentLoaded() {
@@ -238,6 +254,7 @@ class FeedItemFragment : Fragment() {
             )
         }
         binding.txtvTranscriptAvailable.visibility = if (item.hasTranscript()) View.VISIBLE else View.GONE
+        bindPodcastingExtras(item)
         val options = RequestOptions()
             .error(R.drawable.ic_podcast_background_round)
             .diskCacheStrategy(ApGlideSettings.AP_DISK_CACHE_STRATEGY)
@@ -253,6 +270,30 @@ class FeedItemFragment : Fragment() {
             .centerCrop()
             .into(binding.imgvCover)
         updateButtons()
+    }
+
+    /** The people chips (the episode's own, else the podcast's) and the highlights. */
+    private fun bindPodcastingExtras(item: FeedItem) {
+        val binding = feedItemListFragmentBinding
+        val persons = item.effectivePersons
+        if (persons != boundPersons) {
+            boundPersons = persons
+            binding.peopleSection.visibility = if (persons.isEmpty()) View.GONE else View.VISIBLE
+            PodcastingViews.bindPeople(binding.peopleRow, persons)
+        }
+        val soundbites = item.soundbites.orEmpty()
+        if (soundbites != boundSoundbites) {
+            boundSoundbites = soundbites
+            binding.highlightsSection.visibility =
+                if (soundbites.isEmpty() || item.media == null) View.GONE else View.VISIBLE
+            PodcastingViews.bindHighlights(binding.highlightsList, soundbites) { playHighlight(it) }
+        }
+    }
+
+    private fun playHighlight(soundbite: Soundbite) {
+        val item = this.item ?: return
+        PlayAtPosition.play({ activity }, controller, item, soundbite.startMs)
+            ?.let { playDisposables.add(it) }
     }
 
     private fun updatePlayButton() {
@@ -468,6 +509,7 @@ class FeedItemFragment : Fragment() {
         if (feedItem != null && context != null) {
             val duration = feedItem.media?.duration ?: Int.MAX_VALUE
             DBReader.loadDescriptionOfFeedItem(feedItem)
+            DBReader.loadPodcastingExtrasOfFeedItem(feedItem)
             val t = Timeline(context, feedItem.description, duration)
             webviewData = t.processShownotes()
         }

@@ -62,6 +62,9 @@ public class Feed extends FeedFile implements Parcelable {
     private String lastUpdate;
 
     private ArrayList<FeedFunding> fundingList;
+    /** The channel's {@code <podcast:person>} tags; null when the feed lists none. */
+    @Nullable
+    private ArrayList<Person> persons;
     /**
      * Feed type, for example RSS 2 or Atom.
      */
@@ -299,6 +302,9 @@ public class Feed extends FeedFile implements Parcelable {
         if (other.fundingList != null) {
             fundingList = other.fundingList;
         }
+        if (other.persons != null) {
+            persons = other.persons;
+        }
         // this feed's nextPage might already point to a higher page, so we only update the nextPage value
         // if this feed is not paged and the other feed is.
         if (!this.paged && other.paged) {
@@ -343,6 +349,9 @@ public class Feed extends FeedFile implements Parcelable {
             if (author == null || !author.equals(other.author)) {
                 return true;
             }
+        }
+        if (other.persons != null && !other.persons.equals(persons)) {
+            return true;
         }
         if (other.fundingList != null) {
             if (fundingList == null || !fundingList.equals(other.fundingList)) {
@@ -454,6 +463,23 @@ public class Feed extends FeedFile implements Parcelable {
             fundingList = new ArrayList<FeedFunding>();
         }
         fundingList.add(funding);
+    }
+
+    /** The channel's {@code <podcast:person>} tags; null when the feed lists none. */
+    @Nullable
+    public List<Person> getPersons() {
+        return persons;
+    }
+
+    public void setPersons(@Nullable List<Person> persons) {
+        this.persons = persons == null || persons.isEmpty() ? null : new ArrayList<>(persons);
+    }
+
+    public void addPerson(Person person) {
+        if (persons == null) {
+            persons = new ArrayList<>();
+        }
+        persons.add(person);
     }
 
     public ArrayList<FeedFunding> getPaymentLinks() {

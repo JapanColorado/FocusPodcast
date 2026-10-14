@@ -12,7 +12,7 @@ import static allen.town.podcast.model.feed.FeedPreferences.SPEED_USE_GLOBAL;
 final class DbSchema {
 
     public static final String DATABASE_NAME = "focusPodcastApp.db";
-    public static final int VERSION = 10;
+    public static final int VERSION = 11;
 
     /**
      * Maximum number of arguments for IN-operator.
@@ -126,6 +126,14 @@ final class DbSchema {
      */
     public static final String KEY_TRANSCRIPT_URL = "transcript_url";
     public static final String KEY_TRANSCRIPT_TYPE = "transcript_type";
+    /**
+     * Podcasting 2.0 {@code <podcast:person>} tags, on {@code feeds} (the channel's) and on
+     * {@code episodes} (the item's own), and {@code <podcast:soundbite>} tags on {@code episodes},
+     * each list stored as JSON (see {@code PodcastingJson}); added in version 11. The episode
+     * columns are left out of the list projections and read only for the episode screen.
+     */
+    public static final String KEY_PERSONS = "persons";
+    public static final String KEY_SOUNDBITES = "soundbites";
     /** Transcript cache: the raw download, its searchable text, and the URL it came from. */
     public static final String KEY_TRANSCRIPT_RAW = "raw";
     public static final String KEY_TRANSCRIPT_TEXT = "text";
@@ -186,7 +194,8 @@ final class DbSchema {
             + KEY_FEED_SKIP_INTRO + " INTEGER DEFAULT 0,"
             + KEY_AUDIOBOOK + " INTEGER DEFAULT 0,"
             + KEY_CLEAR_VOICE + " INTEGER DEFAULT 0,"
-            + KEY_FEED_AD_SKIP_OVERRIDE + " INTEGER)";
+            + KEY_FEED_AD_SKIP_OVERRIDE + " INTEGER,"
+            + KEY_PERSONS + " TEXT)";
 
     static final String CREATE_TABLE_FEED_ITEMS = "CREATE TABLE "
             + TABLE_NAME_FEED_ITEMS + " (" + TABLE_PRIMARY_KEY
@@ -201,7 +210,9 @@ final class DbSchema {
             + KEY_DISC_NUMBER + " INTEGER DEFAULT 0,"
             + KEY_TRACK_NUMBER + " INTEGER DEFAULT 0,"
             + KEY_TRANSCRIPT_URL + " TEXT,"
-            + KEY_TRANSCRIPT_TYPE + " TEXT)";
+            + KEY_TRANSCRIPT_TYPE + " TEXT,"
+            + KEY_PERSONS + " TEXT,"
+            + KEY_SOUNDBITES + " TEXT)";
 
     static final String CREATE_TABLE_FEED_MEDIA = "CREATE TABLE "
             + TABLE_NAME_FEED_MEDIA + " (" + TABLE_PRIMARY_KEY + KEY_DURATION
@@ -362,7 +373,8 @@ final class DbSchema {
             TABLE_NAME_FEEDS + "." + KEY_FEED_SKIP_ENDING,
             TABLE_NAME_FEEDS + "." + KEY_EPISODE_NOTIFICATION,
             TABLE_NAME_FEEDS + "." + KEY_FEED_AD_SKIP_OVERRIDE,
-            TABLE_NAME_FEEDS + "." + KEY_AUDIOBOOK
+            TABLE_NAME_FEEDS + "." + KEY_AUDIOBOOK,
+            TABLE_NAME_FEEDS + "." + KEY_PERSONS
     };
 
     /**

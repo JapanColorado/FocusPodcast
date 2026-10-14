@@ -133,6 +133,8 @@ public class Db {
     public static final String KEY_WARNING_KEY = DbSchema.KEY_WARNING_KEY;
     public static final String KEY_TRANSCRIPT_URL = DbSchema.KEY_TRANSCRIPT_URL;
     public static final String KEY_TRANSCRIPT_TYPE = DbSchema.KEY_TRANSCRIPT_TYPE;
+    public static final String KEY_PERSONS = DbSchema.KEY_PERSONS;
+    public static final String KEY_SOUNDBITES = DbSchema.KEY_SOUNDBITES;
     public static final String KEY_TRANSCRIPT_RAW = DbSchema.KEY_TRANSCRIPT_RAW;
     public static final String KEY_TRANSCRIPT_TEXT = DbSchema.KEY_TRANSCRIPT_TEXT;
     public static final String KEY_TRANSCRIPT_FETCHED_AT = DbSchema.KEY_TRANSCRIPT_FETCHED_AT;
@@ -521,6 +523,21 @@ public class Db {
      */
     public final Cursor getDescriptionOfItem(final FeedItem item) {
         return itemDao.getDescriptionOfItem(item);
+    }
+
+    /**
+     * The Podcasting 2.0 people and soundbites of one episode (columns {@link #KEY_PERSONS} and
+     * {@link #KEY_SOUNDBITES}, JSON or NULL), which the list queries leave out.
+     */
+    public final Cursor getPodcastingExtrasOfItem(final long itemId) {
+        return itemDao.getPodcastingExtrasOfItem(itemId);
+    }
+
+    /**
+     * The id of the newest episode of the feed that has soundbites, or 0 when none has.
+     */
+    public final long getNewestItemIdWithSoundbites(final long feedId) {
+        return itemDao.getNewestItemIdWithSoundbites(feedId);
     }
 
     public final Cursor getSimpleChaptersOfFeedItemCursor(final FeedItem item) {

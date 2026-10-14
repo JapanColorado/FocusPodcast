@@ -6,6 +6,7 @@ import androidx.annotation.NonNull;
 
 import allen.town.podcast.model.feed.Feed;
 import allen.town.podcast.model.feed.FeedPreferences;
+import allen.town.podcast.model.feed.PodcastingJson;
 import allen.town.podcast.model.feed.SortOrder;
 import allen.town.podcast.storage.db.Db;
 
@@ -65,6 +66,11 @@ public abstract class FeedCursorMapper {
                 cursor.getInt(indexIsSubscribed) > 0,
                 cursor.getString(indexItunesFeedId)
         );
+
+        int indexPersons = cursor.getColumnIndex(Db.KEY_PERSONS);
+        if (indexPersons >= 0) {
+            feed.setPersons(PodcastingJson.personsFromJson(cursor.getString(indexPersons)));
+        }
 
         FeedPreferences preferences = FeedPreferencesCursorMapper.convert(cursor);
         feed.setPreferences(preferences);

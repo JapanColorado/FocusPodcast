@@ -25,8 +25,10 @@ import static allen.town.podcast.storage.db.DbSchema.KEY_LINK;
 import static allen.town.podcast.storage.db.DbSchema.KEY_PAYMENT_LINK;
 import static allen.town.podcast.storage.db.DbSchema.KEY_PODCASTINDEX_CHAPTER_URL;
 import static allen.town.podcast.storage.db.DbSchema.KEY_POSITION;
+import static allen.town.podcast.storage.db.DbSchema.KEY_PERSONS;
 import static allen.town.podcast.storage.db.DbSchema.KEY_PUBDATE;
 import static allen.town.podcast.storage.db.DbSchema.KEY_READ;
+import static allen.town.podcast.storage.db.DbSchema.KEY_SOUNDBITES;
 import static allen.town.podcast.storage.db.DbSchema.KEY_START;
 import static allen.town.podcast.storage.db.DbSchema.KEY_TITLE;
 import static allen.town.podcast.storage.db.DbSchema.KEY_TRANSCRIPT_TEXT;
@@ -64,6 +66,7 @@ import allen.town.podcast.model.feed.Feed;
 import allen.town.podcast.model.feed.FeedItem;
 import allen.town.podcast.model.feed.FeedItemFilter;
 import allen.town.podcast.model.feed.FeedMedia;
+import allen.town.podcast.model.feed.PodcastingJson;
 import allen.town.podcast.storage.db.mapper.FeedItemFilterQuery;
 
 /**
@@ -187,6 +190,14 @@ class FeedItemDao extends Dao {
         values.put(KEY_PODCASTINDEX_CHAPTER_URL, item.getPodcastIndexChapterUrl());
         values.put(KEY_TRANSCRIPT_URL, item.getTranscriptUrl());
         values.put(KEY_TRANSCRIPT_TYPE, item.getTranscriptType());
+        // Like the description these are only written when present: items read by the list
+        // queries come without them, and storing such an item must not erase them.
+        if (item.getPersons() != null) {
+            values.put(KEY_PERSONS, PodcastingJson.personsToJson(item.getPersons()));
+        }
+        if (item.getSoundbites() != null) {
+            values.put(KEY_SOUNDBITES, PodcastingJson.soundbitesToJson(item.getSoundbites()));
+        }
         values.put(KEY_DISC_NUMBER, item.getDiscNumber());
         values.put(KEY_TRACK_NUMBER, item.getTrackNumber());
 
@@ -337,6 +348,19 @@ class FeedItemDao extends Dao {
                 + " FROM " + TABLE_NAME_FEED_ITEMS
                 + " WHERE " + KEY_ID + "=" + item.getId();
         return db.rawQuery(query, null);
+    }
+
+    final Cursor getPodcastingExtrasOfItem(final long itemId) {
+        return db.query(TABLE_NAME_FEED_ITEMS, new String[]{KEY_PERSONS, KEY_SOUNDBITES},
+                KEY_ID + "=?", new String[]{String.valueOf(itemId)}, null, null, null);
+    }
+
+    final long getNewestItemIdWithSoundbites(final long feedId) {
+        try (Cursor cursor = db.query(TABLE_NAME_FEED_ITEMS, new String[]{KEY_ID},
+                KEY_FEED + "=? AND " + KEY_SOUNDBITES + " IS NOT NULL",
+                new String[]{String.valueOf(feedId)}, null, null, KEY_PUBDATE + " DESC", "1")) {
+            return cursor.moveToFirst() ? cursor.getLong(0) : 0;
+        }
     }
 
     final Cursor getSimpleChaptersOfFeedItemCursor(final FeedItem item) {

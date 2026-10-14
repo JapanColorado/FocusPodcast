@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Contents of allen.town.podcast.view.SeriesDetailInfoView, inflated by the view itself. -->
 <merge xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     tools:parentTag="android.widget.FrameLayout">
 
@@ -14,6 +15,19 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
+
+            <!-- Preview of an unsubscribed podcast: plays the newest episode's first highlight -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/playHighlightButton"
+                style="@style/Widget.MaterialComponents.Button.TextButton.Icon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:minHeight="48dp"
+                android:text="@string/play_a_highlight"
+                android:visibility="gone"
+                app:icon="@drawable/ic_play_24dp"
+                tools:visibility="visible" />
 
             <FrameLayout
                 android:id="@+id/description_container"
@@ -150,6 +164,32 @@
                     android:paddingTop="4dp"
                     android:paddingBottom="4dp"
                     tools:background="@android:color/holo_green_dark" />
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:id="@+id/lblHosts"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginBottom="8dp"
+                    android:accessibilityHeading="true"
+                    android:text="@string/hosts_label"
+                    android:textColor="?android:attr/textColorPrimary"
+                    android:textSize="18sp"
+                    android:visibility="gone" />
+
+                <HorizontalScrollView
+                    android:id="@+id/hostsScroll"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:scrollbars="none"
+                    android:visibility="gone">
+
+                    <LinearLayout
+                        android:id="@+id/hostsRow"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal" />
+                </HorizontalScrollView>
 
             </LinearLayout>
         </LinearLayout>

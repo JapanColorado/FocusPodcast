@@ -7,10 +7,12 @@ import allen.town.podcast.MyApp.Companion.runOnUiThread
 import allen.town.podcast.R
 import allen.town.podcast.core.glide.ApGlideSettings
 import allen.town.podcast.core.glide.FastBlurTransformation
+import allen.town.podcast.core.storage.DBReader
 import allen.town.podcast.core.storage.DBWriter
 import allen.town.podcast.dialog.RemoveFeedDialog.OnFeedRemovedListener
 import allen.town.podcast.dialog.RemoveFeedDialog.show
 import allen.town.podcast.model.feed.Feed
+import allen.town.podcast.model.feed.FeedItem
 import allen.town.podcast.view.SeriesDetailInfoView
 import allen.town.podcast.view.SubscribeButton
 import android.animation.Animator
@@ -26,10 +28,16 @@ import android.widget.TextView
 import androidx.fragment.app.Fragment
 import allen.town.podcast.theme.ThemeStore.Companion.accentColor
 import allen.town.podcast.theme.util.ATHUtil.resolveColor
+import allen.town.podcast.util.PlayAtPosition
 import allen.town.podcast.util.TouchTargets
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import com.joanzapata.iconify.Iconify
+import io.reactivex.Maybe
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.disposables.Disposable
+import io.reactivex.schedulers.Schedulers
 
 /**
  * Owns the collapsing header of [allen.town.podcast.fragment.FeedItemlistFragment]: the podcast
@@ -67,6 +75,8 @@ internal class FeedItemListHeader(
     private val subscribeButton: SubscribeButton = root.findViewById(R.id.subscribe_button)
 
     private var headerCreated = false
+    private var highlightDisposable: Disposable? = null
+    private val playDisposables = CompositeDisposable()
 
     init {
         imgvBackground.setOnClickListener { openAbout() }
@@ -100,6 +110,44 @@ internal class FeedItemListHeader(
 
     fun setEpisodesLoaded(loaded: Boolean) {
         detailInfoView.setEpisodesLoaded(loaded)
+    }
+
+    /**
+     * For a podcast being previewed (not subscribed), offers to play the first highlight of its
+     * newest episode that has any, so the show can be sampled before subscribing. Hidden for
+     * subscribed and local podcasts and when no episode has highlights.
+     */
+    fun loadHighlight() {
+        highlightDisposable?.dispose()
+        val feed = currentFeed()
+        if (feed == null || feed.id <= 0 || feed.isSubscribed || feed.isLocalFeed) {
+            detailInfoView.setHighlight(null, null)
+            return
+        }
+        highlightDisposable = Maybe.fromCallable<FeedItem> { DBReader.getNewestItemWithSoundbites(feed.id) }
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(
+                { item: FeedItem ->
+                    val soundbite = item.soundbites?.firstOrNull()
+                    if (soundbite == null || item.media == null) {
+                        detailInfoView.setHighlight(null, null)
+                    } else {
+                        detailInfoView.setHighlight(soundbite) {
+                            PlayAtPosition.play({ fragment.activity }, null, item, soundbite.startMs)
+                                ?.let { playDisposables.add(it) }
+                        }
+                    }
+                },
+                { error: Throwable -> Log.e(TAG, "could not load a highlight", error) },
+                { detailInfoView.setHighlight(null, null) }
+            )
+    }
+
+    /** Stops pending loads; called when the fragment's view goes away. */
+    fun release() {
+        highlightDisposable?.dispose()
+        playDisposables.clear()
     }
 
     fun showSubscribeButton() {

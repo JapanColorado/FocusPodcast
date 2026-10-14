@@ -233,6 +233,7 @@ class FeedItemlistFragment() : Fragment(), OnItemClickListener, Toolbar.OnMenuIt
         onPanelCollapsed(requireActivity() as AppCompatActivity)
         EventBus.getDefault().unregister(this)
         loader.dispose()
+        header.release()
         adapter?.endSelectMode()
         // displayList() only attaches the adapter when it is null; a surviving fragment instance
         // with a new RecyclerView would otherwise show an empty list forever
@@ -464,6 +465,7 @@ class FeedItemlistFragment() : Fragment(), OnItemClickListener, Toolbar.OnMenuIt
                     //while a download is in progress this UI logic is not needed
                     displayList()
                     header.setEpisodesLoaded(true)
+                    header.loadHighlight()
                     val loadedFeed = feed
                     if (loadedFeed != null && loadedFeed.getId() > 0) {
                         header.showSubscribeButton()

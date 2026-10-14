@@ -1088,6 +1088,17 @@
     <string name="bookmark_note_hint">Note</string>
     <string name="bookmark_at_position">At %1$s</string>
     <string name="bookmark_deleted">Bookmark deleted</string>
+    <string name="people_label">People</string>
+    <string name="hosts_label">Hosts</string>
+    <string name="person_role_host">Host</string>
+    <string name="person_role_cohost">Co-host</string>
+    <string name="person_role_guest">Guest</string>
+    <string name="person_chip_description">%1$s, %2$s</string>
+    <string name="person_chip_open_description">%1$s, %2$s. Opens their page</string>
+    <string name="highlights_label">Highlights</string>
+    <string name="highlight_at">Highlight at %1$s</string>
+    <string name="highlight_play_description">Play highlight %1$s, from %2$s, %3$s long</string>
+    <string name="play_a_highlight">Play a highlight</string>
     <string name="bookmark_options">Bookmark options</string>
     <string name="bookmark_unavailable">Bookmarks are only available for podcast episodes</string>
     <string name="bookmark_share_headline">%1$s — %2$s at %3$s</string>

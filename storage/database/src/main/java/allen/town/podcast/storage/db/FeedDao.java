@@ -38,6 +38,7 @@ import static allen.town.podcast.storage.db.DbSchema.KEY_LANGUAGE;
 import static allen.town.podcast.storage.db.DbSchema.KEY_LASTUPDATE;
 import static allen.town.podcast.storage.db.DbSchema.KEY_LAST_UPDATE_FAILED;
 import static allen.town.podcast.storage.db.DbSchema.KEY_LINK;
+import static allen.town.podcast.storage.db.DbSchema.KEY_PERSONS;
 import static allen.town.podcast.storage.db.DbSchema.KEY_CLEAR_VOICE;
 import static allen.town.podcast.storage.db.DbSchema.KEY_MINIMAL_DURATION_FILTER;
 import static allen.town.podcast.storage.db.DbSchema.KEY_MONO_ENABLED;
@@ -79,6 +80,7 @@ import allen.town.podcast.model.feed.FeedCounter;
 import allen.town.podcast.model.feed.FeedFunding;
 import allen.town.podcast.model.feed.FeedItem;
 import allen.town.podcast.model.feed.FeedPreferences;
+import allen.town.podcast.model.feed.PodcastingJson;
 import allen.town.podcast.model.feed.SortOrder;
 
 /**
@@ -126,6 +128,9 @@ class FeedDao extends Dao {
         }
         values.put(KEY_SORT_ORDER, toCodeString(feed.getSortOrder()));
         values.put(KEY_LAST_UPDATE_FAILED, feed.hasLastUpdateFailed());
+        if (feed.getPersons() != null) {
+            values.put(KEY_PERSONS, PodcastingJson.personsToJson(feed.getPersons()));
+        }
         if (feed.getId() == 0) {
             // Create new entry
             Log.d(TAG, "insert new feed into db");

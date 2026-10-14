@@ -71,8 +71,8 @@ public class DbTest {
     // ---------------------------------------------------------------- schema
 
     @Test
-    public void freshDatabaseIsAtSchemaVersion10() {
-        assertEquals(10, Db.VERSION);
+    public void freshDatabaseIsAtSchemaVersion11() {
+        assertEquals(11, Db.VERSION);
         assertEquals(Db.VERSION, Db.getInstance().getDb().getVersion());
     }
 
@@ -495,9 +495,12 @@ public class DbTest {
         return status;
     }
 
-    /** Replaces the feeds table with the current layout minus the override column. */
+    /**
+     * Replaces the feeds table with the current layout minus the override column (and the later
+     * persons column, which the upgrade ladder adds back).
+     */
     private static void rebuildFeedsTable(SQLiteDatabase db, String tail) {
-        String current = "," + Db.KEY_FEED_AD_SKIP_OVERRIDE + " INTEGER)";
+        String current = "," + Db.KEY_FEED_AD_SKIP_OVERRIDE + " INTEGER," + Db.KEY_PERSONS + " TEXT)";
         assertTrue(DbSchema.CREATE_TABLE_FEEDS.endsWith(current));
         db.execSQL("DROP TABLE " + Db.TABLE_NAME_FEEDS);
         db.execSQL(DbSchema.CREATE_TABLE_FEEDS.replace(current, tail));

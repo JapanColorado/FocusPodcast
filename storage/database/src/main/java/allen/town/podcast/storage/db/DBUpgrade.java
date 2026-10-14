@@ -76,6 +76,19 @@ class DBUpgrade {
             db.execSQL(DbSchema.CREATE_TABLE_BOOKMARKS);
             db.execSQL(DbSchema.CREATE_INDEX_BOOKMARKS_FEEDITEM);
         }
+        if (oldVersion < 11) {
+            // Podcasting 2.0 people (podcast and episode) and soundbites (episode), as JSON.
+            // Existing rows read NULL (none) until the next refresh of their feed.
+            addTextColumn(db, DbSchema.TABLE_NAME_FEEDS, DbSchema.KEY_PERSONS);
+            addTextColumn(db, DbSchema.TABLE_NAME_FEED_ITEMS, DbSchema.KEY_PERSONS);
+            addTextColumn(db, DbSchema.TABLE_NAME_FEED_ITEMS, DbSchema.KEY_SOUNDBITES);
+        }
+    }
+
+    private static void addTextColumn(final SQLiteDatabase db, final String table, final String column) {
+        if (!hasColumn(db, table, column)) {
+            db.execSQL("ALTER TABLE " + table + " ADD COLUMN " + column + " TEXT");
+        }
     }
 
     /**

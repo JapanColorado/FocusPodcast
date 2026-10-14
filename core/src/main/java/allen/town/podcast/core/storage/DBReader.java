@@ -34,6 +34,7 @@ import allen.town.podcast.model.feed.FeedItem;
 import allen.town.podcast.model.feed.FeedItemFilter;
 import allen.town.podcast.model.feed.FeedMedia;
 import allen.town.podcast.model.feed.FeedPreferences;
+import allen.town.podcast.model.feed.PodcastingJson;
 import allen.town.podcast.model.transcript.CachedTranscript;
 import allen.town.podcast.storage.db.Db;
 import allen.town.podcast.storage.db.LongIntMap;
@@ -899,6 +900,54 @@ public final class DBReader {
                 String description = cursor.getString(indexDescription);
                 item.setDescriptionIfLonger(description);
             }
+        } finally {
+            adapter.close();
+        }
+    }
+
+    /**
+     * Loads the Podcasting 2.0 people and soundbites of an episode, which the list queries leave
+     * out. Either stays null when the episode has none.
+     */
+    public static void loadPodcastingExtrasOfFeedItem(final FeedItem item) {
+        Db adapter = Db.getInstance();
+        adapter.open();
+        try {
+            loadPodcastingExtrasOfFeedItem(item, adapter);
+        } finally {
+            adapter.close();
+        }
+    }
+
+    private static void loadPodcastingExtrasOfFeedItem(final FeedItem item, Db adapter) {
+        try (Cursor cursor = adapter.getPodcastingExtrasOfItem(item.getId())) {
+            if (cursor.moveToFirst()) {
+                item.setPersons(PodcastingJson.personsFromJson(
+                        cursor.getString(cursor.getColumnIndexOrThrow(Db.KEY_PERSONS))));
+                item.setSoundbites(PodcastingJson.soundbitesFromJson(
+                        cursor.getString(cursor.getColumnIndexOrThrow(Db.KEY_SOUNDBITES))));
+            }
+        }
+    }
+
+    /**
+     * The newest episode of the feed that has soundbites, with its people and soundbites loaded;
+     * null when no episode of the feed has any.
+     */
+    @Nullable
+    public static FeedItem getNewestItemWithSoundbites(final long feedId) {
+        Db adapter = Db.getInstance();
+        adapter.open();
+        try {
+            long itemId = adapter.getNewestItemIdWithSoundbites(feedId);
+            if (itemId == 0) {
+                return null;
+            }
+            FeedItem item = getFeedItem(itemId, adapter);
+            if (item != null) {
+                loadPodcastingExtrasOfFeedItem(item, adapter);
+            }
+            return item;
         } finally {
             adapter.close();
         }

@@ -1,0 +1,28 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<rss version="2.0" xmlns:podcast="https://podcastindex.org/namespace/1.0">
+    <channel>
+        <title>title</title>
+        <podcast:person href="https://example.com/alice" img="https://example.com/alice.jpg">Alice Host</podcast:person>
+        <podcast:person role="Co-Host" group="Cast">  Bob Cohost  </podcast:person>
+        <podcast:person role="producer" group="Writing &amp; Production"></podcast:person>
+        <podcast:liveItem status="pending">
+            <podcast:person role="guest">Live Guest</podcast:person>
+        </podcast:liveItem>
+        <item>
+            <title>With guest</title>
+            <guid>with-guest</guid>
+            <podcast:person role="host">Alice Host</podcast:person>
+            <podcast:person role="GUEST" img="" href="https://example.com/carol">Carol Guest</podcast:person>
+            <podcast:soundbite startTime="73.0" duration="60.5">Why the ocean is salty</podcast:soundbite>
+            <podcast:soundbite startTime="1234.5" duration="42" />
+            <podcast:soundbite startTime="abc" duration="30">Not a number</podcast:soundbite>
+            <podcast:soundbite startTime="10" duration="0">Zero duration</podcast:soundbite>
+            <podcast:soundbite startTime="-5" duration="20">Negative start</podcast:soundbite>
+            <podcast:soundbite duration="20">No start</podcast:soundbite>
+        </item>
+        <item>
+            <title>Inherits</title>
+            <guid>inherits</guid>
+        </item>
+    </channel>
+</rss>

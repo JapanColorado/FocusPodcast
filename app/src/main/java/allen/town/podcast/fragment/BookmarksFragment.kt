@@ -1,22 +1,17 @@
 package allen.town.podcast.fragment
 
 import allen.town.podcast.R
-import allen.town.podcast.actionbuttons.PlayActionButton
 import allen.town.podcast.activity.MainActivity
 import allen.town.podcast.adapter.BookmarkAdapter
 import allen.town.podcast.common.util.DoubleClickBackToContentTopListener
-import allen.town.podcast.core.pref.PlaybackPreferences
-import allen.town.podcast.core.service.playback.PlaybackService
 import allen.town.podcast.core.storage.DBReader
-import allen.town.podcast.core.storage.DBWriter
 import allen.town.podcast.core.util.playback.PlaybackController
 import allen.town.podcast.databinding.BookmarksFragmentBinding
 import allen.town.podcast.event.BookmarksChangedEvent
 import allen.town.podcast.event.FeedListUpdateEvent
 import allen.town.podcast.model.feed.Bookmark
-import allen.town.podcast.model.feed.FeedItem
-import allen.town.podcast.playback.base.PlayerStatus
 import allen.town.podcast.util.BookmarkActions
+import allen.town.podcast.util.PlayAtPosition
 import allen.town.podcast.view.EmptyViewHandler
 import android.os.Bundle
 import android.util.Log
@@ -26,7 +21,6 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.snackbar.Snackbar
-import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
@@ -134,42 +128,11 @@ class BookmarksFragment : Fragment(), BookmarkAdapter.Listener,
             )
     }
 
-    /**
-     * Plays the bookmark's episode from the bookmarked position. When that episode is the one
-     * loaded in the player it seeks there (and resumes); otherwise the position is stored first
-     * and the episode started the usual way, which picks it up.
-     */
+    /** Plays the bookmark's episode from the bookmarked position (see [PlayAtPosition]). */
     override fun onBookmarkClicked(bookmark: Bookmark) {
         val item = bookmark.item ?: return
-        val media = item.media ?: return
-        val position = bookmark.positionMs.toInt()
-        val controller = this.controller
-        if (controller != null && PlaybackService.isRunning
-            && PlaybackPreferences.getCurrentlyPlayingFeedMediaId() == media.id
-        ) {
-            controller.seekTo(position)
-            if (controller.status != PlayerStatus.PLAYING) {
-                controller.playPause()
-            }
-            return
-        }
-        playDisposables.add(Completable.fromAction {
-            val stored = DBReader.getFeedMedia(media.id) ?: media
-            stored.setPosition(position)
-            DBWriter.setFeedMediaPlaybackInformation(stored).get()
-            media.setPosition(position)
-        }
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe(
-                { startPlayback(item) },
-                { error: Throwable -> Log.e(TAG, "could not store the bookmark position", error) }
-            ))
-    }
-
-    private fun startPlayback(item: FeedItem) {
-        val activity = activity ?: return
-        PlayActionButton(item).onClick(activity)
+        PlayAtPosition.play({ activity }, controller, item, bookmark.positionMs)
+            ?.let { playDisposables.add(it) }
     }
 
     override fun onBookmarkMenu(bookmark: Bookmark, anchor: View) {

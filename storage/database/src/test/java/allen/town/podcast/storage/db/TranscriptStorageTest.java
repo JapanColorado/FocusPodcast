@@ -137,10 +137,10 @@ public class TranscriptStorageTest {
     public void upgradeFromVersion8AddsTheTranscriptColumnsAndTable() {
         SQLiteDatabase db = Db.getInstance().getDb();
         String transcriptColumns = "," + DbSchema.KEY_TRANSCRIPT_URL + " TEXT,"
-                + DbSchema.KEY_TRANSCRIPT_TYPE + " TEXT)";
-        assertTrue(DbSchema.CREATE_TABLE_FEED_ITEMS.endsWith(transcriptColumns));
+                + DbSchema.KEY_TRANSCRIPT_TYPE + " TEXT,";
+        assertTrue(DbSchema.CREATE_TABLE_FEED_ITEMS.contains(transcriptColumns));
         db.execSQL("DROP TABLE " + Db.TABLE_NAME_FEED_ITEMS);
-        db.execSQL(DbSchema.CREATE_TABLE_FEED_ITEMS.replace(transcriptColumns, ")"));
+        db.execSQL(DbSchema.CREATE_TABLE_FEED_ITEMS.replace(transcriptColumns, ","));
         db.execSQL("DROP TABLE " + Db.TABLE_NAME_TRANSCRIPTS);
         db.execSQL("INSERT INTO " + Db.TABLE_NAME_FEED_ITEMS + " (" + Db.KEY_TITLE + ") VALUES ('Old item')");
         assertFalse(columnNames(db, Db.TABLE_NAME_FEED_ITEMS).contains(Db.KEY_TRANSCRIPT_URL));
