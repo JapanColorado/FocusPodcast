@@ -86,6 +86,46 @@ final class Biquad {
         }
     }
 
+    /**
+     * Runs three sections back to back over {@code buffer} in one pass, with the same arithmetic
+     * as calling {@link #process} on each in turn. All three must have the same channel count.
+     */
+    static void processCascade(float[] buffer, int frames, Biquad first, Biquad second, Biquad third) {
+        int channels = first.channels;
+        float ab0 = first.b0, ab1 = first.b1, ab2 = first.b2, aa1 = first.a1, aa2 = first.a2;
+        float bb0 = second.b0, bb1 = second.b1, bb2 = second.b2, ba1 = second.a1, ba2 = second.a2;
+        float cb0 = third.b0, cb1 = third.b1, cb2 = third.b2, ca1 = third.a1, ca2 = third.a2;
+        for (int ch = 0; ch < channels; ch++) {
+            float a1s = first.z1[ch];
+            float a2s = first.z2[ch];
+            float b1s = second.z1[ch];
+            float b2s = second.z2[ch];
+            float c1s = third.z1[ch];
+            float c2s = third.z2[ch];
+            for (int i = ch, end = frames * channels; i < end; i += channels) {
+                float x = buffer[i];
+                float y = ab0 * x + a1s;
+                a1s = ab1 * x - aa1 * y + a2s;
+                a2s = ab2 * x - aa2 * y;
+                x = y;
+                y = bb0 * x + b1s;
+                b1s = bb1 * x - ba1 * y + b2s;
+                b2s = bb2 * x - ba2 * y;
+                x = y;
+                y = cb0 * x + c1s;
+                c1s = cb1 * x - ca1 * y + c2s;
+                c2s = cb2 * x - ca2 * y;
+                buffer[i] = y;
+            }
+            first.z1[ch] = Math.abs(a1s) < DENORMAL ? 0f : a1s;
+            first.z2[ch] = Math.abs(a2s) < DENORMAL ? 0f : a2s;
+            second.z1[ch] = Math.abs(b1s) < DENORMAL ? 0f : b1s;
+            second.z2[ch] = Math.abs(b2s) < DENORMAL ? 0f : b2s;
+            third.z1[ch] = Math.abs(c1s) < DENORMAL ? 0f : c1s;
+            third.z2[ch] = Math.abs(c2s) < DENORMAL ? 0f : c2s;
+        }
+    }
+
     void clear() {
         java.util.Arrays.fill(z1, 0f);
         java.util.Arrays.fill(z2, 0f);

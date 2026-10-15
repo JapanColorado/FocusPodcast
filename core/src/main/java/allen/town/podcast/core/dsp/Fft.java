@@ -17,8 +17,9 @@ public final class Fft {
 
     private final int size;
     private final int[] reverse;
-    private final float[] twiddleCos;
-    private final float[] twiddleSin;
+    /** Twiddles of the stages of length 8 and up, laid out stage after stage (len/2 each). */
+    private final float[] stageCos;
+    private final float[] stageSin;
     private final float[] scratchRe;
     private final float[] scratchIm;
 
@@ -31,8 +32,8 @@ public final class Fft {
         }
         this.size = size;
         this.reverse = new int[size];
-        this.twiddleCos = new float[size / 2];
-        this.twiddleSin = new float[size / 2];
+        float[] twiddleCos = new float[size / 2];
+        float[] twiddleSin = new float[size / 2];
         this.scratchRe = new float[size];
         this.scratchIm = new float[size];
 
@@ -41,11 +42,24 @@ public final class Fft {
             reverse[i] = Integer.reverse(i) >>> (32 - bits);
         }
         // Twiddles for the whole transform: exp(-2*pi*i*j/size) for j < size/2. A stage of length
-        // "len" reads them with a stride of size/len, so one table serves every stage.
+        // "len" needs every (size/len)-th of them; they are copied into one contiguous run per stage
+        // so the inner loop reads them sequentially.
         for (int j = 0; j < size / 2; j++) {
             double angle = -2.0 * Math.PI * j / size;
             twiddleCos[j] = (float) Math.cos(angle);
             twiddleSin[j] = (float) Math.sin(angle);
+        }
+        int stageEntries = Math.max(0, size - 4);
+        this.stageCos = new float[stageEntries];
+        this.stageSin = new float[stageEntries];
+        int offset = 0;
+        for (int len = 8; len <= size; len <<= 1) {
+            int stride = size / len;
+            for (int k = 0; k < len / 2; k++) {
+                stageCos[offset + k] = twiddleCos[k * stride];
+                stageSin[offset + k] = twiddleSin[k * stride];
+            }
+            offset += len / 2;
         }
     }
 
@@ -72,26 +86,56 @@ public final class Fft {
                 im[j] = ti;
             }
         }
-        for (int len = 2; len <= size; len <<= 1) {
+        // Stage of length 2: the only twiddle is 1.
+        for (int a = 0; a + 1 < size; a += 2) {
+            float br = re[a + 1];
+            float bi = im[a + 1];
+            re[a + 1] = re[a] - br;
+            im[a + 1] = im[a] - bi;
+            re[a] += br;
+            im[a] += bi;
+        }
+        // Stage of length 4: twiddles 1 and -i, so no multiplications.
+        if (size >= 4) {
+            for (int a = 0; a < size; a += 4) {
+                float br = re[a + 2];
+                float bi = im[a + 2];
+                re[a + 2] = re[a] - br;
+                im[a + 2] = im[a] - bi;
+                re[a] += br;
+                im[a] += bi;
+                // (re + i im) * -i = im - i re
+                float cr = im[a + 3];
+                float ci = -re[a + 3];
+                re[a + 3] = re[a + 1] - cr;
+                im[a + 3] = im[a + 1] - ci;
+                re[a + 1] += cr;
+                im[a + 1] += ci;
+            }
+        }
+        // Remaining stages read their twiddles from a contiguous per-stage table.
+        int stageOffset = 0;
+        for (int len = 8; len <= size; len <<= 1) {
             int half = len >> 1;
-            int stride = size / len;
             for (int base = 0; base < size; base += len) {
-                int twiddle = 0;
                 for (int k = 0; k < half; k++) {
-                    float wr = twiddleCos[twiddle];
-                    float wi = twiddleSin[twiddle];
-                    twiddle += stride;
-
+                    float wr = stageCos[stageOffset + k];
+                    float wi = stageSin[stageOffset + k];
                     int a = base + k;
                     int b = a + half;
-                    float vr = re[b] * wr - im[b] * wi;
-                    float vi = re[b] * wi + im[b] * wr;
-                    re[b] = re[a] - vr;
-                    im[b] = im[a] - vi;
-                    re[a] = re[a] + vr;
-                    im[a] = im[a] + vi;
+                    float rb = re[b];
+                    float ib = im[b];
+                    float vr = rb * wr - ib * wi;
+                    float vi = rb * wi + ib * wr;
+                    float ra = re[a];
+                    float ia = im[a];
+                    re[b] = ra - vr;
+                    im[b] = ia - vi;
+                    re[a] = ra + vr;
+                    im[a] = ia + vi;
                 }
             }
+            stageOffset += half;
         }
     }
 

@@ -46,6 +46,8 @@ final class SpectralDenoiser {
     private final int hop;
     private final int bins;
     private final Fft fft;
+    /** For a channel left without a partner (mono, or the last of an odd count). */
+    private final RealFft realFft;
     private final float[] window;
 
     private final float[][] inFifo;
@@ -53,6 +55,9 @@ final class SpectralDenoiser {
     private final float[][] ready;
     private final float[][] re;
     private final float[][] im;
+    private final float[] frame;
+    private final float[] spectrumRe;
+    private final float[] spectrumIm;
     private int fill;
 
     private final float[] power;
@@ -81,6 +86,7 @@ final class SpectralDenoiser {
         this.hop = n / 2;
         this.bins = n / 2 + 1;
         this.fft = new Fft(n);
+        this.realFft = new RealFft(n);
         this.window = Fft.hann(n);
         for (int i = 0; i < n; i++) {
             window[i] = (float) Math.sqrt(window[i]);
@@ -90,6 +96,9 @@ final class SpectralDenoiser {
         ready = new float[channels][hop];
         re = new float[pairs][n];
         im = new float[pairs][n];
+        frame = new float[n];
+        spectrumRe = new float[bins];
+        spectrumIm = new float[bins];
 
         power = new float[bins];
         smoothed = new float[bins];
@@ -130,15 +139,20 @@ final class SpectralDenoiser {
 
     /** Processes {@code frames} interleaved frames of {@code buffer} in place. */
     void process(float[] buffer, int frames) {
-        int index = 0;
-        for (int f = 0; f < frames; f++) {
+        int done = 0;
+        while (done < frames) {
+            int length = Math.min(hop - fill, frames - done);
             int slot = n - hop + fill;
             for (int ch = 0; ch < channels; ch++) {
-                inFifo[ch][slot] = buffer[index];
-                buffer[index] = ready[ch][fill];
-                index++;
+                float[] in = inFifo[ch];
+                float[] out = ready[ch];
+                for (int f = 0, i = done * channels + ch; f < length; f++, i += channels) {
+                    in[slot + f] = buffer[i];
+                    buffer[i] = out[fill + f];
+                }
             }
-            fill++;
+            fill += length;
+            done += length;
             if (fill == hop) {
                 processFrame();
                 fill = 0;
@@ -146,25 +160,37 @@ final class SpectralDenoiser {
         }
     }
 
-    private void processFrame() {
-        for (int p = 0; p < pairs; p++) {
-            float[] pr = re[p];
-            float[] pi = im[p];
-            float[] left = inFifo[2 * p];
-            float[] right = 2 * p + 1 < channels ? inFifo[2 * p + 1] : null;
-            for (int i = 0; i < n; i++) {
-                pr[i] = left[i] * window[i];
-                pi[i] = right == null ? 0f : right[i] * window[i];
-            }
-            fft.forward(pr, pi);
-        }
+    private boolean isUnpaired(int pair) {
+        return 2 * pair + 1 >= channels;
+    }
 
-        // |X_left|^2 + |X_right|^2 = (|Z[k]|^2 + |Z[n-k]|^2) / 2 for Z = left + i*right.
+    private void processFrame() {
+        // |X_left|^2 + |X_right|^2 = (|Z[k]|^2 + |Z[n-k]|^2) / 2 for Z = left + i*right; an
+        // unpaired channel's real transform counts as |X|^2 = (|X[k]|^2 + |X[n-k]|^2) / 2 as well.
         float perChannel = 0.5f / channels;
         Arrays.fill(power, 0f);
         for (int p = 0; p < pairs; p++) {
+            float[] left = inFifo[2 * p];
+            if (isUnpaired(p)) {
+                for (int i = 0; i < n; i++) {
+                    frame[i] = left[i] * window[i];
+                }
+                realFft.forward(frame, spectrumRe, spectrumIm);
+                float scale = 2f * perChannel;
+                for (int k = 0; k < bins; k++) {
+                    power[k] += (spectrumRe[k] * spectrumRe[k] + spectrumIm[k] * spectrumIm[k]) * scale;
+                }
+                continue;
+            }
             float[] pr = re[p];
             float[] pi = im[p];
+            float[] right = inFifo[2 * p + 1];
+            for (int i = 0; i < n; i++) {
+                float w = window[i];
+                pr[i] = left[i] * w;
+                pi[i] = right[i] * w;
+            }
+            fft.forward(pr, pi);
             for (int k = 0; k < bins; k++) {
                 int mirror = (n - k) & (n - 1);
                 power[k] += (pr[k] * pr[k] + pi[k] * pi[k]
@@ -176,6 +202,19 @@ final class SpectralDenoiser {
         computeGains();
 
         for (int p = 0; p < pairs; p++) {
+            float[] left = overlap[2 * p];
+            if (isUnpaired(p)) {
+                for (int k = 0; k < bins; k++) {
+                    float g = gain[k];
+                    spectrumRe[k] *= g;
+                    spectrumIm[k] *= g;
+                }
+                realFft.inverse(spectrumRe, spectrumIm, frame);
+                for (int i = 0; i < n; i++) {
+                    left[i] += frame[i] * window[i];
+                }
+                continue;
+            }
             float[] pr = re[p];
             float[] pi = im[p];
             for (int k = 0; k < bins; k++) {
@@ -188,13 +227,11 @@ final class SpectralDenoiser {
                 }
             }
             fft.inverse(pr, pi);
-            float[] left = overlap[2 * p];
-            float[] right = 2 * p + 1 < channels ? overlap[2 * p + 1] : null;
+            float[] right = overlap[2 * p + 1];
             for (int i = 0; i < n; i++) {
-                left[i] += pr[i] * window[i];
-                if (right != null) {
-                    right[i] += pi[i] * window[i];
-                }
+                float w = window[i];
+                left[i] += pr[i] * w;
+                right[i] += pi[i] * w;
             }
         }
 

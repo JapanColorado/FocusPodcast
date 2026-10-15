@@ -61,6 +61,8 @@ final class Leveler {
     private boolean speechSeen;
     private double agcDb;
     private float blockGain = 1f;
+    /** Largest absolute input sample of the block {@link #computeBlockGain} last measured. */
+    private float blockPeak;
 
     // limiter state
     private final float[] delay;
@@ -124,10 +126,24 @@ final class Leveler {
             float step = (target - blockGain) / length;
             float g = blockGain;
             int index = start * channels;
-            for (int f = 0; f < length; f++) {
-                g += step;
-                limitFrame(buffer, index, g);
-                index += channels;
+            // When nothing in the block can reach the ceiling and the look-ahead holds no pending
+            // limit, every frame's "required" gain is 1 and the sliding minimum stays a single
+            // entry of 1: skip the bookkeeping. The margin covers rounding in the gain ramp.
+            float largestGain = Math.max(blockGain, target) * 1.001f;
+            if (blockPeak * largestGain <= CEILING && dequeSize == 1 && dequeValue[dequeHead] == 1f) {
+                for (int f = 0; f < length; f++) {
+                    g += step;
+                    passFrame(buffer, index, g);
+                    index += channels;
+                }
+                sampleIndex += length;
+                dequeIndex[dequeHead] = sampleIndex - 1;
+            } else {
+                for (int f = 0; f < length; f++) {
+                    g += step;
+                    limitFrame(buffer, index, g);
+                    index += channels;
+                }
             }
             blockGain = target;
         }
@@ -135,10 +151,16 @@ final class Leveler {
 
     private float computeBlockGain(float[] buffer, int startFrame, int length) {
         double sum = 0;
+        float peak = 0f;
         for (int i = startFrame * channels, end = (startFrame + length) * channels; i < end; i++) {
             float v = buffer[i];
             sum += v * v;
+            float a = Math.abs(v);
+            if (a > peak) {
+                peak = a;
+            }
         }
+        blockPeak = peak;
         double blockPower = sum / ((double) length * channels);
         double levelDb = blockPower > 1e-12 ? 10 * Math.log10(blockPower) : SILENCE_DB;
         double blockSeconds = (double) length / sampleRate;
@@ -188,6 +210,23 @@ final class Leveler {
         return (float) Math.pow(10, (agcDb - reductionDb) / 20);
     }
 
+    /** {@link #limitFrame} for a frame whose required gain is known to be 1 (see process). */
+    private void passFrame(float[] buffer, int index, float g) {
+        limiterGain += (1f - limiterGain) * limiterRelease;
+        int d = delayPos * channels;
+        for (int ch = 0; ch < channels; ch++) {
+            float out = delay[d + ch] * limiterGain;
+            if (out > CEILING) {
+                out = CEILING;
+            } else if (out < -CEILING) {
+                out = -CEILING;
+            }
+            delay[d + ch] = buffer[index + ch] * g;
+            buffer[index + ch] = out;
+        }
+        delayPos = delayPos + 1 == lookahead ? 0 : delayPos + 1;
+    }
+
     private void limitFrame(float[] buffer, int index, float g) {
         float peak = 0f;
         for (int ch = 0; ch < channels; ch++) {
@@ -203,19 +242,25 @@ final class Leveler {
         // Sliding minimum of "required" over the current frame and the look-ahead before it.
         int capacity = dequeValue.length;
         while (dequeSize > 0) {
-            int tail = (dequeHead + dequeSize - 1) % capacity;
+            int tail = dequeHead + dequeSize - 1;
+            if (tail >= capacity) {
+                tail -= capacity;
+            }
             if (dequeValue[tail] >= required) {
                 dequeSize--;
             } else {
                 break;
             }
         }
-        int slot = (dequeHead + dequeSize) % capacity;
+        int slot = dequeHead + dequeSize;
+        if (slot >= capacity) {
+            slot -= capacity;
+        }
         dequeValue[slot] = required;
         dequeIndex[slot] = sampleIndex;
         dequeSize++;
         while (dequeIndex[dequeHead] <= sampleIndex - lookahead - 1) {
-            dequeHead = (dequeHead + 1) % capacity;
+            dequeHead = dequeHead + 1 == capacity ? 0 : dequeHead + 1;
             dequeSize--;
         }
         sampleIndex++;

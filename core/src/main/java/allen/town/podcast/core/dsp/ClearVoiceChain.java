@@ -165,9 +165,7 @@ public final class ClearVoiceChain {
     }
 
     private int runStages(int frames, short[] out, int written) {
-        highPass.process(work, frames);
-        mudCut.process(work, frames);
-        presence.process(work, frames);
+        Biquad.processCascade(work, frames, highPass, mudCut, presence);
         denoiser.process(work, frames);
         leveler.process(work, frames);
         int first = 0;
