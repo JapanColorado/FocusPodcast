@@ -5,10 +5,10 @@ package allen.town.podcast.core.dsp;
  *
  * <p>This exists because the ad detector needs a power spectrum a few hundred thousand times per
  * episode, and the Clear voice enhancer needs a forward and an inverse transform every few
- * milliseconds of playback, and the app is not allowed to gain a new dependency for it (F-Droid
- * build, no native libraries, no DSP jar). It owns nothing but its twiddle tables, its bit-reversal permutation and
- * a pair of scratch buffers, so a single instance can be reused for every sub-window of an episode
- * without allocating.
+ * milliseconds of playback, and a few dozen lines of Java were preferred over a new dependency
+ * (CONTRIBUTING.md asks for a concrete reason before adding one). It owns nothing but its twiddle
+ * tables, its bit-reversal permutation and a pair of scratch buffers, so a single instance can be
+ * reused for every sub-window of an episode without allocating.
  *
  * <p>It is deliberately not thread safe: the scratch buffers are instance state. One instance per
  * analysis thread.
