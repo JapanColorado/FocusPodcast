@@ -26,7 +26,6 @@ import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
-import org.greenrobot.eventbus.EventBus
 
 /**
  * Downloads a feed from a feed URL and parses it. Subclasses can display the
@@ -126,13 +125,11 @@ class RssSearchActivity : DialogActivity() {
     override fun onStart() {
         super.onStart()
         isPaused = false
-        EventBus.getDefault().register(this)
     }
 
     override fun onStop() {
         super.onStop()
         isPaused = true
-        EventBus.getDefault().unregister(this)
         if (downloader != null && !downloader.isFinished) {
             downloader.cancel()
         }

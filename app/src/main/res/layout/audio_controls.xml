@@ -110,6 +110,8 @@
             <allen.town.podcast.common.views.AccentMaterialOutlineBackgroundStatusButton
                 android:id="@+id/clear_voice_off"
                 style="?attr/materialButtonOutlinedStyle"
+                android:paddingStart="4dp"
+                android:paddingEnd="4dp"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
@@ -118,6 +120,8 @@
             <allen.town.podcast.common.views.AccentMaterialOutlineBackgroundStatusButton
                 android:id="@+id/clear_voice_light"
                 style="?attr/materialButtonOutlinedStyle"
+                android:paddingStart="4dp"
+                android:paddingEnd="4dp"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
@@ -126,6 +130,8 @@
             <allen.town.podcast.common.views.AccentMaterialOutlineBackgroundStatusButton
                 android:id="@+id/clear_voice_strong"
                 style="?attr/materialButtonOutlinedStyle"
+                android:paddingStart="4dp"
+                android:paddingEnd="4dp"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"

@@ -43,10 +43,12 @@ object PlayAtPosition {
         if (controller != null && PlaybackService.isRunning
             && PlaybackPreferences.getCurrentlyPlayingFeedMediaId() == media.id
         ) {
-            controller.seekTo(position)
+            // Resume before seeking, as the chapter list does: a resume that arrives while the
+            // seek is still running is dropped, which left playback paused at the new position.
             if (controller.status != PlayerStatus.PLAYING) {
                 controller.playPause()
             }
+            controller.seekTo(position)
             return null
         }
         return Completable.fromAction {

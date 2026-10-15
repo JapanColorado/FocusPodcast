@@ -377,6 +377,11 @@ public class FeedMedia extends FeedFile implements Playable {
     }
 
     public long getItemId() {
+        // itemID is only filled in when the media is unparcelled; a media loaded from the
+        // database knows its episode through item instead.
+        if (item != null && item.getId() > 0) {
+            return item.getId();
+        }
         return itemID;
     }
 
