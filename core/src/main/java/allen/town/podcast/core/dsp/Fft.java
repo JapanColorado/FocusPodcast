@@ -113,49 +113,103 @@ public final class Fft {
                 im[a + 1] += ci;
             }
         }
-        // Remaining stages read their twiddles from a contiguous per-stage table.
+        // Remaining stages read their twiddles from a contiguous per-stage table, two stages per
+        // pass over the data where possible (same arithmetic, half the loads and stores).
         int stageOffset = 0;
-        for (int len = 8; len <= size; len <<= 1) {
+        int len = 8;
+        while (len <= size) {
             int half = len >> 1;
-            for (int base = 0; base < size; base += len) {
-                for (int k = 0; k < half; k++) {
-                    float wr = stageCos[stageOffset + k];
-                    float wi = stageSin[stageOffset + k];
-                    int a = base + k;
-                    int b = a + half;
-                    float rb = re[b];
-                    float ib = im[b];
-                    float vr = rb * wr - ib * wi;
-                    float vi = rb * wi + ib * wr;
-                    float ra = re[a];
-                    float ia = im[a];
-                    re[b] = ra - vr;
-                    im[b] = ia - vi;
-                    re[a] = ra + vr;
-                    im[a] = ia + vi;
+            if (len * 2 <= size) {
+                int nextOffset = stageOffset + half;
+                for (int base = 0; base < size; base += 2 * len) {
+                    for (int k = 0; k < half; k++) {
+                        int i0 = base + k;
+                        int i1 = i0 + half;
+                        int i2 = i0 + len;
+                        int i3 = i2 + half;
+                        // stage len: (i0, i1) and (i2, i3), twiddle W_len^k
+                        float wr = stageCos[stageOffset + k];
+                        float wi = stageSin[stageOffset + k];
+                        float r1 = re[i1];
+                        float m1 = im[i1];
+                        float vr = r1 * wr - m1 * wi;
+                        float vi = r1 * wi + m1 * wr;
+                        float r0 = re[i0];
+                        float m0 = im[i0];
+                        float u1r = r0 - vr;
+                        float u1i = m0 - vi;
+                        float u0r = r0 + vr;
+                        float u0i = m0 + vi;
+                        float r3 = re[i3];
+                        float m3 = im[i3];
+                        vr = r3 * wr - m3 * wi;
+                        vi = r3 * wi + m3 * wr;
+                        float r2 = re[i2];
+                        float m2 = im[i2];
+                        float u3r = r2 - vr;
+                        float u3i = m2 - vi;
+                        float u2r = r2 + vr;
+                        float u2i = m2 + vi;
+                        // stage 2*len: (i0, i2) with W_2len^k, (i1, i3) with W_2len^(k+half)
+                        wr = stageCos[nextOffset + k];
+                        wi = stageSin[nextOffset + k];
+                        vr = u2r * wr - u2i * wi;
+                        vi = u2r * wi + u2i * wr;
+                        re[i2] = u0r - vr;
+                        im[i2] = u0i - vi;
+                        re[i0] = u0r + vr;
+                        im[i0] = u0i + vi;
+                        wr = stageCos[nextOffset + k + half];
+                        wi = stageSin[nextOffset + k + half];
+                        vr = u3r * wr - u3i * wi;
+                        vi = u3r * wi + u3i * wr;
+                        re[i3] = u1r - vr;
+                        im[i3] = u1i - vi;
+                        re[i1] = u1r + vr;
+                        im[i1] = u1i + vi;
+                    }
                 }
+                stageOffset = nextOffset + len;
+                len <<= 2;
+            } else {
+                for (int base = 0; base < size; base += len) {
+                    for (int k = 0; k < half; k++) {
+                        float wr = stageCos[stageOffset + k];
+                        float wi = stageSin[stageOffset + k];
+                        int a = base + k;
+                        int b = a + half;
+                        float rb = re[b];
+                        float ib = im[b];
+                        float vr = rb * wr - ib * wi;
+                        float vi = rb * wi + ib * wr;
+                        float ra = re[a];
+                        float ia = im[a];
+                        re[b] = ra - vr;
+                        im[b] = ia - vi;
+                        re[a] = ra + vr;
+                        im[a] = ia + vi;
+                    }
+                }
+                stageOffset += half;
+                len <<= 1;
             }
-            stageOffset += half;
         }
     }
 
     /**
      * In-place inverse complex transform, scaled by 1/size so that {@code inverse(forward(x))}
-     * returns {@code x}. Computed as conj(forward(conj(X))) / size, which reuses the forward
-     * twiddles.
+     * returns {@code x}. Uses the identity IFFT(X) = swap(FFT(swap(X))) / size, where swap
+     * exchanges the real and imaginary parts, so it costs one forward transform and a scale.
      */
     public void inverse(float[] re, float[] im) {
         if (re.length != size || im.length != size) {
             throw new IllegalArgumentException("arrays must be of length " + size);
         }
-        for (int i = 0; i < size; i++) {
-            im[i] = -im[i];
-        }
-        forward(re, im);
+        forward(im, re);
         float scale = 1f / size;
         for (int i = 0; i < size; i++) {
             re[i] *= scale;
-            im[i] = -im[i] * scale;
+            im[i] *= scale;
         }
     }
 
