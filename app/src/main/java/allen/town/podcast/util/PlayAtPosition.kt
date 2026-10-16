@@ -7,6 +7,7 @@ import allen.town.podcast.core.pref.PlaybackPreferences
 import allen.town.podcast.core.service.playback.PlaybackService
 import allen.town.podcast.core.storage.DBReader
 import allen.town.podcast.core.storage.DBWriter
+import allen.town.podcast.core.util.BookmarkUtils
 import allen.town.podcast.core.util.playback.PlaybackController
 import allen.town.podcast.model.feed.FeedItem
 import allen.town.podcast.playback.base.PlayerStatus
@@ -52,10 +53,13 @@ object PlayAtPosition {
             return null
         }
         return Completable.fromAction {
+            // A last-played time of now keeps the player's rewind-after-pause from moving the
+            // start back before the requested position.
+            val now = System.currentTimeMillis()
             val stored = DBReader.getFeedMedia(media.id) ?: media
-            stored.setPosition(position)
+            BookmarkUtils.prepareStartAt(stored, position, now)
             DBWriter.setFeedMediaPlaybackInformation(stored).get()
-            media.setPosition(position)
+            BookmarkUtils.prepareStartAt(media, position, now)
         }
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())

@@ -1043,7 +1043,7 @@
     <string name="search_in_show_notes">Show notes</string>
     <string name="search_section_podcast">Podcast</string>
     <string name="search_scope_all">All podcasts and audiobooks</string>
-    <string name="search_scope_choose">Search in</string>
+    <string name="search_scope_choose">Search in podcast</string>
     <string name="search_scope_choose_description">Podcast: %1$s. Tap to choose another</string>
     <string name="search_scope_clear">Search all podcasts</string>
     <string name="search_section_published">Published</string>
@@ -1129,5 +1129,7 @@
         <item quantity="other">Delete all %1$d downloads (%2$s)?</item>
     </plurals>
     <string name="storage_delete_all_confirm_msg">This includes favorite episodes. The episode in the player is kept.</string>
+    <string name="storage_player_episode_kept">The episode in the player isn\'t deleted from here.</string>
+    <string name="storage_player_episode_kept_titled">The episode in the player isn\'t deleted from here (%1$s).</string>
     <string name="storage_cleanup_link_sum">Choose when played episodes are deleted automatically</string>
 </resources>

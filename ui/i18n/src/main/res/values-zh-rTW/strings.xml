@@ -880,7 +880,7 @@
   <string name="search_in_show_notes">節目簡介</string>
   <string name="search_section_podcast">Podcast</string>
   <string name="search_scope_all">所有 Podcast 和有聲書</string>
-  <string name="search_scope_choose">在其中搜尋</string>
+  <string name="search_scope_choose">選擇要搜尋的 Podcast</string>
   <string name="search_scope_choose_description">Podcast：%1$s。輕觸以選擇其他 Podcast</string>
   <string name="search_scope_clear">搜尋所有 Podcast</string>
   <string name="search_section_published">發布時間</string>
@@ -964,5 +964,7 @@
         <item quantity="other">刪除全部 %1$d 個下載（%2$s）？</item>
     </plurals>
     <string name="storage_delete_all_confirm_msg">這包括收藏的單集。播放器中的單集會保留。</string>
+    <string name="storage_player_episode_kept">播放器中的單集不會在此刪除。</string>
+    <string name="storage_player_episode_kept_titled">播放器中的單集不會在此刪除（%1$s）。</string>
     <string name="storage_cleanup_link_sum">選擇何時自動刪除已播放的單集</string>
 </resources>

@@ -364,6 +364,12 @@ class LocalSearchFragment constructor() : Fragment(), EpisodeSearchFilterSheet.H
 
     private fun showFilterSheet() {
         if (childFragmentManager.findFragmentByTag(EpisodeSearchFilterSheet.TAG) == null) {
+            // The search field's SearchAutoComplete reopens the keyboard whenever its window
+            // regains focus while it holds focus, i.e. as soon as the sheet closes. Drop the
+            // focus (and the keyboard) first; tapping the field brings both back.
+            val imm = requireActivity().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager?
+            imm?.hideSoftInputFromWindow(searchView.windowToken, 0)
+            searchView.clearFocus()
             EpisodeSearchFilterSheet().show(childFragmentManager, EpisodeSearchFilterSheet.TAG)
         }
     }

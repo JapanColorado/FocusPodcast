@@ -97,11 +97,16 @@ public final class StorageUsage {
         public final long deletableBytes;
         /** Favourites among {@link #deletableCount}. */
         public final int favoriteCount;
+        /**
+         * Whether the episode loaded in the player is among these downloads; it is counted in
+         * {@link #count} but left out of every delete action.
+         */
+        public final boolean holdsPlayerEpisode;
 
         FeedSummary(long bucketId, @Nullable String title, @Nullable String imageUrl,
                     boolean audiobook, int count, long bytes, int playedCount, long playedBytes,
                     int keptFavoriteCount, int deletableCount, long deletableBytes,
-                    int favoriteCount) {
+                    int favoriteCount, boolean holdsPlayerEpisode) {
             this.bucketId = bucketId;
             this.title = title;
             this.imageUrl = imageUrl;
@@ -114,6 +119,7 @@ public final class StorageUsage {
             this.deletableCount = deletableCount;
             this.deletableBytes = deletableBytes;
             this.favoriteCount = favoriteCount;
+            this.holdsPlayerEpisode = holdsPlayerEpisode;
         }
 
         public boolean isUnsubscribedBucket() {
@@ -258,6 +264,7 @@ public final class StorageUsage {
         private int deletableCount;
         private long deletableBytes;
         private int favoriteCount;
+        private boolean holdsPlayerEpisode;
 
         Builder(Entry first) {
             bucketId = first.bucket();
@@ -283,13 +290,15 @@ public final class StorageUsage {
                 if (entry.favorite) {
                     favoriteCount++;
                 }
+            } else {
+                holdsPlayerEpisode = true;
             }
         }
 
         FeedSummary build() {
             return new FeedSummary(bucketId, title, imageUrl, audiobook, count, bytes,
                     playedCount, playedBytes, keptFavoriteCount, deletableCount, deletableBytes,
-                    favoriteCount);
+                    favoriteCount, holdsPlayerEpisode);
         }
     }
 }

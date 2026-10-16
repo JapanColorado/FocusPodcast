@@ -1,5 +1,7 @@
 package allen.town.podcast.core.util;
 
+import allen.town.podcast.model.playback.Playable;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
@@ -61,6 +63,17 @@ public final class BookmarkUtils {
             return NO_TICK;
         }
         return (float) ((double) positionMs / (double) durationMs);
+    }
+
+    /**
+     * Sets {@code media} up to start at exactly {@code positionMs}: the position, and a last-played
+     * time of {@code nowMs}. Starting a prepared episode rewinds by how long it was paused
+     * ({@code RewindAfterPauseUtils}, measured from the last-played time), which would otherwise
+     * land up to 20 s before a bookmark when the episode was last heard hours or days ago.
+     */
+    public static void prepareStartAt(@NonNull Playable media, int positionMs, long nowMs) {
+        media.setPosition(Math.max(0, positionMs));
+        media.setLastPlayedTime(nowMs);
     }
 
     @NonNull

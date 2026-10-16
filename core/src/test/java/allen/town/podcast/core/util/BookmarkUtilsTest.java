@@ -2,7 +2,12 @@ package allen.town.podcast.core.util;
 
 import static org.junit.Assert.assertEquals;
 
+import allen.town.podcast.model.feed.FeedMedia;
+import allen.town.podcast.playback.base.RewindAfterPauseUtils;
+
 import org.junit.Test;
+
+import java.util.concurrent.TimeUnit;
 
 public class BookmarkUtilsTest {
 
@@ -53,5 +58,24 @@ public class BookmarkUtilsTest {
         assertEquals(BookmarkUtils.NO_TICK, BookmarkUtils.tickFraction(10, -1), 0f);
         assertEquals(BookmarkUtils.NO_TICK, BookmarkUtils.tickFraction(1001, 1000), 0f);
         assertEquals(BookmarkUtils.NO_TICK, BookmarkUtils.tickFraction(-1, 1000), 0f);
+    }
+
+    @Test
+    public void startAtSkipsTheRewindAfterPause() {
+        long now = System.currentTimeMillis();
+        int bookmark = 600_000;
+        FeedMedia media = new FeedMedia(null, "https://example.com/ep.mp3", 0, "audio/mpeg");
+        media.setPosition(42_000);
+        media.setLastPlayedTime(now - TimeUnit.DAYS.toMillis(2));
+        // without the fix the start would land LONG_REWIND before the bookmark
+        assertEquals(bookmark - (int) RewindAfterPauseUtils.LONG_REWIND,
+                RewindAfterPauseUtils.calculatePositionWithRewind(bookmark, media.getLastPlayedTime()));
+
+        BookmarkUtils.prepareStartAt(media, bookmark, now);
+
+        assertEquals(bookmark, media.getPosition());
+        assertEquals(now, media.getLastPlayedTime());
+        assertEquals(bookmark, RewindAfterPauseUtils.calculatePositionWithRewind(
+                media.getPosition(), media.getLastPlayedTime()));
     }
 }

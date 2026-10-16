@@ -9,6 +9,7 @@ import allen.town.podcast.fragment.PlaylistFragment
 import allen.town.podcast.fragment.swipeactions.SwipeAction
 import allen.town.podcast.fragment.swipeactions.SwipeActions
 import allen.town.podcast.common.util.ThemeUtils.getColorFromAttr
+import allen.town.podcast.theme.ThemeStore
 import android.content.Context
 import android.content.DialogInterface
 import android.graphics.PorterDuff
@@ -112,16 +113,10 @@ class SwipeActionsDialog(private val context: Context, private val tag: String) 
             icon.mutate()
             DrawableCompat.setTintMode(icon, PorterDuff.Mode.SRC_ATOP)
             if (direction == LEFT && leftAction === action || direction == RIGHT && rightAction === action) {
-                DrawableCompat.setTint(
-                    icon, getColorFromAttr(
-                        context, action.actionColor
-                    )
-                )
-                item.swipeActionLabel.setTextColor(
-                    getColorFromAttr(
-                        context, action.actionColor
-                    )
-                )
+                // the selection is marked in the theme accent, not in the action's own swipe colour
+                val accent = ThemeStore.accentColor(context)
+                DrawableCompat.setTint(icon, accent)
+                item.swipeActionLabel.setTextColor(accent)
             } else {
                 DrawableCompat.setTint(
                     icon, getColorFromAttr(

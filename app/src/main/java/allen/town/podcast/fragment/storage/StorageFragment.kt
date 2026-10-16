@@ -11,15 +11,19 @@ import allen.town.podcast.core.storage.StorageUsage
 import allen.town.podcast.databinding.StorageFragmentBinding
 import allen.town.podcast.event.FeedItemEvent
 import allen.town.podcast.fragment.DownloadPagerFragment
+import allen.town.podcast.common.util.ThemeUtils
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.text.format.Formatter
 import android.util.Log
+import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -43,6 +47,7 @@ class StorageFragment : Fragment(), StorageAdapter.Listener {
     private lateinit var adapter: StorageAdapter
     private var loadDisposable: Disposable? = null
     private var deleteDisposable: Disposable? = null
+    private var playerEpisodeTitle: String? = null
     private val handler = Handler(Looper.getMainLooper())
     private val reloadRunnable = Runnable { load() }
 
@@ -85,6 +90,7 @@ class StorageFragment : Fragment(), StorageAdapter.Listener {
                 val binding = _binding ?: return@subscribe
                 binding.storageProgress.visibility = View.GONE
                 binding.storageList.visibility = View.VISIBLE
+                playerEpisodeTitle = snapshot.playerEpisodeTitle
                 adapter.update(snapshot)
             }, { error -> Log.e(TAG, Log.getStackTraceString(error)) })
     }
@@ -117,11 +123,31 @@ class StorageFragment : Fragment(), StorageAdapter.Listener {
             labels.add(getString(R.string.storage_open_podcast))
             actions.add { openPodcast(summary.bucketId) }
         }
-        AccentMaterialDialog(context, R.style.MaterialAlertDialogTheme)
+        val dialog = AccentMaterialDialog(context, R.style.MaterialAlertDialogTheme)
             .setTitle(summary.title ?: getString(R.string.storage_unsubscribed_title))
             .setItems(labels.toTypedArray()) { _, which -> actions[which]() }
             .setNegativeButton(R.string.cancel_label, null)
-            .show()
+        if (summary.holdsPlayerEpisode) {
+            // shown under the actions, so it is clear why one download is not offered
+            dialog.setView(playerEpisodeNote(context))
+        }
+        dialog.show()
+    }
+
+    private fun playerEpisodeNote(context: Context): TextView {
+        val title = playerEpisodeTitle
+        val note = TextView(context)
+        note.text = if (title.isNullOrBlank()) {
+            getString(R.string.storage_player_episode_kept)
+        } else {
+            getString(R.string.storage_player_episode_kept_titled, title)
+        }
+        note.setTextColor(ThemeUtils.getColorFromAttr(context, android.R.attr.textColorSecondary))
+        note.setTextSize(TypedValue.COMPLEX_UNIT_SP, NOTE_TEXT_SIZE_SP)
+        val horizontal = resources.getDimensionPixelSize(R.dimen.storage_dialog_note_padding_horizontal)
+        val vertical = resources.getDimensionPixelSize(R.dimen.storage_dialog_note_padding_vertical)
+        note.setPadding(horizontal, vertical, horizontal, vertical)
+        return note
     }
 
     private fun confirmDeletePlayed(summary: StorageUsage.FeedSummary) {
@@ -190,5 +216,6 @@ class StorageFragment : Fragment(), StorageAdapter.Listener {
     companion object {
         private const val TAG = "StorageFragment"
         private const val RELOAD_DELAY_MS = 400L
+        private const val NOTE_TEXT_SIZE_SP = 14f
     }
 }

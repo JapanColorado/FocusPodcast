@@ -118,19 +118,6 @@
                     android:orientation="horizontal">
 
                     <com.google.android.material.textview.MaterialTextView
-                        android:id="@+id/separatorIcons"
-                        style="@style/FocusPodcast.TextView.ListItemSecondaryTitle"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="4dp"
-                        android:layout_marginLeft="4dp"
-                        android:layout_marginEnd="4dp"
-                        android:layout_marginRight="4dp"
-                        android:importantForAccessibility="no"
-                        android:text="·"
-                        tools:background="@android:color/holo_blue_light" />
-
-                    <com.google.android.material.textview.MaterialTextView
                         android:id="@+id/txtvPubDate"
                         style="@style/FocusPodcast.TextView.ListItemSecondaryTitle"
                         android:layout_width="wrap_content"
@@ -138,6 +125,17 @@
                         android:layout_marginEnd="4dp"
                         android:layout_marginRight="4dp"
                         tools:text="@sample/episodes.json/data/published_at" />
+
+                    <com.google.android.material.textview.MaterialTextView
+                        android:id="@+id/separatorIcons"
+                        style="@style/FocusPodcast.TextView.ListItemSecondaryTitle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="4dp"
+                        android:layout_marginRight="4dp"
+                        android:importantForAccessibility="no"
+                        android:text="·"
+                        tools:background="@android:color/holo_blue_light" />
                     <allen.town.podcast.common.views.AccentImageView
                         android:id="@+id/ivIsVideo"
                         android:layout_width="16sp"

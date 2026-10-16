@@ -929,7 +929,7 @@
   <string name="search_in_show_notes">节目简介</string>
   <string name="search_section_podcast">播客</string>
   <string name="search_scope_all">所有播客和有声书</string>
-  <string name="search_scope_choose">在其中搜索</string>
+  <string name="search_scope_choose">选择要搜索的播客</string>
   <string name="search_scope_choose_description">播客：%1$s。点按以选择其他播客</string>
   <string name="search_scope_clear">搜索所有播客</string>
   <string name="search_section_published">发布时间</string>
@@ -1013,5 +1013,7 @@
         <item quantity="other">删除全部 %1$d 个下载（%2$s）？</item>
     </plurals>
     <string name="storage_delete_all_confirm_msg">这包括收藏的单集。播放器中的单集会保留。</string>
+    <string name="storage_player_episode_kept">播放器中的单集不会在此删除。</string>
+    <string name="storage_player_episode_kept_titled">播放器中的单集不会在此删除（%1$s）。</string>
     <string name="storage_cleanup_link_sum">选择何时自动删除已播放的单集</string>
 </resources>

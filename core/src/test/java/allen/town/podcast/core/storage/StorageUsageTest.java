@@ -93,6 +93,8 @@ public class StorageUsageTest {
         assertEquals(1, summary.playedCount);
         assertEquals(100, summary.playedBytes);
         assertEquals(1, summary.deletableCount);
+        assertTrue(summary.holdsPlayerEpisode);
+        assertFalse(StorageUsage.aggregate(entries, true, NOTHING_PLAYING).feeds.get(0).holdsPlayerEpisode);
         assertEquals(Collections.singletonList(1L),
                 StorageUsage.selectForDeletion(entries, 1, true, true, 2));
         assertEquals(Collections.singletonList(1L),

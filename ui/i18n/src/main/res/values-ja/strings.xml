@@ -631,7 +631,7 @@
   <string name="search_in_show_notes">番組ノート</string>
   <string name="search_section_podcast">ポッドキャスト</string>
   <string name="search_scope_all">すべてのポッドキャストとオーディオブック</string>
-  <string name="search_scope_choose">検索する番組</string>
+  <string name="search_scope_choose">検索するポッドキャスト</string>
   <string name="search_scope_choose_description">ポッドキャスト: %1$s。タップして変更</string>
   <string name="search_scope_clear">すべてのポッドキャストを検索</string>
   <string name="search_section_published">公開日</string>
@@ -715,5 +715,7 @@
         <item quantity="other">%1$d 件のダウンロードをすべて削除しますか（%2$s）？</item>
     </plurals>
     <string name="storage_delete_all_confirm_msg">お気に入りのエピソードも含まれます。プレーヤーのエピソードは残ります。</string>
+    <string name="storage_player_episode_kept">プレーヤーのエピソードはここでは削除されません。</string>
+    <string name="storage_player_episode_kept_titled">プレーヤーのエピソードはここでは削除されません（%1$s）。</string>
     <string name="storage_cleanup_link_sum">再生済みエピソードを自動的に削除するタイミングを選択</string>
 </resources>
