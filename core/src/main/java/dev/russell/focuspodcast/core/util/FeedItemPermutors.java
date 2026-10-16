@@ -12,6 +12,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Random;
 
 import dev.russell.focuspodcast.core.util.comparator.NaturalOrderComparator;
 import dev.russell.focuspodcast.model.feed.Feed;
@@ -22,6 +23,9 @@ import dev.russell.focuspodcast.model.feed.SortOrder;
  * Sorts {@link FeedItem} lists according to a rule.
  */
 public class FeedItemPermutors {
+
+    /** Seed of {@link #getStablePermutor}'s shuffle; lives as long as the process. */
+    private static volatile long shuffleSeed = new Random().nextLong();
 
     /**
      * Returns a Permutor that sorts a list appropriate to the given sort order.
@@ -82,6 +86,37 @@ public class FeedItemPermutors {
             permutor = (queue) -> Collections.sort(queue, comparator2);
         }
         return permutor;
+    }
+
+    /**
+     * Like {@link #getPermutor}, but {@link SortOrder#RANDOM} gives the same order every time it
+     * is applied (until {@link #reshuffle}), so a list that reloads often does not jump around
+     * and playback can follow the order that is shown. New items land at a random position
+     * without moving the others.
+     */
+    @NonNull
+    public static Permutor<FeedItem> getStablePermutor(@NonNull SortOrder sortOrder) {
+        if (sortOrder == SortOrder.RANDOM || sortOrder == SortOrder.RANDOM_FAKE) {
+            final long seed = shuffleSeed;
+            return list -> Collections.sort(list, (f1, f2) -> {
+                int result = Long.compare(mix(f1.getId() ^ seed), mix(f2.getId() ^ seed));
+                return result != 0 ? result : Long.compare(f1.getId(), f2.getId());
+            });
+        }
+        return getPermutor(sortOrder);
+    }
+
+    /** Picks a new order for {@link #getStablePermutor}'s shuffle. */
+    public static void reshuffle() {
+        shuffleSeed = new Random().nextLong();
+    }
+
+    /** SplitMix64 finaliser: spreads consecutive ids over the whole long range. */
+    private static long mix(long z) {
+        z += 0x9E3779B97F4A7C15L;
+        z = (z ^ (z >>> 30)) * 0xBF58476D1CE4E5B9L;
+        z = (z ^ (z >>> 27)) * 0x94D049BB133111EBL;
+        return z ^ (z >>> 31);
     }
 
     /**

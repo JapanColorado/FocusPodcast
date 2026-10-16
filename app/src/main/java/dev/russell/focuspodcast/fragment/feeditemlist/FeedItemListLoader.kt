@@ -179,7 +179,7 @@ internal class FeedItemListLoader(
         val sortOrder = currentFeed.sortOrder
         if (sortOrder != null) {
             val feedItems = currentFeed.items
-            FeedItemPermutors.getPermutor(sortOrder).reorder(feedItems)
+            FeedItemPermutors.getStablePermutor(sortOrder).reorder(feedItems)
             currentFeed.items = feedItems
         }
         hiddenItemCount = countHiddenItems(currentFeed)

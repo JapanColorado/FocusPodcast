@@ -18,6 +18,7 @@ import dev.russell.focuspodcast.R;
 import dev.russell.focuspodcast.core.dialog.ConfirmationDialog;
 import dev.russell.focuspodcast.core.storage.DBTasks;
 import dev.russell.focuspodcast.core.storage.DBWriter;
+import dev.russell.focuspodcast.core.util.FeedItemPermutors;
 import dev.russell.focuspodcast.core.util.IntentUtils;
 import dev.russell.focuspodcast.core.util.ShareUtils;
 import dev.russell.focuspodcast.dialog.filter.EpisodeFilterSheet;
@@ -122,6 +123,10 @@ public class FeedMenuProcess {
         BaseFeedSortDialog sortDialog = new BaseFeedSortDialog(context,selectedFeed.getSortOrder()) {
             @Override
             protected void updateSort(@NonNull SortOrder sortOrder) {
+                if (sortOrder == SortOrder.RANDOM || sortOrder == SortOrder.RANDOM_FAKE) {
+                    // choosing Random (again) deals a new order
+                    FeedItemPermutors.reshuffle();
+                }
                 selectedFeed.setSortOrder(sortOrder);
                 DBWriter.setFeedItemSortOrder(selectedFeed.getId(), sortOrder);
             }

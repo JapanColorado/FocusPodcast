@@ -41,7 +41,7 @@ public final class AudiobookUtils {
     public static FeedItem nextTrack(@NonNull List<FeedItem> items, @NonNull SortOrder order,
                                      long currentItemId) {
         List<FeedItem> sorted = new ArrayList<>(items);
-        FeedItemPermutors.getPermutor(order).reorder(sorted);
+        FeedItemPermutors.getStablePermutor(order).reorder(sorted);
         for (int i = 0; i < sorted.size(); i++) {
             if (sorted.get(i).getId() == currentItemId) {
                 if (i + 1 >= sorted.size()) {

@@ -9,6 +9,7 @@ import dev.russell.focuspodcast.model.feed.SortOrder.DESC_INDEX
 import android.content.Context
 import android.content.DialogInterface
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AlertDialog
 import androidx.recyclerview.widget.RecyclerView
@@ -25,6 +26,7 @@ abstract class BaseFeedSortDialog(
     var selectedIndex: Int = 0
     var isDesc = true
     private lateinit var adapter: OrderSelectionAdapter
+    private lateinit var orderGroup: MaterialButtonToggleGroup
     fun openDialog() {
 
         sortItems = context.resources.getStringArray(R.array.feed_episodes_sort_options)
@@ -44,6 +46,8 @@ abstract class BaseFeedSortDialog(
             isDesc = (code - ascBaseCode) == DESC_INDEX
         }
         orderGroup.check(if (!isDesc) R.id.asc_button else R.id.desc_button)
+        this.orderGroup = orderGroup
+        updateOrderGroupVisibility()
 
         //https://github.com/BelooS/ChipsLayoutManager
         val chipsLayoutManager = ChipsLayoutManager.newBuilder(context).build()
@@ -74,6 +78,12 @@ abstract class BaseFeedSortDialog(
     }
 
 
+    /** Random has no direction, so the ascending/descending toggle is hidden for it. */
+    private fun updateOrderGroupVisibility() {
+        orderGroup.visibility =
+            if (selectedIndex == SortOrder.RANDOM.groupIndex) View.GONE else View.VISIBLE
+    }
+
     protected abstract fun updateSort(sortOrder: SortOrder)
 
     inner class OrderSelectionAdapter : RecyclerView.Adapter<OrderSelectionAdapter.ViewHolder>() {
@@ -89,6 +99,7 @@ abstract class BaseFeedSortDialog(
             holder.chip.isCheckedIconVisible = holder.chip.isChecked
             holder.chip.setOnClickListener {
                 selectedIndex = position
+                updateOrderGroupVisibility()
                 notifyDataSetChanged()
             }
         }

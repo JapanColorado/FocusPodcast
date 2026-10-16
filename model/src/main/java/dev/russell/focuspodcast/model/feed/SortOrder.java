@@ -32,9 +32,13 @@ public enum SortOrder {
     TRACK_ORDER(8, INTRA_FEED, 7, 3),
     FEED_TITLE_Z_A(101, INTER_FEED,101,3),
     FEED_TITLE_A_Z(102, INTER_FEED,101,3),
-    RANDOM(103, INTER_FEED,0,4),
+    /**
+     * Shuffled. Allowed both for a feed's episode list and for the queue; its groupIndex 4 is its
+     * position in both sort dialogs.
+     */
+    RANDOM(103, INTRA_FEED,0,4),
     // This one is a dummy: without it the algorithm misbehaves, random has to keep 2 entries as well
-    RANDOM_FAKE(104, INTER_FEED,0,4),
+    RANDOM_FAKE(104, INTRA_FEED,0,4),
     SMART_SHUFFLE_NEW_OLD(105, INTER_FEED,105,5),
     SMART_SHUFFLE_OLD_NEW(106, INTER_FEED,105,5);
 
