@@ -18,6 +18,7 @@ import allen.town.podcast.R;
 import allen.town.podcast.core.dialog.ConfirmationDialog;
 import allen.town.podcast.core.storage.DBTasks;
 import allen.town.podcast.core.storage.DBWriter;
+import allen.town.podcast.core.util.FeedItemPermutors;
 import allen.town.podcast.core.util.IntentUtils;
 import allen.town.podcast.core.util.ShareUtils;
 import allen.town.podcast.dialog.filter.EpisodeFilterSheet;
@@ -122,6 +123,10 @@ public class FeedMenuProcess {
         BaseFeedSortDialog sortDialog = new BaseFeedSortDialog(context,selectedFeed.getSortOrder()) {
             @Override
             protected void updateSort(@NonNull SortOrder sortOrder) {
+                if (sortOrder == SortOrder.RANDOM || sortOrder == SortOrder.RANDOM_FAKE) {
+                    // choosing Random (again) deals a new order
+                    FeedItemPermutors.reshuffle();
+                }
                 selectedFeed.setSortOrder(sortOrder);
                 DBWriter.setFeedItemSortOrder(selectedFeed.getId(), sortOrder);
             }

@@ -200,6 +200,7 @@
         <item>@string/title</item>
         <item>@string/duration</item>
         <item>@string/sort_track_order</item>
+        <item>@string/random</item>
     </string-array>
 
 
@@ -213,6 +214,8 @@
         <item>DURATION_SHORT_LONG</item>
         <item>TRACK_ORDER_REVERSED</item>
         <item>TRACK_ORDER</item>
+        <item>RANDOM</item>
+        <item>RANDOM_FAKE</item>
     </string-array>
 
     <string-array name="queue_sort_values">
