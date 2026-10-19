@@ -21,7 +21,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
 
-            <allen.town.podcast.core.view.TopAppBarLayout
+            <dev.russell.focuspodcast.core.view.TopAppBarLayout
                 android:id="@+id/appBarLayout"
                 style="?appBarLayoutStyle"
                 android:layout_width="match_parent"
@@ -83,7 +83,7 @@
 
         </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
-        <allen.town.podcast.common.views.AccentMaterialButton
+        <dev.russell.focuspodcast.common.views.AccentMaterialButton
             android:id="@+id/butConfirm"
             style="@style/Widget.Material3.Button"
             android:layout_width="match_parent"
@@ -101,7 +101,7 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <allen.town.podcast.common.views.AccentProgressBar
+    <dev.russell.focuspodcast.common.views.AccentProgressBar
         android:id="@+id/progressBar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

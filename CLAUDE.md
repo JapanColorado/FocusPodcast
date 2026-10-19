@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What this is
 
-FocusPodcast is an Android podcast app (app id `allen.town.focus.podcast`, packages `allen.town.podcast.*`). This repository is a **hard fork** of [allentown521/FocusPodcast](https://github.com/allentown521/FocusPodcast), which is itself a heavily modified fork of AntennaPod. Upstream mergeability was abandoned in the September 2026 refactor (see `docs/REFACTOR_BASELINE.md` for the before/after numbers), so do not try to keep diffs upstream-friendly. The structure and most core classes still match AntennaPod, but several were renamed (`PodDBAdapter` → `Db`, `UserPreferences` → `Prefs`, `de.danoeh.antennapod` → `allen.town.podcast`), so upstream docs do not map 1:1. Mixed Kotlin/Java: `app` is Kotlin-leaning, `core`/`model`/`parser`/`storage` are almost all Java. All comments and configuration are in English; only the `values-zh-rCN`, `values-zh-rTW` and `values-ja` translation resources contain non-Latin text.
+FocusPodcast is an Android podcast app (app id `dev.russell.focuspodcast`, packages `dev.russell.focuspodcast.*`). This repository is a **hard fork** of [allentown521/FocusPodcast](https://github.com/allentown521/FocusPodcast), which is itself a heavily modified fork of AntennaPod. Upstream mergeability was abandoned in the September 2026 refactor (see `docs/REFACTOR_BASELINE.md` for the before/after numbers), so do not try to keep diffs upstream-friendly. The structure and most core classes still match AntennaPod, but several were renamed (`PodDBAdapter` → `Db`, `UserPreferences` → `Prefs`, `de.danoeh.antennapod` → `allen.town.podcast`), so upstream docs do not map 1:1. In October 2026 the fork moved to its own ids: app id `allen.town.focus.podcast` → `dev.russell.focuspodcast` and packages `allen.town.podcast.*` → `dev.russell.focuspodcast.*` (the About screen's Play Store links still point at the upstream listing). Mixed Kotlin/Java: `app` is Kotlin-leaning, `core`/`model`/`parser`/`storage` are almost all Java. All comments and configuration are in English; only the `values-zh-rCN`, `values-zh-rTW` and `values-ja` translation resources contain non-Latin text.
 
 The app is F-Droid-only: there are no build flavors, no Google Play / Firebase / ads / in-app-purchase code, and no pro gating. Monetisation, analytics, crash reporting, LeanCloud, Cast, cloud backup and the GoRouter service locator were all deleted rather than stubbed; do not reintroduce them.
 
@@ -25,13 +25,14 @@ pixi run build          # assembleRelease (needs secrets.properties)
 pixi run install        # build + adb install the release APK
 pixi run run            # install + launch
 pixi run build-debug    # assembleDebug (no secrets needed)
-pixi run install-debug  # build + adb install the debug APK (allen.town.focus.podcast.debug)
+pixi run install-debug  # build + adb install the debug APK (dev.russell.focuspodcast.debug)
 pixi run run-debug      # debug install + launch
 pixi run test           # testDebugUnitTest
 pixi run lint           # ./gradlew lint
 pixi run nn             # !! ratchet (scripts/count-bangbang.sh)
 pixi run detekt         # detekt static analysis (config/detekt/detekt.yml)
 pixi run check          # build-debug + test + lint + nn + detekt
+pixi run logs           # logcat for the running release app
 pixi run clean
 
 # Raw Gradle equivalents (inside `pixi shell`):
@@ -40,7 +41,7 @@ pixi run clean
 
 ./gradlew test                           # all JVM unit tests (JUnit4 + Robolectric)
 ./gradlew :parser:feed:testDebugUnitTest
-./gradlew :parser:feed:testDebugUnitTest --tests "allen.town.podcast.parser.feed.element.namespace.RssParserTest"
+./gradlew :parser:feed:testDebugUnitTest --tests "dev.russell.focuspodcast.parser.feed.element.namespace.RssParserTest"
 ./gradlew :playback:base:testDebugUnitTest --tests "*RewindAfterPauseUtilTest"
 ./gradlew :core:testDebugUnitTest
 
@@ -61,11 +62,11 @@ Dependency direction (top depends on bottom):
 - **app** — Activities/fragments/adapters, `MyApp` Application. Depends on core and nearly everything else.
 - **core** — the workhorse: `DBReader`/`DBWriter`/`DBTasks`, `PlaybackService` + `LocalPSMP` + `ExoPlayerWrapper`, `DownloadService`, `FeedUpdateWorker`, `SyncService`, `Prefs`, widgets, Glide setup, backup/OPML.
 - **playback/base** — abstract `PlaybackServiceMediaPlayer`, `PlayerStatus`.
-- **storage/database** — raw SQLite `Db.java` (package `allen.town.podcast.storage.db`, `focusPodcastApp.db`, `VERSION = 11`, renumbered from AntennaPod; v8 clear voice, v9 transcripts, v10 bookmarks, v11 Podcasting 2.0 persons/soundbites), `DBUpgrade.java` hand-written ALTER ladder, `mapper/*CursorMapper`. No Room.
+- **storage/database** — raw SQLite `Db.java` (package `dev.russell.focuspodcast.storage.db`, `focusPodcastApp.db`, `VERSION = 11`, renumbered from AntennaPod; v8 clear voice, v9 transcripts, v10 bookmarks, v11 Podcasting 2.0 persons/soundbites), `DBUpgrade.java` hand-written ALTER ladder, `mapper/*CursorMapper`. No Room.
 - **parser/feed** (RSS/Atom), **parser/media** (ID3/Vorbis chapters), **net/ssl**, **net/sync/model** + **net/sync/gpoddernet**
 - **event** — EventBus payload classes only. **model** — POJOs (`Feed`, `FeedItem`, `FeedMedia`, ...).
 - **ui/common** (shared views), **ui/app-start-intent** (typed Intent builders so lower modules can launch app Activities without depending on `app`), **ui/i18n** and **ui/png-icons** (resources only).
-- **lib/common** (`allen.town.podcast.common.*` — base Activity/Application, dialogs, utils), **lib/theme** (`allen.town.podcast.theme.*`), **lib/searchpreference** (`allen.town.podcast.searchpreference.*`). These were git submodules until Phase 1; they are now ordinary in-tree modules and may be edited freely. Their packages were renamed out of their upstream namespaces into `allen.town.podcast.common.*`, `allen.town.podcast.theme.*` and `allen.town.podcast.searchpreference.*` (the handful of files that still declared a RetroMusic package were folded into the package matching their own directory), so every class in the build now lives under `allen.town.podcast.*` and upstream AppThemeHelper / RetroMusic / SearchPreference sources no longer apply as drop-in patches.
+- **lib/common** (`dev.russell.focuspodcast.common.*` — base Activity/Application, dialogs, utils), **lib/theme** (`dev.russell.focuspodcast.theme.*`), **lib/searchpreference** (`dev.russell.focuspodcast.searchpreference.*`). These were git submodules until Phase 1; they are now ordinary in-tree modules and may be edited freely. Their packages were renamed out of their upstream namespaces into `dev.russell.focuspodcast.common.*`, `dev.russell.focuspodcast.theme.*` and `dev.russell.focuspodcast.searchpreference.*` (the handful of files that still declared a RetroMusic package were folded into the package matching their own directory), so every class in the build now lives under `dev.russell.focuspodcast.*` and upstream AppThemeHelper / RetroMusic / SearchPreference sources no longer apply as drop-in patches.
 
 ### The big classes are split into collaborators
 
@@ -143,7 +144,7 @@ the seek bar and can be disabled or deleted per episode.
 ### How the layers talk to each other
 
 - **core → app callbacks via `ClientConfig`.** `MyApp.onCreate` calls `ClientConfig.initialize(context, DownloadServiceCallbacksImpl())`, which also initialises `Db`, `Prefs`, `NetworkUtils` and the sync settings. Receivers and workers that may start in a fresh process call `ClientConfig.ensureInitialized(context)`, which throws if the app never ran. `DownloadServiceCallbacks` (PendingIntents into app Activities) is the only interface core needs from app; if core needs something else only app knows, extend it rather than adding a module dependency.
-- **EventBus (greenrobot) is the main cross-layer channel.** Subscriber indexes are kapt-generated: `allen.town.podcast.ApEventBusIndex` (arg in `app/build.gradle`) and `allen.town.podcast.core.ApCoreEventBusIndex` (arg in `core/build.gradle`), both installed in `MyApp.onCreate`. A `@Subscribe` method in a module without an `eventBusIndex` kapt arg will not be indexed.
+- **EventBus (greenrobot) is the main cross-layer channel.** Subscriber indexes are kapt-generated: `dev.russell.focuspodcast.ApEventBusIndex` (arg in `app/build.gradle`) and `dev.russell.focuspodcast.core.ApCoreEventBusIndex` (arg in `core/build.gradle`), both installed in `MyApp.onCreate`. A `@Subscribe` method in a module without an `eventBusIndex` kapt arg will not be indexed.
 - **RxJava2** for DB/network work off the main thread (`subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())`), with a global handler in `app/.../error/RxJavaErrorHandlerSetup`.
 - **Background work:** `DownloadService` is a foreground Service, not WorkManager. WorkManager is used for `FeedUpdateWorker` (scheduled by `core/util/download/AutoUpdateManager.java`) and `WidgetUpdaterWorker`.
 

@@ -22,7 +22,7 @@
         android:supportsRtl="true">
 
         <service
-            android:name="allen.town.podcast.core.service.download.DownloadService"
+            android:name="dev.russell.focuspodcast.core.service.download.DownloadService"
             android:foregroundServiceType="dataSync"
             android:enabled="true" />
 
@@ -35,7 +35,7 @@
             android:foregroundServiceType="dataSync|mediaProcessing"
             tools:node="merge" />
 
-        <service android:name="allen.town.podcast.core.service.playback.PlaybackService"
+        <service android:name="dev.russell.focuspodcast.core.service.playback.PlaybackService"
             android:label="@string/app_name"
             android:foregroundServiceType="mediaPlayback"
             android:enabled="true"
@@ -48,17 +48,17 @@
         </service>
 
         <receiver
-            android:name="allen.town.podcast.core.receiver.MediaButtonReceiver"
+            android:name="dev.russell.focuspodcast.core.receiver.MediaButtonReceiver"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MEDIA_BUTTON" />
             </intent-filter>
             <intent-filter>
-                <action android:name="allen.town.podcast.NOTIFY_BUTTON_RECEIVER" />
+                <action android:name="dev.russell.focuspodcast.NOTIFY_BUTTON_RECEIVER" />
             </intent-filter>
         </receiver>
 
-        <receiver android:name="allen.town.podcast.core.receiver.FeedsSyncReceiver"
+        <receiver android:name="dev.russell.focuspodcast.core.receiver.FeedsSyncReceiver"
             android:label="@string/feed_update_receiver_name"
             android:exported="true"
             tools:ignore="ExportedReceiver" /> <!-- allow feeds update to be triggered by external apps -->

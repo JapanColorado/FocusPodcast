@@ -73,7 +73,7 @@
 
     </LinearLayout>
 
-    <allen.town.podcast.view.PlayPauseProgressButton
+    <dev.russell.focuspodcast.view.PlayPauseProgressButton
         android:id="@+id/secondaryActionButton"
         style="@style/Widget_PlayerFM_PlayPauseButton"
         android:layout_width="48dp"

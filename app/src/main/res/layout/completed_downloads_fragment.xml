@@ -29,7 +29,7 @@
             android:maxLines="1"
             tools:text="12 episodes · 1.4 GB" />
 
-        <allen.town.podcast.common.views.AccentMaterialTextButton
+        <dev.russell.focuspodcast.common.views.AccentMaterialTextButton
             android:id="@+id/deletePlayedButton"
             style="@style/Widget.Material3.Button.TextButton"
             android:layout_width="wrap_content"
@@ -39,7 +39,7 @@
             tools:visibility="visible" />
     </LinearLayout>
 
-    <allen.town.podcast.view.StorePositionRecyclerView
+    <dev.russell.focuspodcast.view.StorePositionRecyclerView
         android:id="@+id/recyclerView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

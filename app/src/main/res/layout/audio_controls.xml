@@ -13,7 +13,7 @@
         android:minWidth="300dp"
         android:orientation="vertical">
 
-        <allen.town.podcast.common.views.AccentMaterialButton
+        <dev.russell.focuspodcast.common.views.AccentMaterialButton
             android:id="@+id/audio_tracks"
             style="@style/Widget.Material3.Button"
             android:layout_width="match_parent"
@@ -28,7 +28,7 @@
             android:gravity="center_vertical"
             android:orientation="horizontal">
 
-            <allen.town.podcast.common.views.AccentImageView
+            <dev.russell.focuspodcast.common.views.AccentImageView
                 style="@style/Widget.Material3.Button.IconButton"
                 android:importantForAccessibility="no"
                 android:layout_width="wrap_content"
@@ -67,7 +67,7 @@
             app:selectionRequired="true"
             app:singleSelection="true">
 
-            <allen.town.podcast.common.views.AccentMaterialOutlineBackgroundStatusButton
+            <dev.russell.focuspodcast.common.views.AccentMaterialOutlineBackgroundStatusButton
                 android:id="@+id/voice_original"
                 style="?attr/materialButtonOutlinedStyle"
                 android:layout_width="0dp"
@@ -81,7 +81,7 @@
                 app:autoSizeMinTextSize="10sp"
                 app:autoSizeTextType="uniform" />
 
-            <allen.town.podcast.common.views.AccentMaterialOutlineBackgroundStatusButton
+            <dev.russell.focuspodcast.common.views.AccentMaterialOutlineBackgroundStatusButton
                 android:id="@+id/voice_clear"
                 style="?attr/materialButtonOutlinedStyle"
                 android:layout_width="0dp"
@@ -95,7 +95,7 @@
                 app:autoSizeMinTextSize="10sp"
                 app:autoSizeTextType="uniform" />
 
-            <allen.town.podcast.common.views.AccentMaterialOutlineBackgroundStatusButton
+            <dev.russell.focuspodcast.common.views.AccentMaterialOutlineBackgroundStatusButton
                 android:id="@+id/voice_clear_plus"
                 style="?attr/materialButtonOutlinedStyle"
                 android:layout_width="0dp"
@@ -109,7 +109,7 @@
                 app:autoSizeMinTextSize="10sp"
                 app:autoSizeTextType="uniform" />
 
-            <allen.town.podcast.common.views.AccentMaterialOutlineBackgroundStatusButton
+            <dev.russell.focuspodcast.common.views.AccentMaterialOutlineBackgroundStatusButton
                 android:id="@+id/voice_warm"
                 style="?attr/materialButtonOutlinedStyle"
                 android:layout_width="0dp"
@@ -129,14 +129,14 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal">
 
-            <allen.town.podcast.common.views.AccentImageView
+            <dev.russell.focuspodcast.common.views.AccentImageView
                 style="@style/Widget.Material3.Button.IconButton"
                 android:importantForAccessibility="no"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:src="@drawable/ic_trim" />
 
-            <allen.town.podcast.common.common.views.ATESwitch
+            <dev.russell.focuspodcast.common.common.views.ATESwitch
                 android:id="@+id/skipSilence"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -150,14 +150,14 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal">
 
-            <allen.town.podcast.common.views.AccentImageView
+            <dev.russell.focuspodcast.common.views.AccentImageView
                 style="@style/Widget.Material3.Button.IconButton"
                 android:importantForAccessibility="no"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:src="@drawable/ic_volume_adaption" />
 
-            <allen.town.podcast.common.common.views.ATESwitch
+            <dev.russell.focuspodcast.common.common.views.ATESwitch
                 android:id="@+id/stereo_to_mono"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -174,14 +174,14 @@
             android:visibility="gone"
             tools:visibility="visible">
 
-            <allen.town.podcast.common.views.AccentImageView
+            <dev.russell.focuspodcast.common.views.AccentImageView
                 style="@style/Widget.Material3.Button.IconButton"
                 android:importantForAccessibility="no"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:src="@drawable/ic_sound_waves" />
 
-            <allen.town.podcast.common.common.views.ATESwitch
+            <dev.russell.focuspodcast.common.common.views.ATESwitch
                 android:id="@+id/detect_ads"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

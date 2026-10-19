@@ -1,0 +1,781 @@
+package dev.russell.focuspodcast.fragment
+
+import dev.russell.focuspodcast.common.util.DoubleClickBackToContentTopListener
+import dev.russell.focuspodcast.common.util.MenuIconUtil.showToolbarMenuIcon
+import dev.russell.focuspodcast.common.util.TopSnackbarUtil.showSnack
+import dev.russell.focuspodcast.common.views.AccentMaterialDialog
+import dev.russell.focuspodcast.common.views.ItemOffsetDecoration
+import dev.russell.focuspodcast.R
+import dev.russell.focuspodcast.activity.MainActivity
+import dev.russell.focuspodcast.adapter.MultiSelectAdapter
+import dev.russell.focuspodcast.adapter.MultiSelectAdapter.OnSelectModeListener
+import dev.russell.focuspodcast.adapter.PlaylistAdapter
+import dev.russell.focuspodcast.core.dialog.ConfirmationDialog
+import dev.russell.focuspodcast.core.event.DownloadEvent
+import dev.russell.focuspodcast.core.feed.util.PlaybackSpeedUtils
+import dev.russell.focuspodcast.core.pref.Prefs.isPlaylistKeepSorted
+import dev.russell.focuspodcast.core.pref.Prefs.isPlaylistLocked
+import dev.russell.focuspodcast.core.pref.Prefs.queueKeepSortedOrder
+import dev.russell.focuspodcast.core.pref.Prefs.timeRespectsSpeed
+import dev.russell.focuspodcast.core.service.download.DownloadService
+import dev.russell.focuspodcast.core.storage.DBReader
+import dev.russell.focuspodcast.core.storage.DBWriter
+import dev.russell.focuspodcast.core.util.Converter
+import dev.russell.focuspodcast.core.util.FeedItemUtil
+import dev.russell.focuspodcast.core.util.download.AutoUpdateManager
+import dev.russell.focuspodcast.core.util.menuhandler.MenuItemUtils
+import dev.russell.focuspodcast.core.util.menuhandler.MenuItemUtils.UpdateRefreshMenuItemChecker
+import dev.russell.focuspodcast.core.view.TopAppBarLayout
+import dev.russell.focuspodcast.discovery.CombinedSearcher
+import dev.russell.focuspodcast.event.FeedItemEvent
+import dev.russell.focuspodcast.event.PlayerStatusEvent
+import dev.russell.focuspodcast.event.QueueEvent
+import dev.russell.focuspodcast.event.UnreadItemsUpdateEvent
+import dev.russell.focuspodcast.event.playback.PlaybackPositionEvent
+import dev.russell.focuspodcast.fragment.actions.EpisodeMultiSelectActionHandler
+import dev.russell.focuspodcast.fragment.swipeactions.SwipeActions
+import dev.russell.focuspodcast.menuprocess.FeedItemMenuProcess
+import dev.russell.focuspodcast.model.feed.FeedItem
+import dev.russell.focuspodcast.model.feed.FeedItemFilter
+import dev.russell.focuspodcast.model.feed.SortOrder
+import dev.russell.focuspodcast.util.SkeletonRecyclerDelay
+import dev.russell.focuspodcast.view.EmptyViewHandler
+import dev.russell.focuspodcast.view.StorePositionRecyclerView
+import dev.russell.focuspodcast.viewholder.EpisodeItemViewHolder
+import android.content.Context
+import android.content.DialogInterface
+import android.content.SharedPreferences
+import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
+import android.util.Log
+import android.view.*
+import android.view.ContextMenu.ContextMenuInfo
+import android.widget.CheckBox
+import android.widget.CompoundButton
+import android.widget.ProgressBar
+import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.widget.SwitchCompat
+import androidx.appcompat.widget.Toolbar
+import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.ItemTouchHelper
+import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.SimpleItemAnimator
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+import dev.russell.focuspodcast.theme.util.scroll.ThemedFastScroller.create
+import com.beloo.widget.chipslayoutmanager.ChipsLayoutManager
+import com.faltenreich.skeletonlayout.Skeleton
+import com.faltenreich.skeletonlayout.applySkeleton
+import com.google.android.material.button.MaterialButtonToggleGroup
+import com.google.android.material.chip.Chip
+import io.reactivex.Observable
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.Disposable
+import io.reactivex.schedulers.Schedulers
+import org.greenrobot.eventbus.EventBus
+import org.greenrobot.eventbus.Subscribe
+import org.greenrobot.eventbus.ThreadMode
+import java.util.*
+
+/**
+ * Shows all items in the queue.
+ */
+class PlaylistFragment : Fragment(), Toolbar.OnMenuItemClickListener, OnSelectModeListener, DoubleClickBackToContentTopListener.IBackToContentTopView {
+    private lateinit var recyclerView: StorePositionRecyclerView
+    private var recyclerAdapter: PlaylistAdapter? = null
+    private lateinit var emptyView: EmptyViewHandler
+    private lateinit var progLoading: ProgressBar
+    private lateinit var toolbar: Toolbar
+    private var displayUpArrow = false
+    private var queue: MutableList<FeedItem>? = null
+    private var isUpdatingFeeds = false
+    private var disposable: Disposable? = null
+    private val uiHandler = Handler(Looper.getMainLooper())
+    private lateinit var swipeActions: SwipeActions
+    private lateinit var prefs: SharedPreferences
+    private lateinit var skeleton: Skeleton
+    private lateinit var skeletonRecyclerDelay: SkeletonRecyclerDelay
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        retainInstance = true
+        prefs = requireActivity().getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+    }
+
+    override fun onStart() {
+        super.onStart()
+        if (queue != null) {
+            onFragmentLoaded(true)
+        }
+        loadItems(true)
+        EventBus.getDefault().register(this)
+    }
+
+    override fun onPause() {
+        super.onPause()
+        recyclerView.saveScrollPosition(TAG)
+    }
+
+    override fun onStop() {
+        super.onStop()
+        EventBus.getDefault().unregister(this)
+        disposable?.dispose()
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    fun onEventMainThread(event: QueueEvent) {
+        val queue = this.queue ?: return
+        val adapter = recyclerAdapter
+        if (adapter == null) {
+            loadItems(true)
+            return
+        }
+        when (event.action) {
+            QueueEvent.Action.ADDED -> {
+                queue.add(event.position, event.item)
+                adapter.notifyItemInserted(event.position)
+            }
+            QueueEvent.Action.SET_QUEUE, QueueEvent.Action.SORTED -> {
+                this.queue = event.items
+                adapter.notifyDataSetChanged()
+            }
+            QueueEvent.Action.REMOVED, QueueEvent.Action.IRREVERSIBLE_REMOVED -> {
+                val position = FeedItemUtil.indexOfItemWithId(queue, event.item.id)
+                if (position >= 0) {
+                    queue.removeAt(position)
+                    adapter.notifyItemRemoved(position)
+                }
+            }
+            QueueEvent.Action.CLEARED -> {
+                queue.clear()
+                adapter.notifyDataSetChanged()
+            }
+            QueueEvent.Action.MOVED -> return
+            else -> return
+        }
+        recyclerView.saveScrollPosition(TAG)
+        onFragmentLoaded(false)
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    fun onEventMainThread(event: FeedItemEvent) {
+        val queue = this.queue ?: return
+        val adapter = recyclerAdapter
+        if (adapter == null) {
+            loadItems(true)
+            return
+        }
+        var i = 0
+        val size = event.items.size
+        while (i < size) {
+            val item = event.items[i]
+            val pos = FeedItemUtil.indexOfItemWithId(queue, item.id)
+            if (pos >= 0) {
+                queue.removeAt(pos)
+                queue.add(pos, item)
+                adapter.notifyItemChangedCompat(pos)
+                refreshInfoBar()
+            }
+            i++
+        }
+    }
+
+    @Subscribe(sticky = true, threadMode = ThreadMode.MAIN)
+    fun onEventMainThread(event: DownloadEvent) {
+        val update = event.update
+        if (event.hasChangedFeedUpdateStatus(isUpdatingFeeds)) {
+            refreshToolbarState()
+        }
+        val adapter = recyclerAdapter
+        if (adapter != null && update.mediaIds.size > 0) {
+            for (mediaId in update.mediaIds) {
+                val pos = FeedItemUtil.indexOfItemWithMediaId(queue, mediaId)
+                if (pos >= 0) {
+                    adapter.notifyItemChangedCompat(pos)
+                }
+            }
+        }
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    fun onEventMainThread(event: PlaybackPositionEvent) {
+        val adapter = recyclerAdapter ?: return
+        for (i in 0 until adapter.itemCount) {
+            val holder =
+                recyclerView.findViewHolderForAdapterPosition(i) as EpisodeItemViewHolder?
+            if (holder != null && holder.isCurrentlyPlayingItem) {
+                holder.notifyPlaybackPositionUpdated(event)
+                break
+            }
+        }
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    fun onPlayerStatusChanged(event: PlayerStatusEvent?) {
+        loadItems(false)
+        if (isUpdatingFeeds != updateRefreshMenuItemChecker.isRefreshing) {
+            refreshToolbarState()
+        }
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    fun onUnreadItemsChanged(event: UnreadItemsUpdateEvent?) {
+        // Sent when playback position is reset
+        loadItems(false)
+        if (isUpdatingFeeds != updateRefreshMenuItemChecker.isRefreshing) {
+            refreshToolbarState()
+        }
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    fun onKeyUp(event: KeyEvent) {
+        if (!isAdded || !isVisible || !isMenuVisible) {
+            return
+        }
+        when (event.keyCode) {
+            KeyEvent.KEYCODE_T -> recyclerView.smoothScrollToPosition(0)
+            KeyEvent.KEYCODE_B -> recyclerAdapter?.let {
+                recyclerView.smoothScrollToPosition(it.itemCount - 1)
+            }
+            else -> {}
+        }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        uiHandler.removeCallbacksAndMessages(null)
+        recyclerAdapter?.endSelectMode()
+        recyclerAdapter = null
+        toolbar.setOnMenuItemClickListener(null)
+        toolbar.setOnLongClickListener(null)
+    }
+
+    private val updateRefreshMenuItemChecker =
+        UpdateRefreshMenuItemChecker { DownloadService.isRunning() && DownloadService.isDownloadingFeeds() }
+
+    private fun refreshToolbarState() {
+        isUpdatingFeeds = MenuItemUtils.updateRefreshMenuItem(
+            toolbar.menu,
+            R.id.refresh_item, updateRefreshMenuItemChecker
+        )
+    }
+
+    override fun onMenuItemClick(item: MenuItem): Boolean {
+        val itemId = item.itemId
+        if (itemId == R.id.refresh_item) {
+            AutoUpdateManager.runImmediate(requireContext())
+            return true
+        } else if (itemId == R.id.clear_queue) {
+            // make sure the user really wants to clear the queue
+            val conDialog: ConfirmationDialog = object : ConfirmationDialog(
+                activity,
+                R.string.clear_queue_label,
+                R.string.clear_queue_confirmation_msg
+            ) {
+                override fun onConfirmButtonPressed(
+                    dialog: DialogInterface
+                ) {
+                    dialog.dismiss()
+                    DBWriter.clearQueue()
+                }
+            }
+            conDialog.createNewDialog().show()
+            return true
+        } else if (itemId == R.id.action_search) {
+            (requireActivity() as MainActivity).loadChildFragment(LocalSearchFragment.Companion.newInstance())
+            return true
+        } else if (itemId == R.id.queue_sort) {
+            EditSortDialog().openDialog()
+            return true
+        } else if (itemId == R.id.history) {
+            (requireActivity() as MainActivity).loadChildFragment(PlaybackHistoryFragment())
+            return true
+        }
+        return false
+    }
+
+    private fun setQueueLocked(locked: Boolean) {
+        isPlaylistLocked = locked
+        refreshToolbarState()
+        recyclerAdapter?.updateDragDropEnabled()
+        if (locked) {
+            showSnack(activity, R.string.queue_locked, Toast.LENGTH_SHORT)
+        } else {
+            showSnack(activity, R.string.queue_unlocked, Toast.LENGTH_SHORT)
+        }
+    }
+
+    /**
+     * This method is called if the user clicks on a sort order menu item.
+     *
+     * @param sortOrder New sort order.
+     */
+    private fun setSortOrder(sortOrder: SortOrder) {
+        queueKeepSortedOrder = sortOrder
+        DBWriter.reorderQueue(sortOrder, true)
+    }
+
+    override fun onContextItemSelected(item: MenuItem): Boolean {
+        val adapter = recyclerAdapter
+        if (!isVisible || adapter == null) {
+            return false
+        }
+        val selectedItem = adapter.longPressedItem
+        if (selectedItem == null) {
+            Log.i(TAG, "Selected item was null, ignoring selection")
+            return super.onContextItemSelected(item)
+        }
+        val queue = this.queue ?: return super.onContextItemSelected(item)
+        val position = FeedItemUtil.indexOfItemWithId(queue, selectedItem.id)
+        if (position < 0) {
+            Log.i(TAG, "Selected item no longer exist, ignoring selection")
+            return super.onContextItemSelected(item)
+        }
+        if (adapter.onContextItemSelected(item)) {
+            return true
+        }
+        val itemId = item.itemId
+        if (itemId == R.id.move_to_top_item) {
+            queue.add(0, queue.removeAt(position))
+            adapter.notifyItemMoved(position, 0)
+            DBWriter.moveQueueItemToTop(selectedItem.id, true)
+            return true
+        } else if (itemId == R.id.move_to_bottom_item) {
+            queue.add(queue.size - 1, queue.removeAt(position))
+            adapter.notifyItemMoved(position, queue.size - 1)
+            DBWriter.moveQueueItemToBottom(selectedItem.id, true)
+            return true
+        }
+        return FeedItemMenuProcess.onMenuItemClicked(this, item.itemId, selectedItem)
+    }
+
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        super.onCreateView(inflater, container, savedInstanceState)
+        val root = inflater.inflate(R.layout.queue_fragment, container, false)
+        toolbar = root.findViewById<TopAppBarLayout>(R.id.appBarLayout).toolbar
+        toolbar.setOnMenuItemClickListener(this)
+        displayUpArrow = parentFragmentManager.backStackEntryCount != 0
+        if (savedInstanceState != null) {
+            displayUpArrow = savedInstanceState.getBoolean(KEY_UP_ARROW)
+        }
+        (requireActivity() as MainActivity).setupToolbarToggle(toolbar, displayUpArrow)
+        toolbar.inflateMenu(R.menu.playlist_menu)
+        toolbar.setOnClickListener(DoubleClickBackToContentTopListener(this) )
+        showToolbarMenuIcon(toolbar)
+        refreshToolbarState()
+        recyclerView = root.findViewById(R.id.recyclerView)
+        create(recyclerView)
+        val animator = recyclerView.getItemAnimator()
+        if (animator is SimpleItemAnimator) {
+            animator.supportsChangeAnimations = false
+        }
+        recyclerView.setRecycledViewPool((requireActivity() as MainActivity).recycledViewPool)
+        registerForContextMenu(recyclerView)
+        val swipeRefreshLayout = root.findViewById<SwipeRefreshLayout>(R.id.swipeRefresh)
+        swipeRefreshLayout.setDistanceToTriggerSync(resources.getInteger(R.integer.swipe_refresh_distance))
+        swipeRefreshLayout.setOnRefreshListener {
+            AutoUpdateManager.runImmediate(requireContext())
+            uiHandler.postDelayed(
+                { swipeRefreshLayout.isRefreshing = false },
+                resources.getInteger(R.integer.swipe_to_refresh_duration_in_ms).toLong()
+            )
+        }
+        swipeActions = QueueSwipeActions()
+        swipeActions.setFilter(FeedItemFilter(FeedItemFilter.QUEUED))
+        swipeActions.attachTo(recyclerView)
+        emptyView = EmptyViewHandler(context)
+        emptyView.attachToRecyclerView(recyclerView)
+        emptyView.setIcon(R.drawable.ic_playlist)
+        emptyView.setTitle(R.string.no_items_header_label)
+        // An empty playlist is filled from episodes the user already has, so browsing them comes
+        // first; searching covers the user who has no subscriptions yet.
+        emptyView.addAction(R.string.browse_episodes_label, R.drawable.ic_episodes) {
+            (requireActivity() as MainActivity).loadFragment(EpisodesFragment.TAG, null)
+        }
+        emptyView.addAction(R.string.search_podcasts_label, R.drawable.ic_search) {
+            (requireActivity() as MainActivity).loadChildFragment(
+                OnlineSearchFragment.newInstance(CombinedSearcher::class.java, "")
+            )
+        }
+        progLoading = root.findViewById(R.id.progLoading)
+        toolbar.setTitle(getString(R.string.playlist_label))
+        skeleton = recyclerView.applySkeleton(R.layout.item_small_recyclerview_skeleton, 15)
+        skeletonRecyclerDelay = SkeletonRecyclerDelay(skeleton,recyclerView)
+        return root
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        outState.putBoolean(KEY_UP_ARROW, displayUpArrow)
+        super.onSaveInstanceState(outState)
+    }
+
+    private fun onFragmentLoaded(restoreScrollPosition: Boolean) {
+        val queue = this.queue
+        if (queue != null) {
+            var adapter = recyclerAdapter
+            if (adapter == null) {
+                val activity = requireActivity() as MainActivity
+                adapter = object : PlaylistAdapter(activity, swipeActions) {
+                    override fun onCreateContextMenu(
+                        menu: ContextMenu,
+                        v: View,
+                        menuInfo: ContextMenuInfo?
+                    ) {
+                        super.onCreateContextMenu(menu, v, menuInfo)
+                        MenuItemUtils.setOnClickListeners(menu) { item: MenuItem ->
+                            this@PlaylistFragment.onContextItemSelected(
+                                item
+                            )
+                        }
+                    }
+                }
+                recyclerAdapter = adapter
+                adapter.setOnMenuItemClickListener(object :
+                    MultiSelectAdapter.OnMenuItemClickListener {
+                    override fun onMenuItemClick(item: MenuItem?) {
+                        val menuItem = item ?: return
+                        val currentAdapter = recyclerAdapter ?: return
+                        EpisodeMultiSelectActionHandler(
+                            requireActivity() as MainActivity,
+                            currentAdapter.selectedItems
+                        )
+                            .handleAction(menuItem.itemId)
+                        currentAdapter.endSelectMode()
+                    }
+                })
+                adapter.setonPrepareActionListener(object :
+                    MultiSelectAdapter.OnPrepareActionModeListener {
+                    override fun onPrepareActionMode(
+                        mode: androidx.appcompat.view.ActionMode?,
+                        item: Menu?
+                    ) {
+                        // a sorted queue puts the episodes back where they were
+                        item?.findItem(R.id.play_next_batch)?.isVisible =
+                            !DBWriter.isQueueOrderAutomatic()
+                    }
+                })
+                adapter.setOnSelectModeListener(this)
+                recyclerView.adapter = adapter
+                emptyView.updateAdapter(adapter)
+                skeleton =
+                    recyclerView.applySkeleton(R.layout.item_small_recyclerview_skeleton, 15)
+                skeletonRecyclerDelay = SkeletonRecyclerDelay(skeleton,recyclerView)
+                skeletonRecyclerDelay.showSkeleton()
+            }
+            adapter.updateItems(queue)
+        } else {
+            recyclerAdapter = null
+            emptyView.updateAdapter(null)
+        }
+        if (restoreScrollPosition) {
+            recyclerView.restoreScrollPosition(TAG)
+        }
+
+        // we need to refresh the options menu because it sometimes
+        // needs data that may have just been loaded.
+        refreshToolbarState()
+        refreshInfoBar()
+    }
+
+    private fun refreshInfoBar() {
+        val queue = this.queue ?: return
+        var info: String? = String.format(
+            Locale.getDefault(), "%d%s",
+            queue.size, getString(R.string.episodes_suffix)
+        )
+        if (queue.size > 0) {
+            var timeLeft: Long = 0
+            for (item in queue) {
+                val media = item.media ?: continue
+                var playbackSpeed = 1f
+                if (timeRespectsSpeed()) {
+                    playbackSpeed = PlaybackSpeedUtils.getCurrentPlaybackSpeed(media)
+                }
+                val itemTimeLeft = (media.duration - media.position).toLong()
+                timeLeft += (itemTimeLeft / playbackSpeed).toLong()
+            }
+            info += " ("
+            info += Converter.getDurationStringLocalized(activity, timeLeft)
+            info += ")"
+            toolbar.subtitle = info
+        } else {
+            //no subtitle when the playlist is empty
+            toolbar.subtitle = ""
+        }
+        toolbar.setSubtitleTextAppearance(
+            context,
+            R.style.FocusPodcast_TextView_ListItemSecondaryTitle
+        )
+    }
+
+    private fun loadItems(restoreScrollPosition: Boolean) {
+        disposable?.dispose()
+        if (queue == null) {
+            emptyView.hide()
+            skeletonRecyclerDelay.showSkeleton()
+        }
+        disposable = Observable.fromCallable { DBReader.getQueue() }
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe({ items: MutableList<FeedItem>? ->
+                queue = items
+                onFragmentLoaded(restoreScrollPosition)
+                if (skeleton.isSkeleton()) {
+                    skeletonRecyclerDelay.showOriginal()
+                }
+                recyclerAdapter?.notifyDataSetChanged()
+            }) { error: Throwable? -> Log.e(TAG, Log.getStackTraceString(error)) }
+    }
+
+    override fun onStartSelectMode() {
+        swipeActions.detach()
+        refreshToolbarState()
+        toolbar.visibility = View.GONE
+    }
+
+    override fun onEndSelectMode() {
+        swipeActions.attachTo(recyclerView)
+        toolbar.visibility = View.VISIBLE
+    }
+
+    private inner class QueueSwipeActions :
+        SwipeActions(ItemTouchHelper.UP or ItemTouchHelper.DOWN, this@PlaylistFragment, TAG) {
+        // Position tracking whilst dragging
+        var dragFrom = -1
+        var dragTo = -1
+        override fun onMove(
+            recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder,
+            target: RecyclerView.ViewHolder
+        ): Boolean {
+            val fromPosition = viewHolder.bindingAdapterPosition
+            val toPosition = target.bindingAdapterPosition
+
+            // Update tracked position
+            if (dragFrom == -1) {
+                dragFrom = fromPosition
+            }
+            dragTo = toPosition
+            val from = viewHolder.bindingAdapterPosition
+            val to = target.bindingAdapterPosition
+            val queue = this@PlaylistFragment.queue ?: return false
+            val adapter = recyclerAdapter ?: return false
+            if (from >= queue.size || to >= queue.size || from < 0 || to < 0) {
+                return false
+            }
+            queue.add(to, queue.removeAt(from))
+            adapter.notifyItemMoved(from, to)
+            return true
+        }
+
+        override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+            disposable?.dispose()
+
+            //SwipeActions
+            super.onSwiped(viewHolder, direction)
+        }
+
+        override fun isLongPressDragEnabled(): Boolean {
+            return false
+        }
+
+        override fun clearView(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder) {
+            super.clearView(recyclerView, viewHolder)
+            // Check if drag finished
+            if (dragFrom != -1 && dragTo != -1 && dragFrom != dragTo) {
+                reallyMoved(dragFrom, dragTo)
+            }
+            dragTo = -1
+            dragFrom = dragTo
+        }
+
+        private fun reallyMoved(from: Int, to: Int) {
+            // Write drag operation to database
+            DBWriter.moveQueueItem(from, to, true)
+        }
+    }
+
+    internal inner class EditSortDialog {
+        var sortItems = arrayOf<String>()
+        var sortValues = arrayOf<SortOrder>()
+        var selectedIndex = 0
+        var ASC_INDEX = 1
+        var DESC_INDEX = 0
+        var isDesc = true
+        private lateinit var adapter: OrderSelectionAdapter
+        lateinit var orderGroup: MaterialButtonToggleGroup
+        lateinit var keepSortS: SwitchCompat
+        lateinit var lockS: SwitchCompat
+        var lastIsLocked = false
+        var lastIsQueueKeepSorted = false
+        fun openDialog() {
+            val lastSortOrder = queueKeepSortedOrder
+            if (lastSortOrder != null) {
+                selectedIndex = lastSortOrder.groupIndex
+                isDesc = lastSortOrder.code - lastSortOrder.ascBaseCode == DESC_INDEX
+            }
+            lastIsQueueKeepSorted = isPlaylistKeepSorted
+            lastIsLocked = isPlaylistLocked
+            sortItems = requireContext().resources.getStringArray(R.array.queue_sort_options)
+            val commonSortStringValues =
+                requireContext().resources.getStringArray(R.array.queue_sort_values)
+            sortValues = SortOrder.valuesOf(commonSortStringValues)
+            val inflater = LayoutInflater.from(context)
+            val layout = inflater.inflate(R.layout.edit_feed_sort_dialog_layout, null, false)
+            layout.findViewById<View>(R.id.keep_sort_l).visibility = View.VISIBLE
+            keepSortS = layout.findViewById(R.id.keep_sort_s)
+            lockS = layout.findViewById(R.id.lock_s)
+            //keep sorted
+            keepSortS.setChecked(lastIsQueueKeepSorted)
+            keepSortS.setOnCheckedChangeListener(CompoundButton.OnCheckedChangeListener { buttonView, isChecked ->
+                lockS.setEnabled(!isChecked)
+                adapter.notifyDataSetChanged()
+            })
+
+            //lock
+            lockS.setChecked(lastIsLocked)
+            lockS.setEnabled(!keepSortS.isChecked())
+            lockS.setOnCheckedChangeListener(CompoundButton.OnCheckedChangeListener { buttonView, isChecked -> })
+            orderGroup = layout.findViewById(R.id.order_group)
+            setOrderGroupVisibility()
+            orderGroup.check(if (!isDesc) R.id.asc_button else R.id.desc_button)
+            val recyclerView = layout.findViewById<RecyclerView>(R.id.orders)
+            //https://github.com/BelooS/ChipsLayoutManager
+            val chipsLayoutManager = ChipsLayoutManager.newBuilder(context).build()
+            recyclerView.layoutManager = chipsLayoutManager
+            recyclerView.addItemDecoration(ItemOffsetDecoration(requireContext(), 4))
+            adapter = OrderSelectionAdapter()
+            adapter.setHasStableIds(true)
+            recyclerView.adapter = adapter
+            val dialog: AlertDialog.Builder = AccentMaterialDialog(
+                requireContext(),
+                R.style.MaterialAlertDialogTheme
+            )
+            dialog.setView(layout)
+            dialog.setTitle(R.string.sort)
+            dialog.setPositiveButton(android.R.string.ok) { dialog, which ->
+                updateKeepSort()
+                toggleQueueLock()
+                val baseIndex =
+                    if (orderGroup.getCheckedButtonId() == R.id.asc_button) ASC_INDEX else DESC_INDEX
+                setSortOrder(sortValues[selectedIndex * 2 + baseIndex])
+                recyclerAdapter?.updateDragDropEnabled()
+            }
+            dialog.setNegativeButton(R.string.cancel_label, null)
+                .show()
+        }
+
+        private fun updateKeepSort() {
+            if (lastIsQueueKeepSorted == keepSortS.isChecked) {
+                //nothing to do if it matches the last saved value
+                return
+            }
+            val keepSortedNew = keepSortS.isChecked
+            isPlaylistKeepSorted = keepSortedNew
+            recyclerAdapter?.updateDragDropEnabled()
+            if (keepSortedNew) {
+                val sortOrder = queueKeepSortedOrder
+                DBWriter.reorderQueue(sortOrder, true)
+            }
+        }
+
+        private fun toggleQueueLock() {
+            if (lastIsLocked == lockS.isChecked) {
+                //nothing to do if it matches the last saved value
+                return
+            }
+            if (!lockS.isChecked) {
+                setQueueLocked(false)
+            } else {
+                val shouldShowLockWarning = prefs.getBoolean(PREF_SHOW_LOCK_WARNING, true)
+                if (!shouldShowLockWarning) {
+                    setQueueLocked(true)
+                } else {
+                    val builder: AlertDialog.Builder = AccentMaterialDialog(
+                        requireContext(),
+                        R.style.MaterialAlertDialogTheme
+                    )
+                    builder.setTitle(R.string.lock_queue)
+                    builder.setMessage(R.string.queue_lock_warning)
+                    val view = View.inflate(context, R.layout.checkbox_do_not_show_again, null)
+                    val checkDoNotShowAgain =
+                        view.findViewById<CheckBox>(R.id.checkbox_do_not_show_again)
+                    builder.setView(view)
+                    builder.setPositiveButton(R.string.lock_queue) { dialog: DialogInterface?, which: Int ->
+                        prefs.edit().putBoolean(
+                            PREF_SHOW_LOCK_WARNING, !checkDoNotShowAgain.isChecked
+                        ).apply()
+                        setQueueLocked(true)
+                    }
+                    builder.setNegativeButton(R.string.cancel_label, null)
+                    builder.show()
+                }
+            }
+        }
+
+        /**
+         * Whether the current selection is random; if so, the sort group is hidden.
+         *
+         * @return
+         */
+        private val isRandomSelected: Boolean
+            private get() = selectedIndex == SortOrder.RANDOM.groupIndex
+
+        fun setOrderGroupVisibility() {
+            orderGroup.visibility =
+                if (isRandomSelected) View.GONE else View.VISIBLE
+        }
+
+        internal inner class OrderSelectionAdapter :
+            RecyclerView.Adapter<OrderSelectionAdapter.ViewHolder>() {
+            override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+                val inflater = LayoutInflater.from(parent.context)
+                val entryView = inflater.inflate(R.layout.single_tag_chip, parent, false)
+                return ViewHolder(entryView as Chip)
+            }
+
+            override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+                holder.chip.text = sortItems[position]
+                holder.chip.isChecked = selectedIndex == position
+                holder.chip.isCheckedIconVisible = holder.chip.isChecked
+                holder.chip.setOnClickListener {
+                    // the row can be detached by the time the tap lands
+                    val pos = holder.bindingAdapterPosition
+                    if (pos == RecyclerView.NO_POSITION || pos >= sortItems.size) {
+                        return@setOnClickListener
+                    }
+                    selectedIndex = pos
+                    setOrderGroupVisibility()
+                    adapter.notifyDataSetChanged()
+                }
+            }
+
+            override fun getItemCount(): Int {
+                return sortItems.size
+            }
+
+            override fun getItemId(position: Int): Long {
+                return sortItems[position].hashCode().toLong()
+            }
+
+            inner class ViewHolder internal constructor(var chip: Chip) : RecyclerView.ViewHolder(
+                chip
+            )
+        }
+    }
+
+    companion object {
+        const val TAG = "PlaylistFragment"
+        private const val KEY_UP_ARROW = "up_arrow"
+        private const val PREFS = "pref_playlist_fragment"
+        private const val PREF_SHOW_LOCK_WARNING = "show_lock_warning"
+    }
+
+    override fun backToContentTop() {
+        recyclerView.scrollToPosition(5)
+        recyclerView.post { recyclerView.smoothScrollToPosition(0) }
+    }
+}

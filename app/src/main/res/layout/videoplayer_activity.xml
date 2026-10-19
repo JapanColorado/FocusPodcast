@@ -8,13 +8,13 @@
     android:background="@color/black"
     android:orientation="vertical">
 
-    <allen.town.podcast.view.AspectRatioVideoView
+    <dev.russell.focuspodcast.view.AspectRatioVideoView
         android:id="@+id/videoView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center" />
 
-    <allen.town.podcast.common.views.AccentProgressBar
+    <dev.russell.focuspodcast.common.views.AccentProgressBar
         android:id="@+id/progressBar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -41,7 +41,7 @@
             android:contentDescription="@string/rewind_label"
             app:srcCompat="@drawable/ic_fast_rewind" />
 
-        <allen.town.podcast.view.PlayButton
+        <dev.russell.focuspodcast.view.PlayButton
             android:id="@+id/playButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -144,7 +144,7 @@
                 android:textColor="@color/white"
                 android:textStyle="bold" />
 
-            <allen.town.podcast.common.views.AccentSeekbar
+            <dev.russell.focuspodcast.common.views.AccentSeekbar
                 android:id="@+id/sbPosition"
                 android:layout_width="0px"
                 android:layout_height="wrap_content"

@@ -103,7 +103,7 @@
                     tools:background="@android:color/holo_green_dark"
                     tools:text="author" />
 
-                <allen.town.podcast.common.views.AccentImageView
+                <dev.russell.focuspodcast.common.views.AccentImageView
                     android:id="@+id/ivIsVideo"
                     android:visibility="gone"
                     tools:visibility="visible"
@@ -130,7 +130,7 @@
 
         </LinearLayout>
 
-        <allen.town.podcast.view.PlayPauseProgressButton
+        <dev.russell.focuspodcast.view.PlayPauseProgressButton
             android:id="@+id/subscribe_button"
             style="@style/Widget_PlayerFM_PlayPauseButton"
             android:layout_width="48dp"

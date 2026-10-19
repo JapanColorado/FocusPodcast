@@ -10,7 +10,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <allen.town.podcast.core.view.TopAppBarLayout
+        <dev.russell.focuspodcast.core.view.TopAppBarLayout
             android:id="@+id/appBarLayout"
             style="?appBarLayoutStyle"
             android:layout_width="match_parent"
@@ -24,24 +24,24 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <allen.town.podcast.view.MultiSwipeRefreshLayout
+            <dev.russell.focuspodcast.view.MultiSwipeRefreshLayout
                 android:id="@+id/swipeRefresh"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_below="@id/divider">
 
-                <allen.town.podcast.view.StorePositionRecyclerView
+                <dev.russell.focuspodcast.view.StorePositionRecyclerView
                     android:id="@+id/recyclerView"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:paddingHorizontal="@dimen/additional_horizontal_spacing" />
 
-            </allen.town.podcast.view.MultiSwipeRefreshLayout>
+            </dev.russell.focuspodcast.view.MultiSwipeRefreshLayout>
         </LinearLayout>
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
 
-    <allen.town.podcast.common.views.AccentProgressBar
+    <dev.russell.focuspodcast.common.views.AccentProgressBar
         android:id="@+id/progLoading"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

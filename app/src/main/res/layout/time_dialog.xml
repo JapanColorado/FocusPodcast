@@ -32,7 +32,7 @@
 
             </LinearLayout>
 
-            <allen.town.podcast.common.views.AccentMaterialButton
+            <dev.russell.focuspodcast.common.views.AccentMaterialButton
                 android:id="@+id/setSleeptimerButton"
                 style="@style/Widget.Material3.Button"
                 android:layout_width="match_parent"
@@ -71,7 +71,7 @@
                 tools:text="Stops at end of chapter"
                 tools:visibility="visible" />
 
-            <allen.town.podcast.common.views.AccentMaterialButton
+            <dev.russell.focuspodcast.common.views.AccentMaterialButton
                 android:id="@+id/disableSleeptimerButton"
                 style="@style/Widget.Material3.Button"
                 android:layout_width="match_parent"
@@ -85,7 +85,7 @@
                 android:gravity="center_vertical"
                 android:orientation="horizontal">
 
-                <allen.town.podcast.common.views.AccentMaterialOutlineStatusButton
+                <dev.russell.focuspodcast.common.views.AccentMaterialOutlineStatusButton
                     android:id="@+id/extendSleepFiveMinutesButton"
                     style="@style/Widget.Material3.Button.OutlinedButton"
                     android:layout_width="0dp"
@@ -97,7 +97,7 @@
                     android:paddingVertical="4dp"
                     tools:text="+5 min" />
 
-                <allen.town.podcast.common.views.AccentMaterialOutlineStatusButton
+                <dev.russell.focuspodcast.common.views.AccentMaterialOutlineStatusButton
                     android:id="@+id/extendSleepTenMinutesButton"
                     style="@style/Widget.Material3.Button.OutlinedButton"
                     android:layout_width="0dp"
@@ -109,7 +109,7 @@
                     android:paddingVertical="4dp"
                     tools:text="+10 min" />
 
-                <allen.town.podcast.common.views.AccentMaterialOutlineStatusButton
+                <dev.russell.focuspodcast.common.views.AccentMaterialOutlineStatusButton
                     android:id="@+id/extendSleepTwentyMinutesButton"
                     style="@style/Widget.Material3.Button.OutlinedButton"
                     android:layout_width="0dp"
@@ -143,14 +143,14 @@
                 android:layout_height="wrap_content"
                 android:orientation="horizontal">
 
-                <allen.town.podcast.common.views.AccentImageView
+                <dev.russell.focuspodcast.common.views.AccentImageView
                     style="@style/Widget.Material3.Button.IconButton"
                     android:importantForAccessibility="no"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:src="@drawable/ic_shake" />
 
-                <allen.town.podcast.common.common.views.ATESwitch
+                <dev.russell.focuspodcast.common.common.views.ATESwitch
                     android:id="@+id/cbShakeToReset"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -164,14 +164,14 @@
                 android:layout_height="wrap_content"
                 android:orientation="horizontal">
 
-                <allen.town.podcast.common.views.AccentImageView
+                <dev.russell.focuspodcast.common.views.AccentImageView
                     style="@style/Widget.Material3.Button.IconButton"
                     android:importantForAccessibility="no"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:src="@drawable/ic_round_vibration_24" />
 
-                <allen.town.podcast.common.common.views.ATESwitch
+                <dev.russell.focuspodcast.common.common.views.ATESwitch
                     android:id="@+id/cbVibrate"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -185,14 +185,14 @@
                 android:layout_height="wrap_content"
                 android:orientation="horizontal">
 
-                <allen.town.podcast.common.views.AccentImageView
+                <dev.russell.focuspodcast.common.views.AccentImageView
                     style="@style/Widget.Material3.Button.IconButton"
                     android:importantForAccessibility="no"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:src="@drawable/ic_auto" />
 
-                <allen.town.podcast.common.common.views.ATESwitch
+                <dev.russell.focuspodcast.common.common.views.ATESwitch
                     android:id="@+id/chAutoEnable"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"

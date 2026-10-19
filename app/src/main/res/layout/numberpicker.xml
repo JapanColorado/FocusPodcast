@@ -6,18 +6,18 @@
     android:orientation="vertical"
     android:padding="16dp">
 
-    <allen.town.podcast.common.views.AccentTextInputLayout
+    <dev.russell.focuspodcast.common.views.AccentTextInputLayout
         style="?attr/textInputOutlinedDenseStyle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:hintEnabled="true">
-    <allen.town.podcast.common.views.CursorAccentTextInputEditText
+    <dev.russell.focuspodcast.common.views.CursorAccentTextInputEditText
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:inputType="numberDecimal"
             android:ems="10"
             android:selectAllOnFocus="true"
             android:id="@+id/number" />
-    </allen.town.podcast.common.views.AccentTextInputLayout>
+    </dev.russell.focuspodcast.common.views.AccentTextInputLayout>
 
 </LinearLayout>

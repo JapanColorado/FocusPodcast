@@ -16,11 +16,11 @@ android {
     }
 
     defaultConfig {
-        namespace = "allen.town.podcast.core"
+        namespace = "dev.russell.focuspodcast.core"
         buildConfigField "String", "VERSION_NAME", "\"${rootProject.ext.versionName}\""
         kapt {
             arguments {
-                arg('eventBusIndex', 'allen.town.podcast.core.ApCoreEventBusIndex')
+                arg('eventBusIndex', 'dev.russell.focuspodcast.core.ApCoreEventBusIndex')
             }
         }
     }

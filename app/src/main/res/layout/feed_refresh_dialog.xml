@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:padding="16dp">
 
-    <allen.town.podcast.common.views.AccentRadioButton
+    <dev.russell.focuspodcast.common.views.AccentRadioButton
         android:id="@+id/intervalRadioButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -18,20 +18,20 @@
         android:layout_height="wrap_content"
         android:visibility="gone" />
 
-    <allen.town.podcast.common.views.AccentRadioButton
+    <dev.russell.focuspodcast.common.views.AccentRadioButton
         android:id="@+id/timeRadioButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/feed_refresh_time" />
 
-    <allen.town.podcast.view.TimePickerWrap
+    <dev.russell.focuspodcast.view.TimePickerWrap
         android:id="@+id/timePicker"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:timePickerMode="spinner"
         android:visibility="gone" />
 
-    <allen.town.podcast.common.views.AccentRadioButton
+    <dev.russell.focuspodcast.common.views.AccentRadioButton
         android:id="@+id/disableRadioButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

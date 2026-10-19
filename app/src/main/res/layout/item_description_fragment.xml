@@ -20,7 +20,7 @@
         android:fillViewport="true"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
-    <allen.town.podcast.view.PodWebView
+    <dev.russell.focuspodcast.view.PodWebView
         android:id="@+id/webview"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>

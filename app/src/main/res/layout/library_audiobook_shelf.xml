@@ -26,7 +26,7 @@
             android:textStyle="bold"
             tools:targetApi="p" />
 
-        <allen.town.podcast.common.views.AccentMaterialTextButton
+        <dev.russell.focuspodcast.common.views.AccentMaterialTextButton
             android:id="@+id/butSeeAll"
             style="@style/Widget.Material3.Button.TextButton"
             android:layout_width="wrap_content"

@@ -6,12 +6,12 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-    <allen.town.podcast.common.views.AccentTextInputLayout
+    <dev.russell.focuspodcast.common.views.AccentTextInputLayout
             style="?attr/textInputOutlinedDenseStyle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-        <allen.town.podcast.common.views.CursorAccentTextInputEditText
+        <dev.russell.focuspodcast.common.views.CursorAccentTextInputEditText
                 android:id="@+id/deviceName"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -19,9 +19,9 @@
                 android:lines="1"
                 android:imeOptions="actionNext|flagNoFullscreen"/>
 
-    </allen.town.podcast.common.views.AccentTextInputLayout>
+    </dev.russell.focuspodcast.common.views.AccentTextInputLayout>
 
-    <allen.town.podcast.common.views.AccentMaterialButton
+    <dev.russell.focuspodcast.common.views.AccentMaterialButton
         style="@style/Widget.Material3.Button"
             android:id="@+id/createDeviceButton"
             android:layout_width="wrap_content"
@@ -52,7 +52,7 @@
         android:layout_height="wrap_content"
         android:orientation="vertical" />
 
-    <allen.town.podcast.common.views.AccentProgressBar
+    <dev.russell.focuspodcast.common.views.AccentProgressBar
         android:id="@+id/progbarCreateDevice"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

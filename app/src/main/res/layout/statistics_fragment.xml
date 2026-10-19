@@ -5,7 +5,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <allen.town.podcast.common.views.AccentProgressBar
+    <dev.russell.focuspodcast.common.views.AccentProgressBar
         android:id="@+id/progressBar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

@@ -8,7 +8,7 @@
 
     <!-- Only the bulk edit of several podcasts shows this; a single podcast's dialog offers
          "Reset to default" in the card below instead. -->
-    <allen.town.podcast.common.common.views.ATESwitch
+    <dev.russell.focuspodcast.common.common.views.ATESwitch
         app:track="@drawable/switch_track"
         android:thumb="@drawable/switch_thumb"
         android:id="@+id/useGlobalCheckbox"
@@ -25,7 +25,7 @@
         android:orientation="horizontal"
         android:gravity="center_vertical">
 
-        <allen.town.podcast.view.PlaybackSpeedSlider
+        <dev.russell.focuspodcast.view.PlaybackSpeedSlider
             android:id="@+id/seekBar"
             android:layout_width="0dp"
             android:layout_height="wrap_content"

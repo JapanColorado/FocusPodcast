@@ -2,32 +2,32 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <allen.town.podcast.common.common.prefs.supportv7.ATEPreference
+    <dev.russell.focuspodcast.common.common.prefs.supportv7.ATEPreference
         android:key="pref_about"
         android:layout="@layout/list_item_view_no_title"
         android:title="@string/about_pref"
         app:icon="@drawable/ic_info" />
-    <allen.town.podcast.common.common.prefs.supportv7.ATEPreference
+    <dev.russell.focuspodcast.common.common.prefs.supportv7.ATEPreference
         android:key="pref_changelog"
         android:layout="@layout/list_item_view_no_title"
         android:title="@string/change_log"
         app:icon="@drawable/ic_round_change_history_24" />
-    <allen.town.podcast.common.common.prefs.supportv7.ATEPreference
+    <dev.russell.focuspodcast.common.common.prefs.supportv7.ATEPreference
         android:key="prefDocumentation"
         android:layout="@layout/list_item_view_no_title"
         android:title="@string/documentation_support"
         app:icon="@drawable/ic_questionmark" />
-    <allen.town.podcast.common.common.prefs.supportv7.ATEPreference
+    <dev.russell.focuspodcast.common.common.prefs.supportv7.ATEPreference
         android:key="prefViewForum"
         android:layout="@layout/list_item_view_no_title"
         android:title="@string/communication"
         app:icon="@drawable/ic_chat" />
-    <allen.town.podcast.common.common.prefs.supportv7.ATEPreference
+    <dev.russell.focuspodcast.common.common.prefs.supportv7.ATEPreference
         android:key="pref_report_bug"
         android:layout="@layout/list_item_view_no_title"
         android:title="@string/bug_report_title"
         app:icon="@drawable/ic_bug" />
-    <allen.town.podcast.common.common.prefs.supportv7.ATEPreference
+    <dev.russell.focuspodcast.common.common.prefs.supportv7.ATEPreference
         android:key="pref_donate"
         android:layout="@layout/list_item_view"
         android:summary="@string/donate_summary"

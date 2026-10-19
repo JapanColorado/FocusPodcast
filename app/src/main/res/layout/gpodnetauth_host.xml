@@ -10,21 +10,21 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <allen.town.podcast.common.views.AccentRadioButton
+        <dev.russell.focuspodcast.common.views.AccentRadioButton
             android:id="@+id/officialServerRadio"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:checked="true"
             android:text="@string/gpodnetauth_server_official" />
 
-        <allen.town.podcast.common.views.AccentRadioButton
+        <dev.russell.focuspodcast.common.views.AccentRadioButton
             android:id="@+id/customServerRadio"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/gpodnetauth_server_custom" />
     </RadioGroup>
 
-    <allen.town.podcast.common.views.AccentTextInputLayout
+    <dev.russell.focuspodcast.common.views.AccentTextInputLayout
         android:id="@+id/serverUrlTextInput"
         style="?attr/textInputOutlinedDenseStyle"
         android:paddingBottom="16dp"
@@ -33,7 +33,7 @@
         tools:visibility="visible"
         android:visibility="gone">
 
-        <allen.town.podcast.common.views.CursorAccentTextInputEditText
+        <dev.russell.focuspodcast.common.views.CursorAccentTextInputEditText
             android:id="@+id/serverUrlText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -42,9 +42,9 @@
             android:inputType="textNoSuggestions"
             android:lines="1" />
 
-    </allen.town.podcast.common.views.AccentTextInputLayout>
+    </dev.russell.focuspodcast.common.views.AccentTextInputLayout>
 
-    <allen.town.podcast.common.views.AccentMaterialButton
+    <dev.russell.focuspodcast.common.views.AccentMaterialButton
         android:id="@+id/chooseHostButton"
         style="@style/Widget.Material3.Button"
         android:layout_width="match_parent"

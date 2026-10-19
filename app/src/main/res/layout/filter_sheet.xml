@@ -29,7 +29,7 @@
                 android:layout_weight="1"
                 android:textAppearance="?attr/textAppearanceTitleLarge" />
 
-            <allen.town.podcast.common.views.AccentMaterialTextButton
+            <dev.russell.focuspodcast.common.views.AccentMaterialTextButton
                 android:id="@+id/filterSheetReset"
                 style="@style/Widget.Material3.Button.TextButton"
                 android:layout_width="wrap_content"

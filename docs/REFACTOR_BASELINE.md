@@ -17,7 +17,7 @@ because it is deleted outright.
 | Git submodules | 4 | 0 |
 | Unit test files (passing tests) | 10 (58) | 16 (162) |
 | Largest source file (lines) | 1,989 (PlaybackService) | 1,129 (PlayPauseProgressButton) |
-| Vendored library packages outside `allen.town.podcast.*` | 3 | 0 |
+| Vendored library packages outside `dev.russell.focuspodcast.*` | 3 | 0 |
 | Release APK size | 12.3 MB | 11.3 MB |
 | detekt findings (`pixi run detekt`) | 202 | 0 |
 

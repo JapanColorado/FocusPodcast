@@ -58,7 +58,7 @@
                 android:layout_alignParentRight="true"
                 android:layout_centerVertical="true">
 
-                <allen.town.podcast.common.views.AccentImageView
+                <dev.russell.focuspodcast.common.views.AccentImageView
                     android:id="@+id/action_search"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -67,7 +67,7 @@
                     android:padding="6dp"
                     android:src="@drawable/ic_search" />
 
-                <allen.town.podcast.common.views.AccentImageView
+                <dev.russell.focuspodcast.common.views.AccentImageView
                     android:id="@+id/sort_items"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -77,7 +77,7 @@
                     android:padding="6dp"
                     android:src="@drawable/ic_sort" />
 
-                <allen.town.podcast.common.views.AccentImageView
+                <dev.russell.focuspodcast.common.views.AccentImageView
                     android:id="@+id/filter_items"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -90,19 +90,19 @@
         </RelativeLayout>
     </com.google.android.material.appbar.AppBarLayout>
 
-    <allen.town.podcast.view.MultiSwipeRefreshLayout
+    <dev.russell.focuspodcast.view.MultiSwipeRefreshLayout
         android:id="@+id/swipeRefresh"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-        <allen.town.podcast.view.StorePositionRecyclerView
+        <dev.russell.focuspodcast.view.StorePositionRecyclerView
             android:id="@+id/recyclerView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:paddingHorizontal="@dimen/additional_horizontal_spacing" />
 
-    </allen.town.podcast.view.MultiSwipeRefreshLayout>
+    </dev.russell.focuspodcast.view.MultiSwipeRefreshLayout>
 
     <!-- Holds the empty state. A sibling of the list rather than a parent of it, so it sits below
          the collapsing header and scrolls it away like the list does. -->

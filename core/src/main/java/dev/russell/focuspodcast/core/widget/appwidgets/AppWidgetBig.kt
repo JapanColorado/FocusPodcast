@@ -1,0 +1,190 @@
+/*
+ * Copyright (c) 2020 Hemanth Savarla.
+ *
+ * Licensed under the GNU General Public License v3
+ *
+ * This is free software: you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU General Public License for more details.
+ *
+ */
+package dev.russell.focuspodcast.core.widget.appwidgets
+
+import dev.russell.focuspodcast.common.util.RetroUtil
+import dev.russell.focuspodcast.core.R
+import dev.russell.focuspodcast.core.feed.util.ImageResourceUtils
+import dev.russell.focuspodcast.core.widget.WidgetUpdater
+import dev.russell.focuspodcast.core.widget.base.BaseAppWidget
+import android.app.PendingIntent
+import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.drawable.Drawable
+import android.util.Log
+import android.widget.RemoteViews
+import dev.russell.focuspodcast.theme.util.MaterialValueHelper
+import com.bumptech.glide.Glide
+import com.bumptech.glide.request.RequestOptions
+import com.bumptech.glide.request.target.CustomTarget
+import com.bumptech.glide.request.target.Target
+import com.bumptech.glide.request.transition.Transition
+import io.reactivex.Completable
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.Disposable
+
+class AppWidgetBig : BaseAppWidget() {
+    private var target: Target<Bitmap>? = null // for cancellation
+    /** The pending artwork load; superseded by the next update, so it is disposed first. */
+    private var artworkUpdate: Disposable? = null
+
+    private val TAG = "AppWidgetBig"
+
+    /**
+     * Link up various button actions using [PendingIntent].
+     */
+
+    companion object {
+
+        const val NAME = "AppWidgetBig"
+
+        private var mInstance: AppWidgetBig? = null
+        private var imageSize = 0
+
+        @JvmStatic
+        val instance: AppWidgetBig
+            @Synchronized get() = mInstance ?: AppWidgetBig().also { mInstance = it }
+    }
+
+    override fun getLayout(): Int {
+        return R.layout.app_widget_big
+    }
+
+    override fun getPauseBitmap(context: Context): Bitmap? {
+        return createBitmap(
+            RetroUtil.getTintedVectorDrawable(
+                context,
+                R.drawable.ic_widget_pause,
+                MaterialValueHelper.getPrimaryTextColor(context, false)
+            ), 1f
+        )
+    }
+
+    override fun getPlayBitmap(context: Context): Bitmap {
+        return createBitmap(
+            RetroUtil.getTintedVectorDrawable(
+                context,
+                R.drawable.ic_widget_play,
+                MaterialValueHelper.getPrimaryTextColor(context, false)
+            ), 1f
+        )
+    }
+
+    override fun getNextBitmap(context: Context): Bitmap? {
+        return createBitmap(
+            RetroUtil.getTintedVectorDrawable(
+                context,
+                R.drawable.ic_widget_skip,
+                MaterialValueHelper.getPrimaryTextColor(context, false)
+            ), 1f
+        )
+    }
+
+    override fun getForwardBitmap(context: Context): Bitmap? {
+        return createBitmap(
+            RetroUtil.getTintedVectorDrawable(
+                context,
+                R.drawable.ic_widget_fast_forward,
+                MaterialValueHelper.getPrimaryTextColor(context, false)
+            ), 1f
+        )
+    }
+
+    override fun getRewindBitmap(context: Context): Bitmap? {
+        return createBitmap(
+            RetroUtil.getTintedVectorDrawable(
+                context,
+                R.drawable.ic_widget_fast_rewind,
+                MaterialValueHelper.getPrimaryTextColor(context, false)
+            ), 1f
+        )
+    }
+
+    override fun processRemoteViewIfNeeded(
+        context: Context,
+        remoteViews: RemoteViews,
+        widgetState: WidgetUpdater.WidgetState,
+        appWidgetIds: IntArray,
+        isCreated: Boolean,
+    ) {
+        if (widgetState.media != null) {
+            remoteViews.setImageViewResource(R.id.imgvCover, R.drawable.default_audio_art)
+
+            if (imageSize == 0) {
+                val p = RetroUtil.getScreenSize(context)
+                imageSize = p.x.coerceAtMost(p.y)
+            }
+            // Load the album cover async and push the update on completion
+            val appContext = context.applicationContext
+
+
+            artworkUpdate?.dispose()
+            artworkUpdate = Completable.fromAction {
+            }
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe({
+                    if (target != null) {
+                        Glide.with(appContext).clear(target)
+                    }
+
+                    // Combined with centerCrop, there is no blur effect here
+                    target = Glide.with(appContext).asBitmap()
+                        .apply(RequestOptions.centerCropTransform())
+                        .load(
+                            if (widgetState.media.imageLocation.isNullOrEmpty()) ImageResourceUtils.getFallbackImageLocation(
+                                widgetState.media
+                            ) else widgetState.media.imageLocation
+                        )
+                        .into(object : CustomTarget<Bitmap>(imageSize, imageSize) {
+                            override fun onLoadCleared(placeholder: Drawable?) {
+                                // Nothing to release: the RemoteViews bitmap is owned by the widget host.
+                            }
+
+                            override fun onResourceReady(
+                                resource: Bitmap,
+                                transition: Transition<in Bitmap>?
+                            ) {
+                                update(resource)
+                            }
+
+                            override fun onLoadFailed(errorDrawable: Drawable?) {
+                                super.onLoadFailed(errorDrawable)
+                                Log.w(TAG, "onLoadFailed")
+                                update(null)
+                            }
+
+                            private fun update(bitmap: Bitmap?) {
+                                // Set correct drawable for pause state
+                                if (bitmap == null) {
+                                    remoteViews.setImageViewResource(
+                                        R.id.imgvCover,
+                                        R.drawable.default_audio_art
+                                    )
+                                } else {
+                                    remoteViews.setImageViewBitmap(R.id.imgvCover, bitmap)
+                                }
+
+
+                                pushUpdate(context, appWidgetIds, remoteViews)
+                            }
+                        })
+                }) { error: Throwable ->
+                    Log.e(TAG, "Failed to load widget artwork", error)
+                }
+        } else {
+            pushUpdate(context, appWidgetIds, remoteViews)
+        }
+    }
+}

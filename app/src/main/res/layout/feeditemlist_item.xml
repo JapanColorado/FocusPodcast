@@ -51,7 +51,7 @@
                     tools:src="@drawable/ic_round_drag_handle_24" />
 
                 <!-- Needs to have the same width as the action button. Otherwise, the screen jumps around. -->
-                <allen.town.podcast.common.common.views.AccentCheckbox
+                <dev.russell.focuspodcast.common.common.views.AccentCheckbox
                     android:id="@+id/selectCheckBox"
                     android:layout_width="60dp"
                     android:layout_height="match_parent"
@@ -136,21 +136,21 @@
                         android:importantForAccessibility="no"
                         android:text="·"
                         tools:background="@android:color/holo_blue_light" />
-                    <allen.town.podcast.common.views.AccentImageView
+                    <dev.russell.focuspodcast.common.views.AccentImageView
                         android:id="@+id/ivIsVideo"
                         android:layout_width="16sp"
                         android:layout_height="16sp"
                         android:contentDescription="@string/media_type_video_label"
                         app:srcCompat="@drawable/ic_round_videocam_24" />
 
-                    <allen.town.podcast.common.views.AccentImageView
+                    <dev.russell.focuspodcast.common.views.AccentImageView
                         android:id="@+id/isFavorite"
                         android:layout_width="16sp"
                         android:layout_height="16sp"
                         android:contentDescription="@string/is_favorite_label"
                         app:srcCompat="@drawable/ic_star" />
 
-                    <allen.town.podcast.common.views.AccentImageView
+                    <dev.russell.focuspodcast.common.views.AccentImageView
                         android:id="@+id/ivInPlaylist"
                         android:layout_width="16sp"
                         android:layout_height="16sp"
@@ -206,7 +206,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         tools:text="10 MB" />
-                    <allen.town.podcast.common.views.AccentImageView
+                    <dev.russell.focuspodcast.common.views.AccentImageView
                         android:id="@+id/downloaded_button"
                         android:layout_width="18dp"
                         android:layout_height="18dp"
@@ -235,7 +235,7 @@
                             app:trackCornerRadius="16dp"
                             tools:progress="10" />
 
-                        <allen.town.podcast.common.views.AccentImageView
+                        <dev.russell.focuspodcast.common.views.AccentImageView
                             android:layout_width="30dp"
                             android:layout_height="30dp"
                             android:layout_gravity="center"
@@ -261,7 +261,7 @@
             </LinearLayout>
 
 
-            <allen.town.podcast.view.PlayPauseProgressButton
+            <dev.russell.focuspodcast.view.PlayPauseProgressButton
                 android:id="@+id/play_pause_button"
                 style="@style/Widget_PlayerFM_PlayPauseButton"
                 android:layout_width="48dp"

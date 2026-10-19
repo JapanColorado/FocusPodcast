@@ -53,3 +53,8 @@ libs
 # Claude Code worktrees
 .claude/worktrees/
 .kotlin/
+
+# Shared Android-Apps baseline
+.cxx/
+keystore.properties
+*.jks

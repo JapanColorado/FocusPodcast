@@ -5,7 +5,7 @@ apply from: "../../common.gradle"
 
 android {
     defaultConfig {
-        namespace = "allen.town.podcast.ui.i18n"
+        namespace = "dev.russell.focuspodcast.ui.i18n"
     }
     lint {
         disable += ["Typos", "ExtraTranslation", "ImpliedQuantity",

@@ -145,7 +145,7 @@
 
 
 
-                    <allen.town.podcast.view.SubscribeButton
+                    <dev.russell.focuspodcast.view.SubscribeButton
                         android:id="@+id/subscribe_button"
                         android:visibility="gone"
                         tools:visibility="visible"
@@ -189,7 +189,7 @@
     </LinearLayout>
 
 
-    <allen.town.podcast.view.SeriesDetailInfoView
+    <dev.russell.focuspodcast.view.SeriesDetailInfoView
         android:id="@+id/detailInfoView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

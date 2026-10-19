@@ -17,7 +17,7 @@
         android:textSize="16sp"
         tools:text="Folder name that is long enough to be truncated" />
 
-    <allen.town.podcast.common.common.views.AccentCheckbox
+    <dev.russell.focuspodcast.common.common.views.AccentCheckbox
         android:focusable="false"
         android:clickable="false"
         android:focusableInTouchMode="false"

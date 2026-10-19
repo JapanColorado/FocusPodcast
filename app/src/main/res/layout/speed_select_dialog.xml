@@ -26,12 +26,12 @@
                 android:id="@+id/add_current_speed_chip"/>
     </LinearLayout>
 
-    <allen.town.podcast.view.PlaybackSpeedSlider
+    <dev.russell.focuspodcast.view.PlaybackSpeedSlider
             android:id="@+id/speed_seek_bar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="8dp">
-    </allen.town.podcast.view.PlaybackSpeedSlider>
+    </dev.russell.focuspodcast.view.PlaybackSpeedSlider>
 
     <include
             android:id="@+id/own_settings_card"

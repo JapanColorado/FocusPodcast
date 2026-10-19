@@ -2,37 +2,37 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <allen.town.podcast.common.common.prefs.supportv7.ATEPreferenceCategory
+    <dev.russell.focuspodcast.common.common.prefs.supportv7.ATEPreferenceCategory
         android:layout="@layout/preference_category_title"
         android:title="@string/discover">
-        <allen.town.podcast.fragment.pref.PodcastSearchEnginePreference
+        <dev.russell.focuspodcast.fragment.pref.PodcastSearchEnginePreference
             android:key="pref_podcast_search_engine"
             android:layout="@layout/list_item_view"
             android:summary="@string/pref_podcast_search_engine_sum"
             android:title="@string/pref_podcast_search_engine_title"
             app:icon="@drawable/ic_podcast_search" />
-    </allen.town.podcast.common.common.prefs.supportv7.ATEPreferenceCategory>
+    </dev.russell.focuspodcast.common.common.prefs.supportv7.ATEPreferenceCategory>
 
-    <allen.town.podcast.common.common.prefs.supportv7.ATEPreferenceCategory
+    <dev.russell.focuspodcast.common.common.prefs.supportv7.ATEPreferenceCategory
         android:layout="@layout/preference_category_title"
         android:title="@string/pref_mobileUpdate_title">
-        <allen.town.podcast.common.common.prefs.supportv7.ATEPreference
+        <dev.russell.focuspodcast.common.common.prefs.supportv7.ATEPreference
             android:icon="@drawable/ic_refresh"
             android:key="pref_auto_refresh_interval"
             android:layout="@layout/list_item_view_no_title"
             android:summary="@string/feed_refresh_sum"
             android:title="@string/feed_refresh_title" />
-        <allen.town.podcast.common.common.prefs.supportv7.ATESwitchPreference
+        <dev.russell.focuspodcast.common.common.prefs.supportv7.ATESwitchPreference
             android:defaultValue="false"
             android:key="pref_refresh_on_start"
             android:layout="@layout/list_item_view_switch_no_title"
             android:title="@string/pref_refresh_on_start_title" />
-    </allen.town.podcast.common.common.prefs.supportv7.ATEPreferenceCategory>
+    </dev.russell.focuspodcast.common.common.prefs.supportv7.ATEPreferenceCategory>
 
-    <allen.town.podcast.common.common.prefs.supportv7.ATEPreferenceCategory
+    <dev.russell.focuspodcast.common.common.prefs.supportv7.ATEPreferenceCategory
         android:layout="@layout/preference_category_title"
         android:title="@string/library_label">
-        <allen.town.podcast.common.common.prefs.supportv7.ATEListPreference
+        <dev.russell.focuspodcast.common.common.prefs.supportv7.ATEListPreference
             android:defaultValue="0"
             android:entries="@array/nav_drawer_feed_counter_options"
             android:entryValues="@array/nav_drawer_feed_counter_values"
@@ -41,11 +41,11 @@
             android:summary="@string/pref_nav_drawer_episodes_counter_sum"
             android:title="@string/pref_nav_drawer_episodes_counter_title"
             app:icon="@drawable/ic_round_exposure_plus_1_24" />
-        <allen.town.podcast.common.common.prefs.supportv7.ATESwitchPreference
+        <dev.russell.focuspodcast.common.common.prefs.supportv7.ATESwitchPreference
             android:defaultValue="false"
             android:key="pref_show_sub_title"
             android:layout="@layout/list_item_view_switch_no_title"
             android:title="@string/pref_show_subscription_title"
             app:icon="@drawable/ic_round_title_24" />
-    </allen.town.podcast.common.common.prefs.supportv7.ATEPreferenceCategory>
+    </dev.russell.focuspodcast.common.common.prefs.supportv7.ATEPreferenceCategory>
 </PreferenceScreen>

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:squareImageView="http://schemas.android.com/apk/allen.town.podcast"
+    xmlns:squareImageView="http://schemas.android.com/apk/dev.russell.focuspodcast"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/cover_fragment"
     android:layout_width="match_parent"
@@ -13,7 +13,7 @@
         android:layout_height="match_parent"
         android:layout_weight="1">
 
-        <allen.town.podcast.view.RetroShapeableImageView
+        <dev.russell.focuspodcast.view.RetroShapeableImageView
             android:id="@+id/imgvCover"
             android:importantForAccessibility="no"
             android:layout_centerInParent="true"
@@ -23,7 +23,7 @@
             android:scaleType="centerCrop"
             tools:srcCompat="@tools:sample/backgrounds/scenic[6]" />
 
-        <allen.town.podcast.view.RetroShapeableImageView
+        <dev.russell.focuspodcast.view.RetroShapeableImageView
             android:id="@+id/album_cover_overlay"
             android:layout_width="match_parent"
             android:layout_height="match_parent"

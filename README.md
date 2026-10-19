@@ -5,7 +5,7 @@ FocusPodcast helps you manage and play podcasts and virtual podcasts/audio books
 This repository is an independent, F-Droid-style fork of [allentown521/FocusPodcast](https://github.com/allentown521/FocusPodcast) (itself derived from [AntennaPod](https://github.com/AntennaPod/AntennaPod)). Compared with upstream it:
 
 - ships a single build with **no ads, analytics, crash reporting, in-app purchases or cloud services** of any kind;
-- vendors its former submodules in-tree and keeps the whole codebase under `allen.town.podcast.*`;
+- vendors its former submodules in-tree and keeps the whole codebase under `dev.russell.focuspodcast.*`;
 - has an English-only source tree (translations for Chinese and Japanese are kept);
 - enforces a set of quality gates in CI-style checks: zero Kotlin `!!`, zero `printStackTrace`, no empty catch blocks, every Rx chain with an error handler, detekt with no baseline, and a JVM unit-test suite;
 - is not published on Google Play. Upstream's F-Droid listing is not this fork; build it yourself or install a release APK from this repository.
@@ -31,7 +31,7 @@ Bug reports and feature requests for this fork go in this repository's [issue tr
 
 FocusPodcast is licensed under the GNU General Public License (GPL-3.0). You can find the license text in the LICENSE file.
 
-## Building FocusPodcast
+## Building
 
 The build is driven by [pixi](https://pixi.sh), which provides JDK 25. You need an Android SDK with platform 37 and build-tools 36.0.0 (default location `~/Android/Sdk`, override with `ANDROID_HOME`). There are no git submodules and no build flavors.
 
@@ -46,6 +46,7 @@ pixi run lint         # Android lint
 pixi run detekt       # detekt static analysis
 pixi run nn           # Kotlin !! ratchet (must stay at 0)
 pixi run check        # build-debug + test + lint + nn + detekt
+pixi run logs         # logcat for the running app
 ```
 
 Release builds additionally need a `secrets.properties` (copy `secrets.properties.sample`) with your signing keystore. See [CONTRIBUTING.md](CONTRIBUTING.md) for details, and `docs/REFACTOR_BASELINE.md` for the metrics the fork's quality gates are built around.

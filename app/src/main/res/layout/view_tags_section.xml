@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Contents of allen.town.podcast.view.TagsSectionView, inflated by the view itself. -->
+<!-- Contents of dev.russell.focuspodcast.view.TagsSectionView, inflated by the view itself. -->
 <merge xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     tools:parentTag="android.widget.LinearLayout">

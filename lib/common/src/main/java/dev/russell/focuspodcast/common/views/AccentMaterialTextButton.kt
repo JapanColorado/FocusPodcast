@@ -1,0 +1,14 @@
+package dev.russell.focuspodcast.common.views
+
+import android.content.Context
+import android.util.AttributeSet
+import dev.russell.focuspodcast.common.extensions.accentTextColor
+import com.google.android.material.button.MaterialButton
+
+class AccentMaterialTextButton @JvmOverloads constructor(
+    context: Context, attrs: AttributeSet? = null
+) : MaterialButton(context, attrs) {
+    init {
+        accentTextColor(context)
+    }
+}

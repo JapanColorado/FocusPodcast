@@ -6,8 +6,8 @@ cd "$(dirname "$0")/.."
 
 type="${1:-release}"
 case "$type" in
-  release) build_task="build"; package="allen.town.focus.podcast" ;;
-  debug) build_task="build-debug"; package="allen.town.focus.podcast.debug" ;;
+  release) build_task="build"; package="dev.russell.focuspodcast" ;;
+  debug) build_task="build-debug"; package="dev.russell.focuspodcast.debug" ;;
   *) echo "install: unknown build type '$type' (expected release or debug)" >&2; exit 2 ;;
 esac
 

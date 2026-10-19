@@ -16,7 +16,7 @@ android {
     def hasSigningSecrets = secrets.getProperty('storeFile') != null
 
     defaultConfig {
-        namespace = "allen.town.podcast"
+        namespace = "dev.russell.focuspodcast"
         versionCode = rootProject.ext.versionCode
         versionName = rootProject.ext.versionName
         applicationId = rootProject.ext.applicationId
@@ -28,7 +28,7 @@ android {
 
         kapt {
             arguments {
-                arg('eventBusIndex', 'allen.town.podcast.ApEventBusIndex')
+                arg('eventBusIndex', 'dev.russell.focuspodcast.ApEventBusIndex')
             }
         }
     }

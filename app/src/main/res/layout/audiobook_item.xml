@@ -12,7 +12,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <allen.town.podcast.ui.common.SquareImageView
+        <dev.russell.focuspodcast.ui.common.SquareImageView
             android:id="@+id/imgvCover"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

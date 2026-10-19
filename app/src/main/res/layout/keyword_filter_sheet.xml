@@ -39,7 +39,7 @@
             app:selectionRequired="true"
             app:singleSelection="true">
 
-            <allen.town.podcast.common.views.AccentMaterialOutlineBackgroundStatusButton
+            <dev.russell.focuspodcast.common.views.AccentMaterialOutlineBackgroundStatusButton
                 android:id="@+id/keywordInclude"
                 style="?attr/materialButtonOutlinedStyle"
                 android:layout_width="0dp"
@@ -47,7 +47,7 @@
                 android:layout_weight="1"
                 android:text="@string/episode_filters_include" />
 
-            <allen.town.podcast.common.views.AccentMaterialOutlineBackgroundStatusButton
+            <dev.russell.focuspodcast.common.views.AccentMaterialOutlineBackgroundStatusButton
                 android:id="@+id/keywordExclude"
                 style="?attr/materialButtonOutlinedStyle"
                 android:layout_width="0dp"
@@ -56,7 +56,7 @@
                 android:text="@string/episode_filters_exclude" />
         </com.google.android.material.button.MaterialButtonToggleGroup>
 
-        <allen.town.podcast.common.views.AccentTextInputLayout
+        <dev.russell.focuspodcast.common.views.AccentTextInputLayout
             android:id="@+id/keywordInput"
             style="?attr/textInputOutlinedDenseStyle"
             android:layout_width="match_parent"
@@ -67,14 +67,14 @@
             app:endIconDrawable="@drawable/ic_add"
             app:endIconMode="custom">
 
-            <allen.town.podcast.common.views.CursorAccentTextInputEditText
+            <dev.russell.focuspodcast.common.views.CursorAccentTextInputEditText
                 android:id="@+id/keywordInputText"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:imeOptions="actionDone"
                 android:inputType="text"
                 android:singleLine="true" />
-        </allen.town.podcast.common.views.AccentTextInputLayout>
+        </dev.russell.focuspodcast.common.views.AccentTextInputLayout>
 
         <com.google.android.material.chip.ChipGroup
             android:id="@+id/keywordTerms"
@@ -91,7 +91,7 @@
             android:layout_marginBottom="4dp"
             android:background="?android:attr/listDivider" />
 
-        <allen.town.podcast.common.common.views.AccentMaterialSwitch
+        <dev.russell.focuspodcast.common.common.views.AccentMaterialSwitch
             android:id="@+id/keywordDurationSwitch"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -99,20 +99,20 @@
             android:text="@string/episode_filters_min_duration"
             android:textAppearance="?attr/textAppearanceBodyLarge" />
 
-        <allen.town.podcast.common.views.AccentTextInputLayout
+        <dev.russell.focuspodcast.common.views.AccentTextInputLayout
             android:id="@+id/keywordDurationInput"
             style="?attr/textInputOutlinedDenseStyle"
             android:layout_width="120dp"
             android:layout_height="wrap_content">
 
-            <allen.town.podcast.common.views.CursorAccentTextInputEditText
+            <dev.russell.focuspodcast.common.views.CursorAccentTextInputEditText
                 android:id="@+id/keywordDurationText"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:inputType="number"
                 android:maxLength="4"
                 android:singleLine="true" />
-        </allen.town.podcast.common.views.AccentTextInputLayout>
+        </dev.russell.focuspodcast.common.views.AccentTextInputLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -121,7 +121,7 @@
             android:gravity="end"
             android:orientation="horizontal">
 
-            <allen.town.podcast.common.views.AccentMaterialTextButton
+            <dev.russell.focuspodcast.common.views.AccentMaterialTextButton
                 android:id="@+id/keywordCancel"
                 style="@style/Widget.Material3.Button.TextButton"
                 android:layout_width="wrap_content"
@@ -129,7 +129,7 @@
                 android:layout_marginEnd="8dp"
                 android:text="@string/cancel_label" />
 
-            <allen.town.podcast.common.views.AccentMaterialButton
+            <dev.russell.focuspodcast.common.views.AccentMaterialButton
                 android:id="@+id/keywordSave"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

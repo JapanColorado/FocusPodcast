@@ -3,9 +3,9 @@
      player's Audio Effects dialog. They always show the values in effect for the podcast. -->
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:search="http://schemas.android.com/apk/allen.town.podcast.searchpreference">
+    xmlns:search="http://schemas.android.com/apk/dev.russell.focuspodcast.searchpreference">
 
-    <allen.town.podcast.common.common.prefs.supportv7.ATEListPreference
+    <dev.russell.focuspodcast.common.common.prefs.supportv7.ATEListPreference
         android:defaultValue="0"
         android:persistent="false"
         android:entries="@array/clear_voice_options"
@@ -14,14 +14,14 @@
         android:key="feed_clear_voice_pref"
         android:layout="@layout/list_item_view"
         android:title="@string/voice_label" />
-    <allen.town.podcast.common.common.prefs.supportv7.ATESwitchPreference
+    <dev.russell.focuspodcast.common.common.prefs.supportv7.ATESwitchPreference
         android:defaultValue="false"
         android:persistent="false"
         android:key="feed_skip_silence"
         android:layout="@layout/list_item_view_switch_no_title"
         android:title="@string/pref_skip_silence_title"
         app:icon="@drawable/ic_trim" />
-    <allen.town.podcast.common.common.prefs.supportv7.ATESwitchPreference
+    <dev.russell.focuspodcast.common.common.prefs.supportv7.ATESwitchPreference
         android:defaultValue="false"
         android:persistent="false"
         android:icon="@drawable/ic_volume_adaption"
@@ -30,7 +30,7 @@
         android:title="@string/stereo_to_mono" />
 
     <!-- Only while the podcast has its own effects. -->
-    <allen.town.podcast.common.common.prefs.supportv7.ATEPreference
+    <dev.russell.focuspodcast.common.common.prefs.supportv7.ATEPreference
         android:key="feed_effects_reset_to_default"
         android:layout="@layout/list_item_view"
         android:persistent="false"
@@ -39,7 +39,7 @@
         android:visible="false"
         app:icon="@drawable/ic_baseline_settings_backup_restore_24"
         search:ignore="true" />
-    <allen.town.podcast.common.common.prefs.supportv7.ATEPreference
+    <dev.russell.focuspodcast.common.common.prefs.supportv7.ATEPreference
         android:key="feed_effects_set_as_default"
         android:layout="@layout/list_item_view"
         android:persistent="false"

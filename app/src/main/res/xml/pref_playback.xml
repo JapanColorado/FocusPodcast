@@ -2,39 +2,39 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <allen.town.podcast.common.common.prefs.supportv7.ATEPreferenceCategory
+    <dev.russell.focuspodcast.common.common.prefs.supportv7.ATEPreferenceCategory
         android:layout="@layout/preference_category_title"
         android:title="@string/playback_control">
-        <allen.town.podcast.common.common.prefs.supportv7.ATEPreference
+        <dev.russell.focuspodcast.common.common.prefs.supportv7.ATEPreference
             android:layout="@layout/list_item_view_no_title"
             android:key="prefPlaybackFastForwardDeltaLauncher"
             android:summary="@string/pref_fast_forward_sum"
             android:title="@string/pref_fast_forward"/>
-        <allen.town.podcast.common.common.prefs.supportv7.ATEPreference
+        <dev.russell.focuspodcast.common.common.prefs.supportv7.ATEPreference
             android:layout="@layout/list_item_view_no_title"
             android:key="prefPlaybackRewindDeltaLauncher"
             android:summary="@string/pref_rewind_sum"
             android:title="@string/pref_rewind"/>
-        <allen.town.podcast.common.common.prefs.supportv7.ATEPreference
+        <dev.russell.focuspodcast.common.common.prefs.supportv7.ATEPreference
             android:layout="@layout/list_item_view_no_title"
             android:key="prefPlaybackSpeedLauncher"
             android:summary="@string/default_playback_speed_sum"
             android:title="@string/default_playback_speed"/>
-        <allen.town.podcast.common.common.prefs.supportv7.ATESwitchPreference
+        <dev.russell.focuspodcast.common.common.prefs.supportv7.ATESwitchPreference
             android:layout="@layout/list_item_view_switch"
             android:defaultValue="false"
             android:key="pref_respects_playbacktime_for_speed"
             android:summary="@string/pref_playback_time_respects_speed_sum"
             android:title="@string/pref_playback_time_respects_speed_title"/>
-    </allen.town.podcast.common.common.prefs.supportv7.ATEPreferenceCategory>
+    </dev.russell.focuspodcast.common.common.prefs.supportv7.ATEPreferenceCategory>
 
     <!-- Same controls in the same order as a podcast's Audio effects screen and the player's
          Audio Effects dialog. -->
-    <allen.town.podcast.common.common.prefs.supportv7.ATEPreferenceCategory
+    <dev.russell.focuspodcast.common.common.prefs.supportv7.ATEPreferenceCategory
         android:layout="@layout/preference_category_title"
         android:summary="@string/default_audio_effects_sum"
         android:title="@string/default_audio_effects">
-        <allen.town.podcast.common.common.prefs.supportv7.ATEListPreference
+        <dev.russell.focuspodcast.common.common.prefs.supportv7.ATEListPreference
             android:layout="@layout/list_item_view"
             android:defaultValue="0"
             android:entries="@array/clear_voice_options"
@@ -42,31 +42,31 @@
             android:key="pref_clear_voice"
             android:title="@string/voice_label"
             app:icon="@drawable/ic_vocal_enhancement"/>
-        <allen.town.podcast.common.common.prefs.supportv7.ATESwitchPreference
+        <dev.russell.focuspodcast.common.common.prefs.supportv7.ATESwitchPreference
             android:layout="@layout/list_item_view_switch"
             android:defaultValue="false"
             android:key="pref_global_skip_silence"
             android:title="@string/pref_skip_silence_title"
             app:icon="@drawable/ic_trim"/>
-        <allen.town.podcast.common.common.prefs.supportv7.ATESwitchPreference
+        <dev.russell.focuspodcast.common.common.prefs.supportv7.ATESwitchPreference
             android:layout="@layout/list_item_view_switch"
             android:defaultValue="false"
             android:key="pref_stereo_to_mono"
             android:title="@string/stereo_to_mono"
             app:icon="@drawable/ic_volume_adaption"/>
-    </allen.town.podcast.common.common.prefs.supportv7.ATEPreferenceCategory>
+    </dev.russell.focuspodcast.common.common.prefs.supportv7.ATEPreferenceCategory>
 
-    <allen.town.podcast.common.common.prefs.supportv7.ATEPreferenceCategory
+    <dev.russell.focuspodcast.common.common.prefs.supportv7.ATEPreferenceCategory
         android:layout="@layout/preference_category_title"
         android:title="@string/interruptions">
-        <allen.town.podcast.common.common.prefs.supportv7.ATESwitchPreference
+        <dev.russell.focuspodcast.common.common.prefs.supportv7.ATESwitchPreference
             android:layout="@layout/list_item_view_switch"
             android:defaultValue="true"
             android:enabled="true"
             android:key="pref_pause_when_headset_disconnect"
             android:summary="@string/pref_pauseOnDisconnect_sum"
             android:title="@string/pref_pauseOnHeadsetDisconnect_title"/>
-        <allen.town.podcast.common.common.prefs.supportv7.ATESwitchPreference
+        <dev.russell.focuspodcast.common.common.prefs.supportv7.ATESwitchPreference
             android:layout="@layout/list_item_view_switch"
             android:defaultValue="true"
             android:enabled="true"
@@ -74,7 +74,7 @@
             android:key="pref_play_when_headset_reconnect"
             android:summary="@string/pref_unpauseOnHeadsetReconnect_sum"
             android:title="@string/pref_unpauseOnHeadsetReconnect_title"/>
-        <allen.town.podcast.common.common.prefs.supportv7.ATESwitchPreference
+        <dev.russell.focuspodcast.common.common.prefs.supportv7.ATESwitchPreference
             android:layout="@layout/list_item_view_switch"
             android:defaultValue="false"
             android:enabled="true"
@@ -82,26 +82,26 @@
             android:key="pref_play_when_bluetooth_reconnect"
             android:summary="@string/pref_unpauseOnBluetoothReconnect_sum"
             android:title="@string/pref_unpauseOnBluetoothReconnect_title"/>
-        <allen.town.podcast.common.common.prefs.supportv7.ATESwitchPreference
+        <dev.russell.focuspodcast.common.common.prefs.supportv7.ATESwitchPreference
             android:layout="@layout/list_item_view_switch"
             android:defaultValue="true"
             android:enabled="true"
             android:key="pref_pause_when_loss_focus"
             android:summary="@string/pref_pausePlaybackForFocusLoss_sum"
             android:title="@string/pref_pausePlaybackForFocusLoss_title"/>
-        <allen.town.podcast.common.common.prefs.supportv7.ATESwitchPreference
+        <dev.russell.focuspodcast.common.common.prefs.supportv7.ATESwitchPreference
             android:layout="@layout/list_item_view_switch"
             android:defaultValue="true"
             android:enabled="true"
             android:key="pref_replay_after_call"
             android:summary="@string/pref_resumeAfterCall_sum"
             android:title="@string/pref_resumeAfterCall_title"/>
-    </allen.town.podcast.common.common.prefs.supportv7.ATEPreferenceCategory>
+    </dev.russell.focuspodcast.common.common.prefs.supportv7.ATEPreferenceCategory>
 
-    <allen.town.podcast.common.common.prefs.supportv7.ATEPreferenceCategory
+    <dev.russell.focuspodcast.common.common.prefs.supportv7.ATEPreferenceCategory
         android:layout="@layout/preference_category_title"
         android:title="@string/reassign_hardware_buttons">
-        <allen.town.podcast.common.common.prefs.supportv7.ATEListPreference
+        <dev.russell.focuspodcast.common.common.prefs.supportv7.ATEListPreference
             android:layout="@layout/list_item_view"
             android:defaultValue="@string/keycode_media_fast_forward"
             android:entries="@array/button_action_options"
@@ -109,7 +109,7 @@
             android:key="pref_hardware_forward_button"
             android:title="@string/pref_hardware_forward_button_title"
             android:summary="@string/pref_hardware_forward_button_summary"/>
-        <allen.town.podcast.common.common.prefs.supportv7.ATEListPreference
+        <dev.russell.focuspodcast.common.common.prefs.supportv7.ATEListPreference
             android:layout="@layout/list_item_view"
             android:defaultValue="@string/keycode_media_rewind"
             android:entries="@array/button_action_options"
@@ -117,33 +117,33 @@
             android:key="pref_hardware_previous_button"
             android:title="@string/pref_hardware_previous_button_title"
             android:summary="@string/pref_hardware_previous_button_summary"/>
-    </allen.town.podcast.common.common.prefs.supportv7.ATEPreferenceCategory>
+    </dev.russell.focuspodcast.common.common.prefs.supportv7.ATEPreferenceCategory>
 
-    <allen.town.podcast.common.common.prefs.supportv7.ATEPreferenceCategory
+    <dev.russell.focuspodcast.common.common.prefs.supportv7.ATEPreferenceCategory
         android:layout="@layout/preference_category_title"
         android:title="@string/playlist_label">
-        <allen.town.podcast.common.common.prefs.supportv7.ATESwitchPreference
+        <dev.russell.focuspodcast.common.common.prefs.supportv7.ATESwitchPreference
             android:layout="@layout/list_item_view_switch"
             android:defaultValue="true"
             android:enabled="true"
             android:key="pref_add_to_playlist_when_download"
             android:summary="@string/pref_enqueue_downloaded_summary"
             android:title="@string/pref_enqueue_downloaded_title" />
-        <allen.town.podcast.common.common.prefs.supportv7.ATEListPreference
+        <dev.russell.focuspodcast.common.common.prefs.supportv7.ATEListPreference
             android:layout="@layout/list_item_view"
             android:defaultValue="BACK"
             android:entries="@array/enqueue_location_options"
             android:entryValues="@array/enqueue_location_values"
             android:key="pref_episode_location_in_playlist"
             android:title="@string/pref_enqueue_location_title"/>
-        <allen.town.podcast.common.common.prefs.supportv7.ATESwitchPreference
+        <dev.russell.focuspodcast.common.common.prefs.supportv7.ATESwitchPreference
             android:layout="@layout/list_item_view_switch"
             android:defaultValue="true"
             android:enabled="true"
             android:key="pref_follow_playlist"
             android:summary="@string/pref_followQueue_sum"
             android:title="@string/pref_followQueue_title"/>
-        <allen.town.podcast.common.common.prefs.supportv7.ATEListPreference
+        <dev.russell.focuspodcast.common.common.prefs.supportv7.ATEListPreference
             android:layout="@layout/list_item_view"
             android:defaultValue="30"
             android:entries="@array/smart_mark_as_played_values"
@@ -151,12 +151,12 @@
             android:key="pref_smart_mark_as_played_secs"
             android:summary="@string/pref_smart_mark_as_played_sum"
             android:title="@string/pref_smart_mark_as_played_title"/>
-        <allen.town.podcast.common.common.prefs.supportv7.ATESwitchPreference
+        <dev.russell.focuspodcast.common.common.prefs.supportv7.ATESwitchPreference
             android:layout="@layout/list_item_view_switch"
             android:defaultValue="true"
             android:enabled="true"
             android:key="pref_keep_episode_when_skip"
             android:summary="@string/pref_skip_keeps_episodes_sum"
             android:title="@string/pref_skip_keeps_episodes_title"/>
-    </allen.town.podcast.common.common.prefs.supportv7.ATEPreferenceCategory>
+    </dev.russell.focuspodcast.common.common.prefs.supportv7.ATEPreferenceCategory>
 </PreferenceScreen>
