@@ -3,17 +3,20 @@ package allen.town.podcast.core.dsp;
 import allen.town.podcast.model.playback.ClearVoiceLevel;
 
 /**
- * The Clear voice enhancer on interleaved 16-bit PCM, independent of any player API:
- * high-pass at 80 Hz (rumble, handling noise) and a gentle speech EQ (cut around 300 Hz where
- * boomy rooms pile up, lift around 3 kHz where consonants live), then {@link SpectralDenoiser},
- * then {@link Leveler}. Any channel count and sample rate.
+ * The player's Voice modes on interleaved 16-bit PCM, independent of any player API. Every mode
+ * starts with a high-pass at 80 Hz (rumble, handling noise). Light and Strong (Clear voice) then
+ * run a light {@link DeEsser}, {@link SpectralDenoiser} and {@link Leveler}; Warm runs
+ * {@link VoiceEnhancer} instead. Any channel count and sample rate. Clear voice deliberately has
+ * no tonal EQ: the earlier cut around 300 Hz and lift around 3 kHz helped muddy home recordings
+ * but made well-produced voices sound thin, which is most of what people listen to.
  *
  * <p>Off is a plain copy, so it is bit exact. When on, the stages delay the signal by
  * {@link #latencyFrames()}; the chain hides that by discarding the first {@code latency} output
  * frames after a (re)start and by {@link #drain draining} the tail at the end of the stream or
  * when switched off, so the output has exactly the input's frames, in the same positions, with
  * nothing lost or repeated at a switch. Switching between Light and Strong just changes the
- * parameters in place.
+ * parameters in place; switching between Clear voice and Warm drains one and starts the other,
+ * like switching off and on again (the learned noise floor and levels are kept).
  *
  * <p>Threading: {@link #setLevel} may be called from any thread; it only stores a volatile that
  * the audio thread picks up at the start of its next {@link #process} call. Everything else must
@@ -22,25 +25,28 @@ import allen.town.podcast.model.playback.ClearVoiceLevel;
 public final class ClearVoiceChain {
     private static final int CHUNK_FRAMES = 1024;
     private static final double HIGH_PASS_HZ = 80;
-    private static final double MUD_HZ = 300;
-    private static final double PRESENCE_HZ = 3000;
-    private static final double EQ_Q = 0.9;
+    /** De-esser: cut sibilants that rise above the speech body, by at most 8 dB. */
+    private static final double DE_ESS_THRESHOLD_DB = 0;
+    private static final double DE_ESS_MAX_CUT_DB = 8;
     private static final double TARGET_DB = -20;
 
     private final int sampleRate;
     private final int channels;
     private final Biquad highPass;
-    private final Biquad mudCut;
-    private final Biquad presence;
+    private final DeEsser deEsser;
     private final SpectralDenoiser denoiser;
     private final Leveler leveler;
-    private final int latency;
+    private final VoiceEnhancer enhancer;
+    private final int clearLatency;
+    private final int warmLatency;
     private final float[] work;
 
     private volatile int requestedLevel;
     private int appliedLevel = ClearVoiceLevel.OFF;
     /** True while the stages hold audio that has not been emitted yet. */
     private boolean running;
+    /** Which stages are running: Warm's or Clear voice's. Only meaningful while running. */
+    private boolean runningWarm;
     private int skipFrames;
 
     public ClearVoiceChain(int sampleRate, int channels) {
@@ -51,11 +57,13 @@ public final class ClearVoiceChain {
         this.channels = channels;
         highPass = new Biquad(channels);
         highPass.setHighPass(sampleRate, HIGH_PASS_HZ, Math.sqrt(0.5));
-        mudCut = new Biquad(channels);
-        presence = new Biquad(channels);
+        deEsser = new DeEsser(sampleRate, channels);
+        deEsser.setParameters(DE_ESS_THRESHOLD_DB, DE_ESS_MAX_CUT_DB);
         denoiser = new SpectralDenoiser(sampleRate, channels);
         leveler = new Leveler(sampleRate, channels);
-        latency = denoiser.latencyFrames() + leveler.latencyFrames();
+        clearLatency = denoiser.latencyFrames() + leveler.latencyFrames();
+        enhancer = new VoiceEnhancer(sampleRate, channels);
+        warmLatency = enhancer.latencyFrames();
         work = new float[CHUNK_FRAMES * channels];
     }
 
@@ -68,8 +76,13 @@ public final class ClearVoiceChain {
         return requestedLevel;
     }
 
+    /** The delay of the mode now requested (0 when Off). */
     public int latencyFrames() {
-        return latency;
+        int level = requestedLevel;
+        if (level == ClearVoiceLevel.OFF) {
+            return 0;
+        }
+        return level == ClearVoiceLevel.WARM ? warmLatency : clearLatency;
     }
 
     public int getChannels() {
@@ -87,7 +100,7 @@ public final class ClearVoiceChain {
 
     /** Upper bound of the shorts {@link #process} or {@link #drain} may write for {@code inSamples}. */
     public int maxOutputSamples(int inSamples) {
-        return inSamples + latency * channels;
+        return inSamples + Math.max(clearLatency, warmLatency) * channels;
     }
 
     /**
@@ -106,16 +119,25 @@ public final class ClearVoiceChain {
             System.arraycopy(in, 0, out, written, inSamples);
             return written + inSamples;
         }
-        if (level != appliedLevel) {
+        boolean warm = level == ClearVoiceLevel.WARM;
+        if (running && runningWarm != warm) {
+            written = drain(out);
+        }
+        if (!warm && level != appliedLevel) {
             applyParameters(level);
         }
         if (!running) {
             highPass.clear();
-            mudCut.clear();
-            presence.clear();
-            denoiser.flushSignal();
-            leveler.flushSignal();
-            skipFrames = latency;
+            if (warm) {
+                enhancer.reset();
+                skipFrames = warmLatency;
+            } else {
+                deEsser.reset();
+                denoiser.flushSignal();
+                leveler.flushSignal();
+                skipFrames = clearLatency;
+            }
+            runningWarm = warm;
             running = true;
         }
         int frames = inSamples / channels;
@@ -141,7 +163,7 @@ public final class ClearVoiceChain {
             return 0;
         }
         int written = 0;
-        for (int remaining = latency; remaining > 0; ) {
+        for (int remaining = runningWarm ? warmLatency : clearLatency; remaining > 0; ) {
             int length = Math.min(CHUNK_FRAMES, remaining);
             java.util.Arrays.fill(work, 0, length * channels, 0f);
             written = runStages(length, out, written);
@@ -161,13 +183,19 @@ public final class ClearVoiceChain {
         running = false;
         denoiser.reset();
         leveler.reset();
+        enhancer.reset();
         appliedLevel = ClearVoiceLevel.OFF;
     }
 
     private int runStages(int frames, short[] out, int written) {
-        Biquad.processCascade(work, frames, highPass, mudCut, presence);
-        denoiser.process(work, frames);
-        leveler.process(work, frames);
+        highPass.process(work, frames);
+        if (runningWarm) {
+            enhancer.process(work, frames);
+        } else {
+            deEsser.process(work, frames);
+            denoiser.process(work, frames);
+            leveler.process(work, frames);
+        }
         int first = 0;
         if (skipFrames > 0) {
             first = Math.min(skipFrames, frames);
@@ -188,8 +216,6 @@ public final class ClearVoiceChain {
 
     private void applyParameters(int level) {
         boolean strong = level == ClearVoiceLevel.STRONG;
-        mudCut.setPeaking(sampleRate, MUD_HZ, EQ_Q, strong ? -3.0 : -2.0);
-        presence.setPeaking(sampleRate, PRESENCE_HZ, EQ_Q, strong ? 3.5 : 2.0);
         if (strong) {
             denoiser.setStrength(18f, 1.5f);
             leveler.setParameters(TARGET_DB, 12, 9, 0.5, 6, 3, 3);

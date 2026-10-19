@@ -50,6 +50,37 @@ final class Biquad {
         set((1 + alpha * amp) / a0, -2 * cos / a0, (1 - alpha * amp) / a0, -2 * cos / a0, (1 - alpha / amp) / a0);
     }
 
+    /** Butterworth-style low-pass at {@code f0} Hz with quality {@code q}. */
+    void setLowPass(double sampleRate, double f0, double q) {
+        if (f0 <= 0 || f0 >= 0.45 * sampleRate) {
+            setIdentity();
+            return;
+        }
+        double w0 = 2 * Math.PI * f0 / sampleRate;
+        double cos = Math.cos(w0);
+        double alpha = Math.sin(w0) / (2 * q);
+        double a0 = 1 + alpha;
+        set((1 - cos) / 2 / a0, (1 - cos) / a0, (1 - cos) / 2 / a0, -2 * cos / a0, (1 - alpha) / a0);
+    }
+
+    /** Low shelf: {@code gainDb} below about {@code f0} Hz, slope set by {@code q}. */
+    void setLowShelf(double sampleRate, double f0, double q, double gainDb) {
+        if (gainDb == 0 || f0 <= 0 || f0 >= 0.45 * sampleRate) {
+            setIdentity();
+            return;
+        }
+        double amp = Math.pow(10, gainDb / 40);
+        double w0 = 2 * Math.PI * f0 / sampleRate;
+        double cos = Math.cos(w0);
+        double twoSqrtAAlpha = 2 * Math.sqrt(amp) * Math.sin(w0) / (2 * q);
+        double a0 = (amp + 1) + (amp - 1) * cos + twoSqrtAAlpha;
+        set(amp * ((amp + 1) - (amp - 1) * cos + twoSqrtAAlpha) / a0,
+                2 * amp * ((amp - 1) - (amp + 1) * cos) / a0,
+                amp * ((amp + 1) - (amp - 1) * cos - twoSqrtAAlpha) / a0,
+                -2 * ((amp - 1) + (amp + 1) * cos) / a0,
+                ((amp + 1) + (amp - 1) * cos - twoSqrtAAlpha) / a0);
+    }
+
     void setIdentity() {
         set(1, 0, 0, 0, 0);
     }

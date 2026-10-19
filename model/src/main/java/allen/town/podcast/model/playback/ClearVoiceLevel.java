@@ -1,7 +1,9 @@
 package allen.town.podcast.model.playback;
 
 /**
- * Strength of the "Clear voice" enhancer (noise reduction, speech EQ and leveling). Stored as
+ * The player's "Voice" mode: Off (original audio), the two Clear voice strengths (de-essing,
+ * noise reduction and leveling) and Warm (a fuller tone and softer "s" sounds for thin, harsh
+ * microphones, without noise reduction or leveling). Stored as
  * these integers in the feeds table, in the global preference and in events, so the values must
  * never be renumbered.
  */
@@ -9,6 +11,7 @@ public final class ClearVoiceLevel {
     public static final int OFF = 0;
     public static final int LIGHT = 1;
     public static final int STRONG = 2;
+    public static final int WARM = 3;
 
     private ClearVoiceLevel() {
     }
@@ -18,6 +21,6 @@ public final class ClearVoiceLevel {
         if (level <= OFF) {
             return OFF;
         }
-        return Math.min(level, STRONG);
+        return Math.min(level, WARM);
     }
 }

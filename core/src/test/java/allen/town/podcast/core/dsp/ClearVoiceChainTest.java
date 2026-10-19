@@ -83,7 +83,8 @@ public class ClearVoiceChainTest {
     public void silenceStaysExactlySilent() {
         for (int rate : RATES) {
             for (int channels : CHANNELS) {
-                for (int level : new int[]{ClearVoiceLevel.OFF, ClearVoiceLevel.LIGHT, ClearVoiceLevel.STRONG}) {
+                for (int level : new int[]{ClearVoiceLevel.OFF, ClearVoiceLevel.LIGHT, ClearVoiceLevel.STRONG,
+                        ClearVoiceLevel.WARM}) {
                     short[] in = new short[3 * rate * channels];
                     short[] out = run(chain(rate, channels, level), in, 1000);
                     assertArrayEquals(describe(rate, channels, level), in, out);
@@ -97,7 +98,7 @@ public class ClearVoiceChainTest {
         int ceiling = (int) Math.ceil(Leveler.CEILING * 32768) + 1;
         for (int rate : RATES) {
             for (int channels : CHANNELS) {
-                for (int level : new int[]{ClearVoiceLevel.LIGHT, ClearVoiceLevel.STRONG}) {
+                for (int level : new int[]{ClearVoiceLevel.LIGHT, ClearVoiceLevel.STRONG, ClearVoiceLevel.WARM}) {
                     double seconds = 6;
                     double[] signal = new double[(int) (seconds * rate)];
                     Random random = new Random(1);
@@ -172,7 +173,7 @@ public class ClearVoiceChainTest {
         for (int i = onset; i < signal.length; i++) {
             signal[i] = 0.3 * Math.sin(2 * Math.PI * 700.0 * (i - onset) / rate);
         }
-        for (int level : new int[]{ClearVoiceLevel.LIGHT, ClearVoiceLevel.STRONG}) {
+        for (int level : new int[]{ClearVoiceLevel.LIGHT, ClearVoiceLevel.STRONG, ClearVoiceLevel.WARM}) {
             short[] out = run(chain(rate, 1, level), toPcm(signal, 1), 512);
             int first = -1;
             for (int i = 0; i < out.length; i++) {
@@ -192,8 +193,9 @@ public class ClearVoiceChainTest {
         int channels = 2;
         short[] in = toPcm(add(gatedTone(rate, 6, 500, 0.2), noise(rate, 6, 0.01, 3)), channels);
         ClearVoiceChain chain = new ClearVoiceChain(rate, channels);
-        int[] schedule = {ClearVoiceLevel.OFF, ClearVoiceLevel.LIGHT, ClearVoiceLevel.STRONG,
-                ClearVoiceLevel.OFF, ClearVoiceLevel.OFF, ClearVoiceLevel.STRONG, ClearVoiceLevel.LIGHT};
+        int[] schedule = {ClearVoiceLevel.OFF, ClearVoiceLevel.LIGHT, ClearVoiceLevel.WARM, ClearVoiceLevel.STRONG,
+                ClearVoiceLevel.OFF, ClearVoiceLevel.WARM, ClearVoiceLevel.OFF, ClearVoiceLevel.STRONG,
+                ClearVoiceLevel.WARM, ClearVoiceLevel.LIGHT};
         int buffer = 4410 * channels;
         short[] out = new short[in.length];
         short[] tmp = new short[chain.maxOutputSamples(buffer)];
@@ -208,6 +210,38 @@ public class ClearVoiceChainTest {
         }
         written += chain.drain(Arrays.copyOfRange(out, written, out.length));
         assertEquals(in.length, written);
+    }
+
+    @Test
+    public void switchingBetweenClearVoiceAndWarmKeepsTheAudioInPlace() {
+        int rate = 48000;
+        // silence, then a tone that starts while Warm is on, after a switch from Light
+        double[] signal = new double[rate * 3];
+        int onset = 2 * rate + 77;
+        for (int i = onset; i < signal.length; i++) {
+            signal[i] = 0.3 * Math.sin(2 * Math.PI * 700.0 * (i - onset) / rate);
+        }
+        short[] in = toPcm(signal, 1);
+        ClearVoiceChain chain = chain(rate, 1, ClearVoiceLevel.LIGHT);
+        short[] tmp = new short[chain.maxOutputSamples(rate)];
+        short[] out = new short[in.length];
+        int written = 0;
+        for (int pos = 0; pos < in.length; pos += rate) {
+            chain.setLevel(pos < rate ? ClearVoiceLevel.LIGHT : ClearVoiceLevel.WARM);
+            int n = chain.process(Arrays.copyOfRange(in, pos, pos + rate), rate, tmp);
+            System.arraycopy(tmp, 0, out, written, n);
+            written += n;
+        }
+        written += chain.drain(tmp);
+        assertEquals(in.length, written);
+        int first = -1;
+        for (int i = 0; i < out.length; i++) {
+            if (Math.abs(out[i]) > 300) {
+                first = i;
+                break;
+            }
+        }
+        assertTrue("onset at " + first + " instead of " + onset, first >= onset - 8 && first <= onset + 32);
     }
 
     @Test
