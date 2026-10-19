@@ -359,8 +359,6 @@
   <string name="pref_episode_cache_unlimited">Piiramatult</string>
   <string name="pref_gpodnet_setlogin_information_title">Muuda kasutajakonto infot</string>
   <string name="pref_gpodnet_setlogin_information_sum">Muuda oma gpodder.net konto sisselogimise andmeid.</string>
-  <string name="pref_playback_speed_sum">Kohanda kiiruseid, mis on esitamisel saadaval</string>
-  <string name="pref_feed_playback_speed_sum">Millise kiirusega esitatakse selle tellimuse saadete heli</string>
   <string name="pref_feed_skip">Automaatne vahelejätmine</string>
   <string name="pref_feed_skip_sum">Sissejuhatuse ja lõputänu vahele jätmine.</string>
   <string name="pref_feed_skip_ending">Jäta vahele lõpust</string>

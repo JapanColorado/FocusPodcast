@@ -8,12 +8,15 @@ import androidx.preference.ListPreference;
 import allen.town.podcast.R;
 import allen.town.podcast.model.playback.ClearVoiceLevel;
 
-/** Shared bits of the two Clear voice list preferences (global default and per podcast). */
-final class ClearVoicePreferences {
+/**
+ * Shared bits of the two Voice list preferences (global default and per podcast): the entries
+ * name the modes (Original / Clear / Clear+ / Warm) and the summary describes the selected one.
+ */
+public final class ClearVoicePreferences {
     private ClearVoicePreferences() {
     }
 
-    /** Shows {@code level} as the preference's value and in its summary. */
+    /** Shows {@code level} as the preference's value and describes it in the summary. */
     static void show(@NonNull ListPreference preference, int level) {
         int sanitized = ClearVoiceLevel.sanitize(level);
         preference.setValue(String.valueOf(sanitized));
@@ -22,9 +25,14 @@ final class ClearVoicePreferences {
 
     static void updateSummary(@NonNull ListPreference preference, int level) {
         Resources res = preference.getContext().getResources();
-        String[] names = res.getStringArray(R.array.clear_voice_options);
-        int index = Math.min(ClearVoiceLevel.sanitize(level), names.length - 1);
-        preference.setSummary(res.getString(R.string.pref_clear_voice_sum, names[index]));
+        preference.setSummary(description(res, level));
+    }
+
+    /** The one-line description of a Voice mode, as shown under the selector. */
+    @NonNull
+    public static String description(@NonNull Resources res, int level) {
+        String[] descriptions = res.getStringArray(R.array.clear_voice_descriptions);
+        return descriptions[Math.min(ClearVoiceLevel.sanitize(level), descriptions.length - 1)];
     }
 
     /** The level a ListPreference change listener received, or -1 if it is not one. */

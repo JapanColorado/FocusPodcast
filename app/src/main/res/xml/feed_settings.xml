@@ -47,7 +47,6 @@
         <allen.town.podcast.common.common.prefs.supportv7.ATEPreference
             android:key="feedPlaybackSpeed"
             android:layout="@layout/list_item_view_no_title"
-            android:summary="@string/pref_feed_playback_speed_sum"
             android:title="@string/playback_speed"
             app:icon="@drawable/ic_playback_speed" />
 

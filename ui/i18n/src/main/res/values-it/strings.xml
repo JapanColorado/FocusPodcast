@@ -389,8 +389,6 @@
   <string name="synchronization_force_sync_summary">Risincronizza tutte le iscrizioni e gli stati dell\'episodio</string>
   <string name="synchronization_sync_summary">Sincronizza l\'iscrizione e le modifiche dello stato dell\'episodio</string>
   <string name="dialog_choose_sync_service_title">Scegli provider di sincronizzazione</string>
-  <string name="pref_playback_speed_sum">Personalizzare le velocità disponibili per le varie velocità di riproduzione.</string>
-  <string name="pref_feed_playback_speed_sum">Velocità da usare per la riproduzione degli episodi di questo podcast</string>
   <string name="pref_feed_skip">Salta automaticamente</string>
   <string name="pref_feed_skip_sum">Salta alcuni secondi all\'inizio o alla fine.</string>
   <string name="pref_feed_skip_ending">Salta gli ultimi</string>

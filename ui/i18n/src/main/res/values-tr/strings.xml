@@ -462,8 +462,6 @@
     <string name="synchronization_force_sync_summary">Tüm abonelikleri ve bölüm durumlarını yeniden senkronize edin</string>
     <string name="synchronization_sync_summary">Abonelik ve bölüm durumu değişikliklerini senkronize edin</string>
     <string name="dialog_choose_sync_service_title">Senkronizasyon sağlayıcısını seçin</string>
-    <string name="pref_playback_speed_sum">Değişken hızda oynatma için mevcut hızları özelleştirin</string>
-    <string name="pref_feed_playback_speed_sum">Varsayılan oynatma hızını seçin</string>
     <string name="pref_feed_skip">Otomatik Atla</string>
     <string name="pref_feed_skip_sum">Başlangıcı ve sonu atla</string>
     <string name="pref_feed_skip_ending">Son kısmı atla</string>
@@ -504,8 +502,6 @@
     <string name="pref_enqueue_downloaded_title">İndirme başladığında oynatma listesine ekle</string>
     <string name="pref_enqueue_downloaded_summary">Bölümleri indirirken otomatik olarak oynatma listesine ekle</string>
     <string name="pref_skip_silence_title">Sesi Sessizlikleri Atla</string>
-    <string name="pref_custom_for_podcast">Podcast için Özel</string>
-    <string name="pref_custom_for_podcast_sum">Son oynatma efektlerinizi hatırlayacağız ve bunları tüm podcast\'lerde kullanacağız. Sadece bu podcast için özel olanları oluşturmak isterseniz bunu etkinleştirebilirsiniz</string>
     <string name="pref_back_button_behavior_title">Geri Düğmesi Davranışı</string>
     <string name="pref_back_button_behavior_sum">Geri düğmesinin davranışını değiştirin</string>
     <string name="back_button_default">Varsayılan</string>
@@ -815,8 +811,6 @@
     <string name="vinyl">Vinil</string>
     <string name="swipe_to_unlock">Kilidi açmak için kaydırın</string>
     <string name="drive_mode">Sürüş modu</string>
-    <string name="no_equalizer">Ekolayzır bulunamadı</string>
-    <string name="equalizer">Ekolayzır</string>
     <string name="adaptive">Uyarlanabilir</string>
     <string name="full_card">Tam kart</string>
     <string name="blur_card">Bulanık Kart</string>

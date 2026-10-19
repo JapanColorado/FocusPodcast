@@ -248,6 +248,78 @@ public class PerFeedPlaybackSettingsTest {
         assertEquals(1.6f, stored.getFeedPlaybackSpeed(), 0.0001f);
     }
 
+    // ------------------------------------------------------- set as default
+
+    @Test
+    public void makeDefaultMovesThePodcastsEffectsIntoTheDefaults() throws Exception {
+        Feed feed = storedFeed();
+        FeedPreferences preferences = feed.getPreferences();
+        Prefs.setSkipSilence(false);
+        Prefs.stereoToMono(false);
+        Prefs.setClearVoiceLevel(ClearVoiceLevel.OFF);
+        AudioEffectUtils.customize(preferences);
+        preferences.setMono(true);
+        preferences.setClearVoiceLevel(ClearVoiceLevel.WARM);
+
+        AudioEffectUtils.makeDefault(feed.getId(), preferences);
+        awaitDb();
+
+        assertTrue(Prefs.stereoToMono());
+        assertFalse(Prefs.isSkipSilence());
+        assertEquals(ClearVoiceLevel.WARM, Prefs.getClearVoiceLevel());
+        assertFalse(AudioEffectUtils.hasOwnEffects(preferences));
+        FeedPreferences stored = DBReader.getFeedPreferences(feed.getId());
+        assertNotNull(stored);
+        assertFalse(stored.isUseFeedEffect());
+        // what the podcast plays with is unchanged
+        assertEquals(ClearVoiceLevel.WARM, AudioEffectUtils.getClearVoiceLevel(preferences));
+    }
+
+    @Test
+    public void makeDefaultLeavesTheDefaultsAloneWithoutOwnEffects() {
+        Prefs.stereoToMono(false);
+        FeedPreferences preferences = preferences();
+        preferences.setMono(true); // stale value of a podcast that follows the defaults
+
+        AudioEffectUtils.makeDefault(1, preferences);
+
+        assertFalse(Prefs.stereoToMono());
+    }
+
+    @Test
+    public void makeDefaultMovesThePodcastsSpeedIntoTheDefault() throws Exception {
+        Feed feed = storedFeed();
+        FeedPreferences preferences = feed.getPreferences();
+        Prefs.setPlaybackSpeed(1.0f);
+        PlaybackSpeedUtils.setFeedSpeed(feed.getId(), preferences, 1.6f);
+
+        PlaybackSpeedUtils.makeDefault(feed.getId(), preferences);
+        awaitDb();
+
+        assertEquals(1.6f, Prefs.getPlaybackSpeed(MediaType.AUDIO), 0.0001f);
+        assertFalse(PlaybackSpeedUtils.hasOwnSpeed(preferences));
+        FeedPreferences stored = DBReader.getFeedPreferences(feed.getId());
+        assertNotNull(stored);
+        assertFalse(PlaybackSpeedUtils.hasOwnSpeed(stored));
+        assertEquals(1.6f, PlaybackSpeedUtils.getCurrentPlaybackSpeed(mediaOf(feed)), 0.0001f);
+    }
+
+    @Test
+    public void makeDefaultMovesThePodcastsAdChoiceIntoTheDefault() throws Exception {
+        Feed feed = storedFeed();
+        Prefs.setAdSkipEnabled(false);
+        AdSkipUtils.setAdSkipForFeed(feed, true);
+
+        AdSkipUtils.makeDefault(feed);
+        awaitDb();
+
+        assertTrue(Prefs.isAdSkipEnabled());
+        assertNull(feed.getPreferences().getAdSkipOverride());
+        FeedPreferences stored = DBReader.getFeedPreferences(feed.getId());
+        assertNotNull(stored);
+        assertNull(stored.getAdSkipOverride());
+    }
+
     @Test
     public void playableFeedPreferencesFindsTheSubscribedFeed() {
         Feed feed = feed(true);

@@ -389,8 +389,6 @@
   <string name="synchronization_force_sync_summary">Resynchroniser tous les abonnements et tous les statuts d\'épisodes</string>
   <string name="synchronization_sync_summary">Synchroniser l\'abonnement et les statuts d\'épisodes changés</string>
   <string name="dialog_choose_sync_service_title">Choisir le service de synchronisation</string>
-  <string name="pref_playback_speed_sum">Définir les vitesses disponibles lors de la lecture</string>
-  <string name="pref_feed_playback_speed_sum">Vitesse de lecture par défaut des épisodes</string>
   <string name="pref_feed_skip">Saut automatique</string>
   <string name="pref_feed_skip_sum">Sauter le début et la fin des épisodes</string>
   <string name="pref_feed_skip_ending">Sauter à la fin</string>

@@ -13,10 +13,10 @@ import allen.town.podcast.model.playback.ClearVoiceLevel;
 import allen.town.podcast.model.playback.Playable;
 
 /**
- * Resolves and stores the audio effects (skip silence, stereo to mono, Clear voice). A
- * subscribed podcast follows the global defaults from Settings until an effect is changed in the
- * player (or its own effects are switched on in Feed Settings), which gives it its own copy of
- * all of them ({@link FeedPreferences#isUseFeedEffect()}).
+ * Resolves and stores the audio effects (Voice mode, skip silence, stereo to mono). A subscribed
+ * podcast follows the global defaults from Settings until one of them is changed for it, in the
+ * player or on its Audio effects screen, which gives it its own copy of all of them
+ * ({@link FeedPreferences#isUseFeedEffect()}) until "Reset to default".
  */
 public final class AudioEffectUtils {
 
@@ -33,7 +33,7 @@ public final class AudioEffectUtils {
         return isMono(PlayableFeedPreferences.of(media));
     }
 
-    /** The Clear voice strength ({@link ClearVoiceLevel}) for {@code media}. */
+    /** The Voice mode ({@link ClearVoiceLevel}) for {@code media}. */
     public static int getClearVoiceLevel(@Nullable Playable media) {
         return getClearVoiceLevel(PlayableFeedPreferences.of(media));
     }
@@ -89,5 +89,23 @@ public final class AudioEffectUtils {
         });
         EventBus.getDefault().post(AudioEffectsChangedEvent.forFeed(
                 feedId, useFeedEffect, skipSilence, mono, clearVoiceLevel));
+    }
+
+    /**
+     * "Set as default": makes the podcast's own effects the global defaults, tells the playback
+     * service that the defaults changed, and then makes the podcast follow them again. Nothing is
+     * audible, since the podcast's values are now the defaults; podcasts with their own effects
+     * keep them. Does nothing when the podcast has no effects of its own.
+     */
+    public static void makeDefault(long feedId, @NonNull FeedPreferences preferences) {
+        if (!preferences.isUseFeedEffect()) {
+            return;
+        }
+        Prefs.setSkipSilence(preferences.isSkipSilence());
+        Prefs.stereoToMono(preferences.isMono());
+        Prefs.setClearVoiceLevel(preferences.getClearVoiceLevel());
+        EventBus.getDefault().post(AudioEffectsChangedEvent.global());
+        preferences.setUseFeedEffect(false);
+        saveFeedEffects(feedId, preferences);
     }
 }

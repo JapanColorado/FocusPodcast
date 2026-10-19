@@ -19,7 +19,6 @@ import allen.town.podcast.dialog.filter.KeywordFilterSheet
 import allen.town.podcast.event.playback.TitleChangeEvent
 import allen.town.podcast.event.settings.AdSkipChangedEvent
 import allen.town.podcast.event.settings.SkipIntroEndingChangedEvent
-import allen.town.podcast.event.settings.SpeedPresetChangedEvent
 import allen.town.podcast.event.settings.VolumeAdaptionChangedEvent
 import allen.town.podcast.fragment.pref.AbsSettingsFragment
 import allen.town.podcast.fragment.pref.AudioEffectFragment
@@ -33,7 +32,6 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.CompoundButton
 import android.widget.Toast
 import androidx.annotation.StringRes
 import androidx.appcompat.widget.Toolbar
@@ -329,51 +327,78 @@ class FeedSettingsFragment : Fragment() {
             }
         }
 
+        /**
+         * The podcast follows the default speed until a different speed is saved here (or picked
+         * in the player); while it has its own, the dialog offers "Reset to default" and "Set as
+         * default", like the player's speed dialog.
+         */
         private fun setupPlaybackSpeedPreference() {
             val feedPreferences = this.feedPreferences ?: return
             val feed = this.feed ?: return
             val feedPlaybackSpeedPreference =
                 requirePreference<Preference>(PREF_FEED_PLAYBACK_SPEED)
+            updatePlaybackSpeedSummary(feedPlaybackSpeedPreference, feedPreferences)
             feedPlaybackSpeedPreference.onPreferenceClickListener =
-                Preference.OnPreferenceClickListener { preference: Preference? ->
+                Preference.OnPreferenceClickListener {
                     val viewBinding = PlaybackSpeedFeedSettingDialogBinding.inflate(
                         layoutInflater
                     )
+                    viewBinding.useGlobalCheckbox.visibility = View.GONE
                     viewBinding.seekBar.setProgressChangedListener { speed: Float? ->
                         viewBinding.currentSpeedLabel.text = String.format(
                             Locale.getDefault(), "%.1fx", speed
                         )
                     }
-                    val speed = feedPreferences.feedPlaybackSpeed
-                    viewBinding.useGlobalCheckbox.setOnCheckedChangeListener { buttonView: CompoundButton?, isChecked: Boolean ->
-                        viewBinding.seekBar.isEnabled = !isChecked
-                        viewBinding.seekBar.alpha = if (isChecked) 0.4f else 1f
-                        viewBinding.currentSpeedLabel.alpha = if (isChecked) 0.4f else 1f
-                    }
-                    viewBinding.useGlobalCheckbox.isChecked =
-                        speed == FeedPreferences.SPEED_USE_GLOBAL
                     // A podcast that follows the default starts from the default speed.
-                    viewBinding.seekBar.updateSpeed(
-                        PlaybackSpeedUtils.resolveSpeed(feedPreferences, Prefs.getPlaybackSpeed(MediaType.AUDIO))
-                    )
-                    AccentMaterialDialog(
+                    viewBinding.seekBar.updateSpeed(effectiveSpeed(feedPreferences))
+                    val shownSpeed = viewBinding.seekBar.currentSpeed
+                    val hasOwnSpeed = PlaybackSpeedUtils.hasOwnSpeed(feedPreferences)
+                    val card = viewBinding.ownSettingsCard
+                    card.root.visibility = if (hasOwnSpeed) View.VISIBLE else View.GONE
+                    card.ownSettingsText.setText(R.string.podcast_own_speed_applied)
+                    val dialog = AccentMaterialDialog(
                         requireContext(),
                         R.style.MaterialAlertDialogTheme
                     )
                         .setTitle(R.string.playback_speed)
                         .setView(viewBinding.root)
-                        .setPositiveButton(android.R.string.ok) { dialog: DialogInterface?, which: Int ->
-                            val newSpeed =
-                                if (viewBinding.useGlobalCheckbox.isChecked) FeedPreferences.SPEED_USE_GLOBAL else viewBinding.seekBar.currentSpeed
-                            feedPreferences.feedPlaybackSpeed = newSpeed
-                            // only the speed column: the player may have changed other fields since this screen loaded
-                            DBWriter.updateFeedPreferences(feed.id) { it.feedPlaybackSpeed = newSpeed }
-                            EventBus.getDefault().post(SpeedPresetChangedEvent(newSpeed, feed.id))
+                        .setPositiveButton(android.R.string.ok) { _: DialogInterface?, _: Int ->
+                            val newSpeed = viewBinding.seekBar.currentSpeed
+                            // Only a change gives a podcast that follows the default its own speed.
+                            if (hasOwnSpeed || newSpeed != shownSpeed) {
+                                PlaybackSpeedUtils.setFeedSpeed(feed.id, feedPreferences, newSpeed)
+                                updatePlaybackSpeedSummary(feedPlaybackSpeedPreference, feedPreferences)
+                            }
                         }
                         .setNegativeButton(R.string.cancel_label, null)
-                        .show()
+                        .create()
+                    card.resetToDefault.setOnClickListener {
+                        PlaybackSpeedUtils.setFeedSpeed(feed.id, feedPreferences, FeedPreferences.SPEED_USE_GLOBAL)
+                        updatePlaybackSpeedSummary(feedPlaybackSpeedPreference, feedPreferences)
+                        dialog.dismiss()
+                    }
+                    card.setAsDefault.setOnClickListener {
+                        PlaybackSpeedUtils.makeDefault(feed.id, feedPreferences)
+                        updatePlaybackSpeedSummary(feedPlaybackSpeedPreference, feedPreferences)
+                        Toast.makeText(requireContext(), R.string.default_updated, Toast.LENGTH_SHORT).show()
+                        dialog.dismiss()
+                    }
+                    dialog.show()
                     true
                 }
+        }
+
+        private fun effectiveSpeed(feedPreferences: FeedPreferences): Float =
+            PlaybackSpeedUtils.resolveSpeed(feedPreferences, Prefs.getPlaybackSpeed(MediaType.AUDIO))
+
+        /** Shows the speed in effect and whether it is the default or this podcast's own. */
+        private fun updatePlaybackSpeedSummary(pref: Preference, feedPreferences: FeedPreferences) {
+            val speed = String.format(Locale.getDefault(), "%.2fx", effectiveSpeed(feedPreferences))
+            pref.summary = getString(
+                if (PlaybackSpeedUtils.hasOwnSpeed(feedPreferences)) R.string.feed_speed_own_sum
+                else R.string.feed_speed_default_sum,
+                speed
+            )
         }
 
         private fun setupEpisodeFilterPreference() {

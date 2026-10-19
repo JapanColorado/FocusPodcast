@@ -9,8 +9,6 @@ import allen.town.podcast.core.pref.Prefs
 import allen.town.podcast.core.util.playback.PlaybackController
 import allen.town.podcast.databinding.SpeedSelectDialogBinding
 import allen.town.podcast.event.playback.SpeedChangedEvent
-import allen.town.podcast.event.settings.SpeedPresetChangedEvent
-import allen.town.podcast.model.feed.FeedPreferences
 import allen.town.podcast.model.playback.MediaType
 import android.os.Bundle
 import android.os.Handler
@@ -34,7 +32,8 @@ import java.util.*
 /**
  * Speed chooser with the (global) list of speed presets. Opened from the player it changes the
  * speed of what is playing, which for an episode of a subscribed podcast becomes that podcast's
- * own speed, and offers "Reset to default" while the podcast has one. Opened with
+ * own speed; while the podcast has one, a card offers "Reset to default" (follow the default
+ * again) and "Set as default" (make this speed the default, then follow it). Opened with
  * [newGlobalDefaultInstance] from Settings it edits the global default speed instead and does not
  * touch the playing podcast's own speed.
  */
@@ -111,16 +110,28 @@ class PlaySpeedDialog : BottomSheetDialogFragment() {
     private fun updateResetButton() {
         val binding = _binding ?: return
         val feedPreferences = if (globalDefaultMode) null else PlayableFeedPreferences.of(controller?.media)
-        binding.resetSpeed.visibility =
+        binding.ownSettingsCard.root.visibility =
             if (PlaybackSpeedUtils.hasOwnSpeed(feedPreferences)) View.VISIBLE else View.GONE
+    }
+
+    /** Makes the playing podcast's own speed the default, then lets the podcast follow it. */
+    private fun setAsDefault() {
+        val playbackController = controller ?: return
+        val media = playbackController.media
+        if (!PlaybackSpeedUtils.hasOwnSpeed(PlayableFeedPreferences.of(media))) {
+            return
+        }
+        PlaybackSpeedUtils.setDefaultSpeed(PlaybackSpeedUtils.getCurrentPlaybackSpeed(media), media?.mediaType)
+        playbackController.resetPlaybackSpeed()
+        updateResetButton()
+        Toast.makeText(requireContext(), R.string.default_updated, Toast.LENGTH_SHORT).show()
     }
 
     /** Stores and applies a speed the user picked. */
     private fun applySpeed(speed: Float) {
         if (globalDefaultMode) {
-            Prefs.setPlaybackSpeed(speed)
             // Podcasts that follow the default pick the new speed up while playing.
-            EventBus.getDefault().post(SpeedPresetChangedEvent(FeedPreferences.SPEED_USE_GLOBAL, 0))
+            PlaybackSpeedUtils.setDefaultSpeed(speed, MediaType.AUDIO)
             _binding?.addCurrentSpeedChip?.text = speedFormat.format(speed.toDouble())
         } else {
             controller?.setPlaybackSpeed(speed)
@@ -148,10 +159,12 @@ class PlaySpeedDialog : BottomSheetDialogFragment() {
         binding.addCurrentSpeedChip.setCloseIconResource(R.drawable.ic_add)
         binding.addCurrentSpeedChip.setOnCloseIconClickListener { addCurrentSpeed() }
         binding.addCurrentSpeedChip.setOnClickListener { addCurrentSpeed() }
-        binding.resetSpeed.setOnClickListener {
+        binding.ownSettingsCard.ownSettingsText.setText(R.string.podcast_own_speed_applied)
+        binding.ownSettingsCard.resetToDefault.setOnClickListener {
             controller?.resetPlaybackSpeed()
             updateResetButton()
         }
+        binding.ownSettingsCard.setAsDefault.setOnClickListener { setAsDefault() }
         if (globalDefaultMode) {
             binding.speedDialogTitle.setText(R.string.default_playback_speed)
             showSpeed(Prefs.getPlaybackSpeed(MediaType.AUDIO))

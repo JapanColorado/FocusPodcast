@@ -369,8 +369,6 @@
   <string name="pref_episode_cache_unlimited">Neurri gabe</string>
   <string name="pref_gpodnet_setlogin_information_title">Aldatu saio hasieraren informazioa</string>
   <string name="pref_gpodnet_setlogin_information_sum">Aldatu saio hasierako datuak zure gpodder.net-en kontuan.</string>
-  <string name="pref_playback_speed_sum">Pertsonalizatu abiadura aldakorreko erreprodukzioan dauden abiadurak</string>
-  <string name="pref_feed_playback_speed_sum">Podcast hauen berezko irakurtze abiadura</string>
   <string name="pref_feed_skip">Salto automatikoa</string>
   <string name="pref_feed_skip_sum">Saltatu sarrera eta amaiera kredituak.</string>
   <string name="pref_feed_skip_ending">Saltatu azkena</string>

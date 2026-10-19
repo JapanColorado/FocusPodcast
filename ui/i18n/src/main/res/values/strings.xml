@@ -496,8 +496,6 @@
     <string name="synchronization_force_sync_summary">Re-synchronize all subscriptions and episode states</string>
     <string name="synchronization_sync_summary">Synchronize subscription and episode state changes</string>
     <string name="dialog_choose_sync_service_title">Choose synchronization provider</string>
-    <string name="pref_playback_speed_sum">Default for podcasts without their own speed. Changing the speed in the player sets it for that podcast only</string>
-    <string name="pref_feed_playback_speed_sum">Use the default speed from Settings, or set one for this podcast</string>
     <string name="pref_feed_skip">Auto Skip</string>
     <string name="pref_feed_skip_sum">Skip the beginning and the end</string>
     <string name="pref_feed_skip_ending">Skip last</string>
@@ -538,8 +536,6 @@
     <string name="pref_enqueue_downloaded_title">Add to playlist when download starts</string>
     <string name="pref_enqueue_downloaded_summary">Automatically add to playlist when downloading episodes</string>
     <string name="pref_skip_silence_title">Skip Silence in Audio</string>
-    <string name="pref_custom_for_podcast">Customize for this podcast</string>
-    <string name="pref_custom_for_podcast_sum">When off, this podcast uses the default effects from Settings. Changing an effect in the player turns this on</string>
     <string name="pref_back_button_behavior_title">Back Button Behavior</string>
     <string name="pref_back_button_behavior_sum">Change behavior of the back button</string>
     <string name="back_button_default">Default</string>
@@ -779,13 +775,6 @@
     <string name="audio_effects">Audio Effects</string>
     <string name="stereo_to_mono">Downmix: Stereo to mono</string>
     <string name="player_switch_to_audio_only">Play as audio only</string>
-    <string name="clear_voice">Clear voice</string>
-    <string name="clear_voice_hint">Reduces background noise and evens out volume</string>
-    <string name="clear_voice_off">Off</string>
-    <string name="clear_voice_light">Light</string>
-    <string name="clear_voice_strong">Strong</string>
-    <!-- %1$s is Off, Light or Strong -->
-    <string name="pref_clear_voice_sum">%1$s. Reduces background noise and evens out volume</string>
 
 
     <!-- proxy settings -->
@@ -882,8 +871,6 @@
     <string name="vinyl">Vinyl</string>
     <string name="swipe_to_unlock">Swipe to unlock</string>
     <string name="drive_mode">Drive mode</string>
-    <string name="no_equalizer">No equalizer found</string>
-    <string name="equalizer">Equalizer</string>
     <string name="adaptive">Adaptive</string>
     <string name="full_card">Full card</string>
     <string name="blur_card">Blur Card</string>
@@ -945,7 +932,25 @@
     <string name="podcast_own_settings_applied">Using this podcast\'s own settings</string>
     <string name="use_default">Use default</string>
     <string name="default_playback_speed">Default playback speed</string>
-    <string name="pref_default_effect_sum">Default for podcasts without their own effects</string>
+    <string name="voice_label">Voice</string>
+    <string name="voice_original">Original</string>
+    <string name="voice_clear">Clear</string>
+    <string name="voice_clear_plus">Clear+</string>
+    <string name="voice_warm">Warm</string>
+    <string name="voice_original_sum">No processing</string>
+    <string name="voice_clear_sum">Less background noise, even volume, softer S sounds</string>
+    <string name="voice_clear_plus_sum">Stronger cleanup for rough recordings</string>
+    <string name="voice_warm_sum">Fuller tone and softer S sounds for thin or harsh mics</string>
+    <string name="default_audio_effects">Default audio effects</string>
+    <string name="default_audio_effects_sum">Podcasts use these until you change one for a podcast</string>
+    <string name="default_playback_speed_sum">Podcasts use this until you change it for a podcast</string>
+    <string name="set_as_default">Set as default</string>
+    <string name="default_updated">Default updated. Podcasts with their own settings keep them.</string>
+    <string name="podcast_own_speed_applied">Using this podcast\'s own speed</string>
+    <string name="reset_effects_to_default_sum">Use the default audio effects again</string>
+    <string name="set_effects_as_default_sum">Make this podcast\'s effects the default</string>
+    <string name="feed_speed_default_sum">%1$s (default)</string>
+    <string name="feed_speed_own_sum">%1$s (set for this podcast)</string>
     <string name="add_podcast_by_url_label">Add podcast by URL</string>
     <string name="feed_url_hint">RSS feed URL</string>
     <string name="invalid_feed_url_error">Enter a link that starts with http:// or https://</string>

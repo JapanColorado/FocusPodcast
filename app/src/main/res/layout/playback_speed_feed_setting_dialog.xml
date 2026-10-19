@@ -6,6 +6,8 @@
     android:orientation="vertical"
     android:padding="16dp">
 
+    <!-- Only the bulk edit of several podcasts shows this; a single podcast's dialog offers
+         "Reset to default" in the card below instead. -->
     <allen.town.podcast.common.common.views.ATESwitch
         app:track="@drawable/switch_track"
         android:thumb="@drawable/switch_thumb"
@@ -37,5 +39,13 @@
             android:layout_marginLeft="8dp" />
 
     </LinearLayout>
+
+    <include
+        android:id="@+id/own_settings_card"
+        layout="@layout/own_settings_card"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:visibility="gone" />
 
 </LinearLayout>

@@ -10,10 +10,10 @@ import allen.town.podcast.core.storage.DBReader
 import allen.town.podcast.core.util.playback.PlaybackController
 import allen.town.podcast.databinding.AudioControlsBinding
 import allen.town.podcast.event.settings.AudioEffectsChangedEvent
+import allen.town.podcast.fragment.pref.ClearVoicePreferences
 import allen.town.podcast.model.feed.Feed
 import allen.town.podcast.model.feed.FeedPreferences
 import allen.town.podcast.model.playback.ClearVoiceLevel
-import allen.town.podcast.util.NavigationUtil
 import android.app.Dialog
 import android.os.Bundle
 import android.os.Handler
@@ -21,6 +21,7 @@ import android.os.Looper
 import android.util.Log
 import android.view.View
 import android.widget.CompoundButton
+import android.widget.Toast
 import androidx.fragment.app.DialogFragment
 import io.reactivex.Maybe
 import io.reactivex.MaybeEmitter
@@ -30,11 +31,13 @@ import io.reactivex.schedulers.Schedulers
 import org.greenrobot.eventbus.EventBus
 
 /**
- * The player's audio effects dialog. For an episode of a subscribed podcast every change is
- * stored for that podcast: the first change copies the global defaults into the podcast and then
- * applies the change, so the podcast keeps its own effects from then on, and "Reset to default"
- * makes it follow Settings again. Anything else (media without a podcast, a podcast that is only
- * being previewed) changes the global defaults.
+ * The player's audio effects dialog: Voice, Skip silence, Stereo to mono and, for a podcast,
+ * Detect ads. For an episode of a subscribed podcast every change is stored for that podcast: the
+ * first change copies the global defaults into the podcast and then applies the change, so the
+ * podcast keeps its own effects from then on. While it has them a card offers "Reset to default"
+ * (follow Settings again) and "Set as default" (make its values the defaults, then follow them).
+ * Anything else (media without a podcast, a podcast that is only being previewed) changes the
+ * global defaults directly, so the card never shows.
  */
 class PlaybackControlsDialog : DialogFragment() {
     private var controller: PlaybackController? = null
@@ -118,13 +121,13 @@ class PlaybackControlsDialog : DialogFragment() {
         // non-null exactly when changes are stored for this podcast
         val feedPreferences = PlayableFeedPreferences.of(loadedFeed)
 
+        bindVoice(binding, AudioEffectUtils.getClearVoiceLevel(feedPreferences))
         bindSwitch(binding.skipSilence, AudioEffectUtils.isSkipSilence(feedPreferences)) { checked ->
             changeEffect({ it.isSkipSilence = checked }, { Prefs.isSkipSilence = checked })
         }
         bindSwitch(binding.stereoToMono, AudioEffectUtils.isMono(feedPreferences)) { checked ->
             changeEffect({ it.isMono = checked }, { Prefs.stereoToMono(checked) })
         }
-        bindClearVoice(binding, AudioEffectUtils.getClearVoiceLevel(feedPreferences))
 
         if (loadedFeed != null && feedPreferences != null) {
             binding.detectAdsRow.visibility = View.VISIBLE
@@ -132,34 +135,41 @@ class PlaybackControlsDialog : DialogFragment() {
                 AdSkipUtils.setAdSkipForFeed(loadedFeed, checked)
                 updateOwnSettingsCard()
             }
-            binding.resetToDefault.setOnClickListener { resetToDefault(loadedFeed, feedPreferences) }
+            binding.ownSettingsCard.resetToDefault.setOnClickListener { resetToDefault(loadedFeed, feedPreferences) }
+            binding.ownSettingsCard.setAsDefault.setOnClickListener { setAsDefault(loadedFeed, feedPreferences) }
         } else {
             binding.detectAdsRow.visibility = View.GONE
         }
         updateOwnSettingsCard()
-        binding.equalizer.setOnClickListener { NavigationUtil.openEqualizer(requireActivity()) }
     }
 
-    /** Off / Light / Strong as a single-selection button row. */
-    private fun bindClearVoice(binding: AudioControlsBinding, level: Int) {
+    /**
+     * Original / Clear / Clear+ / Warm as a single-selection button row, with a line under the
+     * title that describes the selected mode.
+     */
+    private fun bindVoice(binding: AudioControlsBinding, level: Int) {
         val group = binding.clearVoiceGroup
         group.clearOnButtonCheckedListeners()
         group.check(
             when (level) {
-                ClearVoiceLevel.STRONG -> R.id.clear_voice_strong
-                ClearVoiceLevel.LIGHT -> R.id.clear_voice_light
-                else -> R.id.clear_voice_off
+                ClearVoiceLevel.WARM -> R.id.voice_warm
+                ClearVoiceLevel.STRONG -> R.id.voice_clear_plus
+                ClearVoiceLevel.LIGHT -> R.id.voice_clear
+                else -> R.id.voice_original
             }
         )
+        binding.voiceDescription.text = ClearVoicePreferences.description(resources, level)
         group.addOnButtonCheckedListener { _, checkedId, isChecked ->
             if (!isChecked) {
                 return@addOnButtonCheckedListener
             }
             val chosen = when (checkedId) {
-                R.id.clear_voice_strong -> ClearVoiceLevel.STRONG
-                R.id.clear_voice_light -> ClearVoiceLevel.LIGHT
+                R.id.voice_warm -> ClearVoiceLevel.WARM
+                R.id.voice_clear_plus -> ClearVoiceLevel.STRONG
+                R.id.voice_clear -> ClearVoiceLevel.LIGHT
                 else -> ClearVoiceLevel.OFF
             }
+            binding.voiceDescription.text = ClearVoicePreferences.description(resources, chosen)
             changeEffect({ it.clearVoiceLevel = chosen }, { Prefs.setClearVoiceLevel(chosen) })
         }
     }
@@ -200,12 +210,23 @@ class PlaybackControlsDialog : DialogFragment() {
         setupUi()
     }
 
+    /**
+     * Makes the podcast's effects and ad detection choice the global defaults (only what it has
+     * of its own), then lets it follow them again.
+     */
+    private fun setAsDefault(loadedFeed: Feed, feedPreferences: FeedPreferences) {
+        AudioEffectUtils.makeDefault(loadedFeed.id, feedPreferences)
+        AdSkipUtils.makeDefault(loadedFeed)
+        Toast.makeText(requireContext(), R.string.default_updated, Toast.LENGTH_SHORT).show()
+        setupUi()
+    }
+
     private fun updateOwnSettingsCard() {
         val binding = _binding ?: return
         val feedPreferences = PlayableFeedPreferences.of(feed)
         val hasOwnSettings = feedPreferences != null
                 && (AudioEffectUtils.hasOwnEffects(feedPreferences) || feedPreferences.adSkipOverride != null)
-        binding.ownSettingsCard.visibility = if (hasOwnSettings) View.VISIBLE else View.GONE
+        binding.ownSettingsCard.root.visibility = if (hasOwnSettings) View.VISIBLE else View.GONE
     }
 
     /** Shows a button that cycles through the audio tracks when the media has more than one. */

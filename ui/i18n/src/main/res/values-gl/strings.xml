@@ -389,8 +389,6 @@
   <string name="synchronization_force_sync_summary">Volve a sincronizar tódalas subscricións e estado dos episodios</string>
   <string name="synchronization_sync_summary">Sincroniza os cambios nas subscricións e estado dos episodios</string>
   <string name="dialog_choose_sync_service_title">Elixe o provedor de sincronización</string>
-  <string name="pref_playback_speed_sum">Personaliza as velocidades dispoñibles para reprodución de velocidade variable</string>
-  <string name="pref_feed_playback_speed_sum">A velocidade para reproducir o contido dos episodios deste podcast</string>
   <string name="pref_feed_skip">Omisión automática</string>
   <string name="pref_feed_skip_sum">Omitir introducións e créditos finais.</string>
   <string name="pref_feed_skip_ending">Omitir o final</string>

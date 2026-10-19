@@ -2,9 +2,11 @@ package allen.town.podcast.fragment.pref;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.preference.ListPreference;
+import androidx.preference.Preference;
 
 import org.greenrobot.eventbus.EventBus;
 
@@ -15,11 +17,20 @@ import allen.town.podcast.event.playback.TitleChangeEvent;
 import allen.town.podcast.model.feed.Feed;
 import allen.town.podcast.model.feed.FeedPreferences;
 
+/**
+ * A podcast's Audio effects screen: Voice, Skip silence and Stereo to mono, the same controls in
+ * the same order as Settings and the player's Audio Effects dialog. The controls always show the
+ * values in effect. The podcast follows the global defaults until one of them is changed here (or
+ * in the player): the first change copies the defaults into the podcast before applying itself,
+ * exactly like the dialog. While the podcast has its own effects, "Reset to default" makes it
+ * follow the defaults again and "Set as default" makes its effects the defaults first.
+ */
 public class AudioEffectFragment extends AbsSettingsFragment {
-    private static final String PREF_FEED_AUDIO_EFFECT = "feed_audio_effect_pref";
     private static final String PREF_FEED_SKIP_SILENCE = "feed_skip_silence";
     private static final String PREF_FEED_MONO = "feed_mono_pref";
     private static final String PREF_FEED_CLEAR_VOICE = "feed_clear_voice_pref";
+    private static final String PREF_RESET_TO_DEFAULT = "feed_effects_reset_to_default";
+    private static final String PREF_SET_AS_DEFAULT = "feed_effects_set_as_default";
     private FeedPreferences feedPreferences;
     private Feed feed;
 
@@ -54,63 +65,67 @@ public class AudioEffectFragment extends AbsSettingsFragment {
         super.onResume();
     }
 
-    ATESwitchPreference audioEffectPreference;
     ATESwitchPreference skipSilencePreference;
     ATESwitchPreference monoPreference;
     ListPreference clearVoicePreference;
+    Preference resetToDefaultPreference;
+    Preference setAsDefaultPreference;
 
     private void init() {
-        audioEffectPreference = findPreference(PREF_FEED_AUDIO_EFFECT);
         skipSilencePreference = findPreference(PREF_FEED_SKIP_SILENCE);
         monoPreference = findPreference(PREF_FEED_MONO);
         clearVoicePreference = findPreference(PREF_FEED_CLEAR_VOICE);
+        resetToDefaultPreference = findPreference(PREF_RESET_TO_DEFAULT);
+        setAsDefaultPreference = findPreference(PREF_SET_AS_DEFAULT);
     }
 
-    /**
-     * The master switch is "customize for this podcast": off, the podcast follows the global
-     * defaults from Settings (shown read-only below); on, it has its own values, which start as a
-     * copy of the defaults. Every change is stored and applied live if the podcast is playing.
-     */
+    /** Every change is stored for the podcast and applied live if it is playing. */
     private void setupAudioEffectPreference() {
-        audioEffectPreference.setChecked(feedPreferences.isUseFeedEffect());
-        audioEffectPreference.setOnPreferenceChangeListener((preference, newValue) -> {
-            if ((Boolean) newValue) {
-                AudioEffectUtils.customize(feedPreferences);
-            } else {
-                feedPreferences.setUseFeedEffect(false);
-            }
-            saveEffects();
-            showEffectValues();
-            return true;
-        });
-
-        skipSilencePreference.setOnPreferenceChangeListener((preference, newValue) -> {
-            feedPreferences.setSkipSilence((Boolean) newValue);
-            saveEffects();
-            return true;
-        });
-
-        monoPreference.setOnPreferenceChangeListener((preference, newValue) -> {
-            feedPreferences.setMono((Boolean) newValue);
-            saveEffects();
-            return true;
-        });
-
         clearVoicePreference.setOnPreferenceChangeListener((preference, newValue) -> {
             int level = ClearVoicePreferences.parse(newValue);
             if (level < 0) {
                 return false;
             }
-            feedPreferences.setClearVoiceLevel(level);
-            saveEffects();
+            changeEffect(() -> feedPreferences.setClearVoiceLevel(level));
             ClearVoicePreferences.updateSummary(clearVoicePreference, level);
+            return true;
+        });
+
+        skipSilencePreference.setOnPreferenceChangeListener((preference, newValue) -> {
+            changeEffect(() -> feedPreferences.setSkipSilence((Boolean) newValue));
+            return true;
+        });
+
+        monoPreference.setOnPreferenceChangeListener((preference, newValue) -> {
+            changeEffect(() -> feedPreferences.setMono((Boolean) newValue));
+            return true;
+        });
+
+        resetToDefaultPreference.setOnPreferenceClickListener(preference -> {
+            feedPreferences.setUseFeedEffect(false);
+            AudioEffectUtils.saveFeedEffects(feed.getId(), feedPreferences);
+            showEffectValues();
+            return true;
+        });
+
+        setAsDefaultPreference.setOnPreferenceClickListener(preference -> {
+            AudioEffectUtils.makeDefault(feed.getId(), feedPreferences);
+            Toast.makeText(requireContext(), R.string.default_updated, Toast.LENGTH_SHORT).show();
+            showEffectValues();
             return true;
         });
         showEffectValues();
     }
 
-    private void saveEffects() {
+    /**
+     * Applies one change for this podcast, copying the current defaults into it first if it
+     * followed them, like the player dialog does.
+     */
+    private void changeEffect(Runnable change) {
+        AudioEffectUtils.customize(feedPreferences);
+        change.run();
         AudioEffectUtils.saveFeedEffects(feed.getId(), feedPreferences);
+        updateDefaultRows();
     }
 
     /** Shows the values in effect: the podcast's own, or the global defaults it follows. */
@@ -118,6 +133,13 @@ public class AudioEffectFragment extends AbsSettingsFragment {
         skipSilencePreference.setChecked(AudioEffectUtils.isSkipSilence(feedPreferences));
         monoPreference.setChecked(AudioEffectUtils.isMono(feedPreferences));
         ClearVoicePreferences.show(clearVoicePreference, AudioEffectUtils.getClearVoiceLevel(feedPreferences));
+        updateDefaultRows();
+    }
+
+    private void updateDefaultRows() {
+        boolean ownEffects = AudioEffectUtils.hasOwnEffects(feedPreferences);
+        resetToDefaultPreference.setVisible(ownEffects);
+        setAsDefaultPreference.setVisible(ownEffects);
     }
 
     @Override

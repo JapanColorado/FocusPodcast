@@ -389,8 +389,6 @@
   <string name="synchronization_force_sync_summary">Re-synkroniser alle abonnementer og afspilningsstatus for afsnit</string>
   <string name="synchronization_sync_summary">Synkroniser ændringer i abonnement og afsnitstilstand</string>
   <string name="dialog_choose_sync_service_title">Vælg synkroniseringsudbyder</string>
-  <string name="pref_playback_speed_sum">Tilpas de tilgængelige hastigheder for afspilning med variabel hastighed</string>
-  <string name="pref_feed_playback_speed_sum">Hastighed, der skal bruges, når lydafspilning startes for afsnit i denne podcast</string>
   <string name="pref_feed_skip">Overspring automatisk</string>
   <string name="pref_feed_skip_sum">Overspring introduktioner og slut kreditter.</string>
   <string name="pref_feed_skip_ending">Overspring sidste</string>

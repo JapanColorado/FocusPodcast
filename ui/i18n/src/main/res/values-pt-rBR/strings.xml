@@ -380,8 +380,6 @@
   <string name="synchronization_full_sync_title">Forçar sincronização completa</string>
   <string name="synchronization_summary_unchoosen">Você pode escolher de vários serviços para sincronizar suas assinaturas e o estado de reprodução dos episódios com</string>
     <string name="synchronization_choose_title">Escolher o serviço de sincronização</string>
-  <string name="pref_playback_speed_sum">Personalize as velocidades disponíveis para reprodução de áudio.</string>
-  <string name="pref_feed_playback_speed_sum">A velocidade a ser usada ao iniciar a reprodução de áudio para episódios neste podcast</string>
   <string name="pref_feed_skip">Salto automático</string>
   <string name="pref_feed_skip_sum">Pule as introduções e os créditos finais.</string>
   <string name="pref_feed_skip_ending">Pular últimos</string>

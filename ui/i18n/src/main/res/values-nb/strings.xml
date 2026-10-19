@@ -345,8 +345,6 @@
   <string name="pref_episode_cache_unlimited">Ulimitert</string>
   <string name="pref_gpodnet_setlogin_information_title">Endre innloggingsinformasjon</string>
   <string name="pref_gpodnet_setlogin_information_sum">Endre innlogginsinformasjonen til din gpodder.net konto</string>
-  <string name="pref_playback_speed_sum">Definer hastighetene tilgjengelig for variabel avspillingshastighet</string>
-  <string name="pref_feed_playback_speed_sum">Hastigheten som brukes når episoder av denne podkasten spilles av</string>
   <string name="pref_feed_skip">Automatisk hopp</string>
   <string name="pref_feed_skip_sum">Hopp over introer og \"rulletekster\"</string>
   <string name="pref_feed_skip_ending">Hopp over siste</string>

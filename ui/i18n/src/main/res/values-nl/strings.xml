@@ -389,8 +389,6 @@
   <string name="synchronization_force_sync_summary">Alle abonnementen en afspeelstatussen opnieuw synchroniseren</string>
   <string name="synchronization_sync_summary">Alle gewijzigde abonnementen en afspeelstatussen opnieuw synchroniseren</string>
   <string name="dialog_choose_sync_service_title">Kies een synchronisatiedienst</string>
-  <string name="pref_playback_speed_sum">Pas de beschikbare snelheden aan voor de variabele afspeelsnelheid</string>
-  <string name="pref_feed_playback_speed_sum">De te gebruiken snelheid bij het afspelen van afleveringen in deze podcast</string>
   <string name="pref_feed_skip">Automatisch overslaan</string>
   <string name="pref_feed_skip_sum">Sla introducties en aftitelingen over.</string>
   <string name="pref_feed_skip_ending">Laatste overslaan</string>

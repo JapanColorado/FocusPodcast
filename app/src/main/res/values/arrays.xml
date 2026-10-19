@@ -14,10 +14,20 @@
         <item>high</item>
     </string-array>
 
+    <!-- The Voice modes, in ClearVoiceLevel order -->
     <string-array name="clear_voice_options">
-        <item>@string/clear_voice_off</item>
-        <item>@string/clear_voice_light</item>
-        <item>@string/clear_voice_strong</item>
+        <item>@string/voice_original</item>
+        <item>@string/voice_clear</item>
+        <item>@string/voice_clear_plus</item>
+        <item>@string/voice_warm</item>
+    </string-array>
+
+    <!-- One line per Voice mode, same order; shown as the preference summary -->
+    <string-array name="clear_voice_descriptions">
+        <item>@string/voice_original_sum</item>
+        <item>@string/voice_clear_sum</item>
+        <item>@string/voice_clear_plus_sum</item>
+        <item>@string/voice_warm_sum</item>
     </string-array>
 
     <!-- MUST stay in sync with ClearVoiceLevel in model -->
@@ -25,6 +35,7 @@
         <item>0</item>
         <item>1</item>
         <item>2</item>
+        <item>3</item>
     </string-array>
 
 </resources>

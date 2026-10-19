@@ -291,7 +291,6 @@
   <string name="pref_episode_cache_unlimited">Ensin llende</string>
   <string name="pref_gpodnet_setlogin_information_title">Camudar la información del aniciu de sesión</string>
   <string name="pref_gpodnet_setlogin_information_sum">Camuda la información d\'aniciu de sesión de la to cuenta de gpodder.net .</string>
-  <string name="pref_feed_playback_speed_sum">La velocidá que s\'usa al aniciar la reproducción de los episodios d\'esti podcast</string>
   <string name="pref_feed_skip">Saltu automáticu</string>
   <string name="pref_feed_skip_sum">Salta les introducciones y los creitos del final</string>
   <string name="pref_feed_skip_ending">Saltar los caberos</string>

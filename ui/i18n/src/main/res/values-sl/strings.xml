@@ -397,8 +397,6 @@
   <string name="pref_episode_cache_unlimited">Neomejeno</string>
   <string name="pref_gpodnet_setlogin_information_title">Spremenite podatke za prijavo</string>
   <string name="pref_gpodnet_setlogin_information_sum">Spremenite podatke za prijavo za svoj račun gpodder.net.</string>
-  <string name="pref_playback_speed_sum">Prilagodite hitrosti, ki so na voljo za predvajanje s spremenljivo hitrostjo</string>
-  <string name="pref_feed_playback_speed_sum">Hitrost, ki se uporablja pri zagonu predvajanja zvoka za epizode v tem podcastu</string>
   <string name="pref_feed_skip">Samodejni preskok</string>
   <string name="pref_feed_skip_sum">Preskočite uvodne in končne kredite.</string>
   <string name="pref_feed_skip_ending">Preskoči na zadnjo</string>

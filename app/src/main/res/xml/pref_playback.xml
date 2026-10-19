@@ -18,8 +18,8 @@
         <allen.town.podcast.common.common.prefs.supportv7.ATEPreference
             android:layout="@layout/list_item_view_no_title"
             android:key="prefPlaybackSpeedLauncher"
-            android:summary="@string/pref_playback_speed_sum"
-            android:title="@string/playback_speed"/>
+            android:summary="@string/default_playback_speed_sum"
+            android:title="@string/default_playback_speed"/>
         <allen.town.podcast.common.common.prefs.supportv7.ATESwitchPreference
             android:layout="@layout/list_item_view_switch"
             android:defaultValue="false"
@@ -28,31 +28,32 @@
             android:title="@string/pref_playback_time_respects_speed_title"/>
     </allen.town.podcast.common.common.prefs.supportv7.ATEPreferenceCategory>
 
+    <!-- Same controls in the same order as a podcast's Audio effects screen and the player's
+         Audio Effects dialog. -->
     <allen.town.podcast.common.common.prefs.supportv7.ATEPreferenceCategory
         android:layout="@layout/preference_category_title"
-        android:title="@string/audio_effects">
-        <allen.town.podcast.common.common.prefs.supportv7.ATESwitchPreference
-            android:layout="@layout/list_item_view_switch"
-            android:defaultValue="false"
-            android:key="pref_global_skip_silence"
-            android:summary="@string/pref_default_effect_sum"
-            android:title="@string/pref_skip_silence_title"
-            app:icon="@drawable/ic_trim"/>
-        <allen.town.podcast.common.common.prefs.supportv7.ATESwitchPreference
-            android:layout="@layout/list_item_view_switch"
-            android:defaultValue="false"
-            android:key="pref_stereo_to_mono"
-            android:summary="@string/pref_default_effect_sum"
-            android:title="@string/stereo_to_mono"
-            app:icon="@drawable/ic_volume_adaption"/>
+        android:summary="@string/default_audio_effects_sum"
+        android:title="@string/default_audio_effects">
         <allen.town.podcast.common.common.prefs.supportv7.ATEListPreference
             android:layout="@layout/list_item_view"
             android:defaultValue="0"
             android:entries="@array/clear_voice_options"
             android:entryValues="@array/clear_voice_values"
             android:key="pref_clear_voice"
-            android:title="@string/clear_voice"
+            android:title="@string/voice_label"
             app:icon="@drawable/ic_vocal_enhancement"/>
+        <allen.town.podcast.common.common.prefs.supportv7.ATESwitchPreference
+            android:layout="@layout/list_item_view_switch"
+            android:defaultValue="false"
+            android:key="pref_global_skip_silence"
+            android:title="@string/pref_skip_silence_title"
+            app:icon="@drawable/ic_trim"/>
+        <allen.town.podcast.common.common.prefs.supportv7.ATESwitchPreference
+            android:layout="@layout/list_item_view_switch"
+            android:defaultValue="false"
+            android:key="pref_stereo_to_mono"
+            android:title="@string/stereo_to_mono"
+            app:icon="@drawable/ic_volume_adaption"/>
     </allen.town.podcast.common.common.prefs.supportv7.ATEPreferenceCategory>
 
     <allen.town.podcast.common.common.prefs.supportv7.ATEPreferenceCategory

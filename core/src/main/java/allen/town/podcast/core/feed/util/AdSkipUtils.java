@@ -3,6 +3,8 @@ package allen.town.podcast.core.feed.util;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import org.greenrobot.eventbus.EventBus;
+
 import allen.town.podcast.core.pref.Prefs;
 import allen.town.podcast.core.storage.DBWriter;
 import allen.town.podcast.event.settings.AdSkipChangedEvent;
@@ -51,6 +53,22 @@ public final class AdSkipUtils {
     /** Makes the feed follow the global default again. Posts {@link AdSkipChangedEvent}. */
     public static void resetAdSkipForFeed(@NonNull Feed feed) {
         store(feed, null);
+    }
+
+    /**
+     * "Set as default": makes the feed's own choice the global default, posts
+     * {@link AdSkipChangedEvent} for the default (feed id 0), and makes the feed follow the
+     * default again. Does nothing when the feed has no choice of its own.
+     */
+    public static void makeDefault(@NonNull Feed feed) {
+        FeedPreferences preferences = feed.getPreferences();
+        Boolean override = preferences != null ? preferences.getAdSkipOverride() : null;
+        if (override == null) {
+            return;
+        }
+        Prefs.setAdSkipEnabled(override);
+        EventBus.getDefault().post(new AdSkipChangedEvent(0));
+        resetAdSkipForFeed(feed);
     }
 
     private static void store(@NonNull Feed feed, @Nullable Boolean override) {

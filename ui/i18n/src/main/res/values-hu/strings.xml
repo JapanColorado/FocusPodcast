@@ -382,8 +382,6 @@
   <string name="synchronization_sync_changes_title">Szinkronizálás most</string>
   <string name="synchronization_full_sync_title">Teljes szinkronizáció kényszerítése</string>
   <string name="synchronization_login_status"><![CDATA[Bejelentkezve mint <i>%1$s</i>, ekkor: <i>%2$s</i>. <br/><br/>Ha kijelentkezett, akkor újra kiválaszthatja a szinkronizációs szolgáltatóját]]></string>
-  <string name="pref_playback_speed_sum">A változó sebességű lejátszáshoz elérhető sebességek testreszabása</string>
-  <string name="pref_feed_playback_speed_sum">A podcast epizódjainak indításakor használandó lejátszási sebesség</string>
   <string name="pref_feed_skip">Automatikus kihagyás</string>
   <string name="pref_feed_skip_sum">Bevezetők és lezárások kihagyása</string>
   <string name="pref_feed_skip_ending">Utolsó másodpercek átugrása</string>

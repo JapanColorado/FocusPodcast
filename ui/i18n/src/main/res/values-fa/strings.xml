@@ -369,8 +369,6 @@
   <string name="pref_episode_cache_unlimited">نامحدود</string>
   <string name="pref_gpodnet_setlogin_information_title">تغییر اطلاعات ورود</string>
   <string name="pref_gpodnet_setlogin_information_sum">اطلاعات ورود به سیستم حساب gpodder.net خود را تغییر دهید.</string>
-  <string name="pref_playback_speed_sum">سرعتهای موجود برای بازپخش با سرعت متغیر را سفارشی کنید</string>
-  <string name="pref_feed_playback_speed_sum">سرعت شروع  بازپخش صدا برای قسمت های این پادکست</string>
   <string name="pref_feed_skip">پرش خودکار</string>
   <string name="pref_feed_skip_sum">از اجرای قسمت معرفی و پایانی صرف نظر کن.</string>
   <string name="pref_feed_skip_ending">پرش به آخر</string>

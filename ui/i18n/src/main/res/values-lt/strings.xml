@@ -419,8 +419,6 @@
   <string name="synchronization_force_sync_summary">Sinchronizuoti visų prenumeratų ir epizodų būsenas iš naujo</string>
   <string name="synchronization_sync_summary">Sinchronizuoti prenumeratų ir epizodų būsenų pokyčius</string>
   <string name="dialog_choose_sync_service_title">Pasirinkite sinchronizavimo teikėją</string>
-  <string name="pref_playback_speed_sum">Derinkite prieinamas garso atkūrimo spartas</string>
-  <string name="pref_feed_playback_speed_sum">Atkūrimo sparta, naudojama pradedant šios tinklalaidės epizodų atkūrimą</string>
   <string name="pref_feed_skip">Automatinis praleidimas</string>
   <string name="pref_feed_skip_sum">Praleisti įvadą ir pabaigos žodį.</string>
   <string name="pref_feed_skip_ending">Praleisti pirmas</string>

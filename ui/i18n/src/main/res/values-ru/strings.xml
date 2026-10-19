@@ -419,8 +419,6 @@
   <string name="synchronization_force_sync_summary">Пересихронизировать ваши подписки и состояние выпусков</string>
   <string name="synchronization_sync_summary">Сихронизировать ваши подписки и изменения состояния выпусков</string>
   <string name="dialog_choose_sync_service_title">Выберите провайдера синхронизации</string>
-  <string name="pref_playback_speed_sum">Выбрать значения скорости, доступные при воспроизведении</string>
-  <string name="pref_feed_playback_speed_sum">Скорость, с которой будут изначально воспроизводиться выпуски этого подкаста</string>
   <string name="pref_feed_skip">Автоматический пропуск</string>
   <string name="pref_feed_skip_sum">Пропускать вступительную и заключительную часть.</string>
   <string name="pref_feed_skip_ending">Пропуск в конце</string>

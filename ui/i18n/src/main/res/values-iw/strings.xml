@@ -419,8 +419,6 @@
   <string name="synchronization_force_sync_summary">סנכרון המינוי ושינויי מצב הפרקים מחדש</string>
   <string name="synchronization_sync_summary">סנכרון המינוי ושינויי מצב הפרקים</string>
   <string name="dialog_choose_sync_service_title">בחירת ספק סנכרון</string>
-  <string name="pref_playback_speed_sum">התאמת המהירויות הזמינות למהירות נגינה משתנה</string>
-  <string name="pref_feed_playback_speed_sum">המהירות שתחול על פרקים בפודקאסט זה כשאלו מתחילים להתנגן</string>
   <string name="pref_feed_skip">לדלג אוטומטית</string>
   <string name="pref_feed_skip_sum">לדלג על הקדמה ותודות בסיום.</string>
   <string name="pref_feed_skip_ending">לדלג על האחרון</string>

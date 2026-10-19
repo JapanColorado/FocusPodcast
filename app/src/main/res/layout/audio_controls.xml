@@ -25,6 +25,108 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <allen.town.podcast.common.views.AccentImageView
+                style="@style/Widget.Material3.Button.IconButton"
+                android:importantForAccessibility="no"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_vocal_enhancement" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/voice_label"
+                    android:textColor="?android:textColorPrimary" />
+
+                <!-- describes the selected mode -->
+                <com.google.android.material.textview.MaterialTextView
+                    android:id="@+id/voice_description"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?attr/textAppearanceBodySmall"
+                    android:textColor="?android:textColorSecondary"
+                    tools:text="@string/voice_clear_sum" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- Full width rather than indented under the title, so four buttons fit on a phone. -->
+        <com.google.android.material.button.MaterialButtonToggleGroup
+            android:id="@+id/clear_voice_group"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:contentDescription="@string/voice_label"
+            app:selectionRequired="true"
+            app:singleSelection="true">
+
+            <allen.town.podcast.common.views.AccentMaterialOutlineBackgroundStatusButton
+                android:id="@+id/voice_original"
+                style="?attr/materialButtonOutlinedStyle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:maxLines="1"
+                android:paddingStart="2dp"
+                android:paddingEnd="2dp"
+                android:text="@string/voice_original"
+                app:autoSizeMaxTextSize="14sp"
+                app:autoSizeMinTextSize="10sp"
+                app:autoSizeTextType="uniform" />
+
+            <allen.town.podcast.common.views.AccentMaterialOutlineBackgroundStatusButton
+                android:id="@+id/voice_clear"
+                style="?attr/materialButtonOutlinedStyle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:maxLines="1"
+                android:paddingStart="2dp"
+                android:paddingEnd="2dp"
+                android:text="@string/voice_clear"
+                app:autoSizeMaxTextSize="14sp"
+                app:autoSizeMinTextSize="10sp"
+                app:autoSizeTextType="uniform" />
+
+            <allen.town.podcast.common.views.AccentMaterialOutlineBackgroundStatusButton
+                android:id="@+id/voice_clear_plus"
+                style="?attr/materialButtonOutlinedStyle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:maxLines="1"
+                android:paddingStart="2dp"
+                android:paddingEnd="2dp"
+                android:text="@string/voice_clear_plus"
+                app:autoSizeMaxTextSize="14sp"
+                app:autoSizeMinTextSize="10sp"
+                app:autoSizeTextType="uniform" />
+
+            <allen.town.podcast.common.views.AccentMaterialOutlineBackgroundStatusButton
+                android:id="@+id/voice_warm"
+                style="?attr/materialButtonOutlinedStyle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:maxLines="1"
+                android:paddingStart="2dp"
+                android:paddingEnd="2dp"
+                android:text="@string/voice_warm"
+                app:autoSizeMaxTextSize="14sp"
+                app:autoSizeMinTextSize="10sp"
+                app:autoSizeTextType="uniform" />
+        </com.google.android.material.button.MaterialButtonToggleGroup>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             android:orientation="horizontal">
 
             <allen.town.podcast.common.views.AccentImageView
@@ -65,80 +167,6 @@
         </LinearLayout>
 
         <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center_vertical"
-            android:orientation="horizontal">
-
-            <allen.town.podcast.common.views.AccentImageView
-                style="@style/Widget.Material3.Button.IconButton"
-                android:importantForAccessibility="no"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@drawable/ic_vocal_enhancement" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical">
-
-                <com.google.android.material.textview.MaterialTextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/clear_voice"
-                    android:textColor="?android:textColorPrimary" />
-
-                <com.google.android.material.textview.MaterialTextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/clear_voice_hint"
-                    android:textAppearance="?attr/textAppearanceBodySmall"
-                    android:textColor="?android:textColorSecondary" />
-            </LinearLayout>
-        </LinearLayout>
-
-        <com.google.android.material.button.MaterialButtonToggleGroup
-            android:id="@+id/clear_voice_group"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="48dp"
-            android:layout_marginBottom="8dp"
-            android:contentDescription="@string/clear_voice"
-            app:selectionRequired="true"
-            app:singleSelection="true">
-
-            <allen.town.podcast.common.views.AccentMaterialOutlineBackgroundStatusButton
-                android:id="@+id/clear_voice_off"
-                style="?attr/materialButtonOutlinedStyle"
-                android:paddingStart="4dp"
-                android:paddingEnd="4dp"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="@string/clear_voice_off" />
-
-            <allen.town.podcast.common.views.AccentMaterialOutlineBackgroundStatusButton
-                android:id="@+id/clear_voice_light"
-                style="?attr/materialButtonOutlinedStyle"
-                android:paddingStart="4dp"
-                android:paddingEnd="4dp"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="@string/clear_voice_light" />
-
-            <allen.town.podcast.common.views.AccentMaterialOutlineBackgroundStatusButton
-                android:id="@+id/clear_voice_strong"
-                style="?attr/materialButtonOutlinedStyle"
-                android:paddingStart="4dp"
-                android:paddingEnd="4dp"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="@string/clear_voice_strong" />
-        </com.google.android.material.button.MaterialButtonToggleGroup>
-
-        <LinearLayout
             android:id="@+id/detect_ads_row"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -162,64 +190,14 @@
                 app:track="@drawable/switch_track" />
         </LinearLayout>
 
-        <LinearLayout
-            android:id="@+id/equalizer"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="?rectSelector"
-            android:gravity="center_vertical"
-            android:orientation="horizontal">
-
-            <allen.town.podcast.common.views.AccentImageView
-                style="@style/Widget.Material3.Button.IconButton"
-                android:importantForAccessibility="no"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@drawable/ic_equalizer" />
-
-            <com.google.android.material.textview.MaterialTextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/equalizer"
-                android:textColor="?android:textColorPrimary" />
-        </LinearLayout>
-
-        <com.google.android.material.card.MaterialCardView
+        <include
             android:id="@+id/own_settings_card"
+            layout="@layout/own_settings_card"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="32dp"
             android:visibility="gone"
-            app:cardBackgroundColor="?colorSecondaryContainer"
-            app:cardCornerRadius="12dp"
-            app:cardElevation="0dp"
-            app:cardPreventCornerOverlap="false"
-            tools:visibility="visible">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center_vertical"
-                android:minHeight="60dp"
-                android:orientation="horizontal"
-                android:paddingStart="12dp"
-                android:paddingEnd="4dp">
-
-                <com.google.android.material.textview.MaterialTextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="@string/podcast_own_settings_applied"
-                    android:textColor="?colorSecondary" />
-
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/reset_to_default"
-                    style="@style/Widget.Material3.Button.TextButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/reset_to_default" />
-            </LinearLayout>
-        </com.google.android.material.card.MaterialCardView>
+            tools:visibility="visible" />
     </LinearLayout>
 
 </ScrollView>

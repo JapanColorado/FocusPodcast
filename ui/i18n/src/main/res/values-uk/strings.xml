@@ -397,8 +397,6 @@
   <string name="pref_episode_cache_unlimited">Без обмежень</string>
   <string name="pref_gpodnet_setlogin_information_title">Змінити інформацію для входу</string>
   <string name="pref_gpodnet_setlogin_information_sum">Змінити інформацію щодо облікового запису gpodder.net</string>
-  <string name="pref_playback_speed_sum">Налаштування доступних швидкостей для відтворення зі зміненою швидкістю</string>
-  <string name="pref_feed_playback_speed_sum">Швидкість, яку слід використовувати при запуску відтворення аудіо для епізодів у цьому подкасті</string>
   <string name="pref_feed_skip">Автоматичний пропуск</string>
   <string name="pref_feed_skip_sum">Пропустити введення та кінцеві титри.</string>
   <string name="pref_feed_skip_ending">Пропуск в кінці</string>

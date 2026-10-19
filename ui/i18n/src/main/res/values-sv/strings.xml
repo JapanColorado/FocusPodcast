@@ -389,8 +389,6 @@
   <string name="synchronization_force_sync_summary">Synkronisera om alla prenumerationer och episodstatusar</string>
   <string name="synchronization_sync_summary">Synkronisera ändringar i prenumerationer och episodstatusar</string>
   <string name="dialog_choose_sync_service_title">Välj synkroniseringsleverantör</string>
-  <string name="pref_playback_speed_sum">Anpassa de tillgängliga hastigheterna för variabel uppspelningshastighet</string>
-  <string name="pref_feed_playback_speed_sum">Uppspelningshastigheten att använda för episoder i denna podcast</string>
   <string name="pref_feed_skip">Automatisk överhoppning</string>
   <string name="pref_feed_skip_sum">Hoppa över intron och outron.</string>
   <string name="pref_feed_skip_ending">Hoppa över slut</string>

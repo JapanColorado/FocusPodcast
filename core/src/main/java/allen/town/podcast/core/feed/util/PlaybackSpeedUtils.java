@@ -2,19 +2,23 @@ package allen.town.podcast.core.feed.util;
 
 import static allen.town.podcast.model.feed.FeedPreferences.SPEED_USE_GLOBAL;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+
+import org.greenrobot.eventbus.EventBus;
 
 import allen.town.podcast.core.pref.Prefs;
 import allen.town.podcast.core.storage.DBWriter;
+import allen.town.podcast.event.settings.SpeedPresetChangedEvent;
 import allen.town.podcast.model.feed.FeedPreferences;
 import allen.town.podcast.model.playback.MediaType;
 import allen.town.podcast.model.playback.Playable;
 
 /**
  * Resolves and stores playback speeds. A subscribed podcast follows the global default speed
- * from Settings until the speed is changed in the player, which gives that podcast its own speed
- * ({@link FeedPreferences#getFeedPlaybackSpeed()}); {@link FeedPreferences#SPEED_USE_GLOBAL}
- * makes it follow the default again.
+ * from Settings until the speed is changed for it (in the player or in its Feed Settings), which
+ * gives that podcast its own speed ({@link FeedPreferences#getFeedPlaybackSpeed()});
+ * {@link FeedPreferences#SPEED_USE_GLOBAL} ("Reset to default") makes it follow the default again.
  */
 public final class PlaybackSpeedUtils {
 
@@ -69,5 +73,43 @@ public final class PlaybackSpeedUtils {
             Prefs.setPlaybackSpeed(speed);
         }
         return 0;
+    }
+
+    /**
+     * Changes the global default speed for {@code mediaType} (audio when null) and tells the
+     * playback service, so a playing podcast that follows the default picks it up.
+     */
+    public static void setDefaultSpeed(float speed, @Nullable MediaType mediaType) {
+        if (mediaType == MediaType.VIDEO) {
+            Prefs.setVideoPlaybackSpeed(speed);
+        } else {
+            Prefs.setPlaybackSpeed(speed);
+        }
+        EventBus.getDefault().post(new SpeedPresetChangedEvent(SPEED_USE_GLOBAL, 0));
+    }
+
+    /**
+     * Stores a podcast's own speed, or {@link FeedPreferences#SPEED_USE_GLOBAL} to make it follow
+     * the default, from a screen other than the player: updates {@code preferences}, writes only
+     * the speed column and tells the playback service.
+     */
+    public static void setFeedSpeed(long feedId, @NonNull FeedPreferences preferences, float speed) {
+        preferences.setFeedPlaybackSpeed(speed);
+        // only the speed column: the player may have changed other fields since the caller loaded
+        DBWriter.updateFeedPreferences(feedId, stored -> stored.setFeedPlaybackSpeed(speed));
+        EventBus.getDefault().post(new SpeedPresetChangedEvent(speed, feedId));
+    }
+
+    /**
+     * "Set as default" outside the player: makes the podcast's own speed the global default for
+     * audio and then makes the podcast follow the default again. Does nothing when the podcast
+     * has no speed of its own.
+     */
+    public static void makeDefault(long feedId, @NonNull FeedPreferences preferences) {
+        if (!hasOwnSpeed(preferences)) {
+            return;
+        }
+        setDefaultSpeed(preferences.getFeedPlaybackSpeed(), MediaType.AUDIO);
+        setFeedSpeed(feedId, preferences, SPEED_USE_GLOBAL);
     }
 }

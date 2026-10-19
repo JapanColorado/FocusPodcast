@@ -426,8 +426,6 @@
   <string name="pref_episode_cache_unlimited">غير محدود</string>
   <string name="pref_gpodnet_setlogin_information_title">تغيير بيانات تسجيل الدخول</string>
   <string name="pref_gpodnet_setlogin_information_sum">قم بتغيير بيانات تسجيل الدخول لحساب gpodder.net الخاص بك.</string>
-  <string name="pref_playback_speed_sum">حدد السرعات المتوفرة في التشغيل متعدد السرعات</string>
-  <string name="pref_feed_playback_speed_sum">سرعة التشغيل الصوتي عند بدء تشغيل حلقات من هذا البودكاست </string>
   <string name="pref_feed_skip">تخطي تلقائي</string>
   <string name="pref_feed_skip_sum">تخطى المقدمة والمؤخرة</string>
   <string name="pref_feed_skip_ending">تخطى الآخر</string>

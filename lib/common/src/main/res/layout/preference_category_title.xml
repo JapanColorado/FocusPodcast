@@ -15,7 +15,8 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
 
     <com.google.android.material.textview.MaterialTextView
         android:id="@android:id/title"
@@ -26,4 +27,18 @@
         android:paddingEnd="16dp"
         android:textAppearance="@style/TextViewSubtitle1"
         tools:text="@tools:sample/full_names" />
+
+    <!-- Optional explanation under the title; Preference hides it when there is no summary. -->
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@android:id/summary"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingStart="@dimen/pref_title_padding"
+        android:paddingTop="2dp"
+        android:paddingEnd="16dp"
+        android:textAppearance="@style/TextViewNormal"
+        android:textColor="?android:attr/textColorSecondary"
+        android:visibility="gone"
+        tools:text="@tools:sample/lorem"
+        tools:visibility="visible" />
 </LinearLayout>

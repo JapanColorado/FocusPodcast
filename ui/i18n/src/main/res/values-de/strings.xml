@@ -371,8 +371,6 @@
   <string name="pref_episode_cache_unlimited">Unbegrenzt</string>
   <string name="pref_gpodnet_setlogin_information_title">Anmeldeinformationen ändern</string>
   <string name="pref_gpodnet_setlogin_information_sum">Ändere die Anmeldeinformationen deines gpodder.net Profils</string>
-  <string name="pref_playback_speed_sum">Anpassen der verfügbaren Geschwindigkeiten für die Wiedergabe mit variabler Geschwindigkeit</string>
-  <string name="pref_feed_playback_speed_sum">Abspielgeschwindigkeit für Episoden dieses Podcasts</string>
   <string name="pref_feed_skip">Automatisches Überspringen</string>
   <string name="pref_feed_skip_sum">Einleitung und Ende überspringen.</string>
   <string name="pref_feed_skip_ending">Ende überspringen</string>
