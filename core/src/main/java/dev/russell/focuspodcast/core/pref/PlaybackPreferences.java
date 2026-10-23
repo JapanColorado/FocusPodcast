@@ -2,6 +2,8 @@ package dev.russell.focuspodcast.core.pref;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.preference.PreferenceManager;
 
 import android.util.Log;
@@ -52,6 +54,15 @@ public class PlaybackPreferences implements SharedPreferences.OnSharedPreference
      * The current player status as int.
      */
     private static final String PREF_CURRENT_PLAYER_STATUS = "dev.russell.focuspodcast.preferences.currentPlayerStatus";
+
+    /**
+     * The episode the video mode below belongs to ({@code String.valueOf} of its identifier), and
+     * whether it is being watched (true) or listened to (false). It only ever describes the
+     * episode being played: starting any other episode replaces or clears it, and so does the
+     * end of playback.
+     */
+    private static final String PREF_VIDEO_MODE_MEDIA = "dev.russell.focuspodcast.preferences.videoModeMedia";
+    private static final String PREF_VIDEO_MODE_SHOW_VIDEO = "dev.russell.focuspodcast.preferences.videoModeShowVideo";
 
 
 
@@ -105,6 +116,41 @@ public class PlaybackPreferences implements SharedPreferences.OnSharedPreference
         return prefs.getBoolean(PREF_CURRENT_EPISODE_IS_VIDEO, false);
     }
 
+    /**
+     * Whether the episode with this key is being watched (true) or listened to (false), or null
+     * when no choice has been recorded for it.
+     */
+    @Nullable
+    public static Boolean getVideoMode(@NonNull String mediaKey) {
+        if (!mediaKey.equals(prefs.getString(PREF_VIDEO_MODE_MEDIA, null))) {
+            return null;
+        }
+        return prefs.getBoolean(PREF_VIDEO_MODE_SHOW_VIDEO, true);
+    }
+
+    /** The recorded mode whichever episode it belongs to, or null when none is recorded. */
+    @Nullable
+    public static Boolean getVideoModeOfAnyMedia() {
+        if (prefs.getString(PREF_VIDEO_MODE_MEDIA, null) == null) {
+            return null;
+        }
+        return prefs.getBoolean(PREF_VIDEO_MODE_SHOW_VIDEO, true);
+    }
+
+    public static void clearVideoMode() {
+        prefs.edit()
+                .remove(PREF_VIDEO_MODE_MEDIA)
+                .remove(PREF_VIDEO_MODE_SHOW_VIDEO)
+                .apply();
+    }
+
+    public static void writeVideoMode(@NonNull String mediaKey, boolean showVideo) {
+        prefs.edit()
+                .putString(PREF_VIDEO_MODE_MEDIA, mediaKey)
+                .putBoolean(PREF_VIDEO_MODE_SHOW_VIDEO, showVideo)
+                .apply();
+    }
+
     public static int getCurrentPlayerStatus() {
         return prefs.getInt(PREF_CURRENT_PLAYER_STATUS, PLAYER_STATUS_OTHER);
     }
@@ -115,6 +161,8 @@ public class PlaybackPreferences implements SharedPreferences.OnSharedPreference
         editor.putLong(PREF_CURRENTLY_PLAYING_FEED_ID, NO_MEDIA_PLAYING);
         editor.putLong(PREF_CURRENTLY_PLAYING_FEEDMEDIA_ID, NO_MEDIA_PLAYING);
         editor.putInt(PREF_CURRENT_PLAYER_STATUS, PLAYER_STATUS_OTHER);
+        editor.remove(PREF_VIDEO_MODE_MEDIA);
+        editor.remove(PREF_VIDEO_MODE_SHOW_VIDEO);
         editor.apply();
     }
 

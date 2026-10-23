@@ -28,7 +28,6 @@ import dev.russell.focuspodcast.core.service.playback.PlaybackService
 import dev.russell.focuspodcast.core.util.playback.PlaybackController
 import dev.russell.focuspodcast.event.playback.PlaybackPositionEvent
 import dev.russell.focuspodcast.event.playback.PlaybackServiceEvent
-import dev.russell.focuspodcast.model.playback.MediaType
 import dev.russell.focuspodcast.model.playback.Playable
 import dev.russell.focuspodcast.playback.base.PlayerStatus
 import dev.russell.focuspodcast.view.PlayButton
@@ -72,14 +71,14 @@ class MiniPlayerFragment : Fragment() {
         (root.rootView as? MaterialCardView)?.accentBackgroundColor()
 
         root.findViewById<View>(R.id.fragmentLayout).setOnClickListener { v: View? ->
-            val media = controller?.media
+            val controller = this.controller ?: return@setOnClickListener
+            val media = controller.media
             if (media != null) {
-                if (media.mediaType == MediaType.AUDIO) {
-                    (requireActivity() as MainActivity).bottomSheet.setState(BottomSheetBehavior.STATE_EXPANDED)
+                if (controller.isShowingVideo) {
+                    startActivity(PlaybackService.getPlayerActivityIntent(activity, media))
                 } else {
-                    val intent =
-                        PlaybackService.getPlayerActivityIntent(activity, media)
-                    startActivity(intent)
+                    // Audio, and video episodes listened to as audio only, use the player sheet.
+                    (requireActivity() as MainActivity).bottomSheet.setState(BottomSheetBehavior.STATE_EXPANDED)
                 }
             }
         }
@@ -94,7 +93,7 @@ class MiniPlayerFragment : Fragment() {
         butPlay.setOnClickListener { v: View? ->
             val controller = this.controller ?: return@setOnClickListener
             val media = controller.media
-            if (media != null && media.mediaType == MediaType.VIDEO && controller.status != PlayerStatus.PLAYING) {
+            if (media != null && controller.isShowingVideo && controller.status != PlayerStatus.PLAYING) {
                 controller.playPause()
                 requireContext().startActivity(
                     PlaybackService
@@ -232,7 +231,7 @@ class MiniPlayerFragment : Fragment() {
             )
             .apply(options)
             .into(imgvCover)
-        if (controller?.isPlayingVideoLocally == true) {
+        if (controller?.isShowingVideo == true) {
             (activity as? MainActivity)?.let {
                 it.bottomSheet.setState(BottomSheetBehavior.STATE_COLLAPSED)
             }

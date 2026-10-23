@@ -84,6 +84,11 @@ object Prefs {
     const val NOW_PLAYING_SCREEN_ID = "now_playing_screen_id"
     const val PREF_SMART_MARK_AS_PLAYED_SECS = "pref_smart_mark_as_played_secs"
 
+    /** "video" or "audio": how video episodes play by default (see `VideoModeUtils`). */
+    const val PREF_VIDEO_EPISODES_AS = "pref_video_episodes_as"
+    const val VIDEO_EPISODES_AS_VIDEO = "video"
+    const val VIDEO_EPISODES_AS_AUDIO = "audio"
+
     // Ad auto-skip
     const val PREF_AD_SKIP_ENABLED = "pref_ad_skip_enabled"
     const val PREF_AD_SKIP_SENSITIVITY = "pref_ad_skip_sensitivity"
@@ -299,6 +304,18 @@ object Prefs {
         get() = SyncPrefs.podcastSearchEngineList
         set(value) {
             SyncPrefs.podcastSearchEngineList = value
+        }
+
+    /**
+     * The default for how video episodes play, used by every feed without a choice of its own
+     * (see `VideoModeUtils`): true opens the video player, false plays them as audio only. True on
+     * a fresh install.
+     */
+    @JvmStatic
+    var isPlayVideoAsVideo: Boolean
+        get() = PlaybackPrefs.isPlayVideoAsVideo
+        set(asVideo) {
+            PlaybackPrefs.isPlayVideoAsVideo = asVideo
         }
 
     @JvmStatic

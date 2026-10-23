@@ -5,6 +5,7 @@ import dev.russell.focuspodcast.common.views.AccentMaterialDialog
 import dev.russell.focuspodcast.common.util.TopSnackbarUtil.showSnack
 import dev.russell.focuspodcast.R
 import dev.russell.focuspodcast.core.feed.util.AdSkipUtils
+import dev.russell.focuspodcast.core.feed.util.VideoModeUtils
 import dev.russell.focuspodcast.core.feed.util.PlaybackSpeedUtils
 import dev.russell.focuspodcast.core.pref.Prefs
 import dev.russell.focuspodcast.core.pref.Prefs.isEnableAutodownload
@@ -182,6 +183,7 @@ class FeedSettingsFragment : Fragment() {
                     setupPlaybackSpeedPreference()
                     setupFeedAutoSkipPreference()
                     setupFeedAdSkipPreference()
+                    setupFeedVideoModePreference()
                     setupEpisodeNotificationPreference()
                     setupAudiobookPreference()
                     setupTags()
@@ -263,6 +265,58 @@ class FeedSettingsFragment : Fragment() {
                     updateFeedAdSkipSummary(pref, feedPreferences.adSkipOverride)
                     false
                 }
+        }
+
+        /**
+         * How this podcast's video episodes play: follow the default from the playback settings,
+         * or video / audio only for this podcast. Built like the ad-skip choice above; nothing is
+         * playing differently until the next video episode starts, so no event is posted.
+         */
+        private fun setupFeedVideoModePreference() {
+            val feedPreferences = this.feedPreferences ?: return
+            val feed = this.feed ?: return
+            val pref = requirePreference<ListPreference>(PREF_VIDEO_MODE)
+            pref.entries = arrayOf(
+                getString(
+                    if (Prefs.isPlayVideoAsVideo) R.string.feed_video_default_video
+                    else R.string.feed_video_default_audio
+                ),
+                getString(R.string.video_episodes_as_video),
+                getString(R.string.video_episodes_as_audio)
+            )
+            pref.entryValues = arrayOf(VIDEO_MODE_DEFAULT, VIDEO_MODE_VIDEO, VIDEO_MODE_AUDIO)
+            updateFeedVideoModeSummary(pref, feedPreferences.videoOverride)
+            pref.onPreferenceChangeListener =
+                Preference.OnPreferenceChangeListener { _: Preference?, newValue: Any? ->
+                    when (newValue as? String) {
+                        VIDEO_MODE_VIDEO -> VideoModeUtils.setVideoForFeed(feed, true)
+                        VIDEO_MODE_AUDIO -> VideoModeUtils.setVideoForFeed(feed, false)
+                        else -> VideoModeUtils.resetVideoForFeed(feed)
+                    }
+                    updateFeedVideoModeSummary(pref, feedPreferences.videoOverride)
+                    false
+                }
+        }
+
+        /** Selects the stored choice and spells out the effective state in the summary. */
+        private fun updateFeedVideoModeSummary(pref: ListPreference, override: Boolean?) {
+            when (override) {
+                null -> {
+                    pref.value = VIDEO_MODE_DEFAULT
+                    pref.setSummary(
+                        if (Prefs.isPlayVideoAsVideo) R.string.feed_video_default_video_sum
+                        else R.string.feed_video_default_audio_sum
+                    )
+                }
+                true -> {
+                    pref.value = VIDEO_MODE_VIDEO
+                    pref.setSummary(R.string.feed_video_video_sum)
+                }
+                false -> {
+                    pref.value = VIDEO_MODE_AUDIO
+                    pref.setSummary(R.string.feed_video_audio_sum)
+                }
+            }
         }
 
         /**
@@ -658,6 +712,10 @@ class FeedSettingsFragment : Fragment() {
             private const val AD_SKIP_DEFAULT = "default"
             private const val AD_SKIP_ON = "on"
             private const val AD_SKIP_OFF = "off"
+            private const val PREF_VIDEO_MODE = "feedVideoMode"
+            private const val VIDEO_MODE_DEFAULT = "default"
+            private const val VIDEO_MODE_VIDEO = "video"
+            private const val VIDEO_MODE_AUDIO = "audio"
             private const val PREF_AUDIO_EFFECT = "feed_audio_effect_pref"
             private const val PREF_TAGS = "tags"
             private const val PREF_VOLUME_REDUCTION = "volumeReduction"

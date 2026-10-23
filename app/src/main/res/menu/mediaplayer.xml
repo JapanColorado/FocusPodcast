@@ -55,12 +55,13 @@
         android:visible="false">
     </item>
 
+    <!-- Shown for a video episode that is being listened to as audio only. -->
     <item
-        android:id="@+id/player_switch_to_audio_only"
-        custom:showAsAction="collapseActionView"
-        android:icon="@drawable/music_circle_outline"
-        android:title="@string/player_switch_to_audio_only"
-        android:visible="false">
+        android:id="@+id/watch_video_item"
+        android:icon="@drawable/ic_round_videocam_24"
+        android:title="@string/watch_video"
+        android:visible="false"
+        custom:showAsAction="always">
     </item>
 
     <item

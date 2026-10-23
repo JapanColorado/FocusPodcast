@@ -122,6 +122,7 @@ public class Db {
     public static final String KEY_EPISODE_NOTIFICATION = DbSchema.KEY_EPISODE_NOTIFICATION;
     public static final String KEY_FEED_PLAYBACK_SPEED = DbSchema.KEY_FEED_PLAYBACK_SPEED;
     public static final String KEY_FEED_AD_SKIP_OVERRIDE = DbSchema.KEY_FEED_AD_SKIP_OVERRIDE;
+    public static final String KEY_FEED_VIDEO_OVERRIDE = DbSchema.KEY_FEED_VIDEO_OVERRIDE;
     public static final String KEY_AUDIOBOOK = DbSchema.KEY_AUDIOBOOK;
     public static final String KEY_DISC_NUMBER = DbSchema.KEY_DISC_NUMBER;
     public static final String KEY_TRACK_NUMBER = DbSchema.KEY_TRACK_NUMBER;

@@ -14,6 +14,16 @@
         <item>high</item>
     </string-array>
 
+    <!-- How video episodes play by default; values match Prefs.VIDEO_EPISODES_AS_* -->
+    <string-array name="video_episodes_as_options">
+        <item>@string/video_episodes_as_video</item>
+        <item>@string/video_episodes_as_audio</item>
+    </string-array>
+    <string-array name="video_episodes_as_values" translatable="false">
+        <item>video</item>
+        <item>audio</item>
+    </string-array>
+
     <!-- The Voice modes, in ClearVoiceLevel order -->
     <string-array name="clear_voice_options">
         <item>@string/voice_original</item>

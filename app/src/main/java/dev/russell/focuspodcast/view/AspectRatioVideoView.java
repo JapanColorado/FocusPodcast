@@ -1,32 +1,18 @@
 package dev.russell.focuspodcast.view;
 
-/*
- * Copyright (C) Google Inc.  All rights reserved.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 import android.content.Context;
 import android.util.AttributeSet;
-import android.widget.VideoView;
+import android.view.SurfaceView;
 
-public class AspectRatioVideoView extends VideoView {
+/**
+ * The surface the video player renders into. It measures itself to the largest size with the
+ * video's aspect ratio that fits the space its parent offers, so the picture is letterboxed
+ * rather than stretched; until the video size is known it fills that space.
+ */
+public class AspectRatioVideoView extends SurfaceView {
 
-
-    private int mVideoWidth;
-    private int mVideoHeight;
-    private float mAvailableWidth = -1;
-    private float mAvailableHeight = -1;
+    private int videoWidth;
+    private int videoHeight;
 
     public AspectRatioVideoView(Context context) {
         this(context, null);
@@ -38,78 +24,37 @@ public class AspectRatioVideoView extends VideoView {
 
     public AspectRatioVideoView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
+    }
 
-        mVideoWidth = 0;
-        mVideoHeight = 0;
+    /** Sets the display size of the video (non-square pixels already applied). */
+    public void setVideoSize(int width, int height) {
+        if (width == videoWidth && height == videoHeight) {
+            return;
+        }
+        videoWidth = width;
+        videoHeight = height;
+        requestLayout();
+    }
+
+    /** Width divided by height of the video, or 0 while it is unknown. */
+    public float getVideoAspectRatio() {
+        return videoWidth > 0 && videoHeight > 0 ? (float) videoWidth / videoHeight : 0f;
     }
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        if (mVideoWidth <= 0 || mVideoHeight <= 0) {
-            super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+        int availableWidth = MeasureSpec.getSize(widthMeasureSpec);
+        int availableHeight = MeasureSpec.getSize(heightMeasureSpec);
+        if (videoWidth <= 0 || videoHeight <= 0 || availableWidth <= 0 || availableHeight <= 0) {
+            setMeasuredDimension(availableWidth, availableHeight);
             return;
         }
-
-        if (mAvailableWidth < 0 || mAvailableHeight < 0) {
-            mAvailableWidth = getWidth();
-            mAvailableHeight = getHeight();
-        }
-
-        float heightRatio = (float) mVideoHeight / mAvailableHeight;
-        float widthRatio = (float) mVideoWidth / mAvailableWidth;
-
-        int scaledHeight;
-        int scaledWidth;
-
-        if (heightRatio > widthRatio) {
-            scaledHeight = (int) Math.ceil((float) mVideoHeight
-                    / heightRatio);
-            scaledWidth = (int) Math.ceil((float) mVideoWidth
-                    / heightRatio);
+        float videoRatio = (float) videoWidth / videoHeight;
+        float availableRatio = (float) availableWidth / availableHeight;
+        if (videoRatio > availableRatio) {
+            setMeasuredDimension(availableWidth, Math.round(availableWidth / videoRatio));
         } else {
-            scaledHeight = (int) Math.ceil((float) mVideoHeight
-                    / widthRatio);
-            scaledWidth = (int) Math.ceil((float) mVideoWidth
-                    / widthRatio);
+            setMeasuredDimension(Math.round(availableHeight * videoRatio), availableHeight);
         }
-
-        setMeasuredDimension(scaledWidth, scaledHeight);
     }
-
-    /**
-     * Source code originally from:
-     * http://clseto.mysinablog.com/index.php?op=ViewArticle&articleId=2992625
-     *
-     * @param videoWidth
-     * @param videoHeight
-     */
-    public void setVideoSize(int videoWidth, int videoHeight) {
-        // Set the new video size
-        mVideoWidth = videoWidth;
-        mVideoHeight = videoHeight;
-
-        /*
-         * If this isn't set the video is stretched across the
-         * SurfaceHolders display surface (i.e. the SurfaceHolder
-         * as the same size and the video is drawn to fit this
-         * display area). We want the size to be the video size
-         * and allow the aspectratio to handle how the surface is shown
-         */
-        getHolder().setFixedSize(videoWidth, videoHeight);
-
-        requestLayout();
-        invalidate();
-    }
-
-    /**
-     * Sets the maximum size that the view might expand to
-     * @param width
-     * @param height
-     */
-    public void setAvailableSize(float width, float height) {
-        mAvailableWidth = width;
-        mAvailableHeight = height;
-        requestLayout();
-    }
-
 }

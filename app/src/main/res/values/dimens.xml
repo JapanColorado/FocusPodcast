@@ -10,4 +10,7 @@
     <dimen name="series_detail_subscribe_button_size">52dp</dimen>
     <dimen name="nav_drawer_max_screen_size">480dp</dimen>
     <integer name="anim_duration_medium">300</integer>
+    <!-- Video player: the arrow over "N seconds back/forward", and the gap after a chip's icon. -->
+    <dimen name="video_skip_feedback_icon">36dp</dimen>
+    <dimen name="video_chip_icon_padding">4dp</dimen>
 </resources>

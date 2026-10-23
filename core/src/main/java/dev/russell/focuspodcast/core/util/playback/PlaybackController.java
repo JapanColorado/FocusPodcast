@@ -28,6 +28,7 @@ import java.util.Collections;
 import java.util.List;
 
 import dev.russell.focuspodcast.core.feed.util.PlaybackSpeedUtils;
+import dev.russell.focuspodcast.core.feed.util.VideoModeUtils;
 import dev.russell.focuspodcast.core.pref.PlaybackPreferences;
 import dev.russell.focuspodcast.core.service.playback.PlaybackService;
 import dev.russell.focuspodcast.core.storage.DBWriter;
@@ -552,6 +553,34 @@ public abstract class PlaybackController {
             return PlaybackService.getCurrentMediaType() == MediaType.VIDEO;
         } else {
             return getMedia() != null && getMedia().getMediaType() == MediaType.VIDEO;
+        }
+    }
+
+    /**
+     * Whether the media is a video that should be shown in the video player now (it was not
+     * switched to audio only, and its podcast does not play videos as audio).
+     */
+    public boolean isShowingVideo() {
+        return !PlaybackService.isCasting() && VideoModeUtils.shouldShowVideo(getMedia());
+    }
+
+    /** Switches the playing episode between the video player and audio only. */
+    public void setShowVideo(boolean showVideo) {
+        Playable media = getMedia();
+        if (media == null) {
+            return;
+        }
+        VideoModeUtils.setShowVideo(media, showVideo);
+    }
+
+    /** True while playback is inside an ad segment that {@link #skipCurrentAd()} can skip. */
+    public boolean isInSkippableAdSegment() {
+        return playbackService != null && playbackService.isInSkippableAdSegment();
+    }
+
+    public void skipCurrentAd() {
+        if (playbackService != null) {
+            playbackService.skipCurrentAd();
         }
     }
 

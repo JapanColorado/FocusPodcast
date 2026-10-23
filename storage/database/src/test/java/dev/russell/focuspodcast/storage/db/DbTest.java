@@ -71,8 +71,8 @@ public class DbTest {
     // ---------------------------------------------------------------- schema
 
     @Test
-    public void freshDatabaseIsAtSchemaVersion11() {
-        assertEquals(11, Db.VERSION);
+    public void freshDatabaseIsAtSchemaVersion12() {
+        assertEquals(12, Db.VERSION);
         assertEquals(Db.VERSION, Db.getInstance().getDb().getVersion());
     }
 
@@ -384,6 +384,49 @@ public class DbTest {
         assertEquals(null, mappedAdSkipOverrideOf(feed.getId()));
     }
 
+    /**
+     * The real 11 -&gt; 12 step: rebuild the feeds table without the video column, run the ladder
+     * and check the column comes back with every existing feed following the default.
+     */
+    @Test
+    public void upgradeFromVersion11AddsTheVideoOverrideColumn() {
+        SQLiteDatabase db = Db.getInstance().getDb();
+        String videoColumn = DbSchema.KEY_FEED_VIDEO_OVERRIDE + " INTEGER,";
+        assertTrue(DbSchema.CREATE_TABLE_FEEDS.contains(videoColumn));
+        db.execSQL("DROP TABLE " + Db.TABLE_NAME_FEEDS);
+        db.execSQL(DbSchema.CREATE_TABLE_FEEDS.replace(videoColumn, ""));
+        assertFalse(columnNames(db, Db.TABLE_NAME_FEEDS).contains(Db.KEY_FEED_VIDEO_OVERRIDE));
+        db.execSQL("INSERT INTO " + Db.TABLE_NAME_FEEDS + " (" + Db.KEY_TITLE + ") VALUES ('Old')");
+        long old = lastInsertId(db);
+
+        DBUpgrade.upgrade(db, 11, Db.VERSION);
+
+        assertTrue(columnNames(db, Db.TABLE_NAME_FEEDS).contains(Db.KEY_FEED_VIDEO_OVERRIDE));
+        assertEquals(null, mappedVideoOverrideOf(old));
+        // Running it again must not fail on the column it just added.
+        DBUpgrade.upgrade(db, 11, Db.VERSION);
+    }
+
+    @Test
+    public void feedVideoOverrideRoundTripsAllThreeStates() {
+        Db db = Db.getInstance();
+        Feed feed = newFeed("Video feed");
+        db.setCompleteFeed(feed);
+        assertEquals("a new feed follows the global default", null, mappedVideoOverrideOf(feed.getId()));
+
+        feed.getPreferences().setVideoOverride(Boolean.TRUE);
+        db.setFeedPreferences(feed.getPreferences());
+        assertEquals(Boolean.TRUE, mappedVideoOverrideOf(feed.getId()));
+
+        feed.getPreferences().setVideoOverride(Boolean.FALSE);
+        db.setFeedPreferences(feed.getPreferences());
+        assertEquals(Boolean.FALSE, mappedVideoOverrideOf(feed.getId()));
+
+        feed.getPreferences().setVideoOverride(null);
+        db.setFeedPreferences(feed.getPreferences());
+        assertEquals(null, mappedVideoOverrideOf(feed.getId()));
+    }
+
     // ------------------------------------------------------ feed warnings
 
     @Test
@@ -496,11 +539,12 @@ public class DbTest {
     }
 
     /**
-     * Replaces the feeds table with the current layout minus the override column (and the later
-     * persons column, which the upgrade ladder adds back).
+     * Replaces the feeds table with the current layout minus the ad-skip override column (and the
+     * later video override and persons columns, which the upgrade ladder adds back).
      */
     private static void rebuildFeedsTable(SQLiteDatabase db, String tail) {
-        String current = "," + Db.KEY_FEED_AD_SKIP_OVERRIDE + " INTEGER," + Db.KEY_PERSONS + " TEXT)";
+        String current = "," + Db.KEY_FEED_AD_SKIP_OVERRIDE + " INTEGER,"
+                + Db.KEY_FEED_VIDEO_OVERRIDE + " INTEGER," + Db.KEY_PERSONS + " TEXT)";
         assertTrue(DbSchema.CREATE_TABLE_FEEDS.endsWith(current));
         db.execSQL("DROP TABLE " + Db.TABLE_NAME_FEEDS);
         db.execSQL(DbSchema.CREATE_TABLE_FEEDS.replace(current, tail));
@@ -548,6 +592,14 @@ public class DbTest {
         try (Cursor cursor = Db.getInstance().getFeedCursor(feedId)) {
             assertTrue(cursor.moveToFirst());
             return FeedCursorMapper.convert(cursor).getPreferences().getAdSkipOverride();
+        }
+    }
+
+    /** Reads a feed's video override back through the real cursor mapper. */
+    private static Boolean mappedVideoOverrideOf(long feedId) {
+        try (Cursor cursor = Db.getInstance().getFeedCursor(feedId)) {
+            assertTrue(cursor.moveToFirst());
+            return FeedCursorMapper.convert(cursor).getPreferences().getVideoOverride();
         }
     }
 

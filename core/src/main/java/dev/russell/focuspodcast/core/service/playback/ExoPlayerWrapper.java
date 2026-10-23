@@ -39,6 +39,7 @@ import com.google.android.exoplayer2.upstream.DataSource;
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
 
 import com.google.android.exoplayer2.upstream.HttpDataSource;
+import com.google.android.exoplayer2.video.VideoSize;
 
 import dev.russell.focuspodcast.core.ClientConfig;
 import dev.russell.focuspodcast.core.R;
@@ -49,12 +50,15 @@ import dev.russell.focuspodcast.core.service.download.HttpCredentialEncoder;
 import dev.russell.focuspodcast.core.util.NetworkUtils;
 import dev.russell.focuspodcast.core.util.playback.DownMixAudioProcessor;
 import dev.russell.focuspodcast.core.util.playback.IPlayer;
+import dev.russell.focuspodcast.event.playback.VideoFirstFrameEvent;
+import dev.russell.focuspodcast.event.playback.VideoSizeChangedEvent;
 import dev.russell.focuspodcast.model.playback.ClearVoiceLevel;
 import dev.russell.focuspodcast.playback.base.PlaybackServiceMediaPlayer;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import org.antennapod.audio.MediaPlayer;
+import org.greenrobot.eventbus.EventBus;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -76,6 +80,9 @@ public class ExoPlayerWrapper implements IPlayer {
     private PlaybackParameters playbackParameters;
     private MediaPlayer.OnInfoListener infoListener;
     private DefaultTrackSelector trackSelector;
+    /** Last size reported by {@code onVideoSizeChanged}; 0 until the first video frame. */
+    private volatile int videoWidth = 0;
+    private volatile int videoHeight = 0;
     public DownMixAudioProcessor downMixAudioProcessor = null;
     private ClearVoiceAudioProcessor clearVoiceAudioProcessor = null;
     /** Kept here so that a player rebuilt by {@link #reset()} starts with the same level. */
@@ -105,6 +112,9 @@ public class ExoPlayerWrapper implements IPlayer {
                 DefaultLoadControl.DEFAULT_BUFFER_FOR_PLAYBACK_AFTER_REBUFFER_MS);
         loadControl.setBackBuffer(Prefs.getRewindSecs() * 1000 + 500, true);
         trackSelector = new DefaultTrackSelector(context);
+        // No surface yet: decode no video until one is attached (see setDisplay).
+        trackSelector.setParameters(trackSelector.buildUponParameters()
+                .setTrackTypeDisabled(C.TRACK_TYPE_VIDEO, true));
         exoPlayer = new SimpleExoPlayer.Builder(context, new DownMixRenderFactory(context))
                 .setTrackSelector(trackSelector)
                 .setLoadControl(loadControl.build())
@@ -140,6 +150,21 @@ public class ExoPlayerWrapper implements IPlayer {
                         audioErrorListener.accept(cause != null ? cause.getMessage() : error.getMessage());
                     }
                 }
+            }
+
+            @Override
+            public void onVideoSizeChanged(@NonNull VideoSize size) {
+                if (size.width <= 0 || size.height <= 0) {
+                    return;
+                }
+                videoWidth = Math.round(size.width * size.pixelWidthHeightRatio);
+                videoHeight = size.height;
+                EventBus.getDefault().post(new VideoSizeChangedEvent(videoWidth, videoHeight));
+            }
+
+            @Override
+            public void onRenderedFirstFrame() {
+                EventBus.getDefault().post(new VideoFirstFrameEvent());
             }
 
             @Override
@@ -273,9 +298,17 @@ public class ExoPlayerWrapper implements IPlayer {
         setDataSource(s, null, null);
     }
 
+    /**
+     * Attaches the video player's surface, or detaches it (null) when the episode goes on as audio
+     * only. Without a surface the video track is switched off as well: ExoPlayer would otherwise
+     * keep decoding video into a placeholder surface, which costs battery and makes a video the
+     * device cannot decode fail an episode that is only being listened to.
+     */
     @Override
     public void setDisplay(SurfaceHolder sh) {
         exoPlayer.setVideoSurfaceHolder(sh);
+        trackSelector.setParameters(trackSelector.buildUponParameters()
+                .setTrackTypeDisabled(C.TRACK_TYPE_VIDEO, sh == null));
     }
 
     @Override
@@ -391,18 +424,13 @@ public class ExoPlayerWrapper implements IPlayer {
         this.audioErrorListener = audioErrorListener;
     }
 
+    /** The display width of the video (non-square pixels applied), or 0 before the first frame. */
     int getVideoWidth() {
-        if (exoPlayer.getVideoFormat() == null) {
-            return 0;
-        }
-        return exoPlayer.getVideoFormat().width;
+        return videoWidth;
     }
 
     int getVideoHeight() {
-        if (exoPlayer.getVideoFormat() == null) {
-            return 0;
-        }
-        return exoPlayer.getVideoFormat().height;
+        return videoHeight;
     }
 
     void setOnBufferingUpdateListener(MediaPlayer.OnBufferingUpdateListener bufferingUpdateListener) {

@@ -1,5 +1,6 @@
 package dev.russell.focuspodcast.view
 
+import dev.russell.focuspodcast.core.feed.util.VideoModeUtils
 import dev.russell.focuspodcast.common.util.ImageUtils.getColoredDrawable
 import dev.russell.focuspodcast.common.util.ImageUtils.getColoredVectorDrawable
 import dev.russell.focuspodcast.common.util.Timber
@@ -35,7 +36,6 @@ import dev.russell.focuspodcast.core.util.playback.PlaybackServiceStarter
 import dev.russell.focuspodcast.dialog.UseStreamConfirmDialog
 import dev.russell.focuspodcast.model.feed.FeedItem
 import dev.russell.focuspodcast.model.feed.FeedMedia
-import dev.russell.focuspodcast.model.playback.MediaType
 import android.app.Activity
 import java.util.*
 
@@ -1087,7 +1087,7 @@ class PlayPauseProgressButton : View, ItemActionButton {
             PlaybackServiceStarter(context, media)
                 .callEvenIfRunning(true)
                 .start()
-            if (media.mediaType == MediaType.VIDEO) {
+            if (VideoModeUtils.shouldShowVideo(media)) {
                 context.startActivity(PlaybackService.getPlayerActivityIntent(context, media))
             }
         }

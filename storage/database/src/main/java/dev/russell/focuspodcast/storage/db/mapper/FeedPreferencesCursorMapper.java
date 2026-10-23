@@ -72,6 +72,9 @@ public abstract class FeedPreferencesCursorMapper {
         int indexAdSkip = cursor.getColumnIndex(Db.KEY_FEED_AD_SKIP_OVERRIDE);
         Boolean adSkipOverride = indexAdSkip < 0 || cursor.isNull(indexAdSkip)
                 ? null : cursor.getInt(indexAdSkip) > 0;
+        int indexVideo = cursor.getColumnIndex(Db.KEY_FEED_VIDEO_OVERRIDE);
+        Boolean videoOverride = indexVideo < 0 || cursor.isNull(indexVideo)
+                ? null : cursor.getInt(indexVideo) > 0;
 
         FeedPreferences preferences = new FeedPreferences(feedId,
                 autoDownload,
@@ -87,6 +90,7 @@ public abstract class FeedPreferencesCursorMapper {
                 showNotification,
                 new HashSet<>(Arrays.asList(tagsString.split(FeedPreferences.TAG_SEPARATOR))),skipSilence, clearVoiceLevel, mono, isUseFeedEffect);
         preferences.setAdSkipOverride(adSkipOverride);
+        preferences.setVideoOverride(videoOverride);
         // Version 7 column; a projection without it reads "not an audiobook".
         int indexAudiobook = cursor.getColumnIndex(Db.KEY_AUDIOBOOK);
         preferences.setAudiobook(indexAudiobook >= 0 && cursor.getInt(indexAudiobook) > 0);

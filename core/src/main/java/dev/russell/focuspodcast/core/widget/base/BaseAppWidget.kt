@@ -32,9 +32,9 @@ import dev.russell.focuspodcast.theme.util.VersionUtils
 import dev.russell.focuspodcast.core.R
 import dev.russell.focuspodcast.core.widget.WidgetUpdater
 import dev.russell.focuspodcast.core.widget.WidgetUpdaterWorker
-import dev.russell.focuspodcast.model.playback.MediaType
 import dev.russell.focuspodcast.playback.base.PlayerStatus
 import dev.russell.focuspodcast.ui.startintent.MainActivityStarter
+import dev.russell.focuspodcast.core.feed.util.VideoModeUtils
 import dev.russell.focuspodcast.ui.startintent.VideoPlayerActivityStarter
 import java.util.*
 
@@ -144,7 +144,7 @@ abstract class BaseAppWidget : AppWidgetProvider() {
         }
 
         val startMediaPlayer =
-            if (widgetState.media != null && widgetState.media.mediaType == MediaType.VIDEO) {
+            if (VideoModeUtils.shouldShowVideo(widgetState.media)) {
                 VideoPlayerActivityStarter(context).pendingIntent
             } else {
                 MainActivityStarter(context).withOpenPlayer().pendingIntent

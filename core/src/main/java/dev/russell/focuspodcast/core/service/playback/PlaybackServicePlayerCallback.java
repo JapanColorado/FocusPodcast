@@ -16,6 +16,7 @@ import java.util.List;
 
 import dev.russell.focuspodcast.core.R;
 import dev.russell.focuspodcast.core.feed.util.AudiobookUtils;
+import dev.russell.focuspodcast.core.feed.util.VideoModeUtils;
 import dev.russell.focuspodcast.core.pref.PlaybackPreferences;
 import dev.russell.focuspodcast.core.pref.Prefs;
 import dev.russell.focuspodcast.core.pref.SleepTimerPreferences;
@@ -69,6 +70,7 @@ class PlaybackServicePlayerCallback implements PlaybackServiceMediaPlayer.PSMPCa
         switch (newInfo.playerStatus) {
             case INITIALIZED:
                 if (service.mediaPlayer.getPSMPInfo().playable != null) {
+                    VideoModeUtils.onMediaStarted(service.mediaPlayer.getPSMPInfo().playable);
                     PlaybackPreferences.writeMediaPlaying(service.mediaPlayer.getPSMPInfo().playable,
                             service.mediaPlayer.getPSMPInfo().playerStatus);
                 }
@@ -76,6 +78,8 @@ class PlaybackServicePlayerCallback implements PlaybackServiceMediaPlayer.PSMPCa
                 break;
             case PREPARED:
                 if (service.mediaPlayer.getPSMPInfo().playable != null) {
+                    // Car mode skips INITIALIZED, so the choice is pinned here as well.
+                    VideoModeUtils.onMediaStarted(service.mediaPlayer.getPSMPInfo().playable);
                     PlaybackPreferences.writeMediaPlaying(service.mediaPlayer.getPSMPInfo().playable,
                             service.mediaPlayer.getPSMPInfo().playerStatus);
                 }

@@ -12,7 +12,7 @@ import static dev.russell.focuspodcast.model.feed.FeedPreferences.SPEED_USE_GLOB
 final class DbSchema {
 
     public static final String DATABASE_NAME = "focusPodcastApp.db";
-    public static final int VERSION = 11;
+    public static final int VERSION = 12;
 
     /**
      * Maximum number of arguments for IN-operator.
@@ -97,6 +97,11 @@ final class DbSchema {
      * DEFAULT clause on purpose, so a feed row inserted without its preferences follows the default.
      */
     public static final String KEY_FEED_AD_SKIP_OVERRIDE = "feed_ad_skip_override";
+    /**
+     * How a feed's video episodes play: NULL follows the global default, 1 is video, 0 is audio
+     * only. No DEFAULT clause, for the same reason as {@link #KEY_FEED_AD_SKIP_OVERRIDE}.
+     */
+    public static final String KEY_FEED_VIDEO_OVERRIDE = "feed_video_override";
     /**
      * The version-4 per-feed opt-out ({@code INTEGER DEFAULT 1}, 0 meaning "never skip in this
      * feed"). Only {@link DBUpgrade} still reads it; SQLite on older API levels cannot drop the
@@ -195,6 +200,7 @@ final class DbSchema {
             + KEY_AUDIOBOOK + " INTEGER DEFAULT 0,"
             + KEY_CLEAR_VOICE + " INTEGER DEFAULT 0,"
             + KEY_FEED_AD_SKIP_OVERRIDE + " INTEGER,"
+            + KEY_FEED_VIDEO_OVERRIDE + " INTEGER,"
             + KEY_PERSONS + " TEXT)";
 
     static final String CREATE_TABLE_FEED_ITEMS = "CREATE TABLE "
@@ -373,6 +379,7 @@ final class DbSchema {
             TABLE_NAME_FEEDS + "." + KEY_FEED_SKIP_ENDING,
             TABLE_NAME_FEEDS + "." + KEY_EPISODE_NOTIFICATION,
             TABLE_NAME_FEEDS + "." + KEY_FEED_AD_SKIP_OVERRIDE,
+            TABLE_NAME_FEEDS + "." + KEY_FEED_VIDEO_OVERRIDE,
             TABLE_NAME_FEEDS + "." + KEY_AUDIOBOOK,
             TABLE_NAME_FEEDS + "." + KEY_PERSONS
     };

@@ -85,6 +85,13 @@ public class FeedPreferences implements Serializable {
     @Nullable
     private Boolean adSkipOverride = null;
     /**
+     * This feed's own choice for how its video episodes play: TRUE as video, FALSE as audio only,
+     * null to follow the global default ({@code Prefs.isPlayVideoAsVideo()}). Never read this as
+     * the effective value; {@code VideoModeUtils.isVideoPreferred(FeedPreferences)} resolves it.
+     */
+    @Nullable
+    private Boolean videoOverride = null;
+    /**
      * Whether this feed is an audiobook: its items play one after the other in the feed's order,
      * are never NEW and stay out of the podcast-wide lists and the automatic refresh.
      */
@@ -111,6 +118,20 @@ public class FeedPreferences implements Serializable {
     /** @param override TRUE or FALSE for this feed's own choice, null to follow the default. */
     public void setAdSkipOverride(@Nullable Boolean override) {
         this.adSkipOverride = override;
+    }
+
+    /**
+     * @return TRUE (video) or FALSE (audio only) when the user chose how this feed's video
+     *         episodes play, null when the feed follows the global default.
+     */
+    @Nullable
+    public Boolean getVideoOverride() {
+        return videoOverride;
+    }
+
+    /** @param override TRUE or FALSE for this feed's own choice, null to follow the default. */
+    public void setVideoOverride(@Nullable Boolean override) {
+        this.videoOverride = override;
     }
 
     public FeedPreferences(long feedID, boolean autoDownload, AutoDeleteAction autoDeleteAction,

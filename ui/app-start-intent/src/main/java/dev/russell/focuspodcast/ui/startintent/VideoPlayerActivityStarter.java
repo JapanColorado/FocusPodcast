@@ -11,6 +11,12 @@ import android.os.Build;
  */
 public class VideoPlayerActivityStarter {
     public static final String INTENT = "dev.russell.focuspodcast.intents.VIDEO_PLAYER";
+    /**
+     * Optional: {@code String.valueOf} the identifier of the episode the player is opened for.
+     * Until the playback service has switched to it, the player waits instead of judging the
+     * episode that was playing before.
+     */
+    public static final String EXTRA_MEDIA_KEY = "dev.russell.focuspodcast.extra.videoMediaKey";
     private final Intent intent;
     private final Context context;
 

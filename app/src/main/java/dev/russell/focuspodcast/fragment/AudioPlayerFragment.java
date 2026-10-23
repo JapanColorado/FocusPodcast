@@ -104,6 +104,7 @@ import dev.russell.focuspodcast.model.feed.Chapter;
 import dev.russell.focuspodcast.model.feed.FeedItem;
 import dev.russell.focuspodcast.model.feed.FeedMedia;
 import dev.russell.focuspodcast.model.feed.FeedPreferences;
+import dev.russell.focuspodcast.model.playback.MediaType;
 import dev.russell.focuspodcast.model.playback.Playable;
 import dev.russell.focuspodcast.playback.LibraryViewModel;
 import dev.russell.focuspodcast.view.AdMarkerSeekBar;
@@ -927,6 +928,9 @@ public class AudioPlayerFragment extends Fragment implements
         toolbar.getMenu().findItem(R.id.disable_sleeptimer_item)
                 .setVisible(sleepTimerInToolbar && controller.sleepTimerActive());
         toolbar.getMenu().findItem(R.id.driver_mode).setVisible(true);
+        // A video episode shows here only while it is listened to as audio only.
+        toolbar.getMenu().findItem(R.id.watch_video_item).setVisible(!isDriveMode
+                && media != null && media.getMediaType() == MediaType.VIDEO && !PlaybackService.isCasting());
         MenuIconUtil.showToolbarMenuIcon(toolbar);
     }
 
@@ -953,6 +957,13 @@ public class AudioPlayerFragment extends Fragment implements
         final int itemId = item.getItemId();
         if (itemId == R.id.disable_sleeptimer_item || itemId == R.id.set_sleeptimer_item) {
             new SleepTimerDialog().show(getChildFragmentManager(), "SleepTimerDialog");
+            return true;
+        } else if (itemId == R.id.watch_video_item) {
+            controller.setShowVideo(true);
+            if (getActivity() instanceof MainActivity) {
+                ((MainActivity) getActivity()).getBottomSheet().setState(BottomSheetBehavior.STATE_COLLAPSED);
+            }
+            startActivity(PlaybackService.getPlayerActivityIntent(requireContext(), media));
             return true;
         } else if (itemId == R.id.audio_controls) {
             PlaybackControlsDialog dialog = PlaybackControlsDialog.newInstance(feedItem != null ? feedItem.getFeedId() : 0);

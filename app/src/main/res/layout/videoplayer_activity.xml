@@ -1,169 +1,476 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<!--
+    The video player. These constraints are the landscape (full screen) arrangement: the video fills
+    the screen and the controls overlay it. VideoPlayerLayout derives the portrait arrangement from
+    them (video under the toolbar, title and controls below it, always visible).
+-->
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/videoPlayerContainer"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/black"
-    android:orientation="vertical">
+    android:background="@color/black">
 
-    <dev.russell.focuspodcast.view.AspectRatioVideoView
-        android:id="@+id/videoView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center" />
+    <FrameLayout
+        android:id="@+id/videoFrame"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="@color/black"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
 
-    <dev.russell.focuspodcast.common.views.AccentProgressBar
-        android:id="@+id/progressBar"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:indeterminateOnly="true"
-        android:visibility="invisible" />
-
-    <LinearLayout
-        android:id="@+id/controlsContainer"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:background="@android:color/transparent"
-        android:layoutDirection="ltr"
-        android:orientation="horizontal"
-        android:padding="16dp">
-
-        <androidx.appcompat.widget.AppCompatImageButton
-            android:id="@+id/rewindButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="8dp"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:contentDescription="@string/rewind_label"
-            app:srcCompat="@drawable/ic_fast_rewind" />
-
-        <dev.russell.focuspodcast.view.PlayButton
-            android:id="@+id/playButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="8dp"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:contentDescription="@string/pause_label"
-            app:srcCompat="@drawable/ic_pause_video_white" />
-
-        <androidx.appcompat.widget.AppCompatImageButton
-            android:id="@+id/fastForwardButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="8dp"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:contentDescription="@string/fast_forward_label"
-            app:srcCompat="@drawable/ic_fast_forward_video_white" />
-
-    </LinearLayout>
-
-    <androidx.appcompat.widget.AppCompatImageView
-        android:id="@+id/skipAnimationImage"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:padding="64dp"
-        android:visibility="gone" />
-
-    <LinearLayout
-        android:id="@+id/bottomControlsContainer"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|center"
-        android:orientation="vertical">
-
-        <com.google.android.material.card.MaterialCardView
-            android:id="@+id/seekCardView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_marginBottom="12dp"
-            android:alpha="0"
-            app:cardBackgroundColor="?colorControlNormal"
-            app:cardCornerRadius="8dp"
-            app:cardElevation="0dp"
-            tools:alpha="1">
-
-            <com.google.android.material.textview.MaterialTextView
-                android:id="@+id/seekPositionLabel"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:paddingLeft="24dp"
-                android:paddingTop="4dp"
-                android:paddingRight="24dp"
-                android:paddingBottom="4dp"
-                android:textColor="@color/white"
-                android:textSize="24sp"
-                tools:text="1:06:29" />
-
-        </com.google.android.material.card.MaterialCardView>
-
-        <RelativeLayout
+        <dev.russell.focuspodcast.view.AspectRatioVideoView
+            android:id="@+id/videoView"
             android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:background="#20000000"
-            android:layoutDirection="ltr"
-            android:paddingTop="8dp">
+            android:layout_height="match_parent"
+            android:layout_gravity="center" />
 
-            <com.google.android.material.textview.MaterialTextView
-                android:id="@+id/positionLabel"
+        <!-- Cover art over the surface until the first video frame is drawn, instead of black. -->
+        <ImageView
+            android:id="@+id/videoPlaceholder"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/black"
+            android:importantForAccessibility="no"
+            android:scaleType="fitCenter" />
+
+        <View
+            android:id="@+id/skipBackFeedback"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:alpha="0"
+            android:background="@drawable/bg_video_skip_feedback_left" />
+
+        <View
+            android:id="@+id/skipForwardFeedback"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:alpha="0"
+            android:background="@drawable/bg_video_skip_feedback_right" />
+
+        <TextView
+            android:id="@+id/skipFeedbackLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical|start"
+            android:layout_marginStart="48dp"
+            android:layout_marginEnd="48dp"
+            android:alpha="0"
+            android:drawablePadding="4dp"
+            android:gravity="center"
+            android:shadowColor="#99000000"
+            android:shadowRadius="4"
+            android:textColor="@color/white"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            tools:alpha="1"
+            tools:text="10 seconds back" />
+
+        <dev.russell.focuspodcast.common.views.AccentProgressBar
+            android:id="@+id/progressBar"
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:layout_gravity="center"
+            android:indeterminateOnly="true"
+            android:visibility="invisible" />
+
+        <LinearLayout
+            android:id="@+id/errorPanel"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="#E6000000"
+            android:clickable="true"
+            android:focusable="true"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:padding="24dp"
+            android:visibility="gone"
+            tools:visibility="visible">
+
+            <ImageView
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:importantForAccessibility="no"
+                app:srcCompat="@drawable/ic_round_error_outline_24"
+                app:tint="@color/white" />
+
+            <TextView
+                android:id="@+id/errorTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignParentStart="true"
-                android:layout_alignParentLeft="true"
-                android:layout_alignParentTop="true"
-                android:layout_marginStart="8dp"
-                android:layout_marginLeft="8dp"
-                android:layout_marginTop="4dp"
-                android:layout_marginEnd="8dp"
-                android:layout_marginRight="8dp"
-                android:layout_marginBottom="8dp"
-                android:text="@string/position_default_label"
+                android:layout_marginTop="8dp"
+                android:gravity="center"
+                android:text="@string/video_error_title"
                 android:textColor="@color/white"
+                android:textSize="18sp"
                 android:textStyle="bold" />
 
-            <com.google.android.material.textview.MaterialTextView
-                android:id="@+id/durationLabel"
+            <TextView
+                android:id="@+id/errorMessage"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignParentTop="true"
-                android:layout_alignParentEnd="true"
-                android:layout_alignParentRight="true"
-                android:layout_marginStart="8dp"
-                android:layout_marginLeft="8dp"
                 android:layout_marginTop="4dp"
-                android:layout_marginEnd="8dp"
-                android:layout_marginRight="8dp"
-                android:layout_marginBottom="8dp"
-                android:text="@string/position_default_label"
-                android:textColor="@color/white"
-                android:textStyle="bold" />
+                android:gravity="center"
+                android:maxLines="4"
+                android:textColor="#B3FFFFFF"
+                tools:text="Decoder init failed: OMX.qcom.video.decoder.hevc" />
 
-            <dev.russell.focuspodcast.common.views.AccentSeekbar
-                android:id="@+id/sbPosition"
-                android:layout_width="0px"
+            <LinearLayout
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_centerInParent="true"
-                android:layout_toStartOf="@+id/durationLabel"
-                android:layout_toLeftOf="@+id/durationLabel"
-                android:layout_toEndOf="@+id/positionLabel"
-                android:layout_toRightOf="@+id/positionLabel"
-                android:max="500" />
+                android:layout_marginTop="16dp"
+                android:orientation="horizontal">
 
-        </RelativeLayout>
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/errorRetryButton"
+                    style="@style/Widget.MaterialComponents.Button.TextButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="8dp"
+                    android:text="@string/retry_label"
+                    android:textColor="@color/white" />
 
-    </LinearLayout>
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/errorAudioButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/video_play_as_audio"
+                    android:textColor="@color/black"
+                    app:backgroundTint="@color/white"
+                    app:icon="@drawable/ic_headphones"
+                    app:iconTint="@color/black" />
+            </LinearLayout>
+        </LinearLayout>
+    </FrameLayout>
+
+    <View
+        android:id="@+id/topScrim"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="@drawable/bg_video_scrim_top"
+        app:layout_constraintBottom_toBottomOf="@id/toolbar"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <View
+        android:id="@+id/bottomScrim"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="-48dp"
+        android:background="@drawable/bg_video_scrim_bottom"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/seekRow" />
 
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/toolbar"
-        style="@style/Toolbar"
-        android:layout_height="?actionBarSize"
-        app:layout_collapseMode="pin"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:background="@android:color/transparent"
+        android:minHeight="?actionBarSize"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:navigationContentDescription="@string/player_switch_to_audio_only"
         app:navigationIcon="@drawable/ic_keyboard_backspace_black"
-        app:titleTextAppearance="@style/ToolbarTextAppearanceNormal" />
-</FrameLayout>
+        app:navigationIconTint="@color/white"
+        app:subtitleTextColor="#B3FFFFFF"
+        app:titleTextAppearance="@style/ToolbarTextAppearanceNormal"
+        app:titleTextColor="@color/white" />
+
+    <!-- Title, podcast and chapter under the video; portrait only (landscape uses the toolbar). -->
+    <LinearLayout
+        android:id="@+id/infoContainer"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingStart="16dp"
+        android:paddingTop="16dp"
+        android:paddingEnd="16dp"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/videoFrame"
+        tools:visibility="visible">
+
+        <TextView
+            android:id="@+id/episodeTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:maxLines="2"
+            android:textColor="@color/white"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            tools:text="Episode 312: The one where the title is long enough to wrap" />
+
+        <TextView
+            android:id="@+id/episodeSubtitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:textColor="#B3FFFFFF"
+            tools:text="Podcast name · Chapter 3" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/transportControls"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:layoutDirection="ltr"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <FrameLayout
+            android:id="@+id/rewindButton"
+            android:layout_width="56dp"
+            android:layout_height="56dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/rewind_label">
+
+            <ImageView
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_gravity="center"
+                android:importantForAccessibility="no"
+                app:srcCompat="@drawable/ic_video_replay"
+                app:tint="@color/white" />
+
+            <TextView
+                android:id="@+id/rewindLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginTop="3dp"
+                android:importantForAccessibility="no"
+                android:textColor="@color/white"
+                android:textSize="9sp"
+                android:textStyle="bold"
+                tools:text="10" />
+        </FrameLayout>
+
+        <dev.russell.focuspodcast.view.PlayButton
+            android:id="@+id/playButton"
+            android:layout_width="72dp"
+            android:layout_height="72dp"
+            android:layout_marginStart="40dp"
+            android:layout_marginEnd="40dp"
+            android:background="@drawable/bg_video_play_button"
+            android:contentDescription="@string/pause_label"
+            android:padding="12dp"
+            android:scaleType="fitCenter"
+            app:srcCompat="@drawable/ic_pause_video_white"
+            app:tint="@color/white" />
+
+        <FrameLayout
+            android:id="@+id/fastForwardButton"
+            android:layout_width="56dp"
+            android:layout_height="56dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/fast_forward_label">
+
+            <ImageView
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_gravity="center"
+                android:importantForAccessibility="no"
+                app:srcCompat="@drawable/ic_video_forward"
+                app:tint="@color/white" />
+
+            <TextView
+                android:id="@+id/fastForwardLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginTop="3dp"
+                android:importantForAccessibility="no"
+                android:textColor="@color/white"
+                android:textSize="9sp"
+                android:textStyle="bold"
+                tools:text="30" />
+        </FrameLayout>
+    </LinearLayout>
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/seekCardView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:alpha="0"
+        app:cardBackgroundColor="#CC000000"
+        app:cardCornerRadius="8dp"
+        app:cardElevation="0dp"
+        app:layout_constraintBottom_toTopOf="@id/seekRow"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        tools:alpha="1">
+
+        <TextView
+            android:id="@+id/seekPositionLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:maxWidth="280dp"
+            android:paddingStart="16dp"
+            android:paddingTop="4dp"
+            android:paddingEnd="16dp"
+            android:paddingBottom="4dp"
+            android:textColor="@color/white"
+            android:textSize="20sp"
+            tools:text="1:06:29" />
+    </com.google.android.material.card.MaterialCardView>
+
+    <LinearLayout
+        android:id="@+id/seekRow"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:layoutDirection="ltr"
+        android:orientation="horizontal"
+        android:paddingStart="12dp"
+        android:paddingEnd="12dp"
+        app:layout_constraintBottom_toTopOf="@id/actionsRow"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <TextView
+            android:id="@+id/positionLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:minWidth="44dp"
+            android:text="@string/position_default_label"
+            android:textColor="@color/white"
+            android:textSize="12sp" />
+
+        <dev.russell.focuspodcast.view.AdMarkerSeekBar
+            android:id="@+id/sbPosition"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:max="1000"
+            android:paddingTop="12dp"
+            android:paddingBottom="12dp" />
+
+        <TextView
+            android:id="@+id/durationLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="?attr/selectableItemBackground"
+            android:gravity="end"
+            android:minWidth="44dp"
+            android:text="@string/position_default_label"
+            android:textColor="@color/white"
+            android:textSize="12sp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/actionsRow"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingStart="8dp"
+        android:paddingEnd="8dp"
+        android:paddingBottom="8dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <TextView
+            android:id="@+id/speedButton"
+            android:layout_width="wrap_content"
+            android:layout_height="32dp"
+            android:layout_marginStart="4dp"
+            android:layout_marginEnd="4dp"
+            android:background="@drawable/bg_video_chip"
+            android:contentDescription="@string/playback_speed"
+            android:gravity="center"
+            android:minWidth="56dp"
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp"
+            android:textColor="@color/white"
+            android:textStyle="bold"
+            tools:text="1.5×" />
+
+        <TextView
+            android:id="@+id/sleepTimerButton"
+            android:layout_width="wrap_content"
+            android:layout_height="32dp"
+            android:layout_marginStart="4dp"
+            android:layout_marginEnd="4dp"
+            android:background="@drawable/bg_video_chip"
+            android:contentDescription="@string/sleep_timer_label"
+            android:drawablePadding="4dp"
+            android:gravity="center"
+            android:minWidth="40dp"
+            android:paddingStart="10dp"
+            android:paddingEnd="10dp"
+            android:textColor="@color/white"
+            app:drawableStartCompat="@drawable/ic_sleep"
+            app:drawableTint="@color/white"
+            tools:text="12:30" />
+
+        <ImageButton
+            android:id="@+id/bookmarkButton"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginStart="4dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/bookmark_add"
+            app:srcCompat="@drawable/ic_bookmark_add"
+            app:tint="@color/white" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/skipAdButton"
+            style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:layout_marginStart="8dp"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            android:text="@string/custom_action_skip_ad"
+            android:textColor="@color/black"
+            android:visibility="gone"
+            app:backgroundTint="@color/white"
+            app:cornerRadius="20dp"
+            app:icon="@drawable/ic_skip_24dp"
+            app:iconTint="@color/black"
+            tools:visibility="visible" />
+
+        <Space
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+
+        <ImageButton
+            android:id="@+id/pipButton"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/video_picture_in_picture"
+            app:srcCompat="@drawable/ic_picture_in_picture"
+            app:tint="@color/white" />
+
+        <ImageButton
+            android:id="@+id/fullscreenButton"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginStart="4dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/video_enter_fullscreen"
+            app:srcCompat="@drawable/ic_fullscreen"
+            app:tint="@color/white" />
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

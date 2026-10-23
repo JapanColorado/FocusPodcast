@@ -1137,4 +1137,24 @@
     <string name="storage_player_episode_kept">The episode in the player isn\'t deleted from here.</string>
     <string name="storage_player_episode_kept_titled">The episode in the player isn\'t deleted from here (%1$s).</string>
     <string name="storage_cleanup_link_sum">Choose when played episodes are deleted automatically</string>
+    <!-- Video episodes: watched in the video player or listened to as audio only -->
+    <string name="video_episodes_as_title">Video episodes</string>
+    <string name="video_episodes_as_video">Watch as video</string>
+    <string name="video_episodes_as_audio">Listen as audio only</string>
+    <string name="video_episodes_as_video_sum">Open in the video player. A podcast can choose otherwise in its settings.</string>
+    <string name="video_episodes_as_audio_sum">Play in the normal player without the picture. A podcast can choose otherwise in its settings.</string>
+    <string name="feed_video_default_video">Use default (watch as video)</string>
+    <string name="feed_video_default_audio">Use default (listen as audio only)</string>
+    <string name="feed_video_default_video_sum">Follows the default from the Playback settings, currently watch as video</string>
+    <string name="feed_video_default_audio_sum">Follows the default from the Playback settings, currently listen as audio only</string>
+    <string name="feed_video_video_sum">Video episodes of this podcast open the video player, whatever the default</string>
+    <string name="feed_video_audio_sum">Video episodes of this podcast play as audio only, whatever the default</string>
+    <string name="watch_video">Watch video</string>
+    <string name="video_enter_fullscreen">Full screen</string>
+    <string name="video_exit_fullscreen">Exit full screen</string>
+    <string name="video_picture_in_picture">Picture-in-picture</string>
+    <string name="video_error_title">This video can\'t be played</string>
+    <string name="video_play_as_audio">Play as audio</string>
+    <string name="video_skipped_back">%d seconds back</string>
+    <string name="video_skipped_forward">%d seconds forward</string>
 </resources>

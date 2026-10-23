@@ -83,6 +83,13 @@ class DBUpgrade {
             addTextColumn(db, DbSchema.TABLE_NAME_FEED_ITEMS, DbSchema.KEY_PERSONS);
             addTextColumn(db, DbSchema.TABLE_NAME_FEED_ITEMS, DbSchema.KEY_SOUNDBITES);
         }
+        if (oldVersion < 12) {
+            // How a feed's video episodes play. NULL (every existing feed) follows the default.
+            if (!hasColumn(db, DbSchema.TABLE_NAME_FEEDS, DbSchema.KEY_FEED_VIDEO_OVERRIDE)) {
+                db.execSQL("ALTER TABLE " + DbSchema.TABLE_NAME_FEEDS + " ADD COLUMN "
+                        + DbSchema.KEY_FEED_VIDEO_OVERRIDE + " INTEGER");
+            }
+        }
     }
 
     private static void addTextColumn(final SQLiteDatabase db, final String table, final String column) {

@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The video player's toolbar. Speed, sleep timer and bookmarks are buttons under the seek bar. -->
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:custom="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/audio_only_item"
+        android:icon="@drawable/ic_headphones"
+        android:title="@string/player_switch_to_audio_only"
+        custom:iconTint="@color/white"
+        custom:showAsAction="always" />
+    <item
+        android:id="@+id/audio_controls"
+        android:icon="@drawable/ic_sliders"
+        android:title="@string/audio_controls"
+        custom:iconTint="@color/white"
+        custom:showAsAction="always" />
+    <item
+        android:id="@+id/extra_info_item"
+        android:title="@string/show_info_label"
+        custom:showAsAction="never" />
+    <item
+        android:id="@+id/add_to_favorites_item"
+        android:title="@string/add_to_favorite_label"
+        android:visible="false"
+        custom:showAsAction="never" />
+    <item
+        android:id="@+id/remove_from_favorites_item"
+        android:title="@string/remove_from_favorite_label"
+        android:visible="false"
+        custom:showAsAction="never" />
+    <item
+        android:id="@+id/open_feed_item"
+        android:title="@string/open_podcast"
+        android:visible="false"
+        custom:showAsAction="never" />
+    <item
+        android:id="@+id/visit_website_item"
+        android:title="@string/visit_website_label"
+        android:visible="false"
+        custom:showAsAction="never" />
+    <item
+        android:id="@+id/share_item"
+        android:title="@string/share_label_with_ellipses"
+        android:visible="false"
+        custom:showAsAction="never" />
+</menu>

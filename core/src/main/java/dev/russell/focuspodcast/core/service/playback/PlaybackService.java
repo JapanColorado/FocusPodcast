@@ -35,6 +35,7 @@ import dev.russell.focuspodcast.core.R;
 import dev.russell.focuspodcast.core.feed.util.AudioEffectUtils;
 import dev.russell.focuspodcast.core.feed.util.PlayableFeedPreferences;
 import dev.russell.focuspodcast.core.feed.util.PlaybackSpeedUtils;
+import dev.russell.focuspodcast.core.feed.util.VideoModeUtils;
 import dev.russell.focuspodcast.core.pref.PlaybackPreferences;
 import dev.russell.focuspodcast.core.pref.Prefs;
 import dev.russell.focuspodcast.core.pref.SleepTimerPreferences;
@@ -54,6 +55,7 @@ import dev.russell.focuspodcast.event.playback.PlaybackServiceEvent;
 import dev.russell.focuspodcast.event.playback.SleepTimerMode;
 import dev.russell.focuspodcast.event.playback.SleepTimerUpdatedEvent;
 import dev.russell.focuspodcast.event.playback.SpeedChangedEvent;
+import dev.russell.focuspodcast.event.playback.VideoModeChangedEvent;
 import dev.russell.focuspodcast.event.settings.AdSkipChangedEvent;
 import dev.russell.focuspodcast.event.settings.AudioEffectsChangedEvent;
 import dev.russell.focuspodcast.event.settings.SkipIntroEndingChangedEvent;
@@ -202,13 +204,9 @@ public class PlaybackService extends MediaBrowserServiceCompat {
      * running, the type of the last played media will be looked up.
      */
     public static Intent getPlayerActivityIntent(Context context) {
-        boolean showVideoPlayer;
-
-        if (isRunning) {
-            showVideoPlayer = currentMediaType == MediaType.VIDEO && !isCasting;
-        } else {
-            showVideoPlayer = PlaybackPreferences.getCurrentEpisodeIsVideo();
-        }
+        boolean showVideoPlayer = !isCasting
+                && (!isRunning || currentMediaType == MediaType.VIDEO)
+                && VideoModeUtils.shouldShowVideoForCurrentMedia();
 
         if (showVideoPlayer) {
             return new VideoPlayerActivityStarter(context).getIntent();
@@ -222,8 +220,9 @@ public class PlaybackService extends MediaBrowserServiceCompat {
      * depends on the FeedMedia that is provided as an argument.
      */
     public static Intent getPlayerActivityIntent(Context context, Playable media) {
-        if (media.getMediaType() == MediaType.VIDEO && !isCasting) {
-            return new VideoPlayerActivityStarter(context).getIntent();
+        if (!isCasting && VideoModeUtils.shouldShowVideo(media)) {
+            return new VideoPlayerActivityStarter(context).getIntent()
+                    .putExtra(VideoPlayerActivityStarter.EXTRA_MEDIA_KEY, String.valueOf(media.getIdentifier()));
         } else {
             return new MainActivityStarter(context).withOpenPlayer().getIntent();
         }
@@ -549,11 +548,32 @@ public class PlaybackService extends MediaBrowserServiceCompat {
         mediaPlayer.setVideoSurface(sh);
     }
 
+    /**
+     * The video player's surface is gone (the player was left, or the screen went off). The
+     * episode keeps playing as audio only; pausing is up to the listener.
+     */
     public void notifyVideoSurfaceAbandoned() {
-        mediaPlayer.pause(true, false);
         mediaPlayer.resetVideoSurface();
+    }
+
+    /**
+     * The listener switched the playing episode between video and audio only: point the
+     * notification and the media session at the player that now shows it.
+     */
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    @SuppressWarnings("unused")
+    public void videoModeChanged(VideoModeChangedEvent event) {
         updateNotificationAndMediaSession(getPlayable());
-        stateManager.stopForeground(!Prefs.isPersistNotify());
+    }
+
+    /** True while playback is inside an ad segment that {@link #skipCurrentAd()} can skip. */
+    public boolean isInSkippableAdSegment() {
+        return adSkipper.isInSkippableSegment();
+    }
+
+    /** Skips the ad segment playback is in, with the usual Undo offer. */
+    public void skipCurrentAd() {
+        adSkipper.skipCurrentSegment();
     }
 
     private final PlaybackServiceTaskManager.PSTMCallback taskManagerCallback = new PlaybackServiceTaskManager.PSTMCallback() {

@@ -6,6 +6,7 @@ import dev.russell.focuspodcast.theme.ThemeStore
 import dev.russell.focuspodcast.theme.util.ATHUtil
 import android.content.Context
 import android.graphics.Canvas
+import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.RectF
 import android.util.AttributeSet
@@ -24,6 +25,9 @@ import androidx.core.graphics.ColorUtils
  *
  * Bookmarks are thin ticks in the accent colour that stand out above and below the track, so they
  * read differently from the ad bands and stay visible over the played part of the bar.
+ *
+ * Chapter starts (optional; the video player sets them) are narrow dark notches cut into the
+ * track, so the bar reads as one segment per chapter.
  *
  * The view holds no subscriptions and does no loading: the player fragment hands it the segments
  * and bookmarks it has already loaded, and hands it an empty list when ad skipping is off.
@@ -52,6 +56,14 @@ class AdMarkerSeekBar @JvmOverloads constructor(
     }
     private val tick = RectF()
 
+    private var chapterStartsMs: LongArray = LongArray(0)
+    private var chapterDurationMs: Long = 0
+    private val notchPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        style = Paint.Style.FILL
+        color = Color.BLACK
+        alpha = NOTCH_ALPHA
+    }
+
     /** Cached so onDraw does not resolve theme attributes on every frame. */
     private var bandColor: Int = resolveBandColor()
 
@@ -75,6 +87,16 @@ class AdMarkerSeekBar @JvmOverloads constructor(
         invalidate()
     }
 
+    /**
+     * Replaces the chapter notches. [durationMs] is the length of the episode; a chapter starting
+     * at 0 gets no notch.
+     */
+    fun setChapters(startsMs: List<Long>, durationMs: Long) {
+        this.chapterStartsMs = startsMs.toLongArray()
+        this.chapterDurationMs = durationMs
+        invalidate()
+    }
+
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
         // The track drawable spans the padded width, and AbsSeekBar adds the thumb offset back
@@ -88,7 +110,24 @@ class AdMarkerSeekBar @JvmOverloads constructor(
         val bandHeight = bandHeight()
         val centerY = paddingTop + (height - paddingTop - paddingBottom) / 2f
         drawAdSegments(canvas, left, usableWidth, centerY, bandHeight)
+        drawChapterNotches(canvas, left, usableWidth, centerY, bandHeight)
         drawBookmarkTicks(canvas, left, usableWidth, centerY, bandHeight)
+    }
+
+    private fun drawChapterNotches(canvas: Canvas, left: Float, usableWidth: Float, centerY: Float,
+                                   bandHeight: Float) {
+        if (chapterStartsMs.isEmpty() || chapterDurationMs <= 0) {
+            return
+        }
+        val notchWidth = dp(NOTCH_WIDTH_DP)
+        for (startMs in chapterStartsMs) {
+            if (startMs <= 0 || startMs >= chapterDurationMs) {
+                continue
+            }
+            val x = left + startMs.toFloat() / chapterDurationMs * usableWidth
+            tick.set(x - notchWidth / 2f, centerY - bandHeight / 2f, x + notchWidth / 2f, centerY + bandHeight / 2f)
+            canvas.drawRect(tick, notchPaint)
+        }
     }
 
     private fun drawBookmarkTicks(canvas: Canvas, left: Float, usableWidth: Float, centerY: Float,
@@ -185,5 +224,9 @@ class AdMarkerSeekBar @JvmOverloads constructor(
         /** A bookmark tick: this wide, and standing this far out above and below the track. */
         const val TICK_WIDTH_DP = 2f
         const val TICK_OVERHANG_DP = 4f
+
+        /** A chapter notch: this wide, and dark enough to read as a gap on a light track. */
+        const val NOTCH_WIDTH_DP = 2f
+        const val NOTCH_ALPHA = 170
     }
 }

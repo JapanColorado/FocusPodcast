@@ -593,11 +593,13 @@ public class LocalPSMP extends PlaybackServiceMediaPlayer {
     public void resetVideoSurface() {
         executor.submit(() -> {
             playerLock.lock();
-            if (mediaType == MediaType.VIDEO) {
+            if (mediaType == MediaType.VIDEO && mediaPlayer != null) {
                 Log.d(TAG, "reset video surface");
+                // ExoPlayer plays on as audio only; the framework player has to be re-prepared.
                 mediaPlayer.setDisplay(null);
-                reinit();
-            } else {
+                if (!(mediaPlayer instanceof ExoPlayerWrapper)) {
+                    reinit();
+                }
             }
             playerLock.unlock();
         });

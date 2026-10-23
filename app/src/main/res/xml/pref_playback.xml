@@ -26,6 +26,13 @@
             android:key="pref_respects_playbacktime_for_speed"
             android:summary="@string/pref_playback_time_respects_speed_sum"
             android:title="@string/pref_playback_time_respects_speed_title"/>
+        <dev.russell.focuspodcast.common.common.prefs.supportv7.ATEListPreference
+            android:layout="@layout/list_item_view"
+            android:defaultValue="video"
+            android:entries="@array/video_episodes_as_options"
+            android:entryValues="@array/video_episodes_as_values"
+            android:key="pref_video_episodes_as"
+            android:title="@string/video_episodes_as_title"/>
     </dev.russell.focuspodcast.common.common.prefs.supportv7.ATEPreferenceCategory>
 
     <!-- Same controls in the same order as a podcast's Audio effects screen and the player's

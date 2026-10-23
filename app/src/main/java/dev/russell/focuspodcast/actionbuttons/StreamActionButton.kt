@@ -1,5 +1,6 @@
 package dev.russell.focuspodcast.actionbuttons
 
+import dev.russell.focuspodcast.core.feed.util.VideoModeUtils
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import dev.russell.focuspodcast.model.feed.FeedItem
@@ -10,7 +11,6 @@ import dev.russell.focuspodcast.core.util.NetworkUtils
 import dev.russell.focuspodcast.dialog.UseStreamConfirmDialog
 import dev.russell.focuspodcast.core.util.playback.PlaybackServiceStarter
 import dev.russell.focuspodcast.core.service.playback.PlaybackService
-import dev.russell.focuspodcast.model.playback.MediaType
 import android.app.Activity
 
 class StreamActionButton(val item: FeedItem) : ItemActionButton {
@@ -33,7 +33,7 @@ class StreamActionButton(val item: FeedItem) : ItemActionButton {
         PlaybackServiceStarter(activity, media)
             .callEvenIfRunning(true)
             .start()
-        if (media.mediaType == MediaType.VIDEO) {
+        if (VideoModeUtils.shouldShowVideo(media)) {
             activity.startActivity(PlaybackService.getPlayerActivityIntent(activity, media))
         }
     }

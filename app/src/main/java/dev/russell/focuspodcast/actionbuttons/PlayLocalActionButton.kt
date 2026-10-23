@@ -1,5 +1,6 @@
 package dev.russell.focuspodcast.actionbuttons
 
+import dev.russell.focuspodcast.core.feed.util.VideoModeUtils
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import dev.russell.focuspodcast.model.feed.FeedItem
@@ -7,7 +8,6 @@ import dev.russell.focuspodcast.R
 import dev.russell.focuspodcast.model.feed.FeedMedia
 import dev.russell.focuspodcast.core.util.playback.PlaybackServiceStarter
 import dev.russell.focuspodcast.core.service.playback.PlaybackService
-import dev.russell.focuspodcast.model.playback.MediaType
 import android.app.Activity
 
 class PlayLocalActionButton(val item: FeedItem) : ItemActionButton {
@@ -25,7 +25,7 @@ class PlayLocalActionButton(val item: FeedItem) : ItemActionButton {
         PlaybackServiceStarter(activity, media)
             .callEvenIfRunning(true)
             .start()
-        if (media.mediaType == MediaType.VIDEO) {
+        if (VideoModeUtils.shouldShowVideo(media)) {
             activity.startActivity(PlaybackService.getPlayerActivityIntent(activity, media))
         }
     }

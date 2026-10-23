@@ -33,6 +33,21 @@ public class PlaybackPrefFragment extends AbsSettingsFragment implements SharedP
         setupPlaybackScreen();
         buildSmartMarkAsPlayedPreference();
         buildClearVoicePreference();
+        buildVideoEpisodesPreference();
+    }
+
+    /** The summary spells out what the chosen default does. */
+    private void buildVideoEpisodesPreference() {
+        ListPreference pref = requirePreference(Prefs.PREF_VIDEO_EPISODES_AS);
+        updateVideoEpisodesSummary(pref, Prefs.isPlayVideoAsVideo());
+        pref.setOnPreferenceChangeListener((preference, newValue) -> {
+            updateVideoEpisodesSummary(pref, !Prefs.VIDEO_EPISODES_AS_AUDIO.equals(newValue));
+            return true;
+        });
+    }
+
+    private static void updateVideoEpisodesSummary(ListPreference pref, boolean asVideo) {
+        pref.setSummary(asVideo ? R.string.video_episodes_as_video_sum : R.string.video_episodes_as_audio_sum);
     }
 
     private void buildClearVoicePreference() {

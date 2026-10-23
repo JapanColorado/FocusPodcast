@@ -64,6 +64,12 @@
             app:icon="@drawable/ic_sound_waves" />
 
         <dev.russell.focuspodcast.common.common.prefs.supportv7.ATEListPreference
+            android:key="feedVideoMode"
+            android:layout="@layout/list_item_view"
+            android:title="@string/video_episodes_as_title"
+            app:icon="@drawable/ic_round_videocam_24" />
+
+        <dev.russell.focuspodcast.common.common.prefs.supportv7.ATEListPreference
             android:defaultValue="off"
             android:entries="@array/spnVolumeReductionItems"
             android:entryValues="@array/spnVolumeReductionValues"

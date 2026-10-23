@@ -22,6 +22,7 @@ import static dev.russell.focuspodcast.storage.db.DbSchema.KEY_FEED_IDENTIFIER;
 import static dev.russell.focuspodcast.storage.db.DbSchema.KEY_FEED_PLAYBACK_SPEED;
 import static dev.russell.focuspodcast.storage.db.DbSchema.KEY_FEED_SKIP_ENDING;
 import static dev.russell.focuspodcast.storage.db.DbSchema.KEY_FEED_AD_SKIP_OVERRIDE;
+import static dev.russell.focuspodcast.storage.db.DbSchema.KEY_FEED_VIDEO_OVERRIDE;
 import static dev.russell.focuspodcast.storage.db.DbSchema.KEY_FEED_SKIP_INTRO;
 import static dev.russell.focuspodcast.storage.db.DbSchema.KEY_FEED_TAGS;
 import static dev.russell.focuspodcast.storage.db.DbSchema.KEY_FEED_VOLUME_ADAPTION;
@@ -173,6 +174,12 @@ class FeedDao extends Dao {
             values.putNull(KEY_FEED_AD_SKIP_OVERRIDE);
         } else {
             values.put(KEY_FEED_AD_SKIP_OVERRIDE, adSkipOverride);
+        }
+        Boolean videoOverride = prefs.getVideoOverride();
+        if (videoOverride == null) {
+            values.putNull(KEY_FEED_VIDEO_OVERRIDE);
+        } else {
+            values.put(KEY_FEED_VIDEO_OVERRIDE, videoOverride);
         }
         db.update(TABLE_NAME_FEEDS, values, KEY_ID + "=?", new String[]{String.valueOf(prefs.getFeedID())});
     }

@@ -333,7 +333,6 @@
             android:name="dev.russell.focuspodcast.activity.VideoPlayerActivity"
             android:configChanges="keyboardHidden|orientation|screenSize|screenLayout|smallestScreenSize"
             android:exported="false"
-            android:screenOrientation="sensorLandscape"
             android:supportsPictureInPicture="true"
             android:theme="@style/MainTheme">
             <meta-data

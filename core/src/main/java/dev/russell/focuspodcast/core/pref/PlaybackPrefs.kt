@@ -99,6 +99,18 @@ internal object PlaybackPrefs {
             1.0f
         }
 
+    var isPlayVideoAsVideo: Boolean
+        get() = getString(Prefs.PREF_VIDEO_EPISODES_AS, Prefs.VIDEO_EPISODES_AS_VIDEO) !=
+            Prefs.VIDEO_EPISODES_AS_AUDIO
+        set(asVideo) {
+            prefs.edit()
+                .putString(
+                    Prefs.PREF_VIDEO_EPISODES_AS,
+                    if (asVideo) Prefs.VIDEO_EPISODES_AS_VIDEO else Prefs.VIDEO_EPISODES_AS_AUDIO
+                )
+                .apply()
+        }
+
     /**
      * Returns the global video playback speed.
      * @return
