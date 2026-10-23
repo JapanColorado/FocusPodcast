@@ -159,6 +159,17 @@ public class VideoModeUtilsTest {
     }
 
     @Test
+    public void aVideoListenedToAsAudioUsesTheAudioSpeed() {
+        Prefs.setPlaybackSpeed(1.5f);
+        Prefs.setVideoPlaybackSpeed(1.25f);
+        FeedMedia media = video(feed(null), 1);
+        assertEquals(1.25f, PlaybackSpeedUtils.getCurrentPlaybackSpeed(media), 0f);
+
+        VideoModeUtils.setShowVideo(media, false);
+        assertEquals(1.5f, PlaybackSpeedUtils.getCurrentPlaybackSpeed(media), 0f);
+    }
+
+    @Test
     public void setAndResetStoreTheFeedsChoice() throws Exception {
         Feed feed = feed(null);
         DBWriter.addNewFeed(context, feed).get();

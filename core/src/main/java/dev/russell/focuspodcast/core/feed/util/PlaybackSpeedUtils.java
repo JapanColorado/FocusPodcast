@@ -27,11 +27,20 @@ public final class PlaybackSpeedUtils {
 
     /**
      * Returns the speed {@code media} plays at: its podcast's own speed, or the global default
-     * for its media type.
+     * for the way it is played (see {@link #speedTypeOf}).
      */
     public static float getCurrentPlaybackSpeed(@Nullable Playable media) {
-        MediaType mediaType = media != null ? media.getMediaType() : null;
-        return resolveSpeed(PlayableFeedPreferences.of(media), Prefs.getPlaybackSpeed(mediaType));
+        return resolveSpeed(PlayableFeedPreferences.of(media), Prefs.getPlaybackSpeed(speedTypeOf(media)));
+    }
+
+    /**
+     * Which global default speed applies to {@code media}: the video speed only while a video is
+     * watched in the video player; a video episode listened to as audio only uses the audio
+     * speed, like every other episode in the player sheet.
+     */
+    @NonNull
+    public static MediaType speedTypeOf(@Nullable Playable media) {
+        return VideoModeUtils.shouldShowVideo(media) ? MediaType.VIDEO : MediaType.AUDIO;
     }
 
     /** The podcast's own speed when it has one, otherwise {@code globalSpeed}. */
@@ -67,7 +76,7 @@ public final class PlaybackSpeedUtils {
         if (speed == SPEED_USE_GLOBAL) {
             return 0;
         }
-        if (media != null && media.getMediaType() == MediaType.VIDEO) {
+        if (speedTypeOf(media) == MediaType.VIDEO) {
             Prefs.setVideoPlaybackSpeed(speed);
         } else {
             Prefs.setPlaybackSpeed(speed);

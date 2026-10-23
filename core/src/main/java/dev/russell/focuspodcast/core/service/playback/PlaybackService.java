@@ -563,7 +563,12 @@ public class PlaybackService extends MediaBrowserServiceCompat {
     @Subscribe(threadMode = ThreadMode.MAIN)
     @SuppressWarnings("unused")
     public void videoModeChanged(VideoModeChangedEvent event) {
-        updateNotificationAndMediaSession(getPlayable());
+        Playable playable = getPlayable();
+        updateNotificationAndMediaSession(playable);
+        // Watching uses the default video speed, listening the audio one (a podcast's own wins).
+        if (playable != null) {
+            setSpeed(PlaybackSpeedUtils.getCurrentPlaybackSpeed(playable));
+        }
     }
 
     /** True while playback is inside an ad segment that {@link #skipCurrentAd()} can skip. */

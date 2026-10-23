@@ -121,7 +121,8 @@ class PlaySpeedDialog : BottomSheetDialogFragment() {
         if (!PlaybackSpeedUtils.hasOwnSpeed(PlayableFeedPreferences.of(media))) {
             return
         }
-        PlaybackSpeedUtils.setDefaultSpeed(PlaybackSpeedUtils.getCurrentPlaybackSpeed(media), media?.mediaType)
+        PlaybackSpeedUtils.setDefaultSpeed(
+            PlaybackSpeedUtils.getCurrentPlaybackSpeed(media), PlaybackSpeedUtils.speedTypeOf(media))
         playbackController.resetPlaybackSpeed()
         updateResetButton()
         Toast.makeText(requireContext(), R.string.default_updated, Toast.LENGTH_SHORT).show()
