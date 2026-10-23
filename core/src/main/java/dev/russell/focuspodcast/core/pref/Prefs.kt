@@ -61,6 +61,10 @@ object Prefs {
     // Other
     const val PREF_DELETE_REMOVES_FROM_QUEUE = "prefDeleteRemovesFromQueue"
     const val PREF_USAGE_COUNTING_DATE = "prefUsageCounting"
+
+    /** The HTTP proxy password; a database export leaves it out (see PreferencesBackup). */
+    const val PREF_PROXY_PASSWORD = "pref_proxy_pass"
+
     const val PREF_ONLINE_PODCAST_SEARCH_HISTORY = "pref_online_podcast_search_history"
     const val PREF_FULL_LOCK_SCREEN = "pref_full_lock_screen"
 

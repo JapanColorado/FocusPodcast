@@ -10,6 +10,7 @@ import dev.russell.focuspodcast.config.DownloadServiceCallbacksImpl
 import dev.russell.focuspodcast.config.PodcastSearchDefaultList
 import dev.russell.focuspodcast.core.ApCoreEventBusIndex
 import dev.russell.focuspodcast.core.ClientConfig
+import dev.russell.focuspodcast.core.storage.PreferencesBackup
 import dev.russell.focuspodcast.error.RxJavaErrorHandlerSetup
 import dev.russell.focuspodcast.pref.AppLanguage
 import android.content.Intent
@@ -53,6 +54,8 @@ class MyApp : BaseApplication() {
     }
 
     override fun onCreate() {
+        // Settings from a database import; must land before anything reads or watches them
+        PreferencesBackup.applyPendingRestore(this)
         super.onCreate()
         RxJavaErrorHandlerSetup.setupRxJavaErrorHandler()
         instance = this

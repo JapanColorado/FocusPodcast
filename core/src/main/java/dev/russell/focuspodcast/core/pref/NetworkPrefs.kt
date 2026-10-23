@@ -22,7 +22,6 @@ internal object NetworkPrefs {
     private const val PREF_PROXY_PORT = "pref_proxy_port"
     private const val PREF_PROXY_TYPE = "pref_proxy_type"
     private const val PREF_PROXY_USER = "pref_proxy_username"
-    private const val PREF_PROXY_PASSWORD = "pref_proxy_pass"
     private const val PREF_REFRESH_ON_START = "pref_refresh_on_start"
 
     /*
@@ -166,7 +165,7 @@ internal object NetworkPrefs {
             val host = prefs.getString(PREF_PROXY_HOST, null)
             val port = prefs.getInt(PREF_PROXY_PORT, 0)
             val username = prefs.getString(PREF_PROXY_USER, null)
-            val password = prefs.getString(PREF_PROXY_PASSWORD, null)
+            val password = prefs.getString(Prefs.PREF_PROXY_PASSWORD, null)
             return ProxyConfig(type, host, port, username, password)
         }
         set(config) {
@@ -188,9 +187,9 @@ internal object NetworkPrefs {
                 editor.putString(PREF_PROXY_USER, config.username)
             }
             if (TextUtils.isEmpty(config.password)) {
-                editor.remove(PREF_PROXY_PASSWORD)
+                editor.remove(Prefs.PREF_PROXY_PASSWORD)
             } else {
-                editor.putString(PREF_PROXY_PASSWORD, config.password)
+                editor.putString(Prefs.PREF_PROXY_PASSWORD, config.password)
             }
             editor.apply()
         }
