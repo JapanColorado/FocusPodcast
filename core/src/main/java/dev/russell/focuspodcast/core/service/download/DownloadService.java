@@ -29,6 +29,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import dev.russell.focuspodcast.core.event.DownloadEvent;
 import dev.russell.focuspodcast.core.util.download.ConnectionStateMonitor;
@@ -64,6 +65,13 @@ public class DownloadService extends Service {
     public static final String EXTRA_CLEANUP_MEDIA = "cleanupMedia";
 
     private static final AtomicBoolean RUNNING = new AtomicBoolean(false);
+    /**
+     * The newest start request delivered to onStartCommand. {@link #shutdown()} stops the service
+     * only for that request, so a startForegroundService() that arrives while the downloads of an
+     * earlier one are finishing on a worker thread is not stopped before its onStartCommand runs
+     * (which made the system crash the app with ForegroundServiceDidNotStartInTimeException).
+     */
+    private final AtomicInteger latestStartId = new AtomicInteger();
 
     /**
      * The downloaders currently enqueued or running, owned by {@link DownloadQueue}. Kept here
@@ -274,6 +282,7 @@ public class DownloadService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        latestStartId.set(startId);
         // The service was started with startForegroundService(), so startForeground() must be
         // called on every path (including the immediate shutdown below) to honour the 5s contract.
         Notification notification = notifier.buildSummaryNotification();
@@ -283,7 +292,7 @@ public class DownloadService extends Service {
             // ForegroundServiceStartNotAllowedException (12+) / SecurityException (14+) when the
             // background-start exemption expired between startForegroundService() and here.
             Timber.e(e, "startForeground failed, giving up on this start");
-            stopSelf();
+            stopSelf(startId);
             return Service.START_NOT_STICKY;
         }
 
@@ -309,7 +318,10 @@ public class DownloadService extends Service {
     public void onTimeout(int startId, int fgsType) {
         Log.w(TAG, "foreground service timeout, cancelling all downloads");
         queue.cancelAll();
-        shutdown();
+        notifier.runFinalUpdateAndStop();
+        // Unlike shutdown(), this stops regardless of newer start requests: the quota is spent.
+        ServiceCompat.stopForeground(this, ServiceCompat.STOP_FOREGROUND_REMOVE);
+        stopSelf();
     }
 
     @Override
@@ -377,7 +389,10 @@ public class DownloadService extends Service {
         // the notification. Set the notification text now so that a misleading message
         // is not left on the notification.
         notifier.runFinalUpdateAndStop();
-        ServiceCompat.stopForeground(this, ServiceCompat.STOP_FOREGROUND_REMOVE);
-        stopSelf();
+        // False when a newer start request is already on its way: its onStartCommand must still
+        // run (and call startForeground), so the service stays up and in the foreground for it.
+        if (stopSelfResult(latestStartId.get())) {
+            ServiceCompat.stopForeground(this, ServiceCompat.STOP_FOREGROUND_REMOVE);
+        }
     }
 }
