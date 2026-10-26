@@ -111,6 +111,13 @@ public class ExoPlayerWrapper implements IPlayer {
                 DefaultLoadControl.DEFAULT_BUFFER_FOR_PLAYBACK_MS,
                 DefaultLoadControl.DEFAULT_BUFFER_FOR_PLAYBACK_AFTER_REBUFFER_MS);
         loadControl.setBackBuffer(Prefs.getRewindSecs() * 1000 + 500, true);
+        // The byte budget would otherwise follow the selected tracks: 13 MB with the video track
+        // switched off, against 144 MB with it on. A progressive video file still downloads its
+        // video samples when the track is off, so audio-only playback of a streamed video got
+        // well under the 30 s minimum buffer and stalled on every network dip. A fixed budget
+        // sized for muxed audio+video fixes that; audio files reach the 120 s max duration long
+        // before they reach it, and the allocator only grows as data actually arrives.
+        loadControl.setTargetBufferBytes(DefaultLoadControl.DEFAULT_MUXED_BUFFER_SIZE);
         trackSelector = new DefaultTrackSelector(context);
         // No surface yet: decode no video until one is attached (see setDisplay).
         trackSelector.setParameters(trackSelector.buildUponParameters()
