@@ -116,6 +116,13 @@ public abstract class PlaybackServiceMediaPlayer {
     public abstract void reinit();
 
     /**
+     * Reloads the current media from its stream ({@code stream} true) or its downloaded file,
+     * keeping the position and whether it was playing. Does nothing if it already plays from
+     * there. This method is executed on an internal executor service.
+     */
+    public abstract void switchSource(boolean stream);
+
+    /**
      * Seeks to the specified position. If the PSMP object is in an invalid state, this method will do nothing.
      * Invalid time values (< 0) will be ignored.
      * <p/>

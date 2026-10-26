@@ -36,6 +36,7 @@ public class DownloadErrorLabel {
             case ERROR_NOT_FOUND: return R.string.download_error_not_found;
             case ERROR_CERTIFICATE: return R.string.download_error_certificate;
             case ERROR_PARSER_EXCEPTION_DUPLICATE: return R.string.download_error_duplicate_episode;
+            case ERROR_AUDIO_ONLY_UNSUPPORTED: return R.string.download_error_audio_only_unsupported;
             default:
                 if (BuildConfig.DEBUG) {
                     throw new IllegalArgumentException("No mapping from download error to label");

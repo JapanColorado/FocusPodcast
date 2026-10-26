@@ -16,6 +16,9 @@ public class DefaultDownloaderFactory implements DownloaderFactory {
             Log.e(TAG, "Could not find appropriate downloader for " + request.getSource());
             return null;
         }
+        if (request.isAudioOnly()) {
+            return new AudioOnlyDownloader(context, request);
+        }
         return new HttpDownloader(context, request);
     }
 }

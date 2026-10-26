@@ -6,6 +6,7 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 
+import org.apache.commons.io.FileUtils;
 import org.greenrobot.eventbus.EventBus;
 
 import java.io.File;
@@ -108,6 +109,7 @@ class DownloadPipeline {
     private void performDownload(Downloader downloader) {
         DownloadRequest request = downloader.getDownloadRequest();
         boolean retry = false;
+        DownloadRequest replacement = null;
         try {
             if (request.getRetryCount() > 0 && !downloader.cancelled) {
                 // short, interruptible back-off before an automatic retry
@@ -135,7 +137,10 @@ class DownloadPipeline {
                     retry = !completionHandler.handleSuccessfulDownload(downloader)
                             && completionHandler.handleFailedDownload(downloader);
                 } else {
-                    retry = completionHandler.handleFailedDownload(downloader);
+                    replacement = completionHandler.fullDownloadInstead(downloader);
+                    if (replacement == null) {
+                        retry = completionHandler.handleFailedDownload(downloader);
+                    }
                 }
             } catch (Exception e) {
                 Log.e(TAG, "download result handling threw", e);
@@ -158,6 +163,21 @@ class DownloadPipeline {
                     addNewRequest(request);
                 } catch (Exception e) {
                     Log.e(TAG, "unable to schedule retry", e);
+                }
+            }
+            if (replacement != null) {
+                if (!downloader.cancelled && !queue.isShutdown()) {
+                    // An audio-only download that has to fetch the whole file after all: as with
+                    // a retry, the replacement goes in before this entry leaves the list.
+                    downloader.cancel();
+                    FileUtils.deleteQuietly(new File(request.getDestination()));
+                    try {
+                        addNewRequest(replacement);
+                    } catch (Exception e) {
+                        Log.e(TAG, "unable to schedule the full download", e);
+                    }
+                } else {
+                    completionHandler.discardCancelled(request);
                 }
             }
             queue.remove(downloader);

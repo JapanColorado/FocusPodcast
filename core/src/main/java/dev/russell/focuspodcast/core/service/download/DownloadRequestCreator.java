@@ -2,10 +2,13 @@ package dev.russell.focuspodcast.core.service.download;
 
 import android.util.Log;
 import android.webkit.URLUtil;
+import dev.russell.focuspodcast.core.feed.util.VideoModeUtils;
 import dev.russell.focuspodcast.core.pref.Prefs;
 import dev.russell.focuspodcast.core.util.FileNameGenerator;
 import dev.russell.focuspodcast.model.feed.Feed;
 import dev.russell.focuspodcast.model.feed.FeedMedia;
+import dev.russell.focuspodcast.model.playback.MediaType;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 
 import java.io.File;
@@ -34,20 +37,55 @@ public class DownloadRequestCreator {
                 .lastModified(feed.getLastUpdate());
     }
 
+    /**
+     * A download of this episode. A video episode whose podcast is listened to as audio only
+     * (the "Video episodes" setting, {@link VideoModeUtils#isVideoPreferred}) downloads only its
+     * audio track ({@link AudioOnlyDownloader}); everything else downloads the whole file.
+     */
     public static DownloadRequest.Builder create(FeedMedia media) {
-        final boolean partiallyDownloadedFileExists =
+        return create(media, wantsAudioOnly(media));
+    }
+
+    /**
+     * A download of the whole file, also for a video episode that would otherwise be downloaded
+     * as audio only. Used once the listener agreed to download a video whose audio could not be
+     * cut out of it.
+     */
+    public static DownloadRequest.Builder createFullDownload(FeedMedia media) {
+        return create(media, false);
+    }
+
+    /** Whether {@link #create(FeedMedia)} would download only this episode's audio track. */
+    public static boolean wantsAudioOnly(FeedMedia media) {
+        return media.getMediaType() == MediaType.VIDEO
+                && !media.isContentUri()
+                && !VideoModeUtils.isVideoPreferred(media);
+    }
+
+    private static DownloadRequest.Builder create(FeedMedia media, boolean audioOnly) {
+        boolean partiallyDownloadedFileExists =
                 media.getFile_url() != null && new File(media.getFile_url()).exists();
+        if (partiallyDownloadedFileExists && audioOnly && !FeedMedia.isAudioOnlyFile(media.getFile_url())) {
+            // A whole-file download is under way (the listener agreed to it, or the podcast was
+            // switched to audio only since): resume it rather than throw its progress away.
+            audioOnly = false;
+        } else if (partiallyDownloadedFileExists && !audioOnly && FeedMedia.isAudioOnlyFile(media.getFile_url())) {
+            // Left over from an audio-only download, which a whole-file download cannot resume.
+            Log.d(TAG, "discarding partial audio-only file " + media.getFile_url());
+            FileUtils.deleteQuietly(new File(media.getFile_url()));
+            partiallyDownloadedFileExists = false;
+        }
         File dest;
         if (partiallyDownloadedFileExists) {
             dest = new File(media.getFile_url());
         } else {
-            dest = new File(getMediafilePath(media), getMediafilename(media));
+            dest = new File(getMediafilePath(media), getMediafilename(media, audioOnly));
         }
 
         if (!isFilenameAvailable(dest.toString()) || (!partiallyDownloadedFileExists && dest.exists())) {
             dest = findUnusedFile(dest);
         }
-        Log.d(TAG, "create download request url " + media.getDownload_url());
+        Log.d(TAG, "create download request url " + media.getDownload_url() + (audioOnly ? " (audio only)" : ""));
 
         String username = (media.getItem().getFeed().getPreferences() != null)
                 ? media.getItem().getFeed().getPreferences().getUsername() : null;
@@ -56,7 +94,8 @@ public class DownloadRequestCreator {
 
         return new DownloadRequest.Builder(dest.toString(), media)
                 .deleteOnFailure(false)
-                .withAuthentication(username, password);
+                .withAuthentication(username, password)
+                .audioOnly(audioOnly);
     }
 
     private static File findUnusedFile(File dest) {
@@ -110,7 +149,7 @@ public class DownloadRequestCreator {
         return Prefs.getDataFolder(mediaPath).toString() + "/";
     }
 
-    private static String getMediafilename(FeedMedia media) {
+    private static String getMediafilename(FeedMedia media, boolean audioOnly) {
         String titleBaseFilename = "";
 
         // Try to generate the filename by the item title
@@ -131,7 +170,8 @@ public class DownloadRequestCreator {
         if (baseFilename.length() > filenameMaxLength) {
             baseFilename = baseFilename.substring(0, filenameMaxLength);
         }
+        String extension = audioOnly ? FeedMedia.AUDIO_ONLY_FILE_EXTENSION : FilenameUtils.getExtension(urlBaseFilename);
         return baseFilename + FilenameUtils.EXTENSION_SEPARATOR + media.getId()
-                + FilenameUtils.EXTENSION_SEPARATOR + FilenameUtils.getExtension(urlBaseFilename);
+                + FilenameUtils.EXTENSION_SEPARATOR + extension;
     }
 }

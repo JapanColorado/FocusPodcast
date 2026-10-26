@@ -198,24 +198,8 @@ public class HttpDownloader extends Downloader {
             // in the download log and the failure notification; the exception itself is only logged.
             Log.e(TAG, "Malformed download url " + request.getSource(), e);
             onFail(DownloadError.ERROR_MALFORMED_URL, e.getMessage());
-        } catch (SocketTimeoutException e) {
-            Log.e(TAG, "Timed out downloading " + request.getSource(), e);
-            onFail(DownloadError.ERROR_CONNECTION_ERROR, e.getMessage());
-        } catch (UnknownHostException e) {
-            Log.e(TAG, "Unknown host downloading " + request.getSource(), e);
-            onFail(DownloadError.ERROR_UNKNOWN_HOST, e.getMessage());
         } catch (IOException e) {
-            Log.e(TAG, "I/O error downloading " + request.getSource(), e);
-            if (NetworkUtils.wasDownloadBlocked(e)) {
-                onFail(DownloadError.ERROR_IO_BLOCKED, e.getMessage());
-                return;
-            }
-            String message = e.getMessage();
-            if (message != null && message.contains("Trust anchor for certification path not found")) {
-                onFail(DownloadError.ERROR_CERTIFICATE, e.getMessage());
-                return;
-            }
-            onFail(DownloadError.ERROR_IO_ERROR, e.getMessage());
+            onIOException(e);
         } catch (NullPointerException e) {
             // might be thrown by connection.getInputStream()
             Log.e(TAG, "Connection error downloading " + request.getSource(), e);
@@ -226,7 +210,28 @@ public class HttpDownloader extends Downloader {
         }
     }
 
-    private Response newCall(Request.Builder httpReq) throws IOException {
+    /** Reports a network or file error that ended the download. */
+    void onIOException(IOException e) {
+        if (e instanceof SocketTimeoutException) {
+            Log.e(TAG, "Timed out downloading " + request.getSource(), e);
+            onFail(DownloadError.ERROR_CONNECTION_ERROR, e.getMessage());
+        } else if (e instanceof UnknownHostException) {
+            Log.e(TAG, "Unknown host downloading " + request.getSource(), e);
+            onFail(DownloadError.ERROR_UNKNOWN_HOST, e.getMessage());
+        } else if (NetworkUtils.wasDownloadBlocked(e)) {
+            Log.e(TAG, "I/O error downloading " + request.getSource(), e);
+            onFail(DownloadError.ERROR_IO_BLOCKED, e.getMessage());
+        } else if (e.getMessage() != null
+                && e.getMessage().contains("Trust anchor for certification path not found")) {
+            Log.e(TAG, "I/O error downloading " + request.getSource(), e);
+            onFail(DownloadError.ERROR_CERTIFICATE, e.getMessage());
+        } else {
+            Log.e(TAG, "I/O error downloading " + request.getSource(), e);
+            onFail(DownloadError.ERROR_IO_ERROR, e.getMessage());
+        }
+    }
+
+    Response newCall(Request.Builder httpReq) throws IOException {
         OkHttpClient httpClient = PodcastHttpClient.getHttpClient();
         try {
             return httpClient.newCall(httpReq.build()).execute();
@@ -260,7 +265,7 @@ public class HttpDownloader extends Downloader {
         return contentType != null && contentType.startsWith("text/") && contentLength < 100 * 1024;
     }
 
-    private void callOnFailByResponseCode(Response response) {
+    void callOnFailByResponseCode(Response response) {
         final DownloadError error;
         final String details;
         if (response.code() == HttpURLConnection.HTTP_UNAUTHORIZED) {
@@ -279,7 +284,7 @@ public class HttpDownloader extends Downloader {
         onFail(error, details);
     }
 
-    private void checkIfRedirect(Response response) {
+    void checkIfRedirect(Response response) {
         // detect 301 Moved permanently and 308 Permanent Redirect
         ArrayList<Response> responses = new ArrayList<>();
         while (response != null) {
@@ -300,12 +305,12 @@ public class HttpDownloader extends Downloader {
         }
     }
 
-    private void onSuccess() {
+    void onSuccess() {
         Log.d(TAG, "download successful");
         result.setSuccessful();
     }
 
-    private void onFail(DownloadError reason, String reasonDetailed) {
+    void onFail(DownloadError reason, String reasonDetailed) {
         Log.d(TAG, "failed "  + reason +   reasonDetailed);
         result.setFailed(reason, reasonDetailed);
         if (request.isDeleteOnFailure()) {
@@ -313,7 +318,7 @@ public class HttpDownloader extends Downloader {
         }
     }
 
-    private void onCancelled() {
+    void onCancelled() {
         Log.d(TAG, "download cancelled");
         result.setCancelled();
         cleanup();
@@ -322,7 +327,7 @@ public class HttpDownloader extends Downloader {
     /**
      * Deletes unfinished downloads.
      */
-    private void cleanup() {
+    void cleanup() {
         if (request.getDestination() != null) {
             File dest = new File(request.getDestination());
             if (dest.exists()) {

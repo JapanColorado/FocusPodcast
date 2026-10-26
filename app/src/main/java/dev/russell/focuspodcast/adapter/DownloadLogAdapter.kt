@@ -1,5 +1,6 @@
 package dev.russell.focuspodcast.adapter
 
+import dev.russell.focuspodcast.dialog.FullVideoDownloadDialog
 import android.annotation.SuppressLint
 import dev.russell.focuspodcast.common.util.ImageUtils.getColoredVectorDrawable
 import dev.russell.focuspodcast.common.util.TopSnackbarUtil.showSnack
@@ -152,6 +153,12 @@ class DownloadLogAdapter(private val context: Activity) :
                                 TAG,
                                 "Could not find feed media for feed id: " + status.feedfileId
                             )
+                            return@setOnClickListener
+                        }
+                        if (status.reason == DownloadError.ERROR_AUDIO_ONLY_UNSUPPORTED) {
+                            // Retrying audio only would fail the same way: offer the whole video.
+                            holder.secondaryActionButton.visibility = View.VISIBLE
+                            FullVideoDownloadDialog(context, media, media.size).show()
                             return@setOnClickListener
                         }
                         DownloadService.download(

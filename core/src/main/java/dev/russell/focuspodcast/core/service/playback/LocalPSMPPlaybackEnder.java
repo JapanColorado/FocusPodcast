@@ -1,5 +1,6 @@
 package dev.russell.focuspodcast.core.service.playback;
 
+import dev.russell.focuspodcast.core.feed.util.VideoModeUtils;
 import android.util.Log;
 
 import java.util.concurrent.Future;
@@ -66,7 +67,7 @@ class LocalPSMPPlaybackEnder {
                     player.playerCallback().onPlaybackEnded(nextMedia.getMediaType(), !playNextEpisode);
                     // setting media to null signals to playMediaObject() that we're taking care of post-playback processing
                     player.media = null;
-                    player.playMediaObjectSync(nextMedia, false, !nextMedia.localFileAvailable(),
+                    player.playMediaObjectSync(nextMedia, false, VideoModeUtils.shouldStream(nextMedia),
                             playNextEpisode, playNextEpisode);
                 }
             }

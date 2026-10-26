@@ -8,7 +8,15 @@ import dev.russell.focuspodcast.model.playback.Playable
 import android.content.Context
 import android.content.DialogInterface
 
-class UseStreamConfirmDialog(private val context: Context, private val playable: Playable) {
+/**
+ * Asks before streaming on a metered network. [onStream] replaces the default action (start
+ * [playable] from its stream), e.g. to switch an episode that is already playing to its video.
+ */
+class UseStreamConfirmDialog(
+    private val context: Context,
+    private val playable: Playable,
+    private val onStream: (() -> Unit)? = null,
+) {
     fun show() {
         AccentMaterialDialog(
             context,
@@ -26,6 +34,11 @@ class UseStreamConfirmDialog(private val context: Context, private val playable:
     }
 
     private fun stream() {
+        val action = onStream
+        if (action != null) {
+            action()
+            return
+        }
         PlaybackServiceStarter(context, playable)
             .callEvenIfRunning(true)
             .shouldStreamThisTime(true)

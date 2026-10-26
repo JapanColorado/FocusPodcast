@@ -7,6 +7,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import org.apache.commons.io.FileUtils;
+import org.greenrobot.eventbus.EventBus;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -18,6 +19,7 @@ import dev.russell.focuspodcast.core.service.download.handler.MediaDownloadedHan
 import dev.russell.focuspodcast.core.storage.DBReader;
 import dev.russell.focuspodcast.core.storage.DBWriter;
 import dev.russell.focuspodcast.core.util.NetworkUtils;
+import dev.russell.focuspodcast.event.AudioOnlyDownloadUnavailableEvent;
 import dev.russell.focuspodcast.model.download.DownloadError;
 import dev.russell.focuspodcast.model.download.DownloadStatus;
 import dev.russell.focuspodcast.model.feed.Feed;
@@ -36,6 +38,11 @@ class DownloadCompletionHandler {
     private static final String TAG = "DownloadService";
     /** Maximum number of automatic re-submissions of a media download after a transient error. */
     private static final int MAX_RETRIES = 1;
+    /**
+     * A video whose audio cannot be downloaded on its own is downloaded whole without asking up
+     * to this size; above it (or when the size is unknown) the listener is asked first.
+     */
+    static final long FULL_DOWNLOAD_WITHOUT_ASKING_LIMIT = 2L * 1024 * 1024 * 1024;
 
     private final Context context;
     private final NewEpisodesNotification newEpisodesNotification;
@@ -135,6 +142,33 @@ class DownloadCompletionHandler {
     }
 
     /**
+     * For an audio-only download that found the audio cannot be cut out of the file: a request
+     * for the whole file if it may be downloaded without asking (small enough, and not on a
+     * metered network the listener does not download over), else null. The caller submits the
+     * returned request in place of a retry and drops the empty audio-only file.
+     */
+    @Nullable
+    DownloadRequest fullDownloadInstead(Downloader downloader) {
+        DownloadRequest request = downloader.getDownloadRequest();
+        if (downloader.cancelled
+                || downloader.getResult().getReason() != DownloadError.ERROR_AUDIO_ONLY_UNSUPPORTED
+                || request.getSize() <= 0 || request.getSize() > FULL_DOWNLOAD_WITHOUT_ASKING_LIMIT
+                || !NetworkUtils.isEpisodeDownloadAllowed()) {
+            return null;
+        }
+        FeedMedia media = DBReader.getFeedMedia(request.getFeedfileId());
+        if (media == null || media.getItem() == null) {
+            return null;
+        }
+        Log.d(TAG, "audio only unavailable, downloading the whole file: " + request.getSource());
+        DownloadRequest full = DownloadRequestCreator.createFullDownload(media)
+                .withInitiatedByUser(request.isInitiatedByUser())
+                .build();
+        full.setMediaEnqueued(request.isMediaEnqueued());
+        return full;
+    }
+
+    /**
      * Handles a download that did not succeed.
      *
      * @return true if the request should be re-submitted automatically (the caller takes care
@@ -180,6 +214,12 @@ class DownloadCompletionHandler {
         Log.e(TAG, "download failed: " + status.getReason());
         saveDownloadStatus(status);
         new FailedDownloadHandler(request).run();
+
+        if (status.getReason() == DownloadError.ERROR_AUDIO_ONLY_UNSUPPORTED && request.isInitiatedByUser()) {
+            // Too large to download whole without asking: the app offers the full video.
+            EventBus.getDefault().post(new AudioOnlyDownloadUnavailableEvent(
+                    request.getFeedfileId(), request.getSize()));
+        }
 
         if (type == FeedMedia.FEEDFILETYPE_FEEDMEDIA) {
             FeedItem item = DownloadService.getFeedItemFromId(status.getFeedfileId());

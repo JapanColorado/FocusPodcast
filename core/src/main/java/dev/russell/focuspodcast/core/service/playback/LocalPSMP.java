@@ -396,6 +396,31 @@ public class LocalPSMP extends PlaybackServiceMediaPlayer {
         });
     }
 
+    @Override
+    public void switchSource(boolean stream) {
+        useCallerThread.set(Prefs.useExoplayer());
+        executor.submit(() -> {
+            playerLock.lock();
+            try {
+                if (media == null || this.stream == stream) {
+                    return;
+                }
+                Log.d(TAG, "switching to " + (stream ? "the stream" : "the downloaded file"));
+                // Still loading counts as playing when it was going to start once prepared.
+                boolean wasPlaying = playerStatus == PlayerStatus.PLAYING
+                        || ((playerStatus == PlayerStatus.PREPARING || playerStatus == PlayerStatus.INITIALIZED)
+                                && startWhenPrepared.get());
+                int position = getPosition();
+                if (position != Playable.INVALID_TIME) {
+                    media.setPosition(position);
+                }
+                playMediaObject(media, true, stream, wasPlaying, true);
+            } finally {
+                playerLock.unlock();
+            }
+        });
+    }
+
     /**
      * Seeks to the specified position. If the PSMP object is in an invalid state, this method will do nothing.
      * Invalid time values (< 0) will be ignored.

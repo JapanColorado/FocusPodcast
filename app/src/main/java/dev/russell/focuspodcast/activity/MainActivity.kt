@@ -61,6 +61,12 @@ import com.bumptech.glide.Glide
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.snackbar.Snackbar
 import io.reactivex.Completable
+import dev.russell.focuspodcast.event.AudioOnlyDownloadUnavailableEvent
+import dev.russell.focuspodcast.dialog.FullVideoDownloadDialog
+import dev.russell.focuspodcast.model.feed.FeedMedia
+import dev.russell.focuspodcast.core.storage.DBReader
+import io.reactivex.Maybe
+import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import org.apache.commons.lang3.ArrayUtils
 import org.greenrobot.eventbus.EventBus
@@ -415,6 +421,20 @@ class MainActivity : SimpleToolbarActivity(), OnSharedPreferenceChangeListener {
         if (action != null) {
             snackbar.setAction(getString(R.string.undo)) { v: View? -> action.run() }
         }
+    }
+
+    /** An audio-only download found no audio it could fetch on its own: offer the full video. */
+    @SuppressLint("CheckResult") // fire-and-forget: one DB read with its own onError; nothing to dispose
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    fun onAudioOnlyDownloadUnavailable(event: AudioOnlyDownloadUnavailableEvent) {
+        Maybe.fromCallable<FeedMedia> { DBReader.getFeedMedia(event.mediaId) }
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe({ media ->
+                if (!isFinishing && !isDestroyed) {
+                    FullVideoDownloadDialog(this, media, event.fullSize).show()
+                }
+            }, { Timber.e(it, "loading media for the full video download prompt failed") })
     }
 
     /** Episode downloads are the moment to ask for the notification permission (Android 13+). */

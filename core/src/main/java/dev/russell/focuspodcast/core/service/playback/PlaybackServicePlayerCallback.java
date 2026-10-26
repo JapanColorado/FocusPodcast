@@ -108,7 +108,10 @@ class PlaybackServicePlayerCallback implements PlaybackServiceMediaPlayer.PSMPCa
                 // Auto-enable arms the sleep timer only when an episode starts (PREPARED -> PLAYING).
                 // Resuming from pause or returning from a seek must not re-arm it: otherwise a timer
                 // the user just disabled or undid comes back on the next unpause.
-                if (newInfo.oldPlayerStatus == PlayerStatus.PREPARED
+                // Nor does reloading the same episode from its stream or its file (a video switch).
+                boolean sourceSwitch = service.sourceSwitchPending;
+                service.sourceSwitchPending = false;
+                if (newInfo.oldPlayerStatus == PlayerStatus.PREPARED && !sourceSwitch
                         && SleepTimerPreferences.autoEnable() && !service.sleepTimerActive()) {
                     service.setSleepTimer(SleepTimerPreferences.timerMillis());
                     EventBus.getDefault().post(new MessageEvent(
@@ -242,7 +245,7 @@ class PlaybackServicePlayerCallback implements PlaybackServiceMediaPlayer.PSMPCa
             return parkNext(nextItem.getMedia());
         }
 
-        if (!nextItem.getMedia().localFileAvailable() && !NetworkUtils.isStreamingAllowed()
+        if (!NetworkUtils.isStreamingAllowed() && VideoModeUtils.resolveStream(nextItem.getMedia(), false)
                 && Prefs.isFollowQueue() && !nextItem.getFeed().isLocalFeed()) {
             service.notificationUpdater.displayStreamingNotAllowedNotification(
                     new PlaybackServiceStarter(service, nextItem.getMedia())
@@ -275,7 +278,7 @@ class PlaybackServicePlayerCallback implements PlaybackServiceMediaPlayer.PSMPCa
             Log.d(TAG, "getNextInQueue(): the sleep timer stops before the next track");
             return parkNext(nextItem.getMedia());
         }
-        if (!nextItem.getMedia().localFileAvailable() && !NetworkUtils.isStreamingAllowed()
+        if (!NetworkUtils.isStreamingAllowed() && VideoModeUtils.resolveStream(nextItem.getMedia(), false)
                 && !feed.isLocalFeed()) {
             service.notificationUpdater.displayStreamingNotAllowedNotification(
                     new PlaybackServiceStarter(service, nextItem.getMedia()).getIntent());

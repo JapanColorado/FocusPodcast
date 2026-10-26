@@ -24,7 +24,9 @@ public enum DownloadError {
     ERROR_UNSUPPORTED_TYPE_HTML(19),
     ERROR_NOT_FOUND(20),
     ERROR_CERTIFICATE(21),
-    ERROR_PARSER_EXCEPTION_DUPLICATE(22);
+    ERROR_PARSER_EXCEPTION_DUPLICATE(22),
+    /** The audio track of a video episode could not be cut out of its file on its own. */
+    ERROR_AUDIO_ONLY_UNSUPPORTED(23);
 
     private final int code;
 

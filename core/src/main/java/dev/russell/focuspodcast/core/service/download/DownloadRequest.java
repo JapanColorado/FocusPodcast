@@ -15,6 +15,8 @@ import dev.russell.focuspodcast.model.feed.FeedMedia;
 public class DownloadRequest implements Parcelable {
     public static final String REQUEST_ARG_PAGE_NR = "page";
     public static final String REQUEST_ARG_LOAD_ALL_PAGES = "loadAllPages";
+    /** Set on a media download that fetches only the audio track of a video file. */
+    public static final String REQUEST_ARG_AUDIO_ONLY = "audioOnly";
 
     private final String destination;
     private final String source;
@@ -298,6 +300,11 @@ public class DownloadRequest implements Parcelable {
         return arguments;
     }
 
+    /** Whether this downloads only the audio track of a video episode ({@link AudioOnlyDownloader}). */
+    public boolean isAudioOnly() {
+        return arguments != null && arguments.getBoolean(REQUEST_ARG_AUDIO_ONLY, false);
+    }
+
     public static class Builder {
         private final String destination;
         private final String source;
@@ -356,6 +363,11 @@ public class DownloadRequest implements Parcelable {
         public Builder withAuthentication(String username, String password) {
             this.username = username;
             this.password = password;
+            return this;
+        }
+
+        Builder audioOnly(boolean audioOnly) {
+            arguments.putBoolean(REQUEST_ARG_AUDIO_ONLY, audioOnly);
             return this;
         }
 

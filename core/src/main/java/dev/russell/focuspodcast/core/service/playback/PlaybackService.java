@@ -150,6 +150,12 @@ public class PlaybackService extends MediaBrowserServiceCompat {
      * Is true if a Cast Device is connected to the service.
      */
     private static volatile boolean isCasting = false;
+    /**
+     * Set while the playing episode is reloaded from its stream or its downloaded file (a video
+     * switch of an audio-only download), so that the PREPARED -> PLAYING it goes through is not
+     * taken for an episode start.
+     */
+    volatile boolean sourceSwitchPending = false;
 
     PlaybackServiceMediaPlayer mediaPlayer;
     PlaybackServiceTaskManager taskManager;
@@ -262,7 +268,7 @@ public class PlaybackService extends MediaBrowserServiceCompat {
         }
         mediaPlayer = new LocalPSMP(this, mediaPlayerCallback);
         if (media != null) {
-            mediaPlayer.playMediaObject(media, !media.localFileAvailable(), wasPlaying, true);
+            mediaPlayer.playMediaObject(media, VideoModeUtils.shouldStream(media), wasPlaying, true);
         }
         isCasting = mediaPlayer.isCasting();
     }
@@ -521,7 +527,14 @@ public class PlaybackService extends MediaBrowserServiceCompat {
 
     void startPlaying(Playable playable, boolean allowStreamThisTime) {
         boolean localFeed = URLUtil.isContentUrl(playable.getStreamUrl());
-        boolean stream = !playable.localFileAvailable() || localFeed;
+        // An audio-only download is streamed when it is to be watched, unless streaming is not
+        // allowed: then it is listened to (resolveStream switches it to audio only).
+        // The episode that is already playing keeps its source (playMediaObject ignores it anyway).
+        Playable current = mediaPlayer.getPlayable();
+        boolean alreadyPlaying = current != null && mediaPlayer.getPlayerStatus() == PlayerStatus.PLAYING
+                && current.getIdentifier().equals(playable.getIdentifier());
+        boolean stream = localFeed || (alreadyPlaying ? mediaPlayer.isStreaming()
+                : VideoModeUtils.resolveStream(playable, NetworkUtils.isStreamingAllowed() || allowStreamThisTime));
         if (stream && !localFeed && !NetworkUtils.isStreamingAllowed() && !allowStreamThisTime) {
             notificationUpdater.displayStreamingNotAllowedNotification(
                     new PlaybackServiceStarter(this, playable)
@@ -568,6 +581,16 @@ public class PlaybackService extends MediaBrowserServiceCompat {
         // Watching uses the default video speed, listening the audio one (a podcast's own wins).
         if (playable != null) {
             setSpeed(PlaybackSpeedUtils.getCurrentPlaybackSpeed(playable));
+        }
+        // An audio-only download has no picture: watching it streams the video, and going back
+        // to audio only returns to the downloaded file. The position is kept either way.
+        if (playable != null && VideoModeUtils.isAudioOnlyDownload(playable)) {
+            boolean stream = VideoModeUtils.shouldStream(playable);
+            if (stream != mediaPlayer.isStreaming()) {
+                // The reload goes through PREPARED -> PLAYING again, which is not an episode start.
+                sourceSwitchPending = mediaPlayer.getPlayerStatus() == PlayerStatus.PLAYING;
+                mediaPlayer.switchSource(stream);
+            }
         }
     }
 

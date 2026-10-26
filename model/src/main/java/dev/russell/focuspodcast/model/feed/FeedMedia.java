@@ -16,12 +16,23 @@ import dev.russell.focuspodcast.model.playback.RemoteMedia;
 
 import java.util.Date;
 import java.util.List;
+import java.util.regex.Pattern;
 
 public class FeedMedia extends FeedFile implements Playable {
     private static final String TAG = "FeedMedia";
     public static final int FEEDFILETYPE_FEEDMEDIA = 2;
     public static final int PLAYABLE_TYPE_FEEDMEDIA = 1;
     public static final String FILENAME_PREFIX_EMBEDDED_COVER = "metadata-retriever:";
+
+    /**
+     * The file name ending of an audio-only download of a video episode: the audio track cut out
+     * of the video file. The download file names are built from characters that never include a
+     * dot except before the media id and the extension, so the ending cannot occur by accident
+     * ({@code -<n>} is what a clash with another file in progress adds).
+     */
+    private static final Pattern AUDIO_ONLY_FILE_NAME =
+            Pattern.compile(".*\\.\\d+\\.audio(-\\d+)?\\.m4a$");
+    public static final String AUDIO_ONLY_FILE_EXTENSION = "audio.m4a";
 
     public static final String PREF_MEDIA_ID = "FeedMedia.PrefMediaId";
     private static final String PREF_FEED_ID = "FeedMedia.PrefFeedId";
@@ -374,6 +385,20 @@ public class FeedMedia extends FeedFile implements Playable {
     @Override
     public boolean localFileAvailable() {
         return isDownloaded() && file_url != null;
+    }
+
+    /**
+     * True if this is a video episode whose downloaded file holds only its audio track. It still
+     * counts as a video episode (the media type follows the feed), but watching it needs the
+     * stream.
+     */
+    public boolean isAudioOnlyDownload() {
+        return localFileAvailable() && getMediaType() == MediaType.VIDEO && isAudioOnlyFile(file_url);
+    }
+
+    /** Whether {@code path} is named like an audio-only download (see {@link #AUDIO_ONLY_FILE_EXTENSION}). */
+    public static boolean isAudioOnlyFile(@Nullable String path) {
+        return path != null && AUDIO_ONLY_FILE_NAME.matcher(path).matches();
     }
 
     public long getItemId() {

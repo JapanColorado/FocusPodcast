@@ -63,6 +63,35 @@ public final class VideoModeUtils {
     }
 
     /**
+     * Whether this media has to be streamed: it is not downloaded, or its download holds only
+     * the audio track ({@link FeedMedia#isAudioOnlyDownload()}) and it is to be watched.
+     */
+    public static boolean shouldStream(@NonNull Playable media) {
+        return !media.localFileAvailable() || (isAudioOnlyDownload(media) && shouldShowVideo(media));
+    }
+
+    /**
+     * {@link #shouldStream(Playable)} for starting playback. When streaming is not allowed (mobile
+     * data) and the media is an audio-only download that would be watched, it is listened to
+     * instead: its mode is set to audio only for this playback and the answer is false.
+     */
+    public static boolean resolveStream(@NonNull Playable media, boolean streamingAllowed) {
+        if (!shouldStream(media)) {
+            return false;
+        }
+        if (!streamingAllowed && media.localFileAvailable()) {
+            PlaybackPreferences.writeVideoMode(keyOf(media), false);
+            return false;
+        }
+        return true;
+    }
+
+    /** Whether this media's downloaded file is the audio track of a video episode. */
+    public static boolean isAudioOnlyDownload(@Nullable Playable media) {
+        return media instanceof FeedMedia && ((FeedMedia) media).isAudioOnlyDownload();
+    }
+
+    /**
      * {@link #shouldShowVideo(Playable)} for callers that only know what the playback service
      * last recorded (notification, widgets, media session). The service pins the choice when it
      * starts an episode ({@link #onMediaStarted}), so this agrees with the per-podcast setting.

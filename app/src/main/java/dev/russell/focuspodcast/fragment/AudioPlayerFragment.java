@@ -75,12 +75,15 @@ import dev.russell.focuspodcast.core.util.Converter;
 import dev.russell.focuspodcast.core.util.IntentUtils;
 import dev.russell.focuspodcast.core.util.TimeSpeedConverter;
 import dev.russell.focuspodcast.core.util.playback.PlaybackController;
+import dev.russell.focuspodcast.core.feed.util.VideoModeUtils;
+import dev.russell.focuspodcast.core.util.NetworkUtils;
 import dev.russell.focuspodcast.dialog.AdSegmentsDialog;
 import dev.russell.focuspodcast.dialog.BookmarkNoteDialog;
 import dev.russell.focuspodcast.dialog.PlaySpeedDialog;
 import dev.russell.focuspodcast.dialog.PlaybackControlsDialog;
 import dev.russell.focuspodcast.dialog.SkipPrefDialog;
 import dev.russell.focuspodcast.dialog.SleepTimerDialog;
+import dev.russell.focuspodcast.dialog.UseStreamConfirmDialog;
 import dev.russell.focuspodcast.event.BookmarksChangedEvent;
 import dev.russell.focuspodcast.event.CoverColorChangeEvent;
 import dev.russell.focuspodcast.event.adskip.AdSegmentsChangedEvent;
@@ -122,6 +125,7 @@ import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
+import kotlin.Unit;
 
 /**
  * Shows the audio player.
@@ -934,6 +938,17 @@ public class AudioPlayerFragment extends Fragment implements
         MenuIconUtil.showToolbarMenuIcon(toolbar);
     }
 
+    private void watchVideo(@NonNull Playable media) {
+        if (controller == null || !isAdded()) {
+            return;
+        }
+        controller.setShowVideo(true);
+        if (getActivity() instanceof MainActivity) {
+            ((MainActivity) getActivity()).getBottomSheet().setState(BottomSheetBehavior.STATE_COLLAPSED);
+        }
+        startActivity(PlaybackService.getPlayerActivityIntent(requireContext(), media));
+    }
+
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onEventMainThread(FeedItemEvent event) {
 
@@ -959,11 +974,15 @@ public class AudioPlayerFragment extends Fragment implements
             new SleepTimerDialog().show(getChildFragmentManager(), "SleepTimerDialog");
             return true;
         } else if (itemId == R.id.watch_video_item) {
-            controller.setShowVideo(true);
-            if (getActivity() instanceof MainActivity) {
-                ((MainActivity) getActivity()).getBottomSheet().setState(BottomSheetBehavior.STATE_COLLAPSED);
+            if (VideoModeUtils.isAudioOnlyDownload(media) && !NetworkUtils.isStreamingAllowed()) {
+                // The download holds no picture: watching streams the video, so ask first.
+                new UseStreamConfirmDialog(requireContext(), media, () -> {
+                    watchVideo(media);
+                    return Unit.INSTANCE;
+                }).show();
+            } else {
+                watchVideo(media);
             }
-            startActivity(PlaybackService.getPlayerActivityIntent(requireContext(), media));
             return true;
         } else if (itemId == R.id.audio_controls) {
             PlaybackControlsDialog dialog = PlaybackControlsDialog.newInstance(feedItem != null ? feedItem.getFeedId() : 0);
