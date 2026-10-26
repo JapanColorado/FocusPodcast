@@ -185,8 +185,8 @@ public class PlaybackServiceNotificationBuilder {
     private void addActions(NotificationCompat.Builder notification, MediaSessionCompat.Token mediaSessionToken,
                             PlayerStatus playerStatus) {
         ArrayList<Integer> compactActionList = new ArrayList<>();
-        //TODO: Android 13 seems to ignore the custom notification and uses its own media control
-        // icons (where fast forward and rewind do nothing) and actions, yet Addict manages to show custom icons
+        // Android 13+ ignores these actions and builds its media controls from the session's
+        // playback state; PlaybackServiceMediaSession#updatePlaybackState mirrors them there.
 
         int numActions = 0; // we start and 0 and then increment by 1 for each call to addAction
         // always let them rewind

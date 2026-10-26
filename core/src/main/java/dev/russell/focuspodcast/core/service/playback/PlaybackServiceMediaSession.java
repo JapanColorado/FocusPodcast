@@ -50,6 +50,7 @@ class PlaybackServiceMediaSession {
      */
     static final String CUSTOM_ACTION_FAST_FORWARD = "action.dev.russell.focuspodcast.core.service.fastForward";
     static final String CUSTOM_ACTION_REWIND = "action.dev.russell.focuspodcast.core.service.rewind";
+    static final String CUSTOM_ACTION_SKIP_EPISODE = "action.dev.russell.focuspodcast.core.service.skipEpisode";
 
     private final PlaybackService service;
 
@@ -193,16 +194,7 @@ class PlaybackServiceMediaSession {
         UiModeManager uiModeManager = (UiModeManager) service.getApplicationContext()
                 .getSystemService(Context.UI_MODE_SERVICE);
         if (uiModeManager.getCurrentModeType() == Configuration.UI_MODE_TYPE_CAR) {
-            sessionState.addCustomAction(
-                new PlaybackStateCompat.CustomAction.Builder(
-                        CUSTOM_ACTION_REWIND,
-                        service.getString(R.string.rewind_label), R.drawable.ic_notification_fast_rewind)
-                        .build());
-            sessionState.addCustomAction(
-                new PlaybackStateCompat.CustomAction.Builder(
-                        CUSTOM_ACTION_FAST_FORWARD,
-                        service.getString(R.string.fast_forward_label), R.drawable.ic_notification_fast_forward)
-                        .build());
+            addSeekActions(sessionState);
             service.customActions.addTo(sessionState, false);
         } else {
             // This would give the PIP of videos a play button
@@ -218,9 +210,28 @@ class PlaybackServiceMediaSession {
                         android.R.drawable.ic_media_ff);
                 WearMediaSession.mediaSessionSetExtraForWear(mediaSession);
                 service.customActions.addTo(sessionState, true);
+            } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                // The Android 13+ media controls (lock screen, quick settings) ignore the
+                // notification's actions and build their five slots from this state alone:
+                // previous, play/pause, next, then two custom actions. Without
+                // ACTION_SKIP_TO_PREVIOUS/NEXT the previous and next slots take the first two
+                // custom actions, so rewind and fast forward land either side of play/pause
+                // and the next two (skip episode and the user's extra buttons) fill the rest.
+                capabilities &= ~PlaybackStateCompat.ACTION_SKIP_TO_NEXT;
+                addSeekActions(sessionState);
+                // Like the notification, skip episode gives way to the extra buttons unless the
+                // user put it in the compact view.
+                boolean skipFirst = Prefs.showSkipOnCompactNotification();
+                if (skipFirst) {
+                    addSkipEpisodeAction(sessionState);
+                }
+                service.customActions.addTo(sessionState, false);
+                if (!skipFirst) {
+                    addSkipEpisodeAction(sessionState);
+                }
             } else {
-                // The lock screen and the Android 13+ media controls take their extra buttons
-                // from these custom actions, not from the notification's actions.
+                // Older lock screens take their extra buttons from these custom actions, not
+                // from the notification's actions.
                 service.customActions.addTo(sessionState, false);
             }
         }
@@ -228,6 +239,27 @@ class PlaybackServiceMediaSession {
         sessionState.setActions(capabilities);
 
         mediaSession.setPlaybackState(sessionState.build());
+    }
+
+    private void addSeekActions(PlaybackStateCompat.Builder sessionState) {
+        sessionState.addCustomAction(
+            new PlaybackStateCompat.CustomAction.Builder(
+                    CUSTOM_ACTION_REWIND,
+                    service.getString(R.string.rewind_label), R.drawable.ic_notification_fast_rewind)
+                    .build());
+        sessionState.addCustomAction(
+            new PlaybackStateCompat.CustomAction.Builder(
+                    CUSTOM_ACTION_FAST_FORWARD,
+                    service.getString(R.string.fast_forward_label), R.drawable.ic_notification_fast_forward)
+                    .build());
+    }
+
+    private void addSkipEpisodeAction(PlaybackStateCompat.Builder sessionState) {
+        sessionState.addCustomAction(
+            new PlaybackStateCompat.CustomAction.Builder(
+                    CUSTOM_ACTION_SKIP_EPISODE,
+                    service.getString(R.string.skip_episode_label), R.drawable.ic_notification_skip)
+                    .build());
     }
 
     private static boolean useSkipToPreviousForRewindInLockscreen() {
@@ -396,6 +428,9 @@ class PlaybackServiceMediaSession {
                 onFastForward();
             } else if (CUSTOM_ACTION_REWIND.equals(action)) {
                 onRewind();
+            } else if (CUSTOM_ACTION_SKIP_EPISODE.equals(action)) {
+                // As the notification's skip button: always the next episode, never remapped.
+                service.handleKeycode(KeyEvent.KEYCODE_MEDIA_NEXT, true);
             } else if (!service.customActions.perform(action)) {
                 Log.d(TAG, "Unknown custom action " + action);
             }
