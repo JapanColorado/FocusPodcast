@@ -5,9 +5,13 @@ import androidx.annotation.Nullable;
 
 import org.greenrobot.eventbus.EventBus;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import dev.russell.focuspodcast.core.pref.Prefs;
 import dev.russell.focuspodcast.core.storage.DBWriter;
 import dev.russell.focuspodcast.event.settings.AdSkipChangedEvent;
+import dev.russell.focuspodcast.model.feed.AdSegment;
 import dev.russell.focuspodcast.model.feed.Feed;
 import dev.russell.focuspodcast.model.feed.FeedItem;
 import dev.russell.focuspodcast.model.feed.FeedMedia;
@@ -39,6 +43,33 @@ public final class AdSkipUtils {
      */
     public static boolean isAdSkipEnabled(@Nullable Playable media) {
         return isAdSkipEnabled(preferencesOf(media));
+    }
+
+    /**
+     * Whether a segment is confident enough to count as an ad. Only detected segments are
+     * guesses and need {@code minConfidence}; chapter and manual ones are exact and always count.
+     * Whether the segment is enabled does not matter here.
+     */
+    public static boolean meetsThreshold(@NonNull AdSegment segment, float minConfidence) {
+        return segment.getSource() != AdSegment.Source.DETECTED
+                || segment.getConfidence() >= minConfidence;
+    }
+
+    /**
+     * The segments that clear the current sensitivity setting ({@link Prefs#getAdSkipMinConfidence()}),
+     * i.e. the ones that would be skipped if enabled. Weaker detections stay in the database so a
+     * change of sensitivity needs no re-analysis.
+     */
+    @NonNull
+    public static List<AdSegment> segmentsMeetingThreshold(@NonNull List<AdSegment> segments) {
+        float minConfidence = Prefs.getAdSkipMinConfidence();
+        List<AdSegment> result = new ArrayList<>(segments.size());
+        for (AdSegment segment : segments) {
+            if (meetsThreshold(segment, minConfidence)) {
+                result.add(segment);
+            }
+        }
+        return result;
     }
 
     /**

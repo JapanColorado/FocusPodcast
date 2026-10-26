@@ -1138,8 +1138,9 @@ public class AudioPlayerFragment extends Fragment implements
 
     /**
      * Paints the ad segments of the episode onto the position bar. Nothing is drawn while ad
-     * skipping is off for the episode's feed (its own choice, else the global default), so the
-     * bands never claim a skip that will not happen. The feed's preferences are re-read from the
+     * skipping is off for the episode's feed (its own choice, else the global default), and
+     * detections below the sensitivity threshold are left out, so the bands never claim a skip
+     * that will not happen. The feed's preferences are re-read from the
      * database because a change made elsewhere (the audio-effects dialog, the feed settings) may
      * not have touched the object this screen holds.
      */
@@ -1166,7 +1167,8 @@ public class AudioPlayerFragment extends Fragment implements
                     boolean enabled = stored != null
                             ? AdSkipUtils.isAdSkipEnabled(stored)
                             : AdSkipUtils.isAdSkipEnabled(media);
-                    return enabled ? DBReader.loadAdSegmentsOfFeedItem(itemId)
+                    return enabled
+                            ? AdSkipUtils.segmentsMeetingThreshold(DBReader.loadAdSegmentsOfFeedItem(itemId))
                             : Collections.<AdSegment>emptyList();
                 })
                 .subscribeOn(Schedulers.io())

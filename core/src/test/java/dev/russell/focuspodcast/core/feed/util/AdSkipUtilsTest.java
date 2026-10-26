@@ -18,11 +18,14 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
 
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
+import dev.russell.focuspodcast.core.pref.AdSkipPrefs;
 import dev.russell.focuspodcast.core.pref.PlaybackPreferences;
 import dev.russell.focuspodcast.core.pref.Prefs;
 import dev.russell.focuspodcast.core.pref.UsageStatistics;
@@ -31,6 +34,7 @@ import dev.russell.focuspodcast.core.storage.DBWriter;
 import dev.russell.focuspodcast.core.sync.SynchronizationCredentials;
 import dev.russell.focuspodcast.core.sync.SynchronizationSettings;
 import dev.russell.focuspodcast.event.settings.AdSkipChangedEvent;
+import dev.russell.focuspodcast.model.feed.AdSegment;
 import dev.russell.focuspodcast.model.feed.Feed;
 import dev.russell.focuspodcast.model.feed.FeedFilter;
 import dev.russell.focuspodcast.model.feed.FeedItem;
@@ -150,6 +154,36 @@ public class AdSkipUtilsTest {
         awaitChange(feed);
         assertNull(feed.getPreferences().getAdSkipOverride());
         assertNull(DBReader.getFeedPreferences(feed.getId()).getAdSkipOverride());
+    }
+
+    @Test
+    public void onlyDetectedSegmentsNeedTheThreshold() {
+        assertTrue(AdSkipUtils.meetsThreshold(detected(0.60f), 0.60f));
+        assertFalse(AdSkipUtils.meetsThreshold(detected(0.59f), 0.60f));
+        assertTrue(AdSkipUtils.meetsThreshold(
+                new AdSegment(1, 0, 1000, AdSegment.Source.CHAPTER, 0f), 0.60f));
+        assertTrue(AdSkipUtils.meetsThreshold(
+                new AdSegment(1, 0, 1000, AdSegment.Source.MANUAL, 0f), 0.60f));
+    }
+
+    @Test
+    public void segmentsMeetingThresholdFollowsTheSensitivity() {
+        AdSegment weak = detected(0.50f);
+        AdSegment strong = detected(0.80f);
+        AdSegment chapter = new AdSegment(1, 0, 1000, AdSegment.Source.CHAPTER, 0f);
+        AdSegment disabled = detected(0.80f);
+        disabled.setEnabled(false);
+        List<AdSegment> all = Arrays.asList(weak, strong, chapter, disabled);
+
+        Prefs.setAdSkipSensitivity(AdSkipPrefs.SENSITIVITY_MEDIUM);
+        assertEquals(Arrays.asList(strong, chapter, disabled), AdSkipUtils.segmentsMeetingThreshold(all));
+
+        Prefs.setAdSkipSensitivity(AdSkipPrefs.SENSITIVITY_HIGH);
+        assertEquals(all, AdSkipUtils.segmentsMeetingThreshold(all));
+    }
+
+    private static AdSegment detected(float confidence) {
+        return new AdSegment(1, 0, 1000, AdSegment.Source.DETECTED, confidence);
     }
 
     /** The event is posted from the database thread once the row is written. */

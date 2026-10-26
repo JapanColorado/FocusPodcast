@@ -14,7 +14,8 @@ import io.reactivex.schedulers.Schedulers
 
 /**
  * Paints the video player's position bar: the episode's ad segments (only while ad skipping is on
- * for its podcast, as in the audio player), its bookmarks and its chapter starts. Loads run off the
+ * for its podcast and only those that clear the sensitivity threshold, as in the audio player), its
+ * bookmarks and its chapter starts. Loads run off the
  * main thread; [dispose] cancels them.
  */
 internal class SeekBarMarkers(private val seekBar: AdMarkerSeekBar) {
@@ -56,7 +57,8 @@ internal class SeekBarMarkers(private val seekBar: AdMarkerSeekBar) {
             val stored = if (feedId != 0L) DBReader.getFeedPreferences(feedId) else null
             val enabled = if (stored != null) AdSkipUtils.isAdSkipEnabled(stored)
                 else AdSkipUtils.isAdSkipEnabled(media)
-            if (enabled) DBReader.loadAdSegmentsOfFeedItem(itemId) else emptyList<AdSegment>()
+            if (enabled) AdSkipUtils.segmentsMeetingThreshold(DBReader.loadAdSegmentsOfFeedItem(itemId))
+            else emptyList<AdSegment>()
         }
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())

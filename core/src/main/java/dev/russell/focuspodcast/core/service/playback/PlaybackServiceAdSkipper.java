@@ -287,8 +287,7 @@ class PlaybackServiceAdSkipper {
             if (!segment.isEnabled() || !segment.contains(positionMs)) {
                 continue;
             }
-            if (segment.getSource() == AdSegment.Source.DETECTED
-                    && segment.getConfidence() < minConfidence) {
+            if (!AdSkipUtils.meetsThreshold(segment, minConfidence)) {
                 continue;
             }
             return segment;
@@ -320,8 +319,7 @@ class PlaybackServiceAdSkipper {
                 continue;
             }
             // Only detected segments are guesses; chapter and manual ones are exact.
-            if (segment.getSource() == AdSegment.Source.DETECTED
-                    && segment.getConfidence() < minConfidence) {
+            if (!AdSkipUtils.meetsThreshold(segment, minConfidence)) {
                 continue;
             }
             float effectiveSpeed = speed > 0 ? speed : 1f;
