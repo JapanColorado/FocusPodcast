@@ -58,6 +58,7 @@ import dev.russell.focuspodcast.common.extensions.ColorExtensionsUtils;
 import dev.russell.focuspodcast.common.util.MenuIconUtil;
 import dev.russell.focuspodcast.common.util.TopSnackbarUtil;
 import dev.russell.focuspodcast.common.util.Timber;
+import dev.russell.focuspodcast.common.views.AccentMaterialDialog;
 import dev.russell.focuspodcast.R;
 import dev.russell.focuspodcast.activity.DriveModeActivity;
 import dev.russell.focuspodcast.activity.LockScreenActivity;
@@ -77,6 +78,7 @@ import dev.russell.focuspodcast.core.util.TimeSpeedConverter;
 import dev.russell.focuspodcast.core.util.playback.PlaybackController;
 import dev.russell.focuspodcast.core.feed.util.VideoModeUtils;
 import dev.russell.focuspodcast.core.util.NetworkUtils;
+import dev.russell.focuspodcast.core.util.VideoStreamCheck;
 import dev.russell.focuspodcast.dialog.AdSegmentsDialog;
 import dev.russell.focuspodcast.dialog.BookmarkNoteDialog;
 import dev.russell.focuspodcast.dialog.PlaySpeedDialog;
@@ -187,6 +189,8 @@ public class AudioPlayerFragment extends Fragment implements
     private long bookmarksItemId;
     /** Runs the chapter-only analysis a streamed episode can get. */
     private Disposable adAnalysisDisposable;
+    /** Reads the video's size before "Watch video" on an audio-only download. */
+    private Disposable videoStreamCheckDisposable;
     /** The episode the seek bar is currently showing segments for, or 0 for none. */
     private long adSegmentsItemId;
     /** Where the user tapped "mark ad start", or {@link #NO_PENDING_AD_START}. */
@@ -770,6 +774,10 @@ public class AudioPlayerFragment extends Fragment implements
             adAnalysisDisposable.dispose();
             adAnalysisDisposable = null;
         }
+        if (videoStreamCheckDisposable != null) {
+            videoStreamCheckDisposable.dispose();
+            videoStreamCheckDisposable = null;
+        }
         if (bookmarksDisposable != null) {
             bookmarksDisposable.dispose();
             bookmarksDisposable = null;
@@ -938,6 +946,50 @@ public class AudioPlayerFragment extends Fragment implements
         MenuIconUtil.showToolbarMenuIcon(toolbar);
     }
 
+    /**
+     * Watching an audio-only download streams its video, which for a 4K episode can need far
+     * more than the connection delivers: warn first when Android's speed estimate says it will
+     * not keep up. (If it is watched anyway and never starts, the service goes back to the audio.)
+     */
+    private void checkVideoStreamThenWatch(@NonNull FeedMedia media) {
+        if (videoStreamCheckDisposable != null) {
+            videoStreamCheckDisposable.dispose();
+        }
+        Context appContext = requireContext().getApplicationContext();
+        videoStreamCheckDisposable = Single.fromCallable(() -> VideoStreamCheck.fetchStreamSize(media))
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(size -> {
+                    float speed = VideoStreamCheck.watchingSpeed(media);
+                    long required = VideoStreamCheck.requiredKbps(size, media.getDuration(), speed);
+                    long available = VideoStreamCheck.estimatedDownstreamKbps(appContext);
+                    if (!isAdded()) {
+                        return;
+                    }
+                    if (VideoStreamCheck.isLikelyTooSlow(required, available)) {
+                        showVideoTooHeavyDialog(media, required, available, speed);
+                    } else {
+                        watchVideo(media);
+                    }
+                }, error -> {
+                    Log.e(TAG, "Checking the video stream failed", error);
+                    watchVideo(media);
+                });
+    }
+
+    private void showVideoTooHeavyDialog(@NonNull FeedMedia media, long requiredKbps, long availableKbps,
+                                         float speed) {
+        DecimalFormat number = new DecimalFormat("0.#");
+        new AccentMaterialDialog(requireContext(), R.style.MaterialAlertDialogTheme)
+                .setTitle(R.string.video_stream_too_heavy_title)
+                .setMessage(getString(R.string.video_stream_too_heavy_message,
+                        number.format(speed), number.format(requiredKbps / 1000.0),
+                        number.format(availableKbps / 1000.0)))
+                .setPositiveButton(R.string.video_stream_watch_anyway, (dialog, which) -> watchVideo(media))
+                .setNegativeButton(R.string.video_stream_keep_listening, null)
+                .show();
+    }
+
     private void watchVideo(@NonNull Playable media) {
         if (controller == null || !isAdded()) {
             return;
@@ -974,14 +1026,16 @@ public class AudioPlayerFragment extends Fragment implements
             new SleepTimerDialog().show(getChildFragmentManager(), "SleepTimerDialog");
             return true;
         } else if (itemId == R.id.watch_video_item) {
-            if (VideoModeUtils.isAudioOnlyDownload(media) && !NetworkUtils.isStreamingAllowed()) {
+            if (!VideoModeUtils.isAudioOnlyDownload(media)) {
+                watchVideo(media);
+            } else if (!NetworkUtils.isStreamingAllowed()) {
                 // The download holds no picture: watching streams the video, so ask first.
                 new UseStreamConfirmDialog(requireContext(), media, () -> {
-                    watchVideo(media);
+                    checkVideoStreamThenWatch((FeedMedia) media);
                     return Unit.INSTANCE;
                 }).show();
             } else {
-                watchVideo(media);
+                checkVideoStreamThenWatch((FeedMedia) media);
             }
             return true;
         } else if (itemId == R.id.audio_controls) {

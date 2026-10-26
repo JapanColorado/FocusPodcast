@@ -7,7 +7,9 @@ import android.content.SharedPreferences;
 import android.os.Binder;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.IBinder;
+import android.os.Looper;
 import android.support.v4.media.MediaBrowserCompat;
 import android.text.TextUtils;
 import android.util.Log;
@@ -46,6 +48,7 @@ import dev.russell.focuspodcast.core.util.NetworkUtils;
 import dev.russell.focuspodcast.core.util.playback.PlayableUtils;
 import dev.russell.focuspodcast.core.util.playback.PlaybackServiceStarter;
 import dev.russell.focuspodcast.core.widget.WidgetUpdater;
+import dev.russell.focuspodcast.event.MessageEvent;
 import dev.russell.focuspodcast.event.PlayerErrorEvent;
 import dev.russell.focuspodcast.event.adskip.AdSegmentsChangedEvent;
 import dev.russell.focuspodcast.event.adskip.AdSkipUndoEvent;
@@ -156,6 +159,11 @@ public class PlaybackService extends MediaBrowserServiceCompat {
      * taken for an episode start.
      */
     volatile boolean sourceSwitchPending = false;
+    /** How long the video stream of an audio-only download may take to start playing. */
+    private static final long VIDEO_STREAM_START_TIMEOUT_MS = 10_000;
+    /** Progress past the switch position that counts as "the stream plays". */
+    private static final int VIDEO_STREAM_PROGRESS_MS = 500;
+    private final Handler videoStreamWatchdog = new Handler(Looper.getMainLooper());
 
     PlaybackServiceMediaPlayer mediaPlayer;
     PlaybackServiceTaskManager taskManager;
@@ -278,6 +286,7 @@ public class PlaybackService extends MediaBrowserServiceCompat {
         super.onDestroy();
         Log.d(TAG, "onDestroy");
 
+        videoStreamWatchdog.removeCallbacksAndMessages(null);
         notificationUpdater.notifyStoppedIfPlaying();
         stateManager.stopForeground(!Prefs.isPersistNotify());
         isRunning = false;
@@ -590,8 +599,35 @@ public class PlaybackService extends MediaBrowserServiceCompat {
                 // The reload goes through PREPARED -> PLAYING again, which is not an episode start.
                 sourceSwitchPending = mediaPlayer.getPlayerStatus() == PlayerStatus.PLAYING;
                 mediaPlayer.switchSource(stream);
+                videoStreamWatchdog.removeCallbacksAndMessages(null);
+                if (stream) {
+                    Object identifier = playable.getIdentifier();
+                    int startPosition = playable.getPosition();
+                    videoStreamWatchdog.postDelayed(() -> checkVideoStreamStarted(identifier, startPosition),
+                            VIDEO_STREAM_START_TIMEOUT_MS);
+                }
             }
         }
+    }
+
+    /**
+     * Goes back to the downloaded audio if the video stream of an audio-only download has not
+     * started playing: a 4K episode can need more bandwidth than the connection has, and then it
+     * would sit silent forever. Does nothing if the listener paused or moved on meanwhile.
+     */
+    private void checkVideoStreamStarted(@NonNull Object identifier, int startPosition) {
+        Playable playable = getPlayable();
+        if (playable == null || !identifier.equals(playable.getIdentifier()) || !mediaPlayer.isStreaming()
+                || mediaPlayer.getPlayerStatus() != PlayerStatus.PLAYING) {
+            return;
+        }
+        int position = mediaPlayer.getPosition();
+        if (position != Playable.INVALID_TIME && position > startPosition + VIDEO_STREAM_PROGRESS_MS) {
+            return; // it plays
+        }
+        Log.w(TAG, "video stream did not start in time, back to the downloaded audio");
+        EventBus.getDefault().post(new MessageEvent(getString(R.string.video_stream_fell_back)));
+        VideoModeUtils.setShowVideo(playable, false);
     }
 
     /** True while playback is inside an ad segment that {@link #skipCurrentAd()} can skip. */
