@@ -43,6 +43,9 @@ public interface IPlayer {
     /** Sets the Clear voice strength, a {@code ClearVoiceLevel}; applies to the playing stream. */
     void setClearVoiceLevel(int level);
 
+    /** Sets the Volume leveling mode, a {@code VolumeLeveling}; applies to the playing stream. */
+    void setVolumeLeveling(int mode);
+
     void setVolume(float left, float right);
 
     void start();

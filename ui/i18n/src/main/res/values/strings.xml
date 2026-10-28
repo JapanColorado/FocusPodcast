@@ -947,6 +947,13 @@
     <string name="voice_clear_sum">Less background noise, even volume, softer S sounds</string>
     <string name="voice_clear_plus_sum">Stronger cleanup for rough recordings</string>
     <string name="voice_warm_sum">Fuller tone and softer S sounds for thin or harsh mics</string>
+    <string name="volume_leveling_label">Volume leveling</string>
+    <string name="volume_leveling_off">Off</string>
+    <string name="volume_leveling_gentle">Gentle</string>
+    <string name="volume_leveling_strong">Strong</string>
+    <string name="volume_leveling_off_sum">Each podcast plays at its own volume</string>
+    <string name="volume_leveling_gentle_sum">Every podcast at about the same volume</string>
+    <string name="volume_leveling_strong_sum">Also evens out speakers and loud moments, for noisy places</string>
     <string name="default_audio_effects">Default audio effects</string>
     <string name="default_audio_effects_sum">Podcasts use these until you change one for a podcast</string>
     <string name="default_playback_speed_sum">Podcasts use this until you change it for a podcast</string>

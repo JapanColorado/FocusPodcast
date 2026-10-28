@@ -90,6 +90,14 @@ class DBUpgrade {
                         + DbSchema.KEY_FEED_VIDEO_OVERRIDE + " INTEGER");
             }
         }
+        if (oldVersion < 13) {
+            // A feed's own Volume leveling mode, part of its own audio effects. Existing rows read
+            // 0 (off), which is also what a feed that follows the defaults stores.
+            if (!hasColumn(db, DbSchema.TABLE_NAME_FEEDS, DbSchema.KEY_VOLUME_LEVELING)) {
+                db.execSQL("ALTER TABLE " + DbSchema.TABLE_NAME_FEEDS + " ADD COLUMN "
+                        + DbSchema.KEY_VOLUME_LEVELING + " INTEGER DEFAULT 0");
+            }
+        }
     }
 
     private static void addTextColumn(final SQLiteDatabase db, final String table, final String column) {

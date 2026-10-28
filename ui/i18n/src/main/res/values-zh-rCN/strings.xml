@@ -832,6 +832,13 @@
   <string name="voice_clear_sum">降低背景噪音，平衡音量，柔化齿音</string>
   <string name="voice_clear_plus_sum">更强的清理，适合粗糙的录音</string>
   <string name="voice_warm_sum">音色更饱满，柔化齿音，适合单薄或刺耳的麦克风</string>
+  <string name="volume_leveling_label">音量均衡</string>
+  <string name="volume_leveling_off">关闭</string>
+  <string name="volume_leveling_gentle">柔和</string>
+  <string name="volume_leveling_strong">强</string>
+  <string name="volume_leveling_off_sum">每个播客保持各自的音量</string>
+  <string name="volume_leveling_gentle_sum">让所有播客的音量大致相同</string>
+  <string name="volume_leveling_strong_sum">同时拉平不同说话人和突然变大的声音，适合嘈杂环境</string>
   <string name="default_audio_effects">默认音效</string>
   <string name="default_audio_effects_sum">播客会一直使用这些设置，直到你为某个播客单独更改</string>
   <string name="default_playback_speed_sum">播客会一直使用此速度，直到你为某个播客单独更改</string>

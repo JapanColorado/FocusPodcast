@@ -16,6 +16,7 @@ import java.nio.ByteOrder;
 import java.util.Random;
 
 import dev.russell.focuspodcast.model.playback.ClearVoiceLevel;
+import dev.russell.focuspodcast.model.playback.VolumeLeveling;
 
 /**
  * The ExoPlayer adapter, driven the way {@code DefaultAudioSink} drives it: configure, flush,
@@ -60,6 +61,24 @@ public class ClearVoiceAudioProcessorTest {
         assertEquals(ClearVoiceLevel.STRONG, processor.getLevel());
     }
 
+    @Test
+    public void levelingAloneIsAppliedAndKeepsTheStreamLength() throws Exception {
+        ClearVoiceAudioProcessor processor = configured(ClearVoiceLevel.OFF);
+        processor.setVolumeLeveling(VolumeLeveling.STRONG);
+        // quiet phrases (about -40 dBFS) with faint noise (-70 dBFS) in the pauses between them,
+        // which the leveler brings up
+        ByteBuffer quiet = ByteBuffer.wrap(randomPcm(RATE * 4)).order(ByteOrder.nativeOrder());
+        for (int i = 0; i < RATE * 4 * CHANNELS; i++) {
+            boolean phrase = (i / CHANNELS) % (RATE * 8 / 10) < RATE * 4 / 10;
+            quiet.putShort(i * 2, (short) (quiet.getShort(i * 2) / (phrase ? 10 : 300)));
+        }
+        byte[] input = quiet.array();
+        byte[] output = runThrough(processor, input);
+        assertEquals(input.length, output.length);
+        assertTrue(rms(output, RATE * 2) > 3 * rms(input, RATE * 2));
+        assertEquals(VolumeLeveling.STRONG, processor.getVolumeLeveling());
+    }
+
     private static ClearVoiceAudioProcessor configured(int level) throws Exception {
         ClearVoiceAudioProcessor processor = new ClearVoiceAudioProcessor();
         processor.setLevel(level);
@@ -100,6 +119,18 @@ public class ClearVoiceAudioProcessorTest {
         byte[] bytes = new byte[out.remaining()];
         out.get(bytes);
         collected.write(bytes, 0, bytes.length);
+    }
+
+    /** RMS of the 16-bit samples from frame {@code fromFrame} on. */
+    private static double rms(byte[] pcm, int fromFrame) {
+        ByteBuffer buffer = ByteBuffer.wrap(pcm).order(ByteOrder.nativeOrder());
+        double sum = 0;
+        int count = 0;
+        for (int i = fromFrame * CHANNELS; i < pcm.length / 2; i++, count++) {
+            double v = buffer.getShort(i * 2);
+            sum += v * v;
+        }
+        return Math.sqrt(sum / Math.max(1, count));
     }
 
     private static byte[] randomPcm(int frames) {

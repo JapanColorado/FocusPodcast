@@ -183,6 +183,12 @@ public abstract class PlaybackServiceMediaPlayer {
      */
     public abstract void setClearVoiceLevel(int level);
 
+    /**
+     * Sets the Volume leveling mode (0 off, 1 gentle, 2 strong, see {@code VolumeLeveling}).
+     * Takes effect without restarting playback.
+     */
+    public abstract void setVolumeLeveling(int mode);
+
     public abstract MediaType getCurrentMediaType();
 
     public abstract boolean isStreaming();

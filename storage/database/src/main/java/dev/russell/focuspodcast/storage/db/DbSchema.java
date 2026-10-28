@@ -12,7 +12,7 @@ import static dev.russell.focuspodcast.model.feed.FeedPreferences.SPEED_USE_GLOB
 final class DbSchema {
 
     public static final String DATABASE_NAME = "focusPodcastApp.db";
-    public static final int VERSION = 12;
+    public static final int VERSION = 13;
 
     /**
      * Maximum number of arguments for IN-operator.
@@ -69,6 +69,8 @@ final class DbSchema {
     static final String KEY_LOUDNESS_ENABLED = "loudness";
     /** A feed's own Clear voice strength (0 off, 1 light, 2 strong); added in version 8. */
     public static final String KEY_CLEAR_VOICE = "clear_voice";
+    /** A feed's own Volume leveling mode (0 off, 1 gentle, 2 strong); added in version 13. */
+    public static final String KEY_VOLUME_LEVELING = "volume_leveling";
     public static final String KEY_MONO_ENABLED = "mono";
     public static final String KEY_PLAYED_DURATION = "played_duration";
     public static final String KEY_KEEP_UPDATED = "keep_updated";
@@ -199,6 +201,7 @@ final class DbSchema {
             + KEY_FEED_SKIP_INTRO + " INTEGER DEFAULT 0,"
             + KEY_AUDIOBOOK + " INTEGER DEFAULT 0,"
             + KEY_CLEAR_VOICE + " INTEGER DEFAULT 0,"
+            + KEY_VOLUME_LEVELING + " INTEGER DEFAULT 0,"
             + KEY_FEED_AD_SKIP_OVERRIDE + " INTEGER,"
             + KEY_FEED_VIDEO_OVERRIDE + " INTEGER,"
             + KEY_PERSONS + " TEXT)";
@@ -358,6 +361,7 @@ final class DbSchema {
             TABLE_NAME_FEEDS + "." + KEY_IS_SUBSCRIBED,
             TABLE_NAME_FEEDS + "." + KEY_IS_PAGED,
             TABLE_NAME_FEEDS + "." + KEY_CLEAR_VOICE,
+            TABLE_NAME_FEEDS + "." + KEY_VOLUME_LEVELING,
             TABLE_NAME_FEEDS + "." + KEY_FEED_IDENTIFIER,
             TABLE_NAME_FEEDS + "." + KEY_KEEP_UPDATED,
             TABLE_NAME_FEEDS + "." + KEY_ITUNES_FEED_ID,

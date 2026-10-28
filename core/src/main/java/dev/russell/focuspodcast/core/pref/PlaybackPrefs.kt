@@ -6,6 +6,7 @@ import dev.russell.focuspodcast.core.pref.PrefsStore.prefs
 import dev.russell.focuspodcast.model.feed.SortOrder
 import dev.russell.focuspodcast.model.playback.ClearVoiceLevel
 import dev.russell.focuspodcast.model.playback.MediaType
+import dev.russell.focuspodcast.model.playback.VolumeLeveling
 import android.util.Log
 import android.view.KeyEvent
 import androidx.annotation.VisibleForTesting
@@ -286,6 +287,21 @@ internal object PlaybackPrefs {
     fun setClearVoiceLevel(level: Int) {
         prefs.edit()
             .putString(Prefs.PREF_CLEAR_VOICE, ClearVoiceLevel.sanitize(level).toString())
+            .apply()
+    }
+
+    /**
+     * The default Volume leveling mode (a [VolumeLeveling]). Stored as a string because the
+     * Settings screen edits it with a ListPreference.
+     */
+    fun volumeLeveling(): Int {
+        val stored = prefs.getString(Prefs.PREF_VOLUME_LEVELING, null)?.toIntOrNull() ?: VolumeLeveling.OFF
+        return VolumeLeveling.sanitize(stored)
+    }
+
+    fun setVolumeLeveling(mode: Int) {
+        prefs.edit()
+            .putString(Prefs.PREF_VOLUME_LEVELING, VolumeLeveling.sanitize(mode).toString())
             .apply()
     }
 

@@ -16,8 +16,8 @@ import dev.russell.focuspodcast.playback.base.PlayerStatus;
 /**
  * Owns how loud, how fast and with which effects {@link LocalPSMP} plays: the playback speed and
  * skip-silence parameters (including the {@link SpeedChangedEvent} that announces a speed change),
- * the per-feed volume adaption applied to every volume change, and the Clear voice enhancer and
- * stereo-to-mono downmix effects. {@link LocalPSMP} keeps all the public entry points of
+ * the per-feed volume adaption applied to every volume change, and the Clear voice enhancer,
+ * volume leveling and stereo-to-mono downmix effects. {@link LocalPSMP} keeps all the public entry points of
  * {@code PlaybackServiceMediaPlayer} and delegates their bodies here.
  */
 class LocalPSMPAudioEffects {
@@ -42,16 +42,19 @@ class LocalPSMPAudioEffects {
     }
 
     /**
-     * Applies the Clear voice and downmix effects configured for the current media.
+     * Applies the Clear voice, volume leveling and downmix effects configured for the current media.
      * This method is executed on an internal executor service.
      */
     void setAudioEffect() {
         player.executor.submit(() -> {
             player.playerLock.lock();
             int clearVoiceLevel = AudioEffectUtils.getClearVoiceLevel(player.media);
+            int volumeLeveling = AudioEffectUtils.getVolumeLeveling(player.media);
             boolean isMono = AudioEffectUtils.isMonoEnable(player.media);
-            Log.d(TAG, "set AudioEffect clear voice -> " + clearVoiceLevel + " downmix ->" + isMono);
+            Log.d(TAG, "set AudioEffect clear voice -> " + clearVoiceLevel + " leveling -> " + volumeLeveling
+                    + " downmix ->" + isMono);
             player.mediaPlayer.setClearVoiceLevel(clearVoiceLevel);
+            player.mediaPlayer.setVolumeLeveling(volumeLeveling);
             player.mediaPlayer.setDownmix(isMono);
             player.playerLock.unlock();
         });
@@ -139,6 +142,16 @@ class LocalPSMPAudioEffects {
         if (player.media != null && player.media.getMediaType() == MediaType.AUDIO) {
             player.mediaPlayer.setClearVoiceLevel(level);
             Log.d(TAG, "clear voice was set to " + level);
+        }
+        player.playerLock.unlock();
+    }
+
+    /** Unlike the other effects this also applies to video episodes, whose audio it levels too. */
+    void setVolumeLeveling(int mode) {
+        player.playerLock.lock();
+        if (player.mediaPlayer != null) {
+            player.mediaPlayer.setVolumeLeveling(mode);
+            Log.d(TAG, "volume leveling was set to " + mode);
         }
         player.playerLock.unlock();
     }

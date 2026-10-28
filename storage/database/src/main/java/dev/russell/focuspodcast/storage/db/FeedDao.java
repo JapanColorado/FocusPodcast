@@ -41,6 +41,7 @@ import static dev.russell.focuspodcast.storage.db.DbSchema.KEY_LAST_UPDATE_FAILE
 import static dev.russell.focuspodcast.storage.db.DbSchema.KEY_LINK;
 import static dev.russell.focuspodcast.storage.db.DbSchema.KEY_PERSONS;
 import static dev.russell.focuspodcast.storage.db.DbSchema.KEY_CLEAR_VOICE;
+import static dev.russell.focuspodcast.storage.db.DbSchema.KEY_VOLUME_LEVELING;
 import static dev.russell.focuspodcast.storage.db.DbSchema.KEY_MINIMAL_DURATION_FILTER;
 import static dev.russell.focuspodcast.storage.db.DbSchema.KEY_MONO_ENABLED;
 import static dev.russell.focuspodcast.storage.db.DbSchema.KEY_NEXT_PAGE_LINK;
@@ -153,6 +154,7 @@ class FeedDao extends Dao {
         values.put(KEY_SKIP_SILENCE_ENABLED, prefs.isSkipSilence());
         values.put(KEY_USE_FEED_EFFECT, prefs.isUseFeedEffect());
         values.put(KEY_CLEAR_VOICE, prefs.getClearVoiceLevel());
+        values.put(KEY_VOLUME_LEVELING, prefs.getVolumeLeveling());
         values.put(KEY_MONO_ENABLED, prefs.isMono());
         values.put(KEY_KEEP_UPDATED, prefs.getKeepUpdated());
         values.put(KEY_AUTO_DELETE_ACTION, prefs.getAutoDeleteAction().ordinal());

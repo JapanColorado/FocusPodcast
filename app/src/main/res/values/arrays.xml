@@ -48,4 +48,25 @@
         <item>3</item>
     </string-array>
 
+    <!-- The Volume leveling modes, in VolumeLeveling order -->
+    <string-array name="volume_leveling_options">
+        <item>@string/volume_leveling_off</item>
+        <item>@string/volume_leveling_gentle</item>
+        <item>@string/volume_leveling_strong</item>
+    </string-array>
+
+    <!-- One line per Volume leveling mode, same order; shown as the preference summary -->
+    <string-array name="volume_leveling_descriptions">
+        <item>@string/volume_leveling_off_sum</item>
+        <item>@string/volume_leveling_gentle_sum</item>
+        <item>@string/volume_leveling_strong_sum</item>
+    </string-array>
+
+    <!-- MUST stay in sync with VolumeLeveling in model -->
+    <string-array name="volume_leveling_values" translatable="false">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+    </string-array>
+
 </resources>

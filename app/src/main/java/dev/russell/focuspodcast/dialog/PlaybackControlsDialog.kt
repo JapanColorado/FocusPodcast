@@ -11,9 +11,11 @@ import dev.russell.focuspodcast.core.util.playback.PlaybackController
 import dev.russell.focuspodcast.databinding.AudioControlsBinding
 import dev.russell.focuspodcast.event.settings.AudioEffectsChangedEvent
 import dev.russell.focuspodcast.fragment.pref.ClearVoicePreferences
+import dev.russell.focuspodcast.fragment.pref.VolumeLevelingPreferences
 import dev.russell.focuspodcast.model.feed.Feed
 import dev.russell.focuspodcast.model.feed.FeedPreferences
 import dev.russell.focuspodcast.model.playback.ClearVoiceLevel
+import dev.russell.focuspodcast.model.playback.VolumeLeveling
 import android.app.Dialog
 import android.os.Bundle
 import android.os.Handler
@@ -31,8 +33,8 @@ import io.reactivex.schedulers.Schedulers
 import org.greenrobot.eventbus.EventBus
 
 /**
- * The player's audio effects dialog: Voice, Skip silence, Stereo to mono and, for a podcast,
- * Detect ads. For an episode of a subscribed podcast every change is stored for that podcast: the
+ * The player's audio effects dialog: Voice, Volume leveling, Skip silence, Stereo to mono and,
+ * for a podcast, Detect ads. For an episode of a subscribed podcast every change is stored for that podcast: the
  * first change copies the global defaults into the podcast and then applies the change, so the
  * podcast keeps its own effects from then on. While it has them a card offers "Reset to default"
  * (follow Settings again) and "Set as default" (make its values the defaults, then follow them).
@@ -122,6 +124,7 @@ class PlaybackControlsDialog : DialogFragment() {
         val feedPreferences = PlayableFeedPreferences.of(loadedFeed)
 
         bindVoice(binding, AudioEffectUtils.getClearVoiceLevel(feedPreferences))
+        bindVolumeLeveling(binding, AudioEffectUtils.getVolumeLeveling(feedPreferences))
         bindSwitch(binding.skipSilence, AudioEffectUtils.isSkipSilence(feedPreferences)) { checked ->
             changeEffect({ it.isSkipSilence = checked }, { Prefs.isSkipSilence = checked })
         }
@@ -171,6 +174,32 @@ class PlaybackControlsDialog : DialogFragment() {
             }
             binding.voiceDescription.text = ClearVoicePreferences.description(resources, chosen)
             changeEffect({ it.clearVoiceLevel = chosen }, { Prefs.setClearVoiceLevel(chosen) })
+        }
+    }
+
+    /** Off / Gentle / Strong, laid out like the Voice row. */
+    private fun bindVolumeLeveling(binding: AudioControlsBinding, mode: Int) {
+        val group = binding.volumeLevelingGroup
+        group.clearOnButtonCheckedListeners()
+        group.check(
+            when (mode) {
+                VolumeLeveling.STRONG -> R.id.leveling_strong
+                VolumeLeveling.GENTLE -> R.id.leveling_gentle
+                else -> R.id.leveling_off
+            }
+        )
+        binding.volumeLevelingDescription.text = VolumeLevelingPreferences.description(resources, mode)
+        group.addOnButtonCheckedListener { _, checkedId, isChecked ->
+            if (!isChecked) {
+                return@addOnButtonCheckedListener
+            }
+            val chosen = when (checkedId) {
+                R.id.leveling_strong -> VolumeLeveling.STRONG
+                R.id.leveling_gentle -> VolumeLeveling.GENTLE
+                else -> VolumeLeveling.OFF
+            }
+            binding.volumeLevelingDescription.text = VolumeLevelingPreferences.description(resources, chosen)
+            changeEffect({ it.volumeLeveling = chosen }, { Prefs.setVolumeLeveling(chosen) })
         }
     }
 

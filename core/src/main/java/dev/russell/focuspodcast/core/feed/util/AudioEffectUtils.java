@@ -11,9 +11,11 @@ import dev.russell.focuspodcast.event.settings.AudioEffectsChangedEvent;
 import dev.russell.focuspodcast.model.feed.FeedPreferences;
 import dev.russell.focuspodcast.model.playback.ClearVoiceLevel;
 import dev.russell.focuspodcast.model.playback.Playable;
+import dev.russell.focuspodcast.model.playback.VolumeLeveling;
 
 /**
- * Resolves and stores the audio effects (Voice mode, skip silence, stereo to mono). A subscribed
+ * Resolves and stores the audio effects (Voice mode, volume leveling, skip silence, stereo to
+ * mono). A subscribed
  * podcast follows the global defaults from Settings until one of them is changed for it, in the
  * player or on its Audio effects screen, which gives it its own copy of all of them
  * ({@link FeedPreferences#isUseFeedEffect()}) until "Reset to default".
@@ -38,6 +40,11 @@ public final class AudioEffectUtils {
         return getClearVoiceLevel(PlayableFeedPreferences.of(media));
     }
 
+    /** The Volume leveling mode ({@link VolumeLeveling}) for {@code media}. */
+    public static int getVolumeLeveling(@Nullable Playable media) {
+        return getVolumeLeveling(PlayableFeedPreferences.of(media));
+    }
+
     /** True when the podcast has its own effects instead of following the global defaults. */
     public static boolean hasOwnEffects(@Nullable FeedPreferences preferences) {
         return preferences != null && preferences.isUseFeedEffect();
@@ -55,6 +62,10 @@ public final class AudioEffectUtils {
         return hasOwnEffects(preferences) ? preferences.getClearVoiceLevel() : Prefs.getClearVoiceLevel();
     }
 
+    public static int getVolumeLeveling(@Nullable FeedPreferences preferences) {
+        return hasOwnEffects(preferences) ? preferences.getVolumeLeveling() : Prefs.getVolumeLeveling();
+    }
+
     /**
      * Gives the podcast its own effects, starting from the values currently in effect (the
      * global defaults), so switching to per-podcast effects changes nothing audible by itself.
@@ -68,6 +79,7 @@ public final class AudioEffectUtils {
         preferences.setSkipSilence(Prefs.isSkipSilence());
         preferences.setMono(Prefs.stereoToMono());
         preferences.setClearVoiceLevel(Prefs.getClearVoiceLevel());
+        preferences.setVolumeLeveling(Prefs.getVolumeLeveling());
         preferences.setUseFeedEffect(true);
     }
 
@@ -81,14 +93,16 @@ public final class AudioEffectUtils {
         final boolean skipSilence = preferences.isSkipSilence();
         final boolean mono = preferences.isMono();
         final int clearVoiceLevel = preferences.getClearVoiceLevel();
+        final int volumeLeveling = preferences.getVolumeLeveling();
         DBWriter.updateFeedPreferences(feedId, stored -> {
             stored.setUseFeedEffect(useFeedEffect);
             stored.setSkipSilence(skipSilence);
             stored.setMono(mono);
             stored.setClearVoiceLevel(clearVoiceLevel);
+            stored.setVolumeLeveling(volumeLeveling);
         });
         EventBus.getDefault().post(AudioEffectsChangedEvent.forFeed(
-                feedId, useFeedEffect, skipSilence, mono, clearVoiceLevel));
+                feedId, useFeedEffect, skipSilence, mono, clearVoiceLevel, volumeLeveling));
     }
 
     /**
@@ -104,6 +118,7 @@ public final class AudioEffectUtils {
         Prefs.setSkipSilence(preferences.isSkipSilence());
         Prefs.stereoToMono(preferences.isMono());
         Prefs.setClearVoiceLevel(preferences.getClearVoiceLevel());
+        Prefs.setVolumeLeveling(preferences.getVolumeLeveling());
         EventBus.getDefault().post(AudioEffectsChangedEvent.global());
         preferences.setUseFeedEffect(false);
         saveFeedEffects(feedId, preferences);

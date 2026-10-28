@@ -34,6 +34,7 @@ import dev.russell.focuspodcast.model.feed.FeedMedia;
 import dev.russell.focuspodcast.model.feed.FeedPreferences;
 import dev.russell.focuspodcast.model.feed.VolumeAdaptionSetting;
 import dev.russell.focuspodcast.model.playback.ClearVoiceLevel;
+import dev.russell.focuspodcast.model.playback.VolumeLeveling;
 import dev.russell.focuspodcast.storage.db.mapper.DownloadStatusCursorMapper;
 import dev.russell.focuspodcast.storage.db.mapper.FeedCursorMapper;
 import dev.russell.focuspodcast.storage.db.mapper.FeedItemCursorMapper;
@@ -71,8 +72,8 @@ public class DbTest {
     // ---------------------------------------------------------------- schema
 
     @Test
-    public void freshDatabaseIsAtSchemaVersion12() {
-        assertEquals(12, Db.VERSION);
+    public void freshDatabaseIsAtSchemaVersion13() {
+        assertEquals(13, Db.VERSION);
         assertEquals(Db.VERSION, Db.getInstance().getDb().getVersion());
     }
 
@@ -427,6 +428,42 @@ public class DbTest {
         assertEquals(null, mappedVideoOverrideOf(feed.getId()));
     }
 
+    /**
+     * The real 12 -&gt; 13 step: rebuild the feeds table without the volume leveling column, run
+     * the ladder and check the column comes back with every existing feed reading "off".
+     */
+    @Test
+    public void upgradeFromVersion12AddsTheVolumeLevelingColumn() {
+        SQLiteDatabase db = Db.getInstance().getDb();
+        String levelingColumn = DbSchema.KEY_VOLUME_LEVELING + " INTEGER DEFAULT 0,";
+        assertTrue(DbSchema.CREATE_TABLE_FEEDS.contains(levelingColumn));
+        db.execSQL("DROP TABLE " + Db.TABLE_NAME_FEEDS);
+        db.execSQL(DbSchema.CREATE_TABLE_FEEDS.replace(levelingColumn, ""));
+        assertFalse(columnNames(db, Db.TABLE_NAME_FEEDS).contains(Db.KEY_VOLUME_LEVELING));
+        db.execSQL("INSERT INTO " + Db.TABLE_NAME_FEEDS + " (" + Db.KEY_TITLE + ") VALUES ('Old')");
+        long old = lastInsertId(db);
+
+        DBUpgrade.upgrade(db, 12, Db.VERSION);
+
+        assertTrue(columnNames(db, Db.TABLE_NAME_FEEDS).contains(Db.KEY_VOLUME_LEVELING));
+        assertEquals(VolumeLeveling.OFF, mappedVolumeLevelingOf(old));
+        // Running it again must not fail on the column it just added.
+        DBUpgrade.upgrade(db, 12, Db.VERSION);
+    }
+
+    @Test
+    public void feedVolumeLevelingRoundTripsEveryMode() {
+        Db db = Db.getInstance();
+        Feed feed = newFeed("Leveled feed");
+        db.setCompleteFeed(feed);
+        assertEquals(VolumeLeveling.OFF, mappedVolumeLevelingOf(feed.getId()));
+        for (int mode : new int[]{VolumeLeveling.GENTLE, VolumeLeveling.STRONG, VolumeLeveling.OFF}) {
+            feed.getPreferences().setVolumeLeveling(mode);
+            db.setFeedPreferences(feed.getPreferences());
+            assertEquals(mode, mappedVolumeLevelingOf(feed.getId()));
+        }
+    }
+
     // ------------------------------------------------------ feed warnings
 
     @Test
@@ -600,6 +637,14 @@ public class DbTest {
         try (Cursor cursor = Db.getInstance().getFeedCursor(feedId)) {
             assertTrue(cursor.moveToFirst());
             return FeedCursorMapper.convert(cursor).getPreferences().getVideoOverride();
+        }
+    }
+
+    /** Reads a feed's volume leveling mode back through the real cursor mapper. */
+    private static int mappedVolumeLevelingOf(long feedId) {
+        try (Cursor cursor = Db.getInstance().getFeedCursor(feedId)) {
+            assertTrue(cursor.moveToFirst());
+            return FeedCursorMapper.convert(cursor).getPreferences().getVolumeLeveling();
         }
     }
 

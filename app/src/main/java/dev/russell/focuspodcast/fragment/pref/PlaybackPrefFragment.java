@@ -33,6 +33,7 @@ public class PlaybackPrefFragment extends AbsSettingsFragment implements SharedP
         setupPlaybackScreen();
         buildSmartMarkAsPlayedPreference();
         buildClearVoicePreference();
+        buildVolumeLevelingPreference();
         buildVideoEpisodesPreference();
     }
 
@@ -62,6 +63,22 @@ public class PlaybackPrefFragment extends AbsSettingsFragment implements SharedP
                 return false;
             }
             ClearVoicePreferences.updateSummary(pref, level);
+            return true;
+        });
+    }
+
+    private void buildVolumeLevelingPreference() {
+        ListPreference pref = findPreference(Prefs.PREF_VOLUME_LEVELING);
+        if (pref == null) {
+            return;
+        }
+        VolumeLevelingPreferences.updateSummary(pref, Prefs.getVolumeLeveling());
+        pref.setOnPreferenceChangeListener((preference, newValue) -> {
+            int mode = VolumeLevelingPreferences.parse(newValue);
+            if (mode < 0) {
+                return false;
+            }
+            VolumeLevelingPreferences.updateSummary(pref, mode);
             return true;
         });
     }
@@ -165,7 +182,8 @@ public class PlaybackPrefFragment extends AbsSettingsFragment implements SharedP
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
         if (Prefs.PREF_PLAYBACK_SKIP_SILENCE.equals(key)
                 || Prefs.PREF_STEREO_TO_MONO.equals(key)
-                || Prefs.PREF_CLEAR_VOICE.equals(key)) {
+                || Prefs.PREF_CLEAR_VOICE.equals(key)
+                || Prefs.PREF_VOLUME_LEVELING.equals(key)) {
             // The global default effects changed; a playing podcast without its own follows them.
             EventBus.getDefault().post(AudioEffectsChangedEvent.global());
         }

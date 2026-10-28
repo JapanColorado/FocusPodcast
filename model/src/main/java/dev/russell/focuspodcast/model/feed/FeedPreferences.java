@@ -9,6 +9,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import dev.russell.focuspodcast.model.playback.ClearVoiceLevel;
+import dev.russell.focuspodcast.model.playback.VolumeLeveling;
 
 /**
  * Contains preferences for a single feed.
@@ -46,6 +47,15 @@ public class FeedPreferences implements Serializable {
         this.clearVoiceLevel = ClearVoiceLevel.sanitize(clearVoiceLevel);
     }
 
+    /** This feed's own Volume leveling mode (a {@code VolumeLeveling}); only used with {@link #isUseFeedEffect()}. */
+    public int getVolumeLeveling() {
+        return volumeLeveling;
+    }
+
+    public void setVolumeLeveling(int volumeLeveling) {
+        this.volumeLeveling = VolumeLeveling.sanitize(volumeLeveling);
+    }
+
     public boolean isMono() {
         return mono;
     }
@@ -57,6 +67,7 @@ public class FeedPreferences implements Serializable {
     private boolean autoDownload;
     private boolean skipSilence;
     private int clearVoiceLevel;
+    private int volumeLeveling = VolumeLeveling.OFF;
     private boolean mono;
 
     public boolean isUseFeedEffect() {

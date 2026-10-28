@@ -37,6 +37,12 @@ public class VideoPlayer extends MediaPlayer implements IPlayer {
         Log.d(TAG, "Clear voice is not supported in the video player, ignoring level " + level);
     }
 
+    @Override
+    public void setVolumeLeveling(int mode) {
+        // Same as Clear voice: it runs in ExoPlayer's audio sink.
+        Log.d(TAG, "Volume leveling is not supported in the video player, ignoring mode " + mode);
+    }
+
 
     @Override
     public void setVideoScalingMode(int mode) {

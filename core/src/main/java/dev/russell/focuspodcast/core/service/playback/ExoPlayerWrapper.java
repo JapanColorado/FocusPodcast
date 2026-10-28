@@ -53,6 +53,7 @@ import dev.russell.focuspodcast.core.util.playback.IPlayer;
 import dev.russell.focuspodcast.event.playback.VideoFirstFrameEvent;
 import dev.russell.focuspodcast.event.playback.VideoSizeChangedEvent;
 import dev.russell.focuspodcast.model.playback.ClearVoiceLevel;
+import dev.russell.focuspodcast.model.playback.VolumeLeveling;
 import dev.russell.focuspodcast.playback.base.PlaybackServiceMediaPlayer;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -87,6 +88,7 @@ public class ExoPlayerWrapper implements IPlayer {
     private ClearVoiceAudioProcessor clearVoiceAudioProcessor = null;
     /** Kept here so that a player rebuilt by {@link #reset()} starts with the same level. */
     private volatile int clearVoiceLevel = ClearVoiceLevel.OFF;
+    private volatile int volumeLeveling = VolumeLeveling.OFF;
 
 
     ExoPlayerWrapper(Context context) {
@@ -106,6 +108,7 @@ public class ExoPlayerWrapper implements IPlayer {
         downMixAudioProcessor = new DownMixAudioProcessor();
         clearVoiceAudioProcessor = new ClearVoiceAudioProcessor();
         clearVoiceAudioProcessor.setLevel(clearVoiceLevel);
+        clearVoiceAudioProcessor.setVolumeLeveling(volumeLeveling);
         DefaultLoadControl.Builder loadControl = new DefaultLoadControl.Builder();
         loadControl.setBufferDurationsMs(30000, 120000,
                 DefaultLoadControl.DEFAULT_BUFFER_FOR_PLAYBACK_MS,
@@ -334,6 +337,12 @@ public class ExoPlayerWrapper implements IPlayer {
     public void setClearVoiceLevel(int level) {
         clearVoiceLevel = level;
         clearVoiceAudioProcessor.setLevel(level);
+    }
+
+    @Override
+    public void setVolumeLeveling(int mode) {
+        volumeLeveling = mode;
+        clearVoiceAudioProcessor.setVolumeLeveling(mode);
     }
 
     @Override

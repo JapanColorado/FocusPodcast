@@ -49,6 +49,14 @@
             android:key="pref_clear_voice"
             android:title="@string/voice_label"
             app:icon="@drawable/ic_vocal_enhancement"/>
+        <dev.russell.focuspodcast.common.common.prefs.supportv7.ATEListPreference
+            android:layout="@layout/list_item_view"
+            android:defaultValue="0"
+            android:entries="@array/volume_leveling_options"
+            android:entryValues="@array/volume_leveling_values"
+            android:key="pref_volume_leveling"
+            android:title="@string/volume_leveling_label"
+            app:icon="@drawable/ic_volume_leveling"/>
         <dev.russell.focuspodcast.common.common.prefs.supportv7.ATESwitchPreference
             android:layout="@layout/list_item_view_switch"
             android:defaultValue="false"

@@ -117,6 +117,7 @@ object Prefs {
     const val PREF_PLAYBACK_SKIP_SILENCE = "pref_global_skip_silence"
     const val PREF_STEREO_TO_MONO = "pref_stereo_to_mono"
     const val PREF_CLEAR_VOICE = "pref_clear_voice"
+    const val PREF_VOLUME_LEVELING = "pref_volume_leveling"
 
     /** The pre-Clear-voice "vocal enhancement" switch; only read by the migration. */
     const val PREF_AUDIO_LOUDNESS_LEGACY = "pref_audio_loudness"
@@ -538,6 +539,13 @@ object Prefs {
 
     @JvmStatic
     fun setClearVoiceLevel(level: Int) = PlaybackPrefs.setClearVoiceLevel(level)
+
+    /** The default Volume leveling mode, a `VolumeLeveling`. */
+    @JvmStatic
+    fun getVolumeLeveling(): Int = PlaybackPrefs.volumeLeveling()
+
+    @JvmStatic
+    fun setVolumeLeveling(mode: Int) = PlaybackPrefs.setVolumeLeveling(mode)
 
     /** See [PlaybackPrefs.migrateLoudnessToClearVoice]. */
     @JvmStatic

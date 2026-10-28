@@ -26,6 +26,7 @@ import dev.russell.focuspodcast.core.feed.AudiobookShelfFilter;
 import dev.russell.focuspodcast.model.feed.EpisodeSearchOptions;
 import dev.russell.focuspodcast.model.feed.FeedItemFilter;
 import dev.russell.focuspodcast.model.playback.ClearVoiceLevel;
+import dev.russell.focuspodcast.model.playback.VolumeLeveling;
 import dev.russell.focuspodcast.model.playback.MediaType;
 
 /**
@@ -301,6 +302,19 @@ public class PrefsTest {
         prefs().edit().putString("pref_audiobooks_status", "FINISHED").commit();
         Prefs.migrateAudiobookShelfStatus();
         assertEquals(AudiobookShelfFilter.Status.FINISHED, Prefs.getAudiobookShelfFilter().status);
+    }
+
+    @Test
+    public void volumeLevelingDefaultsToOffAndRoundTrips() {
+        assertEquals(VolumeLeveling.OFF, Prefs.getVolumeLeveling());
+        Prefs.setVolumeLeveling(VolumeLeveling.GENTLE);
+        assertEquals(VolumeLeveling.GENTLE, Prefs.getVolumeLeveling());
+        // what the Settings ListPreference stores
+        assertEquals("1", prefs().getString(Prefs.PREF_VOLUME_LEVELING, null));
+        prefs().edit().putString(Prefs.PREF_VOLUME_LEVELING, "9").commit();
+        assertEquals(VolumeLeveling.STRONG, Prefs.getVolumeLeveling());
+        prefs().edit().putString(Prefs.PREF_VOLUME_LEVELING, "garbage").commit();
+        assertEquals(VolumeLeveling.OFF, Prefs.getVolumeLeveling());
     }
 
     @Test

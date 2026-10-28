@@ -18,9 +18,9 @@ import dev.russell.focuspodcast.model.feed.Feed;
 import dev.russell.focuspodcast.model.feed.FeedPreferences;
 
 /**
- * A podcast's Audio effects screen: Voice, Skip silence and Stereo to mono, the same controls in
- * the same order as Settings and the player's Audio Effects dialog. The controls always show the
- * values in effect. The podcast follows the global defaults until one of them is changed here (or
+ * A podcast's Audio effects screen: Voice, Volume leveling, Skip silence and Stereo to mono, the
+ * same controls in the same order as Settings and the player's Audio Effects dialog. The controls
+ * always show the values in effect. The podcast follows the global defaults until one of them is changed here (or
  * in the player): the first change copies the defaults into the podcast before applying itself,
  * exactly like the dialog. While the podcast has its own effects, "Reset to default" makes it
  * follow the defaults again and "Set as default" makes its effects the defaults first.
@@ -29,6 +29,7 @@ public class AudioEffectFragment extends AbsSettingsFragment {
     private static final String PREF_FEED_SKIP_SILENCE = "feed_skip_silence";
     private static final String PREF_FEED_MONO = "feed_mono_pref";
     private static final String PREF_FEED_CLEAR_VOICE = "feed_clear_voice_pref";
+    private static final String PREF_FEED_VOLUME_LEVELING = "feed_volume_leveling_pref";
     private static final String PREF_RESET_TO_DEFAULT = "feed_effects_reset_to_default";
     private static final String PREF_SET_AS_DEFAULT = "feed_effects_set_as_default";
     private FeedPreferences feedPreferences;
@@ -68,6 +69,7 @@ public class AudioEffectFragment extends AbsSettingsFragment {
     ATESwitchPreference skipSilencePreference;
     ATESwitchPreference monoPreference;
     ListPreference clearVoicePreference;
+    ListPreference volumeLevelingPreference;
     Preference resetToDefaultPreference;
     Preference setAsDefaultPreference;
 
@@ -75,6 +77,7 @@ public class AudioEffectFragment extends AbsSettingsFragment {
         skipSilencePreference = findPreference(PREF_FEED_SKIP_SILENCE);
         monoPreference = findPreference(PREF_FEED_MONO);
         clearVoicePreference = findPreference(PREF_FEED_CLEAR_VOICE);
+        volumeLevelingPreference = findPreference(PREF_FEED_VOLUME_LEVELING);
         resetToDefaultPreference = findPreference(PREF_RESET_TO_DEFAULT);
         setAsDefaultPreference = findPreference(PREF_SET_AS_DEFAULT);
     }
@@ -88,6 +91,16 @@ public class AudioEffectFragment extends AbsSettingsFragment {
             }
             changeEffect(() -> feedPreferences.setClearVoiceLevel(level));
             ClearVoicePreferences.updateSummary(clearVoicePreference, level);
+            return true;
+        });
+
+        volumeLevelingPreference.setOnPreferenceChangeListener((preference, newValue) -> {
+            int mode = VolumeLevelingPreferences.parse(newValue);
+            if (mode < 0) {
+                return false;
+            }
+            changeEffect(() -> feedPreferences.setVolumeLeveling(mode));
+            VolumeLevelingPreferences.updateSummary(volumeLevelingPreference, mode);
             return true;
         });
 
@@ -133,6 +146,7 @@ public class AudioEffectFragment extends AbsSettingsFragment {
         skipSilencePreference.setChecked(AudioEffectUtils.isSkipSilence(feedPreferences));
         monoPreference.setChecked(AudioEffectUtils.isMono(feedPreferences));
         ClearVoicePreferences.show(clearVoicePreference, AudioEffectUtils.getClearVoiceLevel(feedPreferences));
+        VolumeLevelingPreferences.show(volumeLevelingPreference, AudioEffectUtils.getVolumeLeveling(feedPreferences));
         updateDefaultRows();
     }
 

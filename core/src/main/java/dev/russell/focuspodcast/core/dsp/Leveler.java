@@ -10,7 +10,9 @@ import java.util.Arrays;
  *       boost/cut range and at a limited slew rate, so a quiet guest is brought up and a loud host
  *       down over a second or two. It only listens while someone is talking (the short-term level
  *       is well above its own tracked floor), so pauses and background noise are never pumped
- *       up.</li>
+ *       up. Right after {@link #reset()} (a new episode) it settles fast for the first
+ *       {@value #SETTLE_SECONDS} s of speech: a short level average and a steep slew, so a slow
+ *       setting does not start a loud podcast at the previous one's gain for half a minute.</li>
  *   <li>A fast RMS compressor above the target, which catches what the AGC is too slow for
  *       (laughter, a shout, the first words after a speaker change).</li>
  *   <li>A look-ahead peak limiter with a ceiling of -1 dBFS, followed by a hard clamp at the
@@ -39,6 +41,10 @@ final class Leveler {
     private static final double SPEECH_MIN_DB = -65.0;
     private static final double SILENCE_DB = -120.0;
     private static final double DIGITAL_SILENCE_DB = -90.0;
+    /** Seconds of speech after a reset during which the AGC settles fast. */
+    static final double SETTLE_SECONDS = 2.0;
+    private static final double SETTLE_LEVEL_SECONDS = 0.4;
+    private static final double SETTLE_SLEW_DB_PER_SECOND = 12.0;
 
     private final int channels;
     private final int sampleRate;
@@ -59,6 +65,8 @@ final class Leveler {
     private double floorDb;
     private double speechPower;
     private boolean speechSeen;
+    /** Speech still to be heard before the AGC moves at its configured pace. */
+    private double settleSeconds;
     private double agcDb;
     private float blockGain = 1f;
     /** Largest absolute input sample of the block {@link #computeBlockGain} last measured. */
@@ -193,12 +201,15 @@ final class Leveler {
                 speechPower = blockPower;
                 speechSeen = true;
             } else {
-                double keep = Math.exp(-blockSeconds / levelSeconds);
+                double seconds = settleSeconds > 0 ? Math.min(levelSeconds, SETTLE_LEVEL_SECONDS) : levelSeconds;
+                double keep = Math.exp(-blockSeconds / seconds);
                 speechPower = keep * speechPower + (1 - keep) * blockPower;
             }
             double speechDb = 10 * Math.log10(Math.max(speechPower, 1e-12));
             double wanted = Math.max(-maxCutDb, Math.min(maxBoostDb, targetDb - speechDb));
-            double maxStep = slewDbPerSecond * blockSeconds;
+            double slew = settleSeconds > 0 ? Math.max(slewDbPerSecond, SETTLE_SLEW_DB_PER_SECOND) : slewDbPerSecond;
+            settleSeconds -= blockSeconds;
+            double maxStep = slew * blockSeconds;
             agcDb += Math.max(-maxStep, Math.min(maxStep, wanted - agcDb));
         }
 
@@ -303,6 +314,7 @@ final class Leveler {
         floorDb = SILENCE_DB;
         speechPower = 0;
         speechSeen = false;
+        settleSeconds = SETTLE_SECONDS;
         agcDb = 0;
         blockGain = 1f;
     }

@@ -9,13 +9,14 @@ import java.nio.ByteBuffer;
 import java.nio.ShortBuffer;
 
 import dev.russell.focuspodcast.model.playback.ClearVoiceLevel;
+import dev.russell.focuspodcast.model.playback.VolumeLeveling;
 
 /**
  * Runs {@link ClearVoiceChain} inside ExoPlayer's audio sink.
  *
  * <p>The sink only asks a processor whether it is active when the format is configured, so this
  * one is active for every 16-bit PCM stream and passes audio through untouched (a buffer copy)
- * while the level is Off; switching it on or off then takes effect on the next buffer, without
+ * while both the Voice mode and volume leveling are Off; switching either on or off then takes effect on the next buffer, without
  * restarting playback. Other encodings never reach custom processors in practice (the sink
  * converts high-resolution PCM to 16 bit first); they are declined, which leaves the processor
  * out of the chain.
@@ -25,6 +26,7 @@ import dev.russell.focuspodcast.model.playback.ClearVoiceLevel;
  */
 public final class ClearVoiceAudioProcessor extends BaseAudioProcessor {
     private volatile int level = ClearVoiceLevel.OFF;
+    private volatile int volumeLeveling = VolumeLeveling.OFF;
     @Nullable
     private ClearVoiceChain chain;
     private short[] inSamples = new short[0];
@@ -41,6 +43,15 @@ public final class ClearVoiceAudioProcessor extends BaseAudioProcessor {
 
     public int getLevel() {
         return level;
+    }
+
+    /** Sets the {@link VolumeLeveling} mode; like {@link #setLevel}, safe from any thread. */
+    public void setVolumeLeveling(int mode) {
+        this.volumeLeveling = VolumeLeveling.sanitize(mode);
+    }
+
+    public int getVolumeLeveling() {
+        return volumeLeveling;
     }
 
     @Override
@@ -61,6 +72,7 @@ public final class ClearVoiceAudioProcessor extends BaseAudioProcessor {
         ClearVoiceChain current = chain;
         if (current != null) {
             current.setLevel(level);
+            current.setVolumeLeveling(volumeLeveling);
         }
         if (current == null || current.isBypassed()) {
             replaceOutputBuffer(remaining).put(inputBuffer).flip();

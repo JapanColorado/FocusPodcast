@@ -567,6 +567,11 @@ public class LocalPSMP extends PlaybackServiceMediaPlayer {
     }
 
     @Override
+    public void setVolumeLeveling(int mode) {
+        audioEffects.setVolumeLeveling(mode);
+    }
+
+    @Override
     public MediaType getCurrentMediaType() {
         return mediaType;
     }

@@ -98,6 +98,7 @@ public class Db {
     public static final String KEY_ITUNES_FEED_ID = DbSchema.KEY_ITUNES_FEED_ID;
     public static final String KEY_USE_FEED_EFFECT = DbSchema.KEY_USE_FEED_EFFECT;
     public static final String KEY_CLEAR_VOICE = DbSchema.KEY_CLEAR_VOICE;
+    public static final String KEY_VOLUME_LEVELING = DbSchema.KEY_VOLUME_LEVELING;
     public static final String KEY_MONO_ENABLED = DbSchema.KEY_MONO_ENABLED;
     public static final String KEY_PLAYED_DURATION = DbSchema.KEY_PLAYED_DURATION;
     public static final String KEY_KEEP_UPDATED = DbSchema.KEY_KEEP_UPDATED;

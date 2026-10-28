@@ -37,6 +37,7 @@ import dev.russell.focuspodcast.model.feed.FeedMedia;
 import dev.russell.focuspodcast.model.feed.FeedPreferences;
 import dev.russell.focuspodcast.model.feed.VolumeAdaptionSetting;
 import dev.russell.focuspodcast.model.playback.ClearVoiceLevel;
+import dev.russell.focuspodcast.model.playback.VolumeLeveling;
 import dev.russell.focuspodcast.model.playback.MediaType;
 import dev.russell.focuspodcast.storage.db.Db;
 
@@ -190,9 +191,12 @@ public class PerFeedPlaybackSettingsTest {
         Prefs.setSkipSilence(true);
         Prefs.stereoToMono(true);
         Prefs.setClearVoiceLevel(ClearVoiceLevel.STRONG);
+        Prefs.setVolumeLeveling(VolumeLeveling.GENTLE);
         assertTrue(AudioEffectUtils.isSkipEnable(media));
         assertTrue(AudioEffectUtils.isMonoEnable(media));
         assertEquals(ClearVoiceLevel.STRONG, AudioEffectUtils.getClearVoiceLevel(media));
+        assertEquals(VolumeLeveling.GENTLE, AudioEffectUtils.getVolumeLeveling(media));
+        assertEquals(VolumeLeveling.GENTLE, AudioEffectUtils.getVolumeLeveling((FeedMedia) null));
         assertTrue(AudioEffectUtils.isSkipEnable(null));
     }
 
@@ -201,6 +205,7 @@ public class PerFeedPlaybackSettingsTest {
         Prefs.setSkipSilence(true);
         Prefs.stereoToMono(false);
         Prefs.setClearVoiceLevel(ClearVoiceLevel.LIGHT);
+        Prefs.setVolumeLeveling(VolumeLeveling.STRONG);
         FeedPreferences preferences = preferences();
 
         AudioEffectUtils.customize(preferences);
@@ -209,10 +214,13 @@ public class PerFeedPlaybackSettingsTest {
         assertTrue(preferences.isSkipSilence());
         assertFalse(preferences.isMono());
         assertEquals(ClearVoiceLevel.LIGHT, preferences.getClearVoiceLevel());
+        assertEquals(VolumeLeveling.STRONG, preferences.getVolumeLeveling());
 
         // later global changes no longer reach a podcast with its own effects
         Prefs.setSkipSilence(false);
+        Prefs.setVolumeLeveling(VolumeLeveling.OFF);
         assertTrue(AudioEffectUtils.isSkipSilence(preferences));
+        assertEquals(VolumeLeveling.STRONG, AudioEffectUtils.getVolumeLeveling(preferences));
     }
 
     @Test
@@ -238,6 +246,7 @@ public class PerFeedPlaybackSettingsTest {
 
         AudioEffectUtils.customize(stale);
         stale.setClearVoiceLevel(ClearVoiceLevel.STRONG);
+        stale.setVolumeLeveling(VolumeLeveling.GENTLE);
         AudioEffectUtils.saveFeedEffects(feed.getId(), stale);
         awaitDb();
 
@@ -245,6 +254,7 @@ public class PerFeedPlaybackSettingsTest {
         assertNotNull(stored);
         assertTrue(stored.isUseFeedEffect());
         assertEquals(ClearVoiceLevel.STRONG, stored.getClearVoiceLevel());
+        assertEquals(VolumeLeveling.GENTLE, stored.getVolumeLeveling());
         assertEquals(1.6f, stored.getFeedPlaybackSpeed(), 0.0001f);
     }
 
@@ -257,9 +267,11 @@ public class PerFeedPlaybackSettingsTest {
         Prefs.setSkipSilence(false);
         Prefs.stereoToMono(false);
         Prefs.setClearVoiceLevel(ClearVoiceLevel.OFF);
+        Prefs.setVolumeLeveling(VolumeLeveling.OFF);
         AudioEffectUtils.customize(preferences);
         preferences.setMono(true);
         preferences.setClearVoiceLevel(ClearVoiceLevel.WARM);
+        preferences.setVolumeLeveling(VolumeLeveling.GENTLE);
 
         AudioEffectUtils.makeDefault(feed.getId(), preferences);
         awaitDb();
@@ -267,6 +279,7 @@ public class PerFeedPlaybackSettingsTest {
         assertTrue(Prefs.stereoToMono());
         assertFalse(Prefs.isSkipSilence());
         assertEquals(ClearVoiceLevel.WARM, Prefs.getClearVoiceLevel());
+        assertEquals(VolumeLeveling.GENTLE, Prefs.getVolumeLeveling());
         assertFalse(AudioEffectUtils.hasOwnEffects(preferences));
         FeedPreferences stored = DBReader.getFeedPreferences(feed.getId());
         assertNotNull(stored);

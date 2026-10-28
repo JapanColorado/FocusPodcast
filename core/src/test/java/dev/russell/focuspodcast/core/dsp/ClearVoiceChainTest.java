@@ -2,6 +2,7 @@ package dev.russell.focuspodcast.core.dsp;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
@@ -10,9 +11,11 @@ import java.util.Arrays;
 import java.util.Random;
 
 import dev.russell.focuspodcast.model.playback.ClearVoiceLevel;
+import dev.russell.focuspodcast.model.playback.VolumeLeveling;
 
 /**
- * The Clear voice chain end to end on synthetic signals, for mono and stereo at 44.1 and 48 kHz.
+ * The Clear voice and volume leveling chain end to end on synthetic signals, for mono and stereo
+ * at 44.1 and 48 kHz.
  *
  * <p>Note on the test tone: a noise reducer without a noise profile cannot tell a tone that never
  * stops from a hum, and should not, so "speech" here is a 1 kHz tone gated on and off like
@@ -25,6 +28,7 @@ public class ClearVoiceChainTest {
     private static final double ON_SECONDS = 0.4;
     private static final double OFF_SECONDS = 0.4;
     private static final double EDGE_SECONDS = 0.06;
+    private static final int[] LEVELINGS = {VolumeLeveling.OFF, VolumeLeveling.GENTLE, VolumeLeveling.STRONG};
 
     // ------------------------------------------------------------ quality
 
@@ -85,9 +89,11 @@ public class ClearVoiceChainTest {
             for (int channels : CHANNELS) {
                 for (int level : new int[]{ClearVoiceLevel.OFF, ClearVoiceLevel.LIGHT, ClearVoiceLevel.STRONG,
                         ClearVoiceLevel.WARM}) {
-                    short[] in = new short[3 * rate * channels];
-                    short[] out = run(chain(rate, channels, level), in, 1000);
-                    assertArrayEquals(describe(rate, channels, level), in, out);
+                    for (int leveling : LEVELINGS) {
+                        short[] in = new short[3 * rate * channels];
+                        short[] out = run(chain(rate, channels, level, leveling), in, 1000);
+                        assertArrayEquals(describe(rate, channels, level) + " leveling " + leveling, in, out);
+                    }
                 }
             }
         }
@@ -98,7 +104,11 @@ public class ClearVoiceChainTest {
         int ceiling = (int) Math.ceil(Leveler.CEILING * 32768) + 1;
         for (int rate : RATES) {
             for (int channels : CHANNELS) {
-                for (int level : new int[]{ClearVoiceLevel.LIGHT, ClearVoiceLevel.STRONG, ClearVoiceLevel.WARM}) {
+                for (int[] mode : new int[][]{{ClearVoiceLevel.LIGHT, VolumeLeveling.OFF},
+                        {ClearVoiceLevel.STRONG, VolumeLeveling.OFF}, {ClearVoiceLevel.WARM, VolumeLeveling.OFF},
+                        {ClearVoiceLevel.OFF, VolumeLeveling.GENTLE}, {ClearVoiceLevel.OFF, VolumeLeveling.STRONG},
+                        {ClearVoiceLevel.WARM, VolumeLeveling.STRONG}}) {
+                    int level = mode[0];
                     double seconds = 6;
                     double[] signal = new double[(int) (seconds * rate)];
                     Random random = new Random(1);
@@ -114,12 +124,13 @@ public class ClearVoiceChainTest {
                             signal[i] = Math.max(-1, Math.min(1, random.nextGaussian() * 0.8));
                         }
                     }
-                    short[] out = run(chain(rate, channels, level), toPcm(signal, channels), 777);
+                    short[] out = run(chain(rate, channels, level, mode[1]), toPcm(signal, channels), 777);
                     int peak = 0;
                     for (short s : out) {
                         peak = Math.max(peak, Math.abs(s));
                     }
-                    assertTrue(describe(rate, channels, level) + " peak " + peak, peak <= ceiling);
+                    assertTrue(describe(rate, channels, level) + " leveling " + mode[1] + " peak " + peak,
+                            peak <= ceiling);
                 }
             }
         }
@@ -149,6 +160,67 @@ public class ClearVoiceChainTest {
         }
     }
 
+    @Test
+    public void levelingBringsAQuietAndALoudPodcastToTheSameLevel() {
+        int rate = 48000;
+        double seconds = 12;
+        double[] loud = add(speechLike(rate, seconds, 0.3, 41), noise(rate, seconds, 0.0005, 42));
+        double[] quiet = add(speechLike(rate, seconds, 0.02, 43), noise(rate, seconds, 0.0005, 44));
+        for (int voice : new int[]{ClearVoiceLevel.OFF, ClearVoiceLevel.WARM}) {
+            for (int leveling : new int[]{VolumeLeveling.GENTLE, VolumeLeveling.STRONG}) {
+                // each one a new episode, so each starts from a fresh chain
+                double[] loudOut = channel(run(chain(rate, 2, voice, leveling), toPcm(loud, 2), 2048), 2, 0);
+                double[] quietOut = channel(run(chain(rate, 2, voice, leveling), toPcm(quiet, 2), 2048), 2, 0);
+                // from the third second: the settling has to be done by then
+                int from = 3 * rate;
+                double inGap = rmsDb(loud, from) - rmsDb(quiet, from);
+                double outGap = rmsDb(loudOut, from) - rmsDb(quietOut, from);
+                String what = "voice " + voice + " leveling " + leveling + ": loud-quiet gap " + fmt(inGap)
+                        + " -> " + fmt(outGap) + " dB, loud at " + fmt(rmsDb(loudOut, from)) + " dB";
+                System.out.println(what);
+                assertTrue(what, Math.abs(outGap) <= 3);
+            }
+        }
+    }
+
+    @Test
+    public void strongLevelingEvensOutSpeakersMoreThanGentle() {
+        int rate = 48000;
+        double segment = 10;
+        double[] loud = speechLike(rate, segment, 0.2, 51);
+        double[] quiet = speechLike(rate, segment, 0.04, 52);
+        double[] signal = add(concat(loud, quiet, loud, quiet), noise(rate, segment * 4, 0.0005, 53));
+        int seg = (int) (segment * rate);
+        double[] x = channel(toPcm(signal, 1), 1, 0);
+        double inGap = rmsDb(x, 2 * seg + seg / 2, 3 * seg) - rmsDb(x, 3 * seg + seg / 2, 4 * seg);
+        double[] reduction = new double[3];
+        for (int leveling = VolumeLeveling.OFF; leveling <= VolumeLeveling.STRONG; leveling++) {
+            double[] y = channel(run(chain(rate, 1, ClearVoiceLevel.OFF, leveling), toPcm(signal, 1), 2048), 1, 0);
+            double outGap = rmsDb(y, 2 * seg + seg / 2, 3 * seg) - rmsDb(y, 3 * seg + seg / 2, 4 * seg);
+            reduction[leveling] = inGap - outGap;
+            System.out.println("leveling " + leveling + ": speaker gap " + fmt(inGap) + " -> " + fmt(outGap) + " dB");
+        }
+        assertEquals(0, reduction[VolumeLeveling.OFF], 0.01);
+        assertTrue("strong " + fmt(reduction[2]), reduction[VolumeLeveling.STRONG] >= 10);
+        assertTrue("gentle " + fmt(reduction[1]) + " strong " + fmt(reduction[2]),
+                reduction[VolumeLeveling.STRONG] > reduction[VolumeLeveling.GENTLE] + 3);
+    }
+
+    @Test
+    public void levelingWithClearVoiceLevelsAtLeastAsMuchAsClearVoiceAlone() {
+        int rate = 48000;
+        double seconds = 12;
+        double[] quiet = add(speechLike(rate, seconds, 0.01, 61), noise(rate, seconds, 0.0003, 62));
+        double clearAlone = rmsDb(channel(run(chain(rate, 1, ClearVoiceLevel.LIGHT, VolumeLeveling.OFF),
+                toPcm(quiet, 1), 2048), 1, 0), 4 * rate);
+        double clearLeveled = rmsDb(channel(run(chain(rate, 1, ClearVoiceLevel.LIGHT, VolumeLeveling.GENTLE),
+                toPcm(quiet, 1), 2048), 1, 0), 4 * rate);
+        String what = "very quiet podcast: Clear " + fmt(clearAlone) + " dB, Clear + Gentle " + fmt(clearLeveled) + " dB";
+        System.out.println(what);
+        // Clear alone boosts by at most 6 dB; with leveling the range is Gentle's 12 dB
+        assertTrue(what, clearLeveled >= clearAlone + 4);
+    }
+
     // --------------------------------------------------------- mechanics
 
     @Test
@@ -162,6 +234,8 @@ public class ClearVoiceChainTest {
             ClearVoiceChain chain = chain(48000, channels, ClearVoiceLevel.OFF);
             assertTrue(chain.isBypassed());
             assertArrayEquals(in, run(chain, in, 1234));
+            chain.setVolumeLeveling(VolumeLeveling.GENTLE);
+            assertFalse(chain.isBypassed());
         }
     }
 
@@ -173,8 +247,11 @@ public class ClearVoiceChainTest {
         for (int i = onset; i < signal.length; i++) {
             signal[i] = 0.3 * Math.sin(2 * Math.PI * 700.0 * (i - onset) / rate);
         }
-        for (int level : new int[]{ClearVoiceLevel.LIGHT, ClearVoiceLevel.STRONG, ClearVoiceLevel.WARM}) {
-            short[] out = run(chain(rate, 1, level), toPcm(signal, 1), 512);
+        for (int[] mode : new int[][]{{ClearVoiceLevel.LIGHT, VolumeLeveling.OFF},
+                {ClearVoiceLevel.STRONG, VolumeLeveling.OFF}, {ClearVoiceLevel.WARM, VolumeLeveling.OFF},
+                {ClearVoiceLevel.OFF, VolumeLeveling.GENTLE}, {ClearVoiceLevel.WARM, VolumeLeveling.GENTLE},
+                {ClearVoiceLevel.LIGHT, VolumeLeveling.STRONG}}) {
+            short[] out = run(chain(rate, 1, mode[0], mode[1]), toPcm(signal, 1), 512);
             int first = -1;
             for (int i = 0; i < out.length; i++) {
                 if (Math.abs(out[i]) > 300) {
@@ -203,6 +280,8 @@ public class ClearVoiceChainTest {
         int step = 0;
         for (int pos = 0; pos < in.length; pos += buffer, step++) {
             chain.setLevel(schedule[(step / 5) % schedule.length]);
+            // a different rhythm, so every Voice mode meets leveling both on and off
+            chain.setVolumeLeveling(LEVELINGS[(step / 3) % LEVELINGS.length]);
             int length = Math.min(buffer, in.length - pos);
             int n = chain.process(Arrays.copyOfRange(in, pos, pos + length), length, tmp);
             System.arraycopy(tmp, 0, out, written, n);
@@ -285,8 +364,13 @@ public class ClearVoiceChainTest {
     // ------------------------------------------------------------ helpers
 
     private static ClearVoiceChain chain(int rate, int channels, int level) {
+        return chain(rate, channels, level, VolumeLeveling.OFF);
+    }
+
+    private static ClearVoiceChain chain(int rate, int channels, int level, int leveling) {
         ClearVoiceChain chain = new ClearVoiceChain(rate, channels);
         chain.setLevel(level);
+        chain.setVolumeLeveling(leveling);
         return chain;
     }
 

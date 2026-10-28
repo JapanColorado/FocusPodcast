@@ -94,6 +94,9 @@ public abstract class FeedPreferencesCursorMapper {
         // Version 7 column; a projection without it reads "not an audiobook".
         int indexAudiobook = cursor.getColumnIndex(Db.KEY_AUDIOBOOK);
         preferences.setAudiobook(indexAudiobook >= 0 && cursor.getInt(indexAudiobook) > 0);
+        // Version 13 column; a projection without it reads "off".
+        int indexVolumeLeveling = cursor.getColumnIndex(Db.KEY_VOLUME_LEVELING);
+        preferences.setVolumeLeveling(indexVolumeLeveling < 0 ? 0 : cursor.getInt(indexVolumeLeveling));
         return preferences;
     }
 }
