@@ -37,7 +37,7 @@
 
         <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/txtvTitle"
-                style="@style/FocusPodcast.TextView.ListItemPrimaryTitle2"
+                style="@style/Yagi.TextView.ListItemPrimaryTitle2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:maxLines="2"
@@ -68,7 +68,7 @@
                     app:srcCompat="@drawable/ic_episodes"/>
             <com.google.android.material.textview.MaterialTextView
                     android:id="@+id/txtvSubscribers"
-                    style="@style/FocusPodcast.TextView.ListItemSecondaryTitle"
+                    style="@style/Yagi.TextView.ListItemSecondaryTitle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:lines="1"

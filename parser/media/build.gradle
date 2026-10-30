@@ -5,7 +5,7 @@ apply from: "../../common.gradle"
 
 android {
     defaultConfig {
-        namespace = "dev.russell.focuspodcast.parser.media"
+        namespace = "dev.russell.yagi.parser.media"
     }
 }
 

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<dev.russell.focuspodcast.common.views.AccentChip xmlns:android="http://schemas.android.com/apk/res/android"
+<dev.russell.yagi.common.views.AccentChip xmlns:android="http://schemas.android.com/apk/res/android"
     style="@style/Widget.Material3.Chip.Filter"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"

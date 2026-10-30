@@ -399,7 +399,7 @@
   <string name="synchronization_full_sync_title">Forțează sincronizarea completă</string>
   <string name="synchronization_login_status"><![CDATA[Conectat ca <i>%1$s</i> pe <i>%2$s</i>. <br/><br/>Puteți să vă alegeți furnizorul de sincronizare din nou, după ce v-ați deconectat]]></string>
   <string name="synchronization_summary_unchoosen">Puteți alege dintre furnizori multipli pentru a vă sincroniza abonamentele dumneavoastră și starea episoadelor</string>
-    <string name="synchronization_nextcloud_authenticate_browser">Oferă acces folosint web browserul deschis și întorcețivă la FocusPodcast.</string>
+    <string name="synchronization_nextcloud_authenticate_browser">Oferă acces folosint web browserul deschis și întorcețivă la Yagi.</string>
   <string name="synchronization_choose_title">Alege furnizorul de sincronizare</string>
   <string name="synchronization_force_sync_summary">Resincronizează toate abonamentele și starea episoadelor</string>
   <string name="synchronization_sync_summary">Sincronizează schimbările abonamentelor și starea episoadelor </string>
@@ -432,7 +432,6 @@
   <string name="enqueue_location_front">În față</string>
   <string name="enqueue_location_after_current">După episodul curent</string>
   <string name="pref_smart_mark_as_played_disabled">Dezactivat</string>
-  <string name="documentation_support">Ducumentație &amp; Support</string>
     <string name="bug_report_title">Raportează o problemă</string>
     <string name="copy_to_clipboard">Copiază</string>
   <string name="copied_to_clipboard">Copiat în clipboard</string>
@@ -450,7 +449,7 @@
   <string name="back_button_open_drawer">Deschide sertarul de navigație</string>
   <string name="back_button_double_tap">Atinge de două ori pentru a ieși</string>
   <string name="back_button_show_prompt">Confirmă pentru a ieși</string>
-  <string name="close_prompt">Ești sigur că dorești să închizi FocusPodcast ?</string>
+  <string name="close_prompt">Ești sigur că dorești să închizi Yagi ?</string>
   <string name="double_tap_toast">Apasă pe butonul \"înapoi\" din nou pentru a ieși</string>
   <string name="pref_delete_removes_from_queue_title">Șterge fișierele scoase din coadă</string>
   <string name="pref_delete_removes_from_queue_sum">Șterge automat episoadele din coadă când acestea sunt șterse</string>
@@ -480,8 +479,8 @@
   <!--import and export-->
   <string name="opml_export_summary">Transferă abonamentele tale către o alta aplicație</string>
   <string name="opml_import_summary">Importă abonamentele tale din altă aplicație de podcasturi</string>
-  <string name="database_export_summary">Transferă abonamentele, episoadele redate și coada de redare către FocusPodcast de pe alt dispozitiv</string>
-  <string name="database_import_summary">Importă baza de date FocusPodcast din alt dispozitiv</string>
+  <string name="database_export_summary">Transferă abonamentele, episoadele redate și coada de redare către Yagi de pe alt dispozitiv</string>
+  <string name="database_import_summary">Importă baza de date Yagi din alt dispozitiv</string>
   <string name="opml_import_label">OPML import</string>
   <string name="opml_add_podcast_label">Importă lista de podcasturi (OPML)</string>
   <string name="opml_reader_error">A apărut o eroare în timpul citirii fișierului OPML:</string>
@@ -497,8 +496,8 @@
   <string name="export_success_title">Exportarea a reușit</string>
     <string name="opml_import_ask_read_permission">Accesarea memoriei externe este necesară pentru a citi fișierul OPML</string>
   <string name="successful_import_label">Importul a reușit</string>
-  <string name="import_ok">Vă rugăm să apăsa|ți OK pentru a reporni FocusPodcast</string>
-  <string name="import_no_downgrade">Această bază de date a fost exportată cu o versiune mai nouă de FocusPodcast, Versiunea curentă a aplicației tale nu poate să folosească acest fișier.</string>
+  <string name="import_ok">Vă rugăm să apăsa|ți OK pentru a reporni Yagi</string>
+  <string name="import_no_downgrade">Această bază de date a fost exportată cu o versiune mai nouă de Yagi, Versiunea curentă a aplicației tale nu poate să folosească acest fișier.</string>
   <!--Sleep timer-->
   <string name="set_sleeptimer_label">Setează cronometru somn</string>
   <string name="disable_sleeptimer_label">Oprește cronometru somn</string>
@@ -540,10 +539,10 @@
   <string name="gpodnetauth_host">Hostname</string>
   <string name="gpodnetauth_select_server">Selectează serverul</string>
   <string name="gpodnetauth_device_name">Numele dispozitivului</string>
-  <string name="gpodnetauth_device_name_default">FocusPodcast pe %1$s</string>
+  <string name="gpodnetauth_device_name_default">Yagi pe %1$s</string>
   <string name="gpodnetauth_existing_devices">Dispozitive existente</string>
   <string name="gpodnetauth_create_device">Creează un dispozitiv</string>
-  <string name="gpodnetauth_finish_descr">Felicitări! contul tău gpodder.net este acum conectat cu dispozitivul tău. FocusPodcast va sincroniza automat toate abonamentele de pe dispozitivul dumneavoastra cu contul gpodder.net</string>
+  <string name="gpodnetauth_finish_descr">Felicitări! contul tău gpodder.net este acum conectat cu dispozitivul tău. Yagi va sincroniza automat toate abonamentele de pe dispozitivul dumneavoastra cu contul gpodder.net</string>
   <string name="gpodnetauth_finish_butsyncnow">Începe sincronizarea acum</string>
   <string name="gpodnetsync_error_title">eroare de sincronizare gpodder.net</string>
   <string name="gpodnetsync_error_descr">A apărut o eroare în timpul sincronizării:\u0020</string>
@@ -591,10 +590,10 @@
   <string name="episode_filters_hint">Un singur cuvânt \"Cuvinte multiple\"</string>
   <string name="keep_updated">Menține actualizat</string>
   <string name="keep_updated_summary">Include acest podcast când reîmprospătarea automată a podcasturilor este pornită</string>
-  <string name="auto_download_disabled_globally">Descărcarea automată este oprită în setările generale ale FocusPodcast</string>
+  <string name="auto_download_disabled_globally">Descărcarea automată este oprită în setările generale ale Yagi</string>
   <string name="statistics_space_used">Spațiu folosit:</string>
     <string name="statistics_view_all">Vizualizare a tuturor podcasturilor »</string>
-  <!--FocusPodcastSP-->
+  <!--YagiSP-->
   <string name="sp_apps_importing_feeds_msg">Importare abonamente din aplicații cu un singur scop...</string>
   <!--Add podcast fragment-->
   <string name="search_podcast_hint">Caută podcast...</string>
@@ -607,7 +606,7 @@
   <string name="local_folder">Director local</string>
   <string name="reconnect_local_folder">Reconectează directorul local</string>
   <string name="reconnect_local_folder_warning">În cazul în care permisiunile sunt refuzate, poți sa folosești această opțiune pentru a te reconecta la exact același director. Nu selecta alt director.</string>
-  <string name="local_feed_description">Acest podcast virtual a fost creat prin adăugarea unui director la FocusPodcast.</string>
+  <string name="local_feed_description">Acest podcast virtual a fost creat prin adăugarea unui director la Yagi.</string>
   <string name="unable_to_start_system_file_manager">Incapabil de a porni sistemul de management al fișierelor</string>
   <string name="filter">Filtrează</string>
   <!--Sort-->

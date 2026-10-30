@@ -4,7 +4,7 @@ plugins {
 apply from: "../../common.gradle"
 android {
     defaultConfig {
-        namespace = "dev.russell.focuspodcast.net.ssl"
+        namespace = "dev.russell.yagi.net.ssl"
     }
 }
 dependencies {

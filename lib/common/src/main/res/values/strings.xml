@@ -9,14 +9,11 @@
     <string name="add_action">Add</string>
     <string name="copied_to_clipboard">Copied to clipboard</string>
     <string name="share">Share</string>
-    <string name="send_file">Please send me an email, and the email address has been copied</string>
+    <string name="bug_report_share_log">Save or share the log, then attach it to the GitHub issue</string>
     <string name="asc">Ascending</string>
     <string name="desc">Descending</string>
     <string name="title">Title</string>
-    <string name="made_by">By allen town</string>
-    <string name="twitter_follow_me">Follow me</string>
-    <string name="others_app_of_us">Our other apps</string>
-    <string name="rate_me">Rate</string>
+    <string name="made_by">By JapanColorado\nBased on FocusPodcast by allen town and on AntennaPod</string>
     <string name="version" translatable="false">Version %s</string>
     <string name="pref_header_general">Theme</string>
     <string name="communication">Communication</string>
@@ -54,7 +51,6 @@
     <string name="preference_search_hint">Search…</string>
     <string name="preference_search_no_results">No results</string>
     <string name="searchpreference_clear_history">Clear history</string>
-    <string name="documentation_support">FAQ &amp; Help</string>
     <string name="bug_report_title">Report bug</string>
 
     <!-- About screen -->
@@ -66,8 +62,6 @@
 
     <string name="opensource" translatable="false">GitHub</string>
     <!-- Not yet translated into de/fr/ja; the zh translations exist. -->
-    <string name="donate" tools:ignore="MissingTranslation">Donate</string>
-    <string name="donate_summary" tools:ignore="MissingTranslation">Buy our devs a coffee</string>
     <string name="custom_launcher_pick_image">Choose icon image</string>
     <string name="custom_launcher_shape_round">Round</string>
     <string name="custom_launcher_shape_rounded_square">Rounded square</string>

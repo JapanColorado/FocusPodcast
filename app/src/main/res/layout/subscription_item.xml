@@ -2,13 +2,13 @@
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:squareImageView="http://schemas.android.com/apk/dev.russell.focuspodcast"
+    xmlns:squareImageView="http://schemas.android.com/apk/dev.russell.yagi"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:foreground="?attr/selectableItemBackground">
 
-    <dev.russell.focuspodcast.ui.common.SquareImageView
+    <dev.russell.yagi.ui.common.SquareImageView
         android:id="@+id/imgvCover"
         android:importantForAccessibility="no"
         android:layout_width="match_parent"
@@ -50,7 +50,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content">
 
-        <dev.russell.focuspodcast.common.common.views.AccentCheckbox
+        <dev.russell.yagi.common.common.views.AccentCheckbox
             android:id="@+id/selectCheckBox"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

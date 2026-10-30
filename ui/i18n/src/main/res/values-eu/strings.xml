@@ -399,7 +399,6 @@
   <string name="enqueue_location_front">Hasiera</string>
   <string name="enqueue_location_after_current">Oraingo saioaren ondoren</string>
   <string name="pref_smart_mark_as_played_disabled">Desgaitua</string>
-  <string name="documentation_support">Dokumentazioa &amp; Laguntza</string>
     <string name="bug_report_title">Errorearen berri eman</string>
     <string name="copy_to_clipboard">Kopiatu arbelean</string>
   <string name="copied_to_clipboard">Arbelean kopiatu da</string>
@@ -417,7 +416,7 @@
   <string name="back_button_open_drawer">Nabigatze kaxa ireki</string>
   <string name="back_button_double_tap">Sakatu bi aldiz irteteko</string>
   <string name="back_button_show_prompt">Baieztatu irteteko</string>
-  <string name="close_prompt">Ziur FocusPodcast itxi nahi duzula?</string>
+  <string name="close_prompt">Ziur Yagi itxi nahi duzula?</string>
   <string name="double_tap_toast">Sakatu botoia berriz irteteko</string>
   <string name="pref_delete_removes_from_queue_title">Ezabatu ilaratik kendutakoak</string>
   <string name="pref_delete_removes_from_queue_sum">Kendu saio bat automatikoki ilaratik ezabatzean.</string>
@@ -446,7 +445,7 @@
   <string name="opml_export_summary">Zure harpidetzak podcast-en beste aplikazio batera transferitu</string>
   <string name="opml_import_summary">Ekarri zure harpidetzak podcast-en beste aplikazio batetik</string>
   <string name="database_export_summary">Bidali beste gailu batera harpidetzak, ikusitako saioak eta irakur zerrenda</string>
-  <string name="database_import_summary">Ekarri FocusPodcastera datu basea beste gailu batetik</string>
+  <string name="database_import_summary">Ekarri Yagiera datu basea beste gailu batetik</string>
   <string name="opml_import_label">Inportatu OPMLtik</string>
   <string name="opml_add_podcast_label">Podcasten zerrenda inportatu (OPML)</string>
   <string name="opml_reader_error">Errorea OPML dokkumentua irakurtzean:</string>
@@ -462,8 +461,8 @@
   <string name="export_success_title">Esportatzea ongi burutu da</string>
     <string name="opml_import_ask_read_permission">Kanpo biltegirako sarrera behar duzu OPML artxibategiak irakurtzeko</string>
   <string name="successful_import_label">Inportate arrakastatsua</string>
-  <string name="import_ok">Sakatu OK FocusPodcast berrabiarazteko</string>
-  <string name="import_no_downgrade">Datu-basea FocusPodcast-en bertsio berriago batekin esportatu zen. Uneko aplikazioak ez daki nola inportatu.</string>
+  <string name="import_ok">Sakatu OK Yagi berrabiarazteko</string>
+  <string name="import_no_downgrade">Datu-basea Yagi-en bertsio berriago batekin esportatu zen. Uneko aplikazioak ez daki nola inportatu.</string>
   <!--Sleep timer-->
   <string name="set_sleeptimer_label">Ezarri tenporizadore bat</string>
   <string name="disable_sleeptimer_label">Desgaitu tenporizadorea</string>
@@ -502,10 +501,10 @@
   <string name="gpodnetauth_host">Ostalari izena</string>
   <string name="gpodnetauth_select_server">Aukeratu zerbitzaria</string>
   <string name="gpodnetauth_device_name">Gailuaren izena</string>
-  <string name="gpodnetauth_device_name_default">FocusPodcast aktibatuta %1$s</string>
+  <string name="gpodnetauth_device_name_default">Yagi aktibatuta %1$s</string>
   <string name="gpodnetauth_existing_devices">Dauden gailuak</string>
   <string name="gpodnetauth_create_device">Sortu gailua</string>
-  <string name="gpodnetauth_finish_descr">Zorionak! Zure gpodder.net kontua zure gailuarekin lotuta dago orain. Hemendik aurrera, FocusPodcastek automatikoki sinkronizatuko ditu zure gailuaren harpidetzak bzure gpodder.net kontuarekin.</string>
+  <string name="gpodnetauth_finish_descr">Zorionak! Zure gpodder.net kontua zure gailuarekin lotuta dago orain. Hemendik aurrera, Yagiek automatikoki sinkronizatuko ditu zure gailuaren harpidetzak bzure gpodder.net kontuarekin.</string>
   <string name="gpodnetauth_finish_butsyncnow">Hasi sinkronizazioa orain</string>
   <string name="gpodnetsync_error_title">Sinkronizatze errorea gpodder.net-en</string>
   <string name="gpodnetsync_error_descr">Sinkronizazio errorea izan da:\u0020</string>
@@ -549,10 +548,10 @@
   <string name="episode_filters_hint">Hitz solteak \"hitz anizkunak\"</string>
   <string name="keep_updated">Eguneratuta eduki</string>
   <string name="keep_updated_summary">Sartu podcast hau (auto-) freskatzeko podcast guztiak</string>
-  <string name="auto_download_disabled_globally">Deskarga automatikoa desgaituta dago FocusPodcast-en lehentasun orokorretan</string>
+  <string name="auto_download_disabled_globally">Deskarga automatikoa desgaituta dago Yagi-en lehentasun orokorretan</string>
     <string name="statistics_space_used">Erabilitako espazioa:</string>
   <string name="statistics_view_all">Podcast guztietarako ikusi »</string>
-  <!--FocusPodcastSP-->
+  <!--YagiSP-->
   <string name="sp_apps_importing_feeds_msg">Berariazko erabilerako aplikazioen harpidetzak inportatuz …</string>
   <!--Add podcast fragment-->
   <string name="search_podcast_hint">Bilatu podcasta</string>
@@ -565,7 +564,7 @@
   <string name="local_folder">Tokiko karpeta</string>
   <string name="reconnect_local_folder">Birkonektatu tokiko karpeta</string>
   <string name="reconnect_local_folder_warning">Baimenik izan ezean, hau erabil dezakezu karpeta berdina birkonektatzeko. Ez aukeratu beste karpetarik.</string>
-  <string name="local_feed_description">Podcast birtual hau FocusPodcast-i karpeta bat gehituta sortu da</string>
+  <string name="local_feed_description">Podcast birtual hau Yagi-i karpeta bat gehituta sortu da</string>
   <string name="unable_to_start_system_file_manager">Ezin da sistemaren fitxategi kudeatzailea abiarazi</string>
   <string name="filter">Iragazia</string>
   <!--Sort-->

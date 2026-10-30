@@ -414,7 +414,7 @@
   <string name="synchronization_full_sync_title">Выполнить полную синхронизацию</string>
   <string name="synchronization_login_status"><![CDATA[Авторизованы как <i>%1$s</i> на <i>%2$s</i>. <br/><br/>Вы сможете снова выбрать провайдера синхронизации после выхода из системы]]></string>
   <string name="synchronization_summary_unchoosen">Вы можете выбрать провайдера для сихронизации ваших подписок и состояния воспроизведения выпусков</string>
-    <string name="synchronization_nextcloud_authenticate_browser">Предоставить доступ, открыв веб-браузер, и вернуться в FocusPodcast.</string>
+    <string name="synchronization_nextcloud_authenticate_browser">Предоставить доступ, открыв веб-браузер, и вернуться в Yagi.</string>
   <string name="synchronization_choose_title">Выберите провайдера синхронизации</string>
   <string name="synchronization_force_sync_summary">Пересихронизировать ваши подписки и состояние выпусков</string>
   <string name="synchronization_sync_summary">Сихронизировать ваши подписки и изменения состояния выпусков</string>
@@ -447,7 +447,6 @@
   <string name="enqueue_location_front">в начало</string>
   <string name="enqueue_location_after_current">за текущим выпуском</string>
   <string name="pref_smart_mark_as_played_disabled">Отключено</string>
-  <string name="documentation_support">Документация и Поддержка</string>
     <string name="bug_report_title">Сообщить об ошибке</string>
     <string name="copy_to_clipboard">Скопировать в буфер</string>
   <string name="copied_to_clipboard">Скопировано в буфер</string>
@@ -465,7 +464,7 @@
   <string name="back_button_open_drawer">Открыть боковую панель</string>
   <string name="back_button_double_tap">Выход двойным касанием</string>
   <string name="back_button_show_prompt">Подтверджение выхода</string>
-  <string name="close_prompt">Уверены, что хотите закрыть FocusPodcast?</string>
+  <string name="close_prompt">Уверены, что хотите закрыть Yagi?</string>
   <string name="double_tap_toast">Нажмите кнопку «Назад» еще раз, чтобы выйти</string>
   <string name="pref_delete_removes_from_queue_title">Убирать удаленные из очереди</string>
   <string name="pref_delete_removes_from_queue_sum">Автоматически убирать выпуск из очереди при его удалении.</string>
@@ -495,8 +494,8 @@
   <!--import and export-->
   <string name="opml_export_summary">Передать подписки в другое приложение</string>
   <string name="opml_import_summary">Импортировать подписки из другого приложения</string>
-  <string name="database_export_summary">Передать подписки, список прослушанных и очередь в FocusPodcast на другом устройстве</string>
-  <string name="database_import_summary">Импортировать базу данных FocusPodcast с другого устройства</string>
+  <string name="database_export_summary">Передать подписки, список прослушанных и очередь в Yagi на другом устройстве</string>
+  <string name="database_import_summary">Импортировать базу данных Yagi с другого устройства</string>
   <string name="opml_import_label">Импорт OPML</string>
   <string name="opml_add_podcast_label">Импортировать список подкастов (OPML)</string>
   <string name="opml_reader_error">При чтении OPML произошла ошибка:</string>
@@ -512,8 +511,8 @@
   <string name="export_success_title">Экспорт выполнен</string>
     <string name="opml_import_ask_read_permission">Для чтения файла OPML необходим доступ к внешнему хранилищу</string>
   <string name="successful_import_label">Импорт успешен</string>
-  <string name="import_ok">Нажмите OK, чтобы перезапустить FocusPodcast</string>
-  <string name="import_no_downgrade">Выбранная база данных экспортирована из более поздней версии FocusPodcast. Установленная версия не сможет воспользоваться этой базой.</string>
+  <string name="import_ok">Нажмите OK, чтобы перезапустить Yagi</string>
+  <string name="import_no_downgrade">Выбранная база данных экспортирована из более поздней версии Yagi. Установленная версия не сможет воспользоваться этой базой.</string>
   <!--Sleep timer-->
   <string name="set_sleeptimer_label">Установить таймер сна</string>
   <string name="disable_sleeptimer_label">Отключить таймер сна</string>
@@ -558,10 +557,10 @@
   <string name="gpodnetauth_host">Имя узла</string>
   <string name="gpodnetauth_select_server">Выберите сервер</string>
   <string name="gpodnetauth_device_name">Название устройства</string>
-  <string name="gpodnetauth_device_name_default">FocusPodcast на %1$s</string>
+  <string name="gpodnetauth_device_name_default">Yagi на %1$s</string>
   <string name="gpodnetauth_existing_devices">Существующие устройства</string>
   <string name="gpodnetauth_create_device">Создать устройство</string>
-  <string name="gpodnetauth_finish_descr">Поздравляем! Ваша учётная запись gpodder.net связана с устройством. FocusPodcast будет автоматически синхронизировать Ваши подписки с учётной записью gpodder.net.</string>
+  <string name="gpodnetauth_finish_descr">Поздравляем! Ваша учётная запись gpodder.net связана с устройством. Yagi будет автоматически синхронизировать Ваши подписки с учётной записью gpodder.net.</string>
   <string name="gpodnetauth_finish_butsyncnow">Начать синхронизацию</string>
   <string name="gpodnetsync_error_title">Ошибка синхронизации с gpodder.net</string>
   <string name="gpodnetsync_error_descr">Произошла ошибка во время синхронизации:\u0020</string>
@@ -609,10 +608,10 @@
   <string name="episode_filters_hint">По одному слову \"По фразе\"</string>
   <string name="keep_updated">Постоянно обновлять</string>
   <string name="keep_updated_summary">Обновлять подкаст при (авто)обновлении всех подкастов</string>
-  <string name="auto_download_disabled_globally">Автоматическая загрузка отключена в основных настройках FocusPodcast</string>
+  <string name="auto_download_disabled_globally">Автоматическая загрузка отключена в основных настройках Yagi</string>
   <string name="statistics_space_used">Используемое пространство:</string>
     <string name="statistics_view_all">Просмотреть все подкасты »</string>
-  <!--FocusPodcastSP-->
+  <!--YagiSP-->
   <string name="sp_apps_importing_feeds_msg">Импорт подписок из моноприложений…</string>
   <!--Add podcast fragment-->
   <string name="search_podcast_hint">Найти подкаст…</string>
@@ -625,7 +624,7 @@
   <string name="local_folder">Локальная папка</string>
   <string name="reconnect_local_folder">Переподключить локальную папку</string>
   <string name="reconnect_local_folder_warning">В случае отказа в разрешении вы можете использовать это для переподключения к той же самой папке. Не выбирайте другую папку.</string>
-  <string name="local_feed_description">Этот виртуальный подкаст был создан путем добавления папки в FocusPodcast.</string>
+  <string name="local_feed_description">Этот виртуальный подкаст был создан путем добавления папки в Yagi.</string>
   <string name="unable_to_start_system_file_manager">Невозможно запустить системный файловый менеджер</string>
   <string name="filter">Фильтровать</string>
   <!--Sort-->

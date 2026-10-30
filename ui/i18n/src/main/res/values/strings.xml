@@ -4,8 +4,9 @@
     tools:ignore="MissingTranslation">
 
     <!-- Activity and fragment titles -->
-    <string name="app_name" translatable="false">FocusPodcast</string>
-    <string name="provider_authority" translatable="false">dev.russell.focuspodcast.provider</string>
+    <string name="app_name" translatable="false">Yagi</string>
+    <string name="app_tagline">Podcasts and Audiobooks</string>
+    <string name="provider_authority" translatable="false">dev.russell.yagi.provider</string>
     <string name="feed_update_receiver_name">Update Subscriptions</string>
     <string name="feeds_label">Podcasts</string>
     <string name="statistics_label">Playback stats</string>
@@ -497,7 +498,7 @@
     <string name="synchronization_episodes_sync">Subscriptions and Episodes Sync</string>
     <string name="synchronization_summary_unchoosen">Choose from multiple providers to synchronize subscriptions and episodes</string>
     <string name="gpodsync_synchronization_sum">Gpoddersync is an open source Nextcloud application that you need to deploy on your own server, if you know enough then you can continue</string>
-    <string name="synchronization_nextcloud_authenticate_browser">Grant access using the opened web browser and come back to FocusPodcast.</string>
+    <string name="synchronization_nextcloud_authenticate_browser">Grant access using the opened web browser and come back to Yagi.</string>
     <string name="synchronization_choose_title">Choose synchronization provider</string>
     <string name="synchronization_force_sync_summary">Re-synchronize all subscriptions and episode states</string>
     <string name="synchronization_sync_summary">Synchronize subscription and episode state changes</string>
@@ -530,7 +531,6 @@
     <string name="enqueue_location_front">Top of playlist</string>
     <string name="enqueue_location_after_current">After current episode</string>
     <string name="pref_smart_mark_as_played_disabled">Disabled</string>
-    <string name="documentation_support">FAQ &amp; Help</string>
     <string name="bug_report_title">Report bug</string>
     <string name="copy_to_clipboard">Copy to clipboard</string>
     <string name="copied_to_clipboard">Copied to clipboard</string>
@@ -548,7 +548,7 @@
     <string name="back_button_open_drawer">Open navigation drawer</string>
     <string name="back_button_double_tap">Double tap to exit</string>
     <string name="back_button_show_prompt">Confirm to exit</string>
-    <string name="close_prompt">Are you sure you want to close FocusPodcast?</string>
+    <string name="close_prompt">Are you sure you want to close Yagi?</string>
     <string name="double_tap_toast">Click the back button again to exit</string>
     <string name="pref_delete_removes_from_queue_title">Remove from Playlist</string>
     <string name="pref_delete_removes_from_queue_sum">Automatically remove the episode from the queue when it is deleted</string>
@@ -585,8 +585,8 @@
     <!-- import and export -->
     <string name="opml_export_summary">Transfer your subscriptions to another podcast app</string>
     <string name="opml_import_summary">Import your subscriptions from another podcast app</string>
-    <string name="database_export_summary">Transfer subscriptions, listened episodes, queue and settings to FocusPodcast on another device</string>
-    <string name="database_import_summary">Import FocusPodcast database from another device</string>
+    <string name="database_export_summary">Transfer subscriptions, listened episodes, queue and settings to Yagi on another device</string>
+    <string name="database_import_summary">Import Yagi database from another device</string>
     <string name="opml_import_label">OPML import</string>
     <string name="opml_add_podcast_label">Import podcast list (OPML)</string>
     <string name="opml_reader_error">An error has occurred while reading the OPML document:</string>
@@ -602,8 +602,8 @@
     <string name="export_success_title">Export successful</string>
     <string name="opml_import_ask_read_permission">Access to external storage is required to read the OPML file</string>
     <string name="successful_import_label">Import successful</string>
-    <string name="import_ok">Please press OK to restart FocusPodcast</string>
-    <string name="import_no_downgrade">This database was exported with a newer version of FocusPodcast. Your current installation does not yet know how to handle this file.</string>
+    <string name="import_ok">Please press OK to restart Yagi</string>
+    <string name="import_no_downgrade">This database was exported with a newer version of Yagi. Your current installation does not yet know how to handle this file.</string>
 
     <!-- Sleep timer -->
     <string name="set_sleeptimer_label">Set sleep timer</string>
@@ -651,10 +651,10 @@
     <string name="gpodnetauth_host">Hostname</string>
     <string name="gpodnetauth_select_server">Select server</string>
     <string name="gpodnetauth_device_name">Device name</string>
-    <string name="gpodnetauth_device_name_default">FocusPodcast on %1$s</string>
+    <string name="gpodnetauth_device_name_default">Yagi on %1$s</string>
     <string name="gpodnetauth_existing_devices">Existing devices</string>
     <string name="gpodnetauth_create_device">Create device</string>
-    <string name="gpodnetauth_finish_descr">Your gpodder.net account is now linked with your device. FocusPodcast will automatically sync subscriptions on your device with your gpodder.net account</string>
+    <string name="gpodnetauth_finish_descr">Your gpodder.net account is now linked with your device. Yagi will automatically sync subscriptions on your device with your gpodder.net account</string>
     <string name="gpodnetauth_finish_butsyncnow">Start sync now</string>
 
     <string name="gpodnetsync_error_title">gpodder.net sync failed</string>
@@ -707,11 +707,11 @@
     <string name="episode_filters_hint">Single words \"Multiple Words\"</string>
     <string name="keep_updated">Keep Updated</string>
     <string name="keep_updated_summary">Include this podcast when automatically refreshing all podcasts</string>
-    <string name="auto_download_disabled_globally">Auto download is disabled in the main FocusPodcast settings</string>
+    <string name="auto_download_disabled_globally">Auto download is disabled in the main Yagi settings</string>
     <string name="statistics_space_used">Space used:</string>
     <string name="statistics_view_all">View for all podcasts »</string>
 
-    <!-- FocusPodcastSP -->
+    <!-- YagiSP -->
     <string name="sp_apps_importing_feeds_msg">Importing subscriptions from single-purpose apps&#8230;</string>
 
     <!-- Add podcast fragment -->
@@ -726,9 +726,9 @@
     <string name="local_folder">Local folder</string>
     <string name="reconnect_local_folder">Re-connect local folder</string>
     <string name="reconnect_local_folder_warning">In case of permission denials, you can use this to re-connect to the exact same folder. Do not select another folder.</string>
-    <string name="local_feed_description">This virtual podcast was created by adding a folder to FocusPodcast.</string>
+    <string name="local_feed_description">This virtual podcast was created by adding a folder to Yagi.</string>
     <string name="local_file">Local file</string>
-    <string name="local_file_feed_description">This virtual podcast was created by adding a single file to FocusPodcast.</string>
+    <string name="local_file_feed_description">This virtual podcast was created by adding a single file to Yagi.</string>
     <string name="sort_track_order">Track order</string>
     <string name="library_label">Library</string>
     <string name="audiobooks_label">Audiobooks</string>
@@ -819,11 +819,11 @@
 
     <!-- Widget settings -->
     <string name="app_widget_classic_name">Classic</string>
-    <string name="app_widget_md_name">MD (FocusPodcast Pro)</string>
-    <string name="app_widget_md3_name">MD3 (FocusPodcast Pro)</string>
-    <string name="app_widget_big_name">Full Image (FocusPodcast Pro)</string>
-    <string name="app_widget_circle_name">Circle (FocusPodcast Pro)</string>
-    <string name="app_widget_text_name">Minimal Text (FocusPodcast Pro)</string>
+    <string name="app_widget_md_name">MD</string>
+    <string name="app_widget_md3_name">MD3</string>
+    <string name="app_widget_big_name">Full Image</string>
+    <string name="app_widget_circle_name">Circle</string>
+    <string name="app_widget_text_name">Minimal Text</string>
 
     <!-- On-Demand configuration -->
     <string name="on_demand_config_setting_changed">Setting updated successfully.</string>
@@ -839,8 +839,6 @@
     <string name="leave_feedback">Send Feedback</string>
     <string name="log_file">Send log file</string>
 
-    <string name="app_pro">FocusPodcast Pro</string>
-    <string name="need_pro">Require FocusPodcast Pro</string>
     <string name="pro_summary">More Themes, Now playing themes, Custom homepage, and more... to create your own unique podcast app</string>
     <string name="buy_now">View all advanced features</string>
 
@@ -867,7 +865,6 @@
     <string name="tv">TV &amp; Film</string>
     <string name="true_crime">True crime</string>
 
-    <string name="upgrade_tip">The new version of FocusPodcast has been launched. recommended to update on Google Play</string>
 
     <string name="sent_from">Sent from</string>
     <string name="normal">Normal</string>
@@ -971,7 +968,7 @@
     <string name="browse_episodes_label">Browse episodes</string>
     <string name="clear_filter_label">Clear filter</string>
     <string name="notification_rationale_title">Allow notifications?</string>
-    <string name="notification_rationale_message">FocusPodcast uses notifications to show download progress and to tell you about new episodes and failed downloads.</string>
+    <string name="notification_rationale_message">Yagi uses notifications to show download progress and to tell you about new episodes and failed downloads.</string>
     <string name="allow_label">Allow</string>
     <string name="not_now_label">Not now</string>
     <plurals name="feed_filter_hides_all_episodes">
@@ -980,7 +977,7 @@
     </plurals>
     <string name="pref_playback_notification_category">Playback notification</string>
     <string name="pref_system_notification_settings_title">System notification settings</string>
-    <string name="pref_system_notification_settings_sum">Choose which kinds of notifications FocusPodcast shows</string>
+    <string name="pref_system_notification_settings_sum">Choose which kinds of notifications Yagi shows</string>
     <string name="pref_subscriptions_updates_title">Subscriptions &amp; updates</string>
     <string name="pref_subscriptions_updates_sum">Podcast search, refresh schedule, subscription list</string>
     <string name="pref_layout_navigation_category">Layout &amp; navigation</string>

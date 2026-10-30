@@ -88,7 +88,7 @@
 
         <!-- Material 1.13+ gives the FAB a resting Z offset, which drew it over this icon;
              the translationZ keeps the icon on top of its sibling. -->
-        <dev.russell.focuspodcast.view.PlayButton
+        <dev.russell.yagi.view.PlayButton
             android:id="@+id/butPlay"
             android:layout_width="@dimen/audioplayer_playercontrols_length_m"
             android:layout_height="@dimen/audioplayer_playercontrols_length_m"
@@ -101,7 +101,7 @@
             app:srcCompat="@drawable/ic_play_48dp"
             tools:srcCompat="@drawable/ic_play_48dp" />
 
-        <dev.russell.focuspodcast.common.views.AccentProgressBar
+        <dev.russell.yagi.common.views.AccentProgressBar
             android:id="@+id/progLoading"
             android:layout_width="@dimen/audioplayer_playercontrols_length_big"
             android:layout_height="@dimen/audioplayer_playercontrols_length_big"

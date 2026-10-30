@@ -454,7 +454,6 @@
   <string name="enqueue_location_front">E penn ar roll</string>
   <string name="enqueue_location_after_current">Goude ar rann bremanel</string>
   <string name="pref_smart_mark_as_played_disabled">Diweredekaet</string>
-  <string name="documentation_support">Diellerezh ha skoazell</string>
     <string name="bug_report_title">Danevellañ ur beug</string>
     <string name="copy_to_clipboard">Eilañ er golver</string>
   <string name="copied_to_clipboard">Eilet er golver</string>
@@ -472,7 +471,7 @@
   <string name="back_button_open_drawer">Digeriñ ar stalaf merdeiñ</string>
   <string name="back_button_double_tap">Stokit 2 wech da guitaat</string>
   <string name="back_button_show_prompt">Kadarnaat e fell deoc\'h kuitaat</string>
-  <string name="close_prompt">Sur oc\'h e fell deoc\'h kuitaat FocusPodcast?</string>
+  <string name="close_prompt">Sur oc\'h e fell deoc\'h kuitaat Yagi?</string>
   <string name="double_tap_toast">Stokañ ur wech ouzhpenn evit kuitaa</string>
   <string name="pref_delete_removes_from_queue_title">Dilemel a denn eus al lost</string>
   <string name="pref_delete_removes_from_queue_sum">Tennañ ur rann eus al lost ent emgefreek pa vez dilamet.</string>
@@ -500,8 +499,8 @@
   <!--import and export-->
   <string name="opml_export_summary">Treuzkas ho koumanantoù d\'un arload podskignad all</string>
   <string name="opml_import_summary">Enporzhiañ ho koumanantoù adalek un arload podskignad all</string>
-  <string name="database_export_summary">Treuzkas ar c\'houmanantoù, ar rannoù lennet hag el lost da FocusPodcast war ur benveg all</string>
-  <string name="database_import_summary">Enporzhiañ stlennvon FocusPodcast adalek ur benveg all</string>
+  <string name="database_export_summary">Treuzkas ar c\'houmanantoù, ar rannoù lennet hag el lost da Yagi war ur benveg all</string>
+  <string name="database_import_summary">Enporzhiañ stlennvon Yagi adalek ur benveg all</string>
   <string name="opml_import_label">Enporzhiañ ur restr OPML</string>
   <string name="opml_add_podcast_label">Enporzhiañ ul listenn podskignadoù (OPML)</string>
   <string name="opml_reader_error">Degouezhet ez eus bet ur fazi en ul lenn ar restr OPML</string>
@@ -517,7 +516,7 @@
   <string name="export_success_title">Ezporzhiet gant berzh</string>
     <string name="opml_import_ask_read_permission">Ret eo aotren haeziñ ar c\'hadaviñ diavaez evit lenn ar restr OPML</string>
   <string name="successful_import_label">Enporzhiet gant berzh</string>
-  <string name="import_ok">Pouezit war OK evit adloc\'hañ FocusPodcast</string>
+  <string name="import_ok">Pouezit war OK evit adloc\'hañ Yagi</string>
   <string name="import_no_downgrade">Enporzhiet eo bet ar stlennvon gant un handelv nevesoc\'h eus AntennPod. Ho staliadur bremanel na oar ket c\'hoazh penaos merañ ar restr-mañ.</string>
   <!--Sleep timer-->
   <string name="set_sleeptimer_label">Lakaat ar munuter</string>
@@ -566,7 +565,7 @@
   <string name="gpodnetauth_host">Anv ostiz</string>
   <string name="gpodnetauth_select_server">Dibab un dafariad</string>
   <string name="gpodnetauth_device_name">Anv ar benveg</string>
-  <string name="gpodnetauth_device_name_default">FocusPodcast war %1$s</string>
+  <string name="gpodnetauth_device_name_default">Yagi war %1$s</string>
   <string name="gpodnetauth_existing_devices">Binviji a zo anezho</string>
   <string name="gpodnetauth_create_device">Krouiñ ur benveg</string>
   <string name="gpodnetauth_finish_descr">Gourc\'hemennoù! Liammet eo ho kont gpodder.net gant ho penveg. Goubredet e vo ent emgefreek ar c\'houmanantoù war ho penveg gant ho kont gpodder.net.</string>
@@ -613,10 +612,10 @@
   <string name="episode_filters_hint">Gerioù o-unan \"Meur a c\'her\"</string>
   <string name="keep_updated">Leuskel hizivaet</string>
   <string name="keep_updated_summary">Ebarzhiñ ar podskignad pa vez hizivaet an holl bodskignadoù</string>
-  <string name="auto_download_disabled_globally">N\'eo ket gweredekaet al lenn emgefreek e arventennoù pennañ FocusPodcast</string>
+  <string name="auto_download_disabled_globally">N\'eo ket gweredekaet al lenn emgefreek e arventennoù pennañ Yagi</string>
     <string name="statistics_space_used">Plas implijet:</string>
   <string name="statistics_view_all">Diskouez an holl bodskignadoù »</string>
-  <!--FocusPodcastSP-->
+  <!--YagiSP-->
   <string name="sp_apps_importing_feeds_msg">Oc\'h enporzhiañ ar c\'houmanantoù diwar arloadoù gant un arver unel...</string>
   <!--Add podcast fragment-->
   <string name="search_podcast_hint">Klask ur podskignad...</string>
@@ -629,7 +628,7 @@
   <string name="local_folder">Teuliad lec\'hel</string>
   <string name="reconnect_local_folder">Adkennaskañ un teuliad lec\'hel</string>
   <string name="reconnect_local_folder_warning">Gallout a rit implijout an dra-se evit adkennaskañ ar memes teuliad pa vez nac\'het an aotre. Arabat dibab un teuliad all.</string>
-  <string name="local_feed_description">Krouet eo bet ar podskignad galloudel-mañ en ur ouzhpennañ un teuliad da FocusPodcast.</string>
+  <string name="local_feed_description">Krouet eo bet ar podskignad galloudel-mañ en ur ouzhpennañ un teuliad da Yagi.</string>
   <string name="unable_to_start_system_file_manager">N\'haller ket loc\'hañ merour restroù ar reizhiad</string>
   <string name="filter">Sil</string>
   <!--Sort-->

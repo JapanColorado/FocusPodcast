@@ -39,7 +39,7 @@
 
     <color name="primary_color_5">#dddddd</color>
 
-    <color name="ic_launcher_background">#FFFFFF</color>
+    <color name="ic_launcher_background">#5E35B1</color>
 
     <!-- Overrides the SkeletonLayout library's own skeleton_mask / skeleton_shimmer resources
          by name (see values-night for the dark variants). Nothing references these directly,

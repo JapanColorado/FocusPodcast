@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <dev.russell.focuspodcast.core.view.TopAppBarLayout
+    <dev.russell.yagi.core.view.TopAppBarLayout
         android:id="@+id/appBarLayout"
         style="?appBarLayoutStyle"
         android:layout_width="match_parent"

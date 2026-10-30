@@ -11,7 +11,7 @@
         android:layout_height="match_parent"
         android:background="?attr/colorSurface">
 
-        <dev.russell.focuspodcast.core.view.TopAppBarLayout
+        <dev.russell.yagi.core.view.TopAppBarLayout
             android:id="@+id/appBarLayout"
             style="?appBarLayoutStyle"
             android:layout_width="match_parent"
@@ -27,7 +27,7 @@
             android:clipToPadding="false"
             app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
-        <dev.russell.focuspodcast.view.StorePositionRecyclerView
+        <dev.russell.yagi.view.StorePositionRecyclerView
             android:id="@+id/recyclerViewFeeds"
             android:layout_width="match_parent"
             android:layout_height="match_parent"

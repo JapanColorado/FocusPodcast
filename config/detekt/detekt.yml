@@ -1,4 +1,4 @@
-# detekt configuration for FocusPodcast.
+# detekt configuration for Yagi.
 #
 # This file is merged on top of detekt's built-in default config
 # (`buildUponDefaultConfig = true` in the root build.gradle), so anything not

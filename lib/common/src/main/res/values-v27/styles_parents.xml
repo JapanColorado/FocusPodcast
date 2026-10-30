@@ -14,7 +14,7 @@
 
 <resources>
 
-    <style name="Theme.FocusPodcast.Base.Adaptive" parent="Theme.Material3.DayNight.NoActionBar">
+    <style name="Theme.Yagi.Base.Adaptive" parent="Theme.Material3.DayNight.NoActionBar">
         <item name="toolbarPopupTheme">@style/ThemeOverlay.AppCompat.Light</item>
         <item name="roundSelector">@drawable/round_selector</item>
         <item name="rectSelector">@drawable/rect_selector</item>
@@ -26,13 +26,13 @@
         <item name="popupMenuBackground">@drawable/popup_background</item>
     </style>
 
-    <style name="Theme.FocusPodcast.Base" parent="Theme.FocusPodcast.Base.Black">
+    <style name="Theme.Yagi.Base" parent="Theme.Yagi.Base.Black">
 
         <!--Manual setting colors-->
         <item name="colorSurface">@color/darkColorSurface</item>
     </style>
 
-    <style name="Theme.FocusPodcast.Base.Light" parent="Theme.Material3.Light.NoActionBar">
+    <style name="Theme.Yagi.Base.Light" parent="Theme.Material3.Light.NoActionBar">
         <item name="roundSelector">@drawable/round_selector</item>
         <item name="rectSelector">@drawable/rect_selector</item>
         <item name="toolbarPopupTheme">@style/ThemeOverlay.AppCompat.Light</item>

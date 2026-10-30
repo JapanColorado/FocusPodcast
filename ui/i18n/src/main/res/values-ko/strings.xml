@@ -345,7 +345,6 @@
   <string name="enqueue_location_front">앞</string>
   <string name="enqueue_location_after_current">현재 에피소드 다음</string>
   <string name="pref_smart_mark_as_played_disabled">사용 안 함</string>
-  <string name="documentation_support">문서 및 지원</string>
     <string name="bug_report_title">문제점 보고</string>
     <string name="copy_to_clipboard">클립보드로 복사</string>
   <string name="copied_to_clipboard">클립보드에 복사함</string>
@@ -488,7 +487,7 @@
   <string name="auto_download_disabled_globally">자동 다운로드는 안테나팟 메인 설정에서 꺼져 있습니다</string>
     <string name="statistics_space_used">사용한 용량:</string>
   <string name="statistics_view_all">모든 팟캐스트에 대한 뷰 »</string>
-  <!--FocusPodcastSP-->
+  <!--YagiSP-->
   <string name="sp_apps_importing_feeds_msg">단일 용도 앱에서 구독 정보를 가져옵니다...</string>
   <!--Add podcast fragment-->
   <string name="search_podcast_hint">팟캐스트 검색…</string>

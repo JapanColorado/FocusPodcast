@@ -397,7 +397,6 @@
   <string name="enqueue_location_front">جلو</string>
   <string name="enqueue_location_after_current">بعد از اپیزود فعلی</string>
   <string name="pref_smart_mark_as_played_disabled">غیرفعال</string>
-  <string name="documentation_support">مستندات و پشتیبانی</string>
     <string name="bug_report_title">گزارش مشکل</string>
     <string name="copy_to_clipboard">کپی به کلیپ بورد</string>
   <string name="copied_to_clipboard">در کلیپ بورد کپی شد</string>
@@ -461,7 +460,7 @@
     <string name="opml_import_ask_read_permission">برای خواندن فایل OPML دسترسی به حافظه خارجی لازم است</string>
   <string name="successful_import_label">وارد کردن موفقیت آمیز</string>
   <string name="import_ok">لطفاً OK را فشار دهید تا آنتن پاد دوباره راه اندازی شود</string>
-  <string name="import_no_downgrade">پایگاه داده با نسخه‌از جدیدتر از FocusPodcast خروجی گرفته شده است. نسخه نصب شده فعلی شما هنوز نمی‌داند که چگونه باید با این پرونده کار کند.</string>
+  <string name="import_no_downgrade">پایگاه داده با نسخه‌از جدیدتر از Yagi خروجی گرفته شده است. نسخه نصب شده فعلی شما هنوز نمی‌داند که چگونه باید با این پرونده کار کند.</string>
   <!--Sleep timer-->
   <string name="set_sleeptimer_label">تنظیم زمان‌سنج خواب</string>
   <string name="disable_sleeptimer_label">از کار انداختن زمان‌سنج خواب</string>
@@ -500,7 +499,7 @@
   <string name="gpodnetauth_host">نام میزبان</string>
   <string name="gpodnetauth_select_server">انتخاب سرور</string>
   <string name="gpodnetauth_device_name">نام دستگاه</string>
-  <string name="gpodnetauth_device_name_default">FocusPodcast برروی %1$s</string>
+  <string name="gpodnetauth_device_name_default">Yagi برروی %1$s</string>
   <string name="gpodnetauth_existing_devices">دستگاههای موجود</string>
   <string name="gpodnetauth_create_device">ایجاد دستگاه</string>
   <string name="gpodnetauth_finish_descr">تبریک می گویم! حساب gpodder.net شما اکنون با دستگاه شما پیوند داده شده است. آنتن پاد از این پس اشتراک های دستگاه شما را با حساب gpodder.net خود به طور خودکار همگام سازی می کند.</string>
@@ -550,7 +549,7 @@
   <string name="auto_download_disabled_globally">بارگیری خودکار در تنظیمات اصلی  آنتن پاد غیرفعال است</string>
     <string name="statistics_space_used">فضای مورد استفاده:</string>
   <string name="statistics_view_all">مشاهده همه پادکست ها »</string>
-  <!--FocusPodcastSP-->
+  <!--YagiSP-->
   <string name="sp_apps_importing_feeds_msg">وارد کردن اشتراک از برنامه های تک منظوره</string>
   <!--Add podcast fragment-->
   <string name="search_podcast_hint">جستجوی پادکست ...</string>

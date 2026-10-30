@@ -414,7 +414,7 @@
   <string name="synchronization_full_sync_title">אילוץ סנכרון מלא</string>
   <string name="synchronization_login_status"><![CDATA[נכנסת בתור <i>%1$s</i> אל <i>%2$s</i>. <br/><br/>אפשר לבחור את שרת הסנכרון שלך שוב לאחר היציאה מהחשבון]]></string>
   <string name="synchronization_summary_unchoosen">אפשר לבחור בין מגוון ספקית לסנכרון המינויים ומצב נגינ הפרקים שלך עם</string>
-    <string name="synchronization_nextcloud_authenticate_browser">יש להעניק גישה באמצעות הדפדפן שנפתח ולחזור ל־FocusPodcast.</string>
+    <string name="synchronization_nextcloud_authenticate_browser">יש להעניק גישה באמצעות הדפדפן שנפתח ולחזור ל־Yagi.</string>
   <string name="synchronization_choose_title">בחירת ספק סנכרון</string>
   <string name="synchronization_force_sync_summary">סנכרון המינוי ושינויי מצב הפרקים מחדש</string>
   <string name="synchronization_sync_summary">סנכרון המינוי ושינויי מצב הפרקים</string>
@@ -447,7 +447,6 @@
   <string name="enqueue_location_front">חזית</string>
   <string name="enqueue_location_after_current">לאחר הפרק הנוכחי</string>
   <string name="pref_smart_mark_as_played_disabled">מושבת</string>
-  <string name="documentation_support">תיעוד ותמיכה</string>
     <string name="bug_report_title">דיווח על תקלה</string>
     <string name="copy_to_clipboard">העתקה ללוח הגזירים</string>
   <string name="copied_to_clipboard">הועתק ללוח הגזירים</string>
@@ -612,7 +611,7 @@
   <string name="auto_download_disabled_globally">הורדה אוטומטית מושבתת בהגדרות הראשיות של אנטנה־פּוֹד</string>
   <string name="statistics_space_used">מקום תפוס:</string>
     <string name="statistics_view_all">להציג לכל הפודקאסטים »</string>
-  <!--FocusPodcastSP-->
+  <!--YagiSP-->
   <string name="sp_apps_importing_feeds_msg">מתבצע ייבוא מינויים מיישומונים ממוקדי מטרה…</string>
   <!--Add podcast fragment-->
   <string name="search_podcast_hint">חיפוש פודקאסט…</string>

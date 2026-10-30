@@ -384,7 +384,7 @@
   <string name="synchronization_full_sync_title">Forzar sincronización completa</string>
   <string name="synchronization_login_status"><![CDATA[Tes conexión como <i>%1$s</i> en <i>%2$s</i>. <br/><br/>Podes cambiar de provedor de sincronización unha vez te desconectes do actua]]></string>
   <string name="synchronization_summary_unchoosen">Podes elexir entre múltiples provedores para sincronizar as túas subscricións e estado de reprodución dos episodios</string>
-    <string name="synchronization_nextcloud_authenticate_browser">Conceder acceso usando o navegador web e volver a FocusPodcast.</string>
+    <string name="synchronization_nextcloud_authenticate_browser">Conceder acceso usando o navegador web e volver a Yagi.</string>
   <string name="synchronization_choose_title">Elixe o provedor de sincronización</string>
   <string name="synchronization_force_sync_summary">Volve a sincronizar tódalas subscricións e estado dos episodios</string>
   <string name="synchronization_sync_summary">Sincroniza os cambios nas subscricións e estado dos episodios</string>
@@ -417,7 +417,6 @@
   <string name="enqueue_location_front">Diante</string>
   <string name="enqueue_location_after_current">Tras o episodio actual</string>
   <string name="pref_smart_mark_as_played_disabled">Desactivado</string>
-  <string name="documentation_support">Documentación &amp; Axuda</string>
     <string name="bug_report_title">Informar de fallo</string>
     <string name="copy_to_clipboard">Copiar ó portapapeis</string>
   <string name="copied_to_clipboard">Copiado ó portapapeis</string>
@@ -435,7 +434,7 @@
   <string name="back_button_open_drawer">Abrir a caixa de navegación</string>
   <string name="back_button_double_tap">Dobre toque para saír</string>
   <string name="back_button_show_prompt">Confirmar a saída</string>
-  <string name="close_prompt">Confirma o peche do FocusPodcast?</string>
+  <string name="close_prompt">Confirma o peche do Yagi?</string>
   <string name="double_tap_toast">Tocar o botón Atrás outra vez para saír</string>
   <string name="pref_delete_removes_from_queue_title">Eliminar quita da Cola</string>
   <string name="pref_delete_removes_from_queue_sum">Eliminar automáticamente un episodio da cola cando se elimina.</string>
@@ -465,8 +464,8 @@
   <!--import and export-->
   <string name="opml_export_summary">Mover as túas subscricións a outra app de podcast</string>
   <string name="opml_import_summary">Importar as túas subscricións desde outra app de podcast</string>
-  <string name="database_export_summary">Mover as subscricións, episodios escoitados e cola a FocusPodcast en outro dispositivo</string>
-  <string name="database_import_summary">Importar a base de datos FocusPodcast desde outro dispositivo</string>
+  <string name="database_export_summary">Mover as subscricións, episodios escoitados e cola a Yagi en outro dispositivo</string>
+  <string name="database_import_summary">Importar a base de datos Yagi desde outro dispositivo</string>
   <string name="opml_import_label">Importar OPML</string>
   <string name="opml_add_podcast_label">Importar lista de podcast (OPML)</string>
   <string name="opml_reader_error">Houbo un fallo ao ler o documento OPML:</string>
@@ -482,8 +481,8 @@
   <string name="export_success_title">Exportado con éxito</string>
     <string name="opml_import_ask_read_permission">Precísase acceso ao almacenamento externo para ler o ficheiro OPML</string>
   <string name="successful_import_label">Importación correcta</string>
-  <string name="import_ok">Preme OK para reiniciar FocusPodcast</string>
-  <string name="import_no_downgrade">A base de datos foi exportada cunha versión máis recente de FocusPodcast. A instalación actual non sabe como xestionar este ficheiro.</string>
+  <string name="import_ok">Preme OK para reiniciar Yagi</string>
+  <string name="import_no_downgrade">A base de datos foi exportada cunha versión máis recente de Yagi. A instalación actual non sabe como xestionar este ficheiro.</string>
   <!--Sleep timer-->
   <string name="set_sleeptimer_label">Establecer apagado automático</string>
   <string name="disable_sleeptimer_label">Desactivar o apagado automático</string>
@@ -522,10 +521,10 @@
   <string name="gpodnetauth_host">Servidor</string>
   <string name="gpodnetauth_select_server">Elixe servidor</string>
   <string name="gpodnetauth_device_name">Nome do dispositivo</string>
-  <string name="gpodnetauth_device_name_default">FocusPodcast en %1$s</string>
+  <string name="gpodnetauth_device_name_default">Yagi en %1$s</string>
   <string name="gpodnetauth_existing_devices">Dispositivos existentes</string>
   <string name="gpodnetauth_create_device">Crear dispositivo</string>
-  <string name="gpodnetauth_finish_descr">Parabéns! A túa conta gpodder.net está conectada ao dispositivo. FocusPodcast poderá agora sincronizar automaticamente as túas subscricións no dispositivo na conta de gpodder.net</string>
+  <string name="gpodnetauth_finish_descr">Parabéns! A túa conta gpodder.net está conectada ao dispositivo. Yagi poderá agora sincronizar automaticamente as túas subscricións no dispositivo na conta de gpodder.net</string>
   <string name="gpodnetauth_finish_butsyncnow">Iniciar a sincronización</string>
   <string name="gpodnetsync_error_title">fallo na sincronización con gpodder.net</string>
   <string name="gpodnetsync_error_descr">Houbo un fallo durante a sincronización:\u0020</string>
@@ -573,10 +572,10 @@
   <string name="episode_filters_hint">Palabras simples \"Varias palabras\"</string>
   <string name="keep_updated">Manter actualizado</string>
   <string name="keep_updated_summary">Incluír este podcast ao (auto-)actualizar todos os podcast</string>
-  <string name="auto_download_disabled_globally">A descarga automática está desactivada nos axustes principais de FocusPodcast</string>
+  <string name="auto_download_disabled_globally">A descarga automática está desactivada nos axustes principais de Yagi</string>
   <string name="statistics_space_used">Espazo utilizado:</string>
     <string name="statistics_view_all">Vista para todos os podcats »</string>
-  <!--FocusPodcastSP-->
+  <!--YagiSP-->
   <string name="sp_apps_importing_feeds_msg">Importando as subscricións desde aplicacións de propósito único...</string>
   <!--Add podcast fragment-->
   <string name="search_podcast_hint">Buscar podcast...</string>
@@ -589,7 +588,7 @@
   <string name="local_folder">Cartafol local</string>
   <string name="reconnect_local_folder">Reconectar cartafol local</string>
   <string name="reconnect_local_folder_warning">En caso de faltar permisos, podes usar esto para reconectar o exactamente o mesmo cartafol. Non elixas outro cartafol.</string>
-  <string name="local_feed_description">O podcast virtual foi creado ó engadir un cartafol a FocusPodcast.</string>
+  <string name="local_feed_description">O podcast virtual foi creado ó engadir un cartafol a Yagi.</string>
   <string name="unable_to_start_system_file_manager">Non foi posible abrir o xestor de ficheiros</string>
   <string name="filter">Filtrado</string>
   <!--Sort-->

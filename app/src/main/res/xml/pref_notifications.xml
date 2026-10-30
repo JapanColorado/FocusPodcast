@@ -1,36 +1,36 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:search="http://schemas.android.com/apk/dev.russell.focuspodcast.searchpreference">
+    xmlns:search="http://schemas.android.com/apk/dev.russell.yagi.searchpreference">
 
-    <dev.russell.focuspodcast.common.common.prefs.supportv7.ATEPreference
+    <dev.russell.yagi.common.common.prefs.supportv7.ATEPreference
         android:icon="@drawable/ic_notifications"
         android:key="prefSystemNotificationSettings"
         android:layout="@layout/list_item_view"
         android:summary="@string/pref_system_notification_settings_sum"
         android:title="@string/pref_system_notification_settings_title" />
 
-    <dev.russell.focuspodcast.common.common.prefs.supportv7.ATEPreferenceCategory
+    <dev.russell.yagi.common.common.prefs.supportv7.ATEPreferenceCategory
         android:layout="@layout/preference_category_title"
         android:title="@string/pref_playback_notification_category">
-        <dev.russell.focuspodcast.common.common.prefs.supportv7.ATESwitchPreference
+        <dev.russell.yagi.common.common.prefs.supportv7.ATESwitchPreference
             android:layout="@layout/list_item_view_switch"
             android:defaultValue="true"
             android:enabled="true"
             android:key="pref_persist_notification"
             android:summary="@string/pref_persistNotify_sum"
             android:title="@string/pref_persistNotify_title" />
-        <dev.russell.focuspodcast.common.common.prefs.supportv7.ATEPreference
+        <dev.russell.yagi.common.common.prefs.supportv7.ATEPreference
             android:layout="@layout/list_item_view_no_title"
             android:key="pref_compact_noti_buttons"
             android:summary="@string/pref_compact_notification_buttons_sum"
             android:title="@string/pref_compact_notification_buttons_title" />
-        <dev.russell.focuspodcast.common.common.prefs.supportv7.ATEPreference
+        <dev.russell.yagi.common.common.prefs.supportv7.ATEPreference
             android:layout="@layout/list_item_view_no_title"
             android:key="pref_notification_custom_buttons"
             android:summary="@string/pref_custom_notification_buttons_sum"
             android:title="@string/pref_custom_notification_buttons_title" />
         <!-- Android 8+ always shows the playback buttons, so this is hidden there -->
-        <dev.russell.focuspodcast.common.common.prefs.supportv7.ATESwitchPreference
+        <dev.russell.yagi.common.common.prefs.supportv7.ATESwitchPreference
             android:layout="@layout/list_item_view_switch"
             android:defaultValue="false"
             android:enabled="true"
@@ -38,15 +38,15 @@
             android:summary="@string/pref_expandNotify_sum"
             android:title="@string/pref_expandNotify_title"
             search:ignore="true" />
-    </dev.russell.focuspodcast.common.common.prefs.supportv7.ATEPreferenceCategory>
+    </dev.russell.yagi.common.common.prefs.supportv7.ATEPreferenceCategory>
 
     <!-- The two categories below replace the notification channels on Android 7 and older and
          are hidden on 8+, where the system settings entry above covers them. -->
-    <dev.russell.focuspodcast.common.common.prefs.supportv7.ATEPreferenceCategory
+    <dev.russell.yagi.common.common.prefs.supportv7.ATEPreferenceCategory
         android:key="notificationCategoryNews"
         android:layout="@layout/preference_category_title"
         android:title="@string/notification_group_news">
-        <dev.russell.focuspodcast.common.common.prefs.supportv7.ATESwitchPreference
+        <dev.russell.yagi.common.common.prefs.supportv7.ATESwitchPreference
             android:layout="@layout/list_item_view_switch"
             android:defaultValue="false"
             android:enabled="true"
@@ -54,13 +54,13 @@
             android:summary="@string/notification_channel_episode_auto_download"
             android:title="@string/notification_channel_auto_download"
             search:ignore="true" />
-    </dev.russell.focuspodcast.common.common.prefs.supportv7.ATEPreferenceCategory>
+    </dev.russell.yagi.common.common.prefs.supportv7.ATEPreferenceCategory>
 
-    <dev.russell.focuspodcast.common.common.prefs.supportv7.ATEPreferenceCategory
+    <dev.russell.yagi.common.common.prefs.supportv7.ATEPreferenceCategory
         android:key="notificationCategoryErrors"
         android:layout="@layout/preference_category_title"
         android:title="@string/notification_group_errors">
-        <dev.russell.focuspodcast.common.common.prefs.supportv7.ATESwitchPreference
+        <dev.russell.yagi.common.common.prefs.supportv7.ATESwitchPreference
             android:layout="@layout/list_item_view_switch"
             android:defaultValue="true"
             android:enabled="true"
@@ -68,12 +68,12 @@
             android:summary="@string/notification_channel_download_error_description"
             android:title="@string/notification_channel_download_error"
             search:ignore="true" />
-        <dev.russell.focuspodcast.common.common.prefs.supportv7.ATESwitchPreference
+        <dev.russell.yagi.common.common.prefs.supportv7.ATESwitchPreference
             android:layout="@layout/list_item_view_switch"
             android:defaultValue="true"
             android:key="pref_show_gpod_notifications"
             android:summary="@string/notification_channel_sync_error_description"
             android:title="@string/notification_channel_sync_error"
             search:ignore="true" />
-    </dev.russell.focuspodcast.common.common.prefs.supportv7.ATEPreferenceCategory>
+    </dev.russell.yagi.common.common.prefs.supportv7.ATEPreferenceCategory>
 </PreferenceScreen>

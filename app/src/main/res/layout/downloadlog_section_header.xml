@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Section header of the downloads "Activity" list ("In progress (n)", "Problems (n)"). -->
-<dev.russell.focuspodcast.common.views.AccentTextView xmlns:android="http://schemas.android.com/apk/res/android"
+<dev.russell.yagi.common.views.AccentTextView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/sectionTitle"
     android:layout_width="match_parent"

@@ -435,7 +435,7 @@
   <string name="synchronization_summary_unchoosen">从多个提供商中选择一个用来同步订阅和剧集</string>
   <string name="synchronization_episodes_sync">剧集和订阅同步</string>
   <string name="gpodsync_synchronization_sum">Gpoddersync 是一个开源的 Nextcloud 应用程序，您需要在自己的服务器上部署，如果您足够了解那么可以继续</string>
-  <string name="synchronization_nextcloud_authenticate_browser">使用打开的网页浏览器授予访问权限，然后返回到 FocusPodcast</string>
+  <string name="synchronization_nextcloud_authenticate_browser">使用打开的网页浏览器授予访问权限，然后返回到 Yagi</string>
   <string name="synchronization_choose_title">选择同步供应商</string>
   <string name="synchronization_force_sync_summary">重新同步所有订阅和剧集状态</string>
   <string name="synchronization_sync_summary">同步订阅和剧集状态更改</string>
@@ -468,7 +468,6 @@
   <string name="enqueue_location_front">最前面</string>
   <string name="enqueue_location_after_current">在当前音频之后</string>
   <string name="pref_smart_mark_as_played_disabled">已禁用</string>
-  <string name="documentation_support">常见问题 &amp; 帮助</string>
   <string name="bug_report_title">报告Bug</string>
     <string name="copy_to_clipboard">复制到剪贴板</string>
   <string name="copied_to_clipboard">已复制到剪贴板</string>
@@ -486,7 +485,7 @@
   <string name="back_button_open_drawer">打开导航抽屉</string>
   <string name="back_button_double_tap">双击退出</string>
   <string name="back_button_show_prompt">确认退出</string>
-  <string name="close_prompt">您确定想要关闭FocusPodcast吗？</string>
+  <string name="close_prompt">您确定想要关闭Yagi吗？</string>
   <string name="double_tap_toast">再次点击返回键退出</string>
   <string name="pref_delete_removes_from_queue_title">从播放列表移除</string>
   <string name="pref_delete_removes_from_queue_sum">剧集被删除时自动将其从播放列表移除</string>
@@ -521,8 +520,8 @@
   <!--import and export-->
   <string name="opml_export_summary">将您的订阅转移到另一个播客应用 </string>
   <string name="opml_import_summary">从另一个播客应用导入您的订阅</string>
-  <string name="database_export_summary">将订阅、剧集和播放列表转移到另一台设备上的FocusPodcast</string>
-  <string name="database_import_summary">从另一台设备导入FocusPodcast数据库 </string>
+  <string name="database_export_summary">将订阅、剧集和播放列表转移到另一台设备上的Yagi</string>
+  <string name="database_import_summary">从另一台设备导入Yagi数据库 </string>
   <string name="opml_import_label">OPML 导入</string>
   <string name="opml_add_podcast_label">导入播客列表 (OPML)</string>
   <string name="opml_reader_error">读取 OPML 文档时发生错误</string>
@@ -538,8 +537,8 @@
   <string name="export_success_title">成功导出</string>
   <string name="opml_import_ask_read_permission">读取 OPML 文件需要访问外部存储的权限</string>
   <string name="successful_import_label">导入成功</string>
-  <string name="import_ok">请按\"确定\"重新启动FocusPodcast</string>
-  <string name="import_no_downgrade">该数据库是使用较新版本的FocusPodcast导出的，您当前安装的版本尚不知如何处理该文件</string>
+  <string name="import_ok">请按\"确定\"重新启动Yagi</string>
+  <string name="import_no_downgrade">该数据库是使用较新版本的Yagi导出的，您当前安装的版本尚不知如何处理该文件</string>
   <!--Sleep timer-->
   <string name="set_sleeptimer_label">设置睡眠计时器</string>
   <string name="disable_sleeptimer_label">禁用睡眠计时器</string>
@@ -583,10 +582,10 @@
   <string name="gpodnetauth_host">主机名</string>
   <string name="gpodnetauth_select_server">选择服务器</string>
   <string name="gpodnetauth_device_name">设备名</string>
-  <string name="gpodnetauth_device_name_default">FocusPodcast 于 %1$s</string>
+  <string name="gpodnetauth_device_name_default">Yagi 于 %1$s</string>
   <string name="gpodnetauth_existing_devices">现有设备</string>
   <string name="gpodnetauth_create_device">创建设备</string>
-  <string name="gpodnetauth_finish_descr">您的 gpodder.net 帐户与设备已连接，  现在 FocusPodcast 将自动同步您 gpodder.net 帐户内的订阅信息到设备上</string>
+  <string name="gpodnetauth_finish_descr">您的 gpodder.net 帐户与设备已连接，  现在 Yagi 将自动同步您 gpodder.net 帐户内的订阅信息到设备上</string>
   <string name="gpodnetauth_finish_butsyncnow">开始同步</string>
   <string name="gpodnetsync_error_title">gpodder.net 同步失败</string>
   <string name="gpodnetsync_error_descr">同步失败: \u0020</string>
@@ -634,14 +633,14 @@
   <string name="episode_filters_hint">单个单词  “多个单词”</string>
   <string name="keep_updated">保持最新</string>
   <string name="keep_updated_summary">自动刷新所有播客时包括此播客 </string>
-  <string name="auto_download_disabled_globally">FocusPodcast主设置中已禁用自动下载</string>
+  <string name="auto_download_disabled_globally">Yagi主设置中已禁用自动下载</string>
   <string name="statistics_space_used">占用的空间: </string>
     <string name="statistics_view_all">所有播客视图 »</string>
 
   <string name="statistics_filter_all_time">全部</string>
   <string name="statistics_filter_past_month">过去一个月</string>
   <string name="statistics_filter_past_year">过去一年</string>
-  <!--FocusPodcastSP-->
+  <!--YagiSP-->
   <string name="sp_apps_importing_feeds_msg">正在从选定的应用中导入订阅...</string>
   <!--Add podcast fragment-->
   <string name="search_podcast_hint">搜索播客……</string>
@@ -654,9 +653,9 @@
   <string name="local_folder">本地文件夹</string>
   <string name="reconnect_local_folder">重新连接本地文件夹</string>
   <string name="reconnect_local_folder_warning">在权限遭拒的情况下，您可以使用它重新连接到完全相同的文件夹，不要选择其他文件夹</string>
-  <string name="local_feed_description">这个虚拟播客是通过向FocusPodcast添加一个文件夹创建的</string>
+  <string name="local_feed_description">这个虚拟播客是通过向Yagi添加一个文件夹创建的</string>
   <string name="local_file">本地文件</string>
-  <string name="local_file_feed_description">这个虚拟播客是通过向FocusPodcast添加一个文件创建的</string>
+  <string name="local_file_feed_description">这个虚拟播客是通过向Yagi添加一个文件创建的</string>
   <string name="sort_track_order">曲目顺序</string>
   <string name="library_label">资料库</string>
   <string name="audiobooks_label">有声书</string>
@@ -745,18 +744,16 @@
   <string name="leave_feedback">反馈问题</string>
   <string name="log_file">发送日志文件</string>
 
-  <string name="app_pro">FocusPodcast 高级版</string>
-  <string name="need_pro">需要升级 FocusPodcast 高级版</string>
   <string name="pro_summary">更多主题、正在播放主题、自定义首页等等，打造专属于自己的独一无二的播客app</string>
   <string name="buy_now">查看所有高级特性</string>
 
 
   <string name="app_widget_classic_name">经典</string>
-  <string name="app_widget_md_name">MD (FocusPodcast 高级版)</string>
-  <string name="app_widget_md3_name">MD3 (FocusPodcast 高级版)</string>
-  <string name="app_widget_big_name">完整图像 (FocusPodcast 高级版)</string>
-  <string name="app_widget_circle_name">唱盘 (FocusPodcast 高级版)</string>
-  <string name="app_widget_text_name">极简文字 (FocusPodcast 高级版)</string>
+  <string name="app_widget_md_name">MD</string>
+  <string name="app_widget_md3_name">MD3</string>
+  <string name="app_widget_big_name">完整图像</string>
+  <string name="app_widget_circle_name">唱盘</string>
+  <string name="app_widget_text_name">极简文字</string>
 
 
   <string name="all">全部</string>
@@ -780,7 +777,6 @@
   <string name="tv">电视与电影</string>
   <string name="true_crime">真实案件</string>
 
-  <string name="upgrade_tip">FocusPodcast 新版已上线，建议前往google play进行更新</string>
   <string name="sent_from">来自</string>
   <string name="normal">正常</string>
   <string name="blur">模糊</string>
@@ -856,7 +852,7 @@
   <string name="browse_episodes_label">浏览单集</string>
   <string name="clear_filter_label">清除过滤</string>
   <string name="notification_rationale_title">允许通知？</string>
-  <string name="notification_rationale_message">FocusPodcast 通过通知显示下载进度，并提醒你新单集和下载失败。</string>
+  <string name="notification_rationale_message">Yagi 通过通知显示下载进度，并提醒你新单集和下载失败。</string>
   <string name="allow_label">允许</string>
   <string name="not_now_label">以后再说</string>
   <plurals name="feed_filter_hides_all_episodes">
@@ -864,7 +860,7 @@
   </plurals>
   <string name="pref_playback_notification_category">播放通知</string>
   <string name="pref_system_notification_settings_title">系统通知设置</string>
-  <string name="pref_system_notification_settings_sum">选择 FocusPodcast 显示哪些类型的通知</string>
+  <string name="pref_system_notification_settings_sum">选择 Yagi 显示哪些类型的通知</string>
   <string name="pref_subscriptions_updates_title">订阅与更新</string>
   <string name="pref_subscriptions_updates_sum">播客搜索、刷新计划、订阅列表</string>
   <string name="pref_layout_navigation_category">布局与导航</string>
@@ -1029,4 +1025,5 @@
     <string name="storage_player_episode_kept">播放器中的单集不会在此删除。</string>
     <string name="storage_player_episode_kept_titled">播放器中的单集不会在此删除（%1$s）。</string>
     <string name="storage_cleanup_link_sum">选择何时自动删除已播放的单集</string>
+  <string name="app_tagline">播客与有声书</string>
 </resources>

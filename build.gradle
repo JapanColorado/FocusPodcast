@@ -40,7 +40,7 @@ allprojects {
 
 project.ext {
     //app info
-    applicationId = "dev.russell.focuspodcast"
+    applicationId = "dev.russell.yagi"
     // androidx.core 1.19 requires compileSdk 37.
     compileSdkVersion = 37
     // The current AndroidX releases need 23, WorkManager 2.12 needs 24.

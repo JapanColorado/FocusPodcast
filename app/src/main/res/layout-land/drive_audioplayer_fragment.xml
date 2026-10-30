@@ -9,7 +9,7 @@
     android:focusable="true"
     tools:background="@color/alpha54black">
 
-    <dev.russell.focuspodcast.common.views.StatusBarView
+    <dev.russell.yagi.common.views.StatusBarView
         android:id="@+id/status_bar"
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -120,7 +120,7 @@
         app:layout_constraintStart_toStartOf="parent">
 
 
-        <dev.russell.focuspodcast.view.AdMarkerSeekBar
+        <dev.russell.yagi.view.AdMarkerSeekBar
             android:id="@+id/sbPosition"
             style="@style/Widget.MaterialComponents.LinearProgressIndicator"
             android:layout_width="match_parent"
@@ -262,7 +262,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1">
 
-                <dev.russell.focuspodcast.view.PlayButton
+                <dev.russell.yagi.view.PlayButton
                     android:id="@+id/butPlay"
                     android:layout_width="84dp"
                     android:layout_height="84dp"
@@ -278,7 +278,7 @@
                     app:srcCompat="@drawable/ic_play_48dp"
                     tools:srcCompat="@drawable/ic_play_48dp" />
 
-                <dev.russell.focuspodcast.common.views.AccentProgressBar
+                <dev.russell.yagi.common.views.AccentProgressBar
                     android:id="@+id/progLoading"
                     android:layout_width="84dp"
                     android:layout_height="84dp"

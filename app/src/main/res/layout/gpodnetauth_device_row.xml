@@ -4,7 +4,7 @@
     android:layout_height="wrap_content"
     android:paddingTop="8dp">
 
-    <dev.russell.focuspodcast.common.views.AccentMaterialOutlineStatusButton
+    <dev.russell.yagi.common.views.AccentMaterialOutlineStatusButton
         android:id="@+id/selectDeviceButton"
         style="@style/Widget.Material3.Button.OutlinedButton"
         android:layout_width="match_parent"

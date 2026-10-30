@@ -51,7 +51,7 @@
                     tools:src="@drawable/ic_round_drag_handle_24" />
 
                 <!-- Needs to have the same width as the action button. Otherwise, the screen jumps around. -->
-                <dev.russell.focuspodcast.common.common.views.AccentCheckbox
+                <dev.russell.yagi.common.common.views.AccentCheckbox
                     android:id="@+id/selectCheckBox"
                     android:layout_width="60dp"
                     android:layout_height="match_parent"
@@ -119,7 +119,7 @@
 
                     <com.google.android.material.textview.MaterialTextView
                         android:id="@+id/txtvPubDate"
-                        style="@style/FocusPodcast.TextView.ListItemSecondaryTitle"
+                        style="@style/Yagi.TextView.ListItemSecondaryTitle"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginEnd="4dp"
@@ -128,7 +128,7 @@
 
                     <com.google.android.material.textview.MaterialTextView
                         android:id="@+id/separatorIcons"
-                        style="@style/FocusPodcast.TextView.ListItemSecondaryTitle"
+                        style="@style/Yagi.TextView.ListItemSecondaryTitle"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginEnd="4dp"
@@ -136,21 +136,21 @@
                         android:importantForAccessibility="no"
                         android:text="·"
                         tools:background="@android:color/holo_blue_light" />
-                    <dev.russell.focuspodcast.common.views.AccentImageView
+                    <dev.russell.yagi.common.views.AccentImageView
                         android:id="@+id/ivIsVideo"
                         android:layout_width="16sp"
                         android:layout_height="16sp"
                         android:contentDescription="@string/media_type_video_label"
                         app:srcCompat="@drawable/ic_round_videocam_24" />
 
-                    <dev.russell.focuspodcast.common.views.AccentImageView
+                    <dev.russell.yagi.common.views.AccentImageView
                         android:id="@+id/isFavorite"
                         android:layout_width="16sp"
                         android:layout_height="16sp"
                         android:contentDescription="@string/is_favorite_label"
                         app:srcCompat="@drawable/ic_star" />
 
-                    <dev.russell.focuspodcast.common.views.AccentImageView
+                    <dev.russell.yagi.common.views.AccentImageView
                         android:id="@+id/ivInPlaylist"
                         android:layout_width="16sp"
                         android:layout_height="16sp"
@@ -166,7 +166,7 @@
                 -->
                 <com.google.android.material.textview.MaterialTextView
                     android:id="@+id/txtvTitle"
-                    style="@style/FocusPodcast.TextView.ListItemPrimaryTitle"
+                    style="@style/Yagi.TextView.ListItemPrimaryTitle"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:ellipsize="end"
@@ -183,7 +183,7 @@
 
                     <com.google.android.material.textview.MaterialTextView
                         android:id="@+id/txtvDuration"
-                        style="@style/FocusPodcast.TextView.ListItemSecondaryTitle"
+                        style="@style/Yagi.TextView.ListItemSecondaryTitle"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         tools:background="@android:color/holo_blue_light"
@@ -191,7 +191,7 @@
 
                     <com.google.android.material.textview.MaterialTextView
                         android:id="@+id/size_separator"
-                        style="@style/FocusPodcast.TextView.ListItemSecondaryTitle"
+                        style="@style/Yagi.TextView.ListItemSecondaryTitle"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="4dp"
@@ -202,11 +202,11 @@
 
                     <com.google.android.material.textview.MaterialTextView
                         android:id="@+id/size"
-                        style="@style/FocusPodcast.TextView.ListItemSecondaryTitle"
+                        style="@style/Yagi.TextView.ListItemSecondaryTitle"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         tools:text="10 MB" />
-                    <dev.russell.focuspodcast.common.views.AccentImageView
+                    <dev.russell.yagi.common.views.AccentImageView
                         android:id="@+id/downloaded_button"
                         android:layout_width="18dp"
                         android:layout_height="18dp"
@@ -235,7 +235,7 @@
                             app:trackCornerRadius="16dp"
                             tools:progress="10" />
 
-                        <dev.russell.focuspodcast.common.views.AccentImageView
+                        <dev.russell.yagi.common.views.AccentImageView
                             android:layout_width="30dp"
                             android:layout_height="30dp"
                             android:layout_gravity="center"
@@ -261,7 +261,7 @@
             </LinearLayout>
 
 
-            <dev.russell.focuspodcast.view.PlayPauseProgressButton
+            <dev.russell.yagi.view.PlayPauseProgressButton
                 android:id="@+id/play_pause_button"
                 style="@style/Widget_PlayerFM_PlayPauseButton"
                 android:layout_width="48dp"

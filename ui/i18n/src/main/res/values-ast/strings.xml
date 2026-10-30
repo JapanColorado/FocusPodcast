@@ -311,7 +311,6 @@
   <string name="enqueue_location_back">A lo cabero</string>
   <string name="enqueue_location_front">Al comienzu</string>
   <string name="enqueue_location_after_current">Darréu del episodiu actual</string>
-  <string name="documentation_support">Documentación y sofitu</string>
     <string name="bug_report_title">Informar d\'un fallu</string>
     <string name="copy_to_clipboard">Copiar al cartafueyu</string>
   <string name="copied_to_clipboard">Copióse al cartafueyu</string>
@@ -328,7 +327,7 @@
   <string name="back_button_open_drawer">Apertura del caxón de navegación</string>
   <string name="back_button_double_tap">Dos calcos pa colar</string>
   <string name="back_button_show_prompt">Confirmación pa colar</string>
-  <string name="close_prompt">¿De xuru que quies zarrar FocusPodcast?</string>
+  <string name="close_prompt">¿De xuru que quies zarrar Yagi?</string>
   <string name="double_tap_toast">Volvi tocar el botón Atrás pa colar</string>
     <string name="pref_delete_removes_from_queue_title">«Desaniciar» quita de la cola</string>
   <string name="pref_delete_removes_from_queue_sum">Quita automáticamente los episodios de la cola al desanicialos.</string>
@@ -348,8 +347,8 @@
   <!--import and export-->
   <string name="opml_export_summary">Tresfier les soscripciones a otra aplicación de podcasts</string>
   <string name="opml_import_summary">Importa les soscripciones d\'otra aplicación de podcasts</string>
-  <string name="database_export_summary">Tresfier les soscripciones, los episodios sentíos y la cola al FocusPodcast d\'otru preséu</string>
-  <string name="database_import_summary">Importa la base de datos del FocusPodcast d\'otru preséu</string>
+  <string name="database_export_summary">Tresfier les soscripciones, los episodios sentíos y la cola al Yagi d\'otru preséu</string>
+  <string name="database_import_summary">Importa la base de datos del Yagi d\'otru preséu</string>
   <string name="opml_add_podcast_label">Importar una llista de podcasts (OPML)</string>
   <string name="select_all_label">Esbillar too</string>
   <string name="deselect_all_label">Deseleicionar too</string>
@@ -359,8 +358,8 @@
   <string name="please_wait">Espera…</string>
   <string name="export_success_title">La esportación fízose correutamente</string>
     <string name="successful_import_label">La importación fízose correutamente</string>
-  <string name="import_ok">Primi «D\'acuerdu» pa reaniciar FocusPodcast</string>
-  <string name="import_no_downgrade">Esta base de datos esportóse con una versión nueva d\'FocusPodcast. La instalación actual entá nun sabe cómo remanar esti ficheru.</string>
+  <string name="import_ok">Primi «D\'acuerdu» pa reaniciar Yagi</string>
+  <string name="import_no_downgrade">Esta base de datos esportóse con una versión nueva d\'Yagi. La instalación actual entá nun sabe cómo remanar esti ficheru.</string>
   <!--Sleep timer-->
   <string name="set_sleeptimer_label">Afitar el temporizador</string>
   <string name="extend_sleep_timer_label">+%d min</string>
@@ -394,10 +393,10 @@
   <string name="gpodnetauth_host">Agospiador</string>
   <string name="gpodnetauth_select_server">Esbillar el sirvidor</string>
   <string name="gpodnetauth_device_name">Nome del preséu</string>
-  <string name="gpodnetauth_device_name_default">FocusPodcast en «%1$s»</string>
+  <string name="gpodnetauth_device_name_default">Yagi en «%1$s»</string>
   <string name="gpodnetauth_existing_devices">Preseos esistentes</string>
   <string name="gpodnetauth_create_device">Crear el preséu</string>
-  <string name="gpodnetauth_finish_descr">¡Norabona! La to cuenta de gpodder.net ta enllaciada col preséu. Dende agora, FocusPodcast va sincronizar automáticamente les soscripciones del preséu con esta cuenta.</string>
+  <string name="gpodnetauth_finish_descr">¡Norabona! La to cuenta de gpodder.net ta enllaciada col preséu. Dende agora, Yagi va sincronizar automáticamente les soscripciones del preséu con esta cuenta.</string>
   <string name="gpodnetauth_finish_butsyncnow">Sincronizar agora</string>
   <string name="gpodnetsync_error_descr">Asocedió un fallu demientres la sincronización:\u0020</string>
   <string name="gpodnetsync_pref_report_successful">Sincronización correuta</string>
@@ -435,10 +434,10 @@
   <string name="episode_filters_hint">Pallabres individuales \"Pallabres múltiples\"</string>
   <string name="keep_updated">Anovamientu automáticu</string>
   <string name="keep_updated_summary">Inclúi esti podcast al refrescar (automáticamente) tolos podcasts</string>
-  <string name="auto_download_disabled_globally">La descarga automática ta desactivada nos axustes principales d\'FocusPodcast</string>
+  <string name="auto_download_disabled_globally">La descarga automática ta desactivada nos axustes principales d\'Yagi</string>
     <string name="statistics_space_used">Espaciu n\'usu:</string>
   <string name="statistics_view_all">Ver lo de tolos podcasts »</string>
-  <!--FocusPodcastSP-->
+  <!--YagiSP-->
   <!--Add podcast fragment-->
   <string name="search_podcast_hint">Buscar podcasts…</string>
   <string name="advanced">Avanzao</string>
@@ -448,7 +447,7 @@
     <string name="search_powered_by">Resultaos de %1$s</string>
   <!--Local feeds-->
   <string name="local_folder">Carpeta llocal</string>
-  <string name="local_feed_description">Esti podcast virtual creóse por amestar una carpeta a FocusPodcast.</string>
+  <string name="local_feed_description">Esti podcast virtual creóse por amestar una carpeta a Yagi.</string>
   <string name="unable_to_start_system_file_manager">Nun ye posible aniciar el xestor de ficheros del sistema</string>
   <string name="filter">Peñera</string>
   <!--Sort-->

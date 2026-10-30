@@ -5,7 +5,7 @@ apply from: "../../common.gradle"
 
 android {
     defaultConfig {
-        namespace = "dev.russell.focuspodcast.common"
+        namespace = "dev.russell.yagi.common"
     }
 }
 

@@ -6,13 +6,13 @@
     <string name="add_action">添加</string>
     <string name="copied_to_clipboard">已複製</string>
     <string name="share">分享</string>
-    <string name="send_file">请给我发送邮件，邮件地址已複製</string>
+    <string name="bug_report_share_log">儲存或分享記錄檔，然後將其附加到 GitHub Issue</string>
 
     <string name="asc">升序</string>
     <string name="desc">降序</string>
     <string name="title">標題</string>
     <string name="pref_language_name">選擇語言</string>
-    <string name="made_by">作者 allen town</string>
+    <string name="made_by">作者 JapanColorado\n基於 allen town 的 FocusPodcast 和 AntennaPod</string>
     <string name="communication">溝通與交流</string>
     <string name="change_log">更新日誌</string>
     <string name="others">其它</string>
@@ -21,9 +21,6 @@
     <string name="not_today">不是今日</string>
     <string name="yesterday">昨日</string>
 
-    <string name="twitter_follow_me">關注我</string>
-    <string name="rate_me">打分</string>
-    <string name="others_app_of_us">我們的其他應用</string>
 
 
 
@@ -48,7 +45,6 @@
     <string name="preference_search_hint">搜索</string>
     <string name="preference_search_no_results">无结果</string>
     <string name="searchpreference_clear_history">清除历史记录</string>
-    <string name="documentation_support">常见问题 &amp; 帮助</string>
     <string name="bug_report_title">报告Bug</string>
     <!--About screen-->
     <string name="about_pref">关于</string>
@@ -56,8 +52,6 @@
 
     <string name="pref_custom_launcher_title">自定義啟動器圖標</string>
     <string name="pref_custom_launcher_summary">並非所有手機都支持此功能，請自行測試</string>
-    <string name="donate">捐贈</string>
-    <string name="donate_summary">為開發者購買咖啡</string>
     <string name="custom_launcher_pick_image">選擇圖示圖片</string>
     <string name="custom_launcher_shape_round">圓形</string>
     <string name="custom_launcher_shape_rounded_square">圓角方形</string>

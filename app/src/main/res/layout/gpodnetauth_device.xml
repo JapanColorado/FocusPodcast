@@ -6,12 +6,12 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-    <dev.russell.focuspodcast.common.views.AccentTextInputLayout
+    <dev.russell.yagi.common.views.AccentTextInputLayout
             style="?attr/textInputOutlinedDenseStyle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-        <dev.russell.focuspodcast.common.views.CursorAccentTextInputEditText
+        <dev.russell.yagi.common.views.CursorAccentTextInputEditText
                 android:id="@+id/deviceName"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -19,9 +19,9 @@
                 android:lines="1"
                 android:imeOptions="actionNext|flagNoFullscreen"/>
 
-    </dev.russell.focuspodcast.common.views.AccentTextInputLayout>
+    </dev.russell.yagi.common.views.AccentTextInputLayout>
 
-    <dev.russell.focuspodcast.common.views.AccentMaterialButton
+    <dev.russell.yagi.common.views.AccentMaterialButton
         style="@style/Widget.Material3.Button"
             android:id="@+id/createDeviceButton"
             android:layout_width="wrap_content"
@@ -32,7 +32,7 @@
     <com.google.android.material.textview.MaterialTextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        style="@style/FocusPodcast.TextView.Heading"
+        style="@style/Yagi.TextView.Heading"
         android:layout_marginTop="16dp"
         android:text="@string/gpodnetauth_existing_devices"/>
 
@@ -52,7 +52,7 @@
         android:layout_height="wrap_content"
         android:orientation="vertical" />
 
-    <dev.russell.focuspodcast.common.views.AccentProgressBar
+    <dev.russell.yagi.common.views.AccentProgressBar
         android:id="@+id/progbarCreateDevice"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

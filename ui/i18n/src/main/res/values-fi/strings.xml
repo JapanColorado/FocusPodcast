@@ -384,7 +384,7 @@
   <string name="synchronization_full_sync_title">Pakota täysi synkronointi</string>
   <string name="synchronization_login_status"><![CDATA[Kirjauduttu sisään <i>%1$s</i> kohteessa <i>%2$s</i>. <br/><br/>Voit valita synkronointipalveluntarjoajan uudelleen kirjauduttuasi ulos]]></string>
   <string name="synchronization_summary_unchoosen">Voit valita useista palveluntarjoajista, joiden kanssa voit synkronoida tilauksesi ja jaksojen toistotilan</string>
-    <string name="synchronization_nextcloud_authenticate_browser">Myönnä käyttöoikeus avatun verkkoselaimen avulla ja palaa FocusPodcastiin.</string>
+    <string name="synchronization_nextcloud_authenticate_browser">Myönnä käyttöoikeus avatun verkkoselaimen avulla ja palaa Yagiiin.</string>
   <string name="synchronization_choose_title">Valitse synkronointipalveluntarjoaja</string>
   <string name="synchronization_force_sync_summary">Uudelleensynkronoi kaikki tilaukset ja jaksojen tilat</string>
   <string name="synchronization_sync_summary">Synkronoi tilausten ja jaksojen tilojen muutokset</string>
@@ -417,7 +417,6 @@
   <string name="enqueue_location_front">Eteen</string>
   <string name="enqueue_location_after_current">Nykyisen jakson jälkeen</string>
   <string name="pref_smart_mark_as_played_disabled">Poissa käytöstä</string>
-  <string name="documentation_support">Dokumentaatio ja tuki</string>
     <string name="bug_report_title">Ilmoita virheestä</string>
     <string name="copy_to_clipboard">Kopioi leikepöydälle</string>
   <string name="copied_to_clipboard">Kopioitiin leikepöydälle</string>
@@ -435,7 +434,7 @@
   <string name="back_button_open_drawer">Avaa navigaatiohylly</string>
   <string name="back_button_double_tap">Tuplanaputa sulkemiseen</string>
   <string name="back_button_show_prompt">Varmista poistuminen</string>
-  <string name="close_prompt">Haluatko varmasti sulkea FocusPodcastin?</string>
+  <string name="close_prompt">Haluatko varmasti sulkea Yagiin?</string>
   <string name="double_tap_toast">Napauta takaisin-painiketta sulkeaksesi</string>
   <string name="pref_delete_removes_from_queue_title">Deletointi poistaa jonosta</string>
   <string name="pref_delete_removes_from_queue_sum">Poista jakso automaattisesti jonosta kun se deletoidaan.</string>
@@ -465,8 +464,8 @@
   <!--import and export-->
   <string name="opml_export_summary">Siirrä tilauksesi toiseen podcast-sovellukseen</string>
   <string name="opml_import_summary">Tuo tilauksesi toisesta podcast-sovelluksesta</string>
-  <string name="database_export_summary">Siirrä tilaukset, kuunnellut jaksot ja jono toisella laitteella olevaan FocusPodcastiin</string>
-  <string name="database_import_summary">Tuo FocusPodcast-tietokanta toiselta laitteelta</string>
+  <string name="database_export_summary">Siirrä tilaukset, kuunnellut jaksot ja jono toisella laitteella olevaan Yagiiin</string>
+  <string name="database_import_summary">Tuo Yagi-tietokanta toiselta laitteelta</string>
   <string name="opml_import_label">OPML tuonti</string>
   <string name="opml_add_podcast_label">Tuo podcastien lista (OPML)</string>
   <string name="opml_reader_error">Virhe lukiessa OPML dokumenttia:</string>
@@ -482,8 +481,8 @@
   <string name="export_success_title">Vienti onnistunut</string>
     <string name="opml_import_ask_read_permission">Pääsy ulkoiseen solvellukseen tarvitaan OPML tiedoston lukemiseen</string>
   <string name="successful_import_label">Tuonti onnistui</string>
-  <string name="import_ok">Valitse OK käynnistääksesi FocusPodcastin uudelleen</string>
-  <string name="import_no_downgrade">Tämä tietokanta on viety FocusPodcastin uudemmalla versiolla. Tämänhetkinen versiosi ei vielä osaa käsitellä sitä.</string>
+  <string name="import_ok">Valitse OK käynnistääksesi Yagiin uudelleen</string>
+  <string name="import_no_downgrade">Tämä tietokanta on viety Yagiin uudemmalla versiolla. Tämänhetkinen versiosi ei vielä osaa käsitellä sitä.</string>
   <!--Sleep timer-->
   <string name="set_sleeptimer_label">Aseta uniajastin</string>
   <string name="disable_sleeptimer_label">Lopeta uniajastin</string>
@@ -522,10 +521,10 @@
   <string name="gpodnetauth_host">Isäntänimi</string>
   <string name="gpodnetauth_select_server">Valitse palvelin</string>
   <string name="gpodnetauth_device_name">Laitteen nimi</string>
-  <string name="gpodnetauth_device_name_default">FocusPodcast laitteella %1$s</string>
+  <string name="gpodnetauth_device_name_default">Yagi laitteella %1$s</string>
   <string name="gpodnetauth_existing_devices">Olemassaolevat laitteet</string>
   <string name="gpodnetauth_create_device">Luo laite</string>
-  <string name="gpodnetauth_finish_descr">Onneksi olkoon! Sinun gpodder.net tili on liitetty laitteeseesi. FocusPodcast alkaa automaattisesti synkronoimaan gpodder.net tiliisi.</string>
+  <string name="gpodnetauth_finish_descr">Onneksi olkoon! Sinun gpodder.net tili on liitetty laitteeseesi. Yagi alkaa automaattisesti synkronoimaan gpodder.net tiliisi.</string>
   <string name="gpodnetauth_finish_butsyncnow">Aloita synkrointi nyt</string>
   <string name="gpodnetsync_error_title">gpodder.net synkrointivirhe</string>
   <string name="gpodnetsync_error_descr">Synkronointivirhe:\u0020</string>
@@ -573,10 +572,10 @@
   <string name="episode_filters_hint">Yksittäiset sanat \"Monta sanaa\"</string>
   <string name="keep_updated">Pidä päivitettynä</string>
   <string name="keep_updated_summary">Sisällytä tämä podcast kun kaikki podcastit (auto)päivitetään</string>
-  <string name="auto_download_disabled_globally">Automaattinen lataaminen on pysäytetty FocusPodcastin asetuksissa</string>
+  <string name="auto_download_disabled_globally">Automaattinen lataaminen on pysäytetty Yagiin asetuksissa</string>
   <string name="statistics_space_used">Tilaa käytetty:</string>
     <string name="statistics_view_all">Kaikki podcastit »</string>
-  <!--FocusPodcastSP-->
+  <!--YagiSP-->
   <string name="sp_apps_importing_feeds_msg">Tuodaan tilauksia sovelluksista</string>
   <!--Add podcast fragment-->
   <string name="search_podcast_hint">Etsi podcastia...</string>
@@ -589,7 +588,7 @@
   <string name="local_folder">Paikallinen kansio</string>
   <string name="reconnect_local_folder">Yhdistä paikallinen kansio uudelleen</string>
   <string name="reconnect_local_folder_warning">Jos lupa evätään, voit käyttää tätä yhteyden muodostamiseen uudelleen täsmälleen samaan kansioon. Älä valitse toista kansiota.</string>
-  <string name="local_feed_description">Tämä virtuaalinen podcast luotiin lisäämällä kansio FocusPodcastiin.</string>
+  <string name="local_feed_description">Tämä virtuaalinen podcast luotiin lisäämällä kansio Yagiiin.</string>
   <string name="unable_to_start_system_file_manager">Järjestelmän tiedostonhallintaa ei voi käynnistää</string>
   <string name="filter">Suodin</string>
   <!--Sort-->

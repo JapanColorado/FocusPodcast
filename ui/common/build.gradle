@@ -4,7 +4,7 @@ plugins {
 apply from: "../../common.gradle"
 android {
     defaultConfig {
-        namespace = "dev.russell.focuspodcast.ui.common"
+        namespace = "dev.russell.yagi.ui.common"
     }
 }
 dependencies {

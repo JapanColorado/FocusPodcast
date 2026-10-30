@@ -2,7 +2,7 @@
 <resources>
 
     <!-- Aktivite ve fragment başlıkları -->
-    <string name="app_name" translatable="false">FocusPodcast</string>
+    <string name="app_name" translatable="false">Yagi</string>
     <string name="feed_update_receiver_name">Abonelikleri Güncelle</string>
     <string name="feeds_label">Podcastler</string>
     <string name="statistics_label">Oynatma İstatistikleri</string>
@@ -457,7 +457,7 @@
     <string name="synchronization_episodes_sync">Abonelikler ve Bölümler Senkronizasyonu</string>
     <string name="synchronization_summary_unchoosen">Abonelikleri ve bölümleri senkronize etmek için birden fazla sağlayıcıdan seçim yapın</string>
     <string name="gpodsync_synchronization_sum">Gpoddersync, kendi sunucunuza dağıtmanız gereken açık kaynaklı bir Nextcloud uygulamasıdır, yeterince bilgi sahibiyseniz devam edebilirsiniz</string>
-    <string name="synchronization_nextcloud_authenticate_browser">Açılan web tarayıcısını kullanarak erişimi yetkilendirin ve FocusPodcast\'e geri dönün.</string>
+    <string name="synchronization_nextcloud_authenticate_browser">Açılan web tarayıcısını kullanarak erişimi yetkilendirin ve Yagi\'e geri dönün.</string>
     <string name="synchronization_choose_title">Senkronizasyon sağlayıcısını seçin</string>
     <string name="synchronization_force_sync_summary">Tüm abonelikleri ve bölüm durumlarını yeniden senkronize edin</string>
     <string name="synchronization_sync_summary">Abonelik ve bölüm durumu değişikliklerini senkronize edin</string>
@@ -490,7 +490,6 @@
     <string name="enqueue_location_front">Oynatma listesinin başı</string>
     <string name="enqueue_location_after_current">Mevcut bölümden sonra</string>
     <string name="pref_smart_mark_as_played_disabled">Devre Dışı</string>
-    <string name="documentation_support">SSS &amp; Yardım</string>
     <string name="bug_report_title">Hata bildirimi</string>
     <string name="copy_to_clipboard">Panoya kopyala</string>
     <string name="copied_to_clipboard">Panoya kopyalandı</string>
@@ -508,7 +507,7 @@
     <string name="back_button_open_drawer">Navigasyon çekmecesini aç</string>
     <string name="back_button_double_tap">Çıkmak için iki kez dokun</string>
     <string name="back_button_show_prompt">Çıkış için onayla</string>
-    <string name="close_prompt">FocusPodcast\'i kapatmak istediğinizden emin misiniz?</string>
+    <string name="close_prompt">Yagi\'i kapatmak istediğinizden emin misiniz?</string>
     <string name="double_tap_toast">Çıkmak için tekrar geri düğmesine basın</string>
     <string name="pref_delete_removes_from_queue_title">Oynatma Listesinden Kaldır</string>
     <string name="pref_delete_removes_from_queue_sum">Bölüm silindiğinde otomatik olarak kuyruktan kaldır</string>
@@ -544,8 +543,8 @@
     <!-- içe ve dışa aktar -->
     <string name="opml_export_summary">Aboneliklerinizi başka bir podcast uygulamasına aktarın</string>
     <string name="opml_import_summary">Aboneliklerinizi başka bir podcast uygulamasından içe aktarın</string>
-    <string name="database_export_summary">Abonelikleri, dinlenilen bölümleri ve kuyruğu başka bir cihazdaki FocusPodcast\'e aktar</string>
-    <string name="database_import_summary">Başka bir cihazdan FocusPodcast veritabanını içe aktar</string>
+    <string name="database_export_summary">Abonelikleri, dinlenilen bölümleri ve kuyruğu başka bir cihazdaki Yagi\'e aktar</string>
+    <string name="database_import_summary">Başka bir cihazdan Yagi veritabanını içe aktar</string>
     <string name="opml_import_label">OPML içe aktarma</string>
     <string name="opml_add_podcast_label">Podcast listesini içe aktar (OPML)</string>
     <string name="opml_reader_error">OPML belgesini okurken bir hata oluştu:</string>
@@ -561,8 +560,8 @@
     <string name="export_success_title">Dışa aktarma başarılı</string>
     <string name="opml_import_ask_read_permission">OPML dosyasını okumak için harici depolama izni gereklidir</string>
     <string name="successful_import_label">İçe aktarma başarılı</string>
-    <string name="import_ok">Lütfen FocusPodcast\'i yeniden başlatmak için Tamam\'a basın</string>
-    <string name="import_no_downgrade">Bu veritabanı daha yeni bir FocusPodcast sürümü ile dışa aktarılmış. Mevcut kurulumunuz bu dosyayı nasıl işleneceğini henüz bilmiyor.</string>
+    <string name="import_ok">Lütfen Yagi\'i yeniden başlatmak için Tamam\'a basın</string>
+    <string name="import_no_downgrade">Bu veritabanı daha yeni bir Yagi sürümü ile dışa aktarılmış. Mevcut kurulumunuz bu dosyayı nasıl işleneceğini henüz bilmiyor.</string>
 
     <!-- Uyku zamanlayıcısı -->
     <string name="set_sleeptimer_label">Uyku zamanlayıcısını ayarla</string>
@@ -606,10 +605,10 @@
     <string name="gpodnetauth_host">Sunucu Adı</string>
     <string name="gpodnetauth_select_server">Sunucuyu seç</string>
     <string name="gpodnetauth_device_name">Cihaz adı</string>
-    <string name="gpodnetauth_device_name_default">%1$s üzerindeki FocusPodcast</string>
+    <string name="gpodnetauth_device_name_default">%1$s üzerindeki Yagi</string>
     <string name="gpodnetauth_existing_devices">Mevcut cihazlar</string>
     <string name="gpodnetauth_create_device">Cihaz oluştur</string>
-    <string name="gpodnetauth_finish_descr">Gpodder.net hesabınız artık cihazınızla bağlantılı. FocusPodcast, cihazınızdaki abonelikleri gpodder.net hesabınızla otomatik olarak senkronize edecek</string>
+    <string name="gpodnetauth_finish_descr">Gpodder.net hesabınız artık cihazınızla bağlantılı. Yagi, cihazınızdaki abonelikleri gpodder.net hesabınızla otomatik olarak senkronize edecek</string>
     <string name="gpodnetauth_finish_butsyncnow">Şimdi senkronize etmeye başla</string>
 
     <string name="gpodnetsync_error_title">gpodder.net senkronizasyonu başarısız</string>
@@ -661,11 +660,11 @@
     <string name="episode_filters_hint">Tek kelimeler "Çok Kelimeler"</string>
     <string name="keep_updated">Güncel Tut</string>
     <string name="keep_updated_summary">Bu podcast\'i tüm podcast\'leri otomatik yenilerken dahil et</string>
-    <string name="auto_download_disabled_globally">Otomatik indirme ana FocusPodcast ayarlarında devre dışı bırakılmıştır</string>
+    <string name="auto_download_disabled_globally">Otomatik indirme ana Yagi ayarlarında devre dışı bırakılmıştır</string>
     <string name="statistics_space_used">Kullanılan alan:</string>
     <string name="statistics_view_all">Tüm podcast\'ler için görüntüle »</string>
 
-    <!-- FocusPodcastSP -->
+    <!-- YagiSP -->
     <string name="sp_apps_importing_feeds_msg">Tek amaçlı uygulamalardan abonelikler içe aktarılıyor&#8230;</string>
 
     <!-- Podcast ekleme parçası -->
@@ -680,7 +679,7 @@
     <string name="local_folder">Yerel klasör</string>
     <string name="reconnect_local_folder">Yerel klasörü yeniden bağla</string>
     <string name="reconnect_local_folder_warning">İzin reddi durumunda, aynı klasörü yeniden bağlamak için bunu kullanabilirsiniz. Başka bir klasör seçmeyin.</string>
-    <string name="local_feed_description">Bu sanal podcast, FocusPodcast\'e bir klasör eklenerek oluşturuldu.</string>
+    <string name="local_feed_description">Bu sanal podcast, Yagi\'e bir klasör eklenerek oluşturuldu.</string>
     <string name="unable_to_start_system_file_manager">Sistem dosya yöneticisi başlatılamadı</string>
 
     <string name="filter">Filtre</string>
@@ -754,11 +753,11 @@
     <string name="notification_channel_new_episode_description">Bildirimler etkinleştirildiğinde bir podcast\'in yeni bir bölümü bulunduğunda gösterilir</string>
     <!-- Widget ayarları -->
     <string name="app_widget_classic_name">Klasik</string>
-    <string name="app_widget_md_name">MD (FocusPodcast Pro)</string>
-    <string name="app_widget_md3_name">MD3 (FocusPodcast Pro)</string>
-    <string name="app_widget_big_name">Tam Görüntü (FocusPodcast Pro)</string>
-    <string name="app_widget_circle_name">Daire (FocusPodcast Pro)</string>
-    <string name="app_widget_text_name">Minimal Metin (FocusPodcast Pro)</string>
+    <string name="app_widget_md_name">MD</string>
+    <string name="app_widget_md3_name">MD3</string>
+    <string name="app_widget_big_name">Tam Görüntü</string>
+    <string name="app_widget_circle_name">Daire</string>
+    <string name="app_widget_text_name">Minimal Metin</string>
 
     <!-- İsteğe Bağlı yapılandırma -->
     <string name="on_demand_config_setting_changed">Ayar başarıyla güncellendi.</string>
@@ -773,8 +772,6 @@
     <string name="leave_feedback">Geri Bildirim Gönder</string>
     <string name="log_file">Günlük dosyasını gönder</string>
 
-    <string name="app_pro">FocusPodcast Pro</string>
-    <string name="need_pro">FocusPodcast Pro gerektirir</string>
     <string name="pro_summary">Daha fazla tema, Şimdi oynatılan temalar, Özel ana sayfa ve daha fazlası... kendi benzersiz podcast uygulamanızı oluşturun</string>
     <string name="buy_now">Tüm gelişmiş özellikleri görüntüle</string>
 
@@ -801,7 +798,6 @@
     <string name="tv">TV &amp; Film</string>
     <string name="true_crime">Gerçek Suç</string>
 
-    <string name="upgrade_tip">FocusPodcast\'in yeni sürümü yayımlandı. Google Play\'de güncellemeniz önerilir</string>
 
     <string name="sent_from">Gönderilen</string>
     <string name="normal">Normal</string>

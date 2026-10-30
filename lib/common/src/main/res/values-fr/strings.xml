@@ -8,14 +8,11 @@
     <string name="add_action">Ajouter</string>
     <string name="copied_to_clipboard">Copié dans le presse-papiers</string>
     <string name="share">Partager</string>
-    <string name="send_file">Veuillez m\'envoyer un e-mail, et l\'adresse e-mail a été copiée</string>
+    <string name="bug_report_share_log">Enregistrez ou partagez le journal, puis joignez-le au ticket GitHub</string>
     <string name="asc">Ascendant</string>
     <string name="desc">Descendant</string>
     <string name="title">Titre</string>
-    <string name="made_by">Par ville allen</string>
-    <string name="twitter_follow_me">Suivez-moi</string>
-    <string name="others_app_of_us">Nos autres applications</string>
-    <string name="rate_me">Évaluer</string>
+    <string name="made_by">Par JapanColorado\nBasé sur FocusPodcast d\'allen town et sur AntennaPod</string>
     <string name="version" translatable="false">Version %s</string>
     <string name="pref_header_general">Thème</string>
     <string name="communication">Communication</string>
@@ -52,7 +49,6 @@
     <string name="preference_search_hint">Rechercher…</string>
     <string name="preference_search_no_results">Aucun résultat</string>
     <string name="searchpreference_clear_history">Effacer l\'historique</string>
-    <string name="documentation_support">FAQ &amp; Aide</string>
     <string name="bug_report_title">Signaler un bogue</string>
 
     <!-- À propos de l\'écran -->

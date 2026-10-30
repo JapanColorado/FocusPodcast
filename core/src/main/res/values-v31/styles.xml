@@ -1,5 +1,5 @@
 <resources>
 
-    <style name="Theme.FocusPodcast.Splash" parent="Theme.FocusPodcast.FollowSystem">
+    <style name="Theme.Yagi.Splash" parent="Theme.Yagi.FollowSystem">
     </style>
 </resources>

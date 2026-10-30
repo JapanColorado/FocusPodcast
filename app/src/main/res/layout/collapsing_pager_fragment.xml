@@ -11,7 +11,7 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
-        <dev.russell.focuspodcast.core.view.TopAppBarLayout
+        <dev.russell.yagi.core.view.TopAppBarLayout
             android:id="@+id/appBarLayout"
             style="?appBarLayoutStyle"
             android:layout_width="match_parent"
@@ -25,7 +25,7 @@
             app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior"
             android:orientation="vertical">
 
-            <dev.russell.focuspodcast.common.views.AccentTabLayout
+            <dev.russell.yagi.common.views.AccentTabLayout
                 android:id="@+id/sliding_tabs"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

@@ -263,7 +263,7 @@
   <string name="playback_error_source">A médiafájl nem érhető el</string>
   <string name="playback_error_unknown">Ismeretlen hiba</string>
   <string name="no_media_playing_label">Nincs médialejátszás</string>
-  <string name="unknown_media_key">FocusPodcast – Ismeretlen médiabillentyű: %1$d</string>
+  <string name="unknown_media_key">Yagi – Ismeretlen médiabillentyű: %1$d</string>
   <string name="error_file_not_found">A fájl nem található</string>
   <string name="no_media_label">Az elem nem tartalmaz médiafájlt</string>
   <!--Queue operations-->
@@ -410,7 +410,6 @@
   <string name="enqueue_location_front">Elejére</string>
   <string name="enqueue_location_after_current">A jelenlegi epizód után</string>
   <string name="pref_smart_mark_as_played_disabled">Letiltva</string>
-  <string name="documentation_support">Dokumentáció és támogatás</string>
     <string name="bug_report_title">Hibajelentés</string>
     <string name="copy_to_clipboard">Másolás vágólapra</string>
   <string name="copied_to_clipboard">Vágólapra másolva</string>
@@ -428,7 +427,7 @@
   <string name="back_button_open_drawer">Navigációs fiók megnyitása</string>
   <string name="back_button_double_tap">Dupla koppintás a kilépéshez</string>
   <string name="back_button_show_prompt">Megerősítés a kilépéshez</string>
-  <string name="close_prompt">Biztos, hogy bezárja az FocusPodcastot?</string>
+  <string name="close_prompt">Biztos, hogy bezárja az Yagiot?</string>
   <string name="double_tap_toast">A kilépéshez érintse meg újra a vissza gombot</string>
   <string name="pref_delete_removes_from_queue_title">A törlés eltávolítja a sorból</string>
   <string name="pref_delete_removes_from_queue_sum">Törléskor az epizód automatikus eltávolítása a sorból.</string>
@@ -457,8 +456,8 @@
   <!--import and export-->
   <string name="opml_export_summary">A feliratkozásai átküldése egy másik podcast alkalmazásnak</string>
   <string name="opml_import_summary">Feliratkozások importálása egy másik podcast alkalmazásból</string>
-  <string name="database_export_summary">Feliratkozások, meghallgatott epizódok és a lejátszási sor átküldése egy másik eszközök lévő FocusPodcastnak</string>
-  <string name="database_import_summary">FocusPodcast adatbázis importálása egy másik eszközről</string>
+  <string name="database_export_summary">Feliratkozások, meghallgatott epizódok és a lejátszási sor átküldése egy másik eszközök lévő Yaginak</string>
+  <string name="database_import_summary">Yagi adatbázis importálása egy másik eszközről</string>
   <string name="opml_import_label">OPML importálása</string>
   <string name="opml_add_podcast_label">Postcastlista (OPML) importálása</string>
   <string name="opml_reader_error">Hiba történt az OPML-dokumentum olvasásakor:</string>
@@ -474,8 +473,8 @@
   <string name="export_success_title">Exportálás sikeres</string>
     <string name="opml_import_ask_read_permission">A külső tároló elérése szükséges az OPML fájl olvasásához</string>
   <string name="successful_import_label">Importálás sikeres</string>
-  <string name="import_ok">Nyomja meg az OK gombot az FocusPodcast újraindításához</string>
-  <string name="import_no_downgrade">Az adatbázis az FocusPodcast egy újabb verziójából lett exportálva. A jelenlegi telepítése még nem tudja, hogyan kezelje ezt a fájlt.</string>
+  <string name="import_ok">Nyomja meg az OK gombot az Yagi újraindításához</string>
+  <string name="import_no_downgrade">Az adatbázis az Yagi egy újabb verziójából lett exportálva. A jelenlegi telepítése még nem tudja, hogyan kezelje ezt a fájlt.</string>
   <!--Sleep timer-->
   <string name="set_sleeptimer_label">Alvási időzítő beállítása</string>
   <string name="disable_sleeptimer_label">Alvási időzítő letiltása</string>
@@ -514,10 +513,10 @@
   <string name="gpodnetauth_host">Kiszolgálónév</string>
   <string name="gpodnetauth_select_server">Válasszon kiszolgálót</string>
   <string name="gpodnetauth_device_name">Eszköz neve</string>
-  <string name="gpodnetauth_device_name_default">FocusPodcast ezen: %1$s</string>
+  <string name="gpodnetauth_device_name_default">Yagi ezen: %1$s</string>
   <string name="gpodnetauth_existing_devices">Létező eszközök</string>
   <string name="gpodnetauth_create_device">Eszköz létrehozása</string>
-  <string name="gpodnetauth_finish_descr">Gratulálunk! A gpodder.net fiókja most már össze van kapcsolva az eszközével. Az FocusPodcast automatikusan szinkronizálja az eszközén lévő feliratkozásait a gpodder.net fiókjával.</string>
+  <string name="gpodnetauth_finish_descr">Gratulálunk! A gpodder.net fiókja most már össze van kapcsolva az eszközével. Az Yagi automatikusan szinkronizálja az eszközén lévő feliratkozásait a gpodder.net fiókjával.</string>
   <string name="gpodnetauth_finish_butsyncnow">Szinkronizálás indítása most</string>
   <string name="gpodnetsync_error_title">gpodder.net szinkronizálási hiba</string>
   <string name="gpodnetsync_error_descr">Hiba történt a szinkronizálás során:\u0020</string>
@@ -563,10 +562,10 @@
   <string name="episode_filters_hint">Különálló szavak „Több szó”</string>
   <string name="keep_updated">Frissítse</string>
   <string name="keep_updated_summary">Vegye bele ezt a podcastot is az összes podcast (automatikus) frissítésébe</string>
-  <string name="auto_download_disabled_globally">Az automatikus letöltés ki van kapcsolva a fő FocusPodcast beállításokban</string>
+  <string name="auto_download_disabled_globally">Az automatikus letöltés ki van kapcsolva a fő Yagi beállításokban</string>
     <string name="statistics_space_used">Használt tárhely: </string>
   <string name="statistics_view_all">Megtekintés az összes podcasthoz »</string>
-  <!--FocusPodcastSP-->
+  <!--YagiSP-->
   <string name="sp_apps_importing_feeds_msg">Feliratkozások importálása az egycélú alkalmazásokból…</string>
   <!--Add podcast fragment-->
   <string name="search_podcast_hint">Podcast keresése…</string>
@@ -579,7 +578,7 @@
   <string name="local_folder">Helyi mappa</string>
   <string name="reconnect_local_folder">Helyi mappa újracsatlakoztatása</string>
   <string name="reconnect_local_folder_warning">Jogosultság-megtagadás esetén arra használhatja, hogy újracsatlakoztassa ugyanazt a mappát. Ne válasszon másik mappát.</string>
-  <string name="local_feed_description">Ez a virtuális podcast egy mappa FocusPodcasthoz adásával készült.</string>
+  <string name="local_feed_description">Ez a virtuális podcast egy mappa Yagihoz adásával készült.</string>
   <string name="unable_to_start_system_file_manager">A rendszer fájlkezelője nem indítható el</string>
   <string name="filter">Szűrő</string>
   <!--Sort-->

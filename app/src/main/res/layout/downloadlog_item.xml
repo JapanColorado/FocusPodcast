@@ -31,7 +31,7 @@
 
             <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/txtvTitle"
-                style="@style/FocusPodcast.TextView.ListItemPrimaryTitle"
+                style="@style/Yagi.TextView.ListItemPrimaryTitle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:ellipsize="end"
@@ -43,7 +43,7 @@
 
         <com.google.android.material.textview.MaterialTextView
             android:id="@+id/status"
-            style="@style/FocusPodcast.TextView.ListItemSecondaryTitle"
+            style="@style/Yagi.TextView.ListItemSecondaryTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             tools:text="Media file - 01/01/1970" />
@@ -73,7 +73,7 @@
 
     </LinearLayout>
 
-    <dev.russell.focuspodcast.view.PlayPauseProgressButton
+    <dev.russell.yagi.view.PlayPauseProgressButton
         android:id="@+id/secondaryActionButton"
         style="@style/Widget_PlayerFM_PlayPauseButton"
         android:layout_width="48dp"

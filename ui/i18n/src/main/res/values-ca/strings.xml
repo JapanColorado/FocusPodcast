@@ -397,7 +397,6 @@
   <string name="enqueue_location_front">Principi</string>
   <string name="enqueue_location_after_current">Després de l\'episodi actual</string>
   <string name="pref_smart_mark_as_played_disabled">Desactivat</string>
-  <string name="documentation_support">Documentació &amp; Suport</string>
     <string name="bug_report_title">Informa d\'un bug</string>
     <string name="copy_to_clipboard">Còpia al porta-retalls </string>
   <string name="copied_to_clipboard">Copiat al porta-retalls</string>
@@ -415,7 +414,7 @@
   <string name="back_button_open_drawer">Obri el calaix de navegació</string>
   <string name="back_button_double_tap">Doble toc per a eixir</string>
   <string name="back_button_show_prompt">Confema per a eixir</string>
-  <string name="close_prompt">Estàs segur que vols tancar FocusPodcast?</string>
+  <string name="close_prompt">Estàs segur que vols tancar Yagi?</string>
   <string name="double_tap_toast">Toca el botó \"endarrere\" un altra vegada per a eixir</string>
   <string name="pref_delete_removes_from_queue_title">\"Esborrar\" remou de la cua</string>
   <string name="pref_delete_removes_from_queue_sum">Remou automàticament un episodi de la cua quan siga esborrat</string>
@@ -443,8 +442,8 @@
   <!--import and export-->
   <string name="opml_export_summary">Transfereix les teues subscripcions a un altra aplicació de podcast</string>
   <string name="opml_import_summary">Importa les teues subscripcions des d\'un altra aplicació de podcast</string>
-  <string name="database_export_summary">Transfereix subscripcions i cola a FocusPodcast en un altre dispositiu</string>
-  <string name="database_import_summary">Importa base de dades d\'FocusPodcast des d\'un altre dispositiu</string>
+  <string name="database_export_summary">Transfereix subscripcions i cola a Yagi en un altre dispositiu</string>
+  <string name="database_import_summary">Importa base de dades d\'Yagi des d\'un altre dispositiu</string>
   <string name="opml_import_label">Importació d\'OPML</string>
   <string name="opml_add_podcast_label">Importa llista de podcasts (OPML)</string>
   <string name="opml_reader_error">S\'ha produït un error en llegir el document OPML: </string>
@@ -460,8 +459,8 @@
   <string name="export_success_title">Exportació correcta</string>
     <string name="opml_import_ask_read_permission">Per llegir arxius OPML és necessari accés a la memòria externa</string>
   <string name="successful_import_label">Importació correcta</string>
-  <string name="import_ok">Si us plau, premeu D\'acord per reiniciar FocusPodcast</string>
-  <string name="import_no_downgrade">Aquesta base de dades va ser exportada amb una versió més nova d\'FocusPodcast. La versió que tens ara mateixa no sap com processar-la.</string>
+  <string name="import_ok">Si us plau, premeu D\'acord per reiniciar Yagi</string>
+  <string name="import_no_downgrade">Aquesta base de dades va ser exportada amb una versió més nova d\'Yagi. La versió que tens ara mateixa no sap com processar-la.</string>
   <!--Sleep timer-->
   <string name="set_sleeptimer_label">Defineix un temporitzador</string>
   <string name="disable_sleeptimer_label">Desactiva el temporitzador</string>
@@ -500,10 +499,10 @@
   <string name="gpodnetauth_host">Nom del servidor</string>
   <string name="gpodnetauth_select_server">Selecciona servidor</string>
   <string name="gpodnetauth_device_name">Nom del dispositiu</string>
-  <string name="gpodnetauth_device_name_default">FocusPodcast a %1$s</string>
+  <string name="gpodnetauth_device_name_default">Yagi a %1$s</string>
   <string name="gpodnetauth_existing_devices">Dispositius existents</string>
   <string name="gpodnetauth_create_device">Crea dispositiu</string>
-  <string name="gpodnetauth_finish_descr">Felicitats! El vostre compte de gpodder.net s\'ha enllaçat amb el dispositiu. D\'ara endavant, FocusPodcast sincronitzarà automàticament les subscripcions del dispositiu al vostre compte.</string>
+  <string name="gpodnetauth_finish_descr">Felicitats! El vostre compte de gpodder.net s\'ha enllaçat amb el dispositiu. D\'ara endavant, Yagi sincronitzarà automàticament les subscripcions del dispositiu al vostre compte.</string>
   <string name="gpodnetauth_finish_butsyncnow">Sincronitza ara</string>
   <string name="gpodnetsync_error_title">Error de sincronització a gpodder.net</string>
   <string name="gpodnetsync_error_descr">S\'ha produït un error durant la sincronització:\u0020</string>
@@ -547,10 +546,10 @@
   <string name="episode_filters_hint">Una paraula \"Diverses paraules\"</string>
   <string name="keep_updated">Manté actualitzat</string>
   <string name="keep_updated_summary">Incloure aquest podcast quan (auto-)actualitzen tots els podcasts</string>
-  <string name="auto_download_disabled_globally">La baixada automàtica està deshabilitada als ajustos generals d\'FocusPodcast</string>
+  <string name="auto_download_disabled_globally">La baixada automàtica està deshabilitada als ajustos generals d\'Yagi</string>
     <string name="statistics_space_used">Espai utilitzat:</string>
   <string name="statistics_view_all">Veure per tots els podcasts »</string>
-  <!--FocusPodcastSP-->
+  <!--YagiSP-->
   <string name="sp_apps_importing_feeds_msg">S\'estan important les subscripcions des de les apps de propòsit únic...</string>
   <!--Add podcast fragment-->
   <string name="search_podcast_hint">Cerca podcast…</string>
@@ -563,7 +562,7 @@
   <string name="local_folder">Carpeta local</string>
   <string name="reconnect_local_folder">Torna a connectar la carpeta local</string>
   <string name="reconnect_local_folder_warning">En cas de denegació de permisos, pots utilitzar-ho per tornar a connectar a la mateixa carpeta. No seleccionis cap altra carpeta.</string>
-  <string name="local_feed_description">Aquest podcast virtual es va crear afegint una carpeta a FocusPodcast.</string>
+  <string name="local_feed_description">Aquest podcast virtual es va crear afegint una carpeta a Yagi.</string>
   <string name="unable_to_start_system_file_manager">No es pot iniciar el gestor de fitxers del sistema</string>
   <string name="filter">Filtra</string>
   <!--Sort-->

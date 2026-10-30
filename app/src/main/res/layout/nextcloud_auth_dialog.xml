@@ -7,14 +7,14 @@
     android:orientation="vertical"
     android:clipToPadding="false">
 
-    <dev.russell.focuspodcast.common.views.AccentTextInputLayout
+    <dev.russell.yagi.common.views.AccentTextInputLayout
         android:id="@+id/serverUrlTextInput"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="16dp"
         style="?attr/textInputOutlinedDenseStyle">
 
-        <dev.russell.focuspodcast.common.views.CursorAccentTextInputEditText
+        <dev.russell.yagi.common.views.CursorAccentTextInputEditText
             android:id="@+id/serverUrlText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -23,7 +23,7 @@
             android:lines="1"
             android:imeOptions="actionNext|flagNoFullscreen" />
 
-    </dev.russell.focuspodcast.common.views.AccentTextInputLayout>
+    </dev.russell.yagi.common.views.AccentTextInputLayout>
 
     <LinearLayout
         android:id="@+id/loginProgressContainer"
@@ -33,7 +33,7 @@
         android:orientation="horizontal"
         android:layout_gravity="center_vertical">
 
-        <dev.russell.focuspodcast.common.views.AccentProgressBar
+        <dev.russell.yagi.common.views.AccentProgressBar
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
@@ -54,7 +54,7 @@
         android:textColor="@color/download_failed_red"
         android:layout_marginBottom="16dp" />
 
-    <dev.russell.focuspodcast.common.views.AccentMaterialButton
+    <dev.russell.yagi.common.views.AccentMaterialButton
         android:id="@+id/loginButton"
         style="@style/Widget.Material3.Button"
         android:layout_width="match_parent"

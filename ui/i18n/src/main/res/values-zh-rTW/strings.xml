@@ -409,7 +409,6 @@
   <string name="enqueue_location_front">最前</string>
   <string name="enqueue_location_after_current">當前這集以後</string>
   <string name="pref_smart_mark_as_played_disabled">停用</string>
-  <string name="documentation_support">常見問題與幫助</string>
   <string name="bug_report_title">回報錯誤</string>
     <string name="copy_to_clipboard">複製到剪貼簿</string>
   <string name="copied_to_clipboard">已複製到剪貼簿</string>
@@ -427,7 +426,7 @@
   <string name="back_button_open_drawer">開啟側邊選單</string>
   <string name="back_button_double_tap">按兩下後離開 App</string>
   <string name="back_button_show_prompt">離開前需要確認</string>
-  <string name="close_prompt">確定關閉 FocusPodcast？</string>
+  <string name="close_prompt">確定關閉 Yagi？</string>
   <string name="double_tap_toast">重按返回鍵以離開</string>
   <string name="pref_delete_removes_from_queue_title">从待播清單中移除</string>
   <string name="pref_delete_removes_from_queue_sum">刪除某單集後，自動將其從待播清單中移除</string>
@@ -466,8 +465,8 @@
   <!--import and export-->
   <string name="opml_export_summary">將您的訂閱清單移到另一個 Podcast 軟體</string>
   <string name="opml_import_summary">從其他 Podcast 軟體匯入訂閱清單</string>
-  <string name="database_export_summary">將訂閱、聆聽紀錄、待播清單傳送到其他設備上的 FocusPodcast</string>
-  <string name="database_import_summary">自其他設備匯入 FocusPodcast 資料庫</string>
+  <string name="database_export_summary">將訂閱、聆聽紀錄、待播清單傳送到其他設備上的 Yagi</string>
+  <string name="database_import_summary">自其他設備匯入 Yagi 資料庫</string>
   <string name="opml_import_label">OPML 匯入</string>
   <string name="opml_add_podcast_label">自 OPML 匯入 Podcast 清單</string>
   <string name="opml_reader_error">讀取 OPML 時發生錯誤：</string>
@@ -483,8 +482,8 @@
   <string name="export_success_title">匯出成功</string>
     <string name="opml_import_ask_read_permission">讀取 OPML 檔需要存取外部儲存空間的權限</string>
   <string name="successful_import_label">匯入完畢</string>
-  <string name="import_ok">請按下 OK 重新啟動 FocusPodcast</string>
-  <string name="import_no_downgrade">此資料庫是以新版 FocusPodcast 匯出的，您目前使用的版本無法使用這份資料</string>
+  <string name="import_ok">請按下 OK 重新啟動 Yagi</string>
+  <string name="import_no_downgrade">此資料庫是以新版 Yagi 匯出的，您目前使用的版本無法使用這份資料</string>
   <!--Sleep timer-->
   <string name="set_sleeptimer_label">設定睡眠定時</string>
   <string name="disable_sleeptimer_label">停用睡眠定時</string>
@@ -530,7 +529,7 @@
   <string name="gpodnetauth_create_device">新增裝置</string>
   <string name="gpodsync_synchronization_sum">Gpoddersync 是一個開源的 Nextcloud 應用程序，您需要在自己的服務器上部署，如果您足夠了解那麼可以繼續</string>
   <string name="gpodnetauth_sum">Gpodder.net 是一個的開源播客同步服務，您可能需要在自己的服務器上部署，如果您足夠了解那麼可以繼續</string>
-  <string name="gpodnetauth_finish_descr">您的 gpodder.net 帳號已經成功連結到當前的設備！FocusPodcast 今後將自動與 gpodder.net 同步此設備的訂閱清單</string>
+  <string name="gpodnetauth_finish_descr">您的 gpodder.net 帳號已經成功連結到當前的設備！Yagi 今後將自動與 gpodder.net 同步此設備的訂閱清單</string>
   <string name="gpodnetauth_finish_butsyncnow">現在開始同步</string>
   <string name="gpodnetsync_error_title">gpodder.net 同步錯誤</string>
   <string name="gpodnetsync_error_descr">更新時發生錯誤：\u0020</string>
@@ -570,15 +569,15 @@
   <string name="episode_filters_exclude">排除</string>
   <string name="keep_updated">維持更新</string>
   <string name="keep_updated_summary">自動更新所有 Podcast 時包括此 Podcast</string>
-  <string name="auto_download_disabled_globally">FocusPodcast 的主設定中已停用自動下載功能</string>
+  <string name="auto_download_disabled_globally">Yagi 的主設定中已停用自動下載功能</string>
     <string name="statistics_space_used">佔用空間：</string>
   <string name="statistics_view_all">檢視所有 Podcast »</string>
 
   <string name="statistics_filter_all_time">全部</string>
   <string name="statistics_filter_past_month">過去一個月</string>
   <string name="statistics_filter_past_year">過去一年</string>
-  <!--FocusPodcastSP-->
-  <string name="sp_apps_importing_feeds_msg">從 FocusPodcastSP 匯入訂閱清單</string>
+  <!--YagiSP-->
+  <string name="sp_apps_importing_feeds_msg">從 YagiSP 匯入訂閱清單</string>
   <!--Add podcast fragment-->
   <string name="search_podcast_hint">搜尋 Podcast…</string>
   <string name="advanced">進階</string>
@@ -590,9 +589,9 @@
   <string name="local_folder">本機資料夾</string>
   <string name="reconnect_local_folder">重新連接本機資料夾</string>
   <string name="reconnect_local_folder_warning">若因權限問題被拒絕連接，您可以用此方法重新連上同一個資料夾，此時請勿選擇其他的資料夾</string>
-  <string name="local_feed_description">此虛擬 Podcast 是在 FocusPodcast 裡增加資料夾而產生的</string>
+  <string name="local_feed_description">此虛擬 Podcast 是在 Yagi 裡增加資料夾而產生的</string>
   <string name="local_file">本機檔案</string>
-  <string name="local_file_feed_description">此虛擬 Podcast 是在 FocusPodcast 裡增加檔案而產生的</string>
+  <string name="local_file_feed_description">此虛擬 Podcast 是在 Yagi 裡增加檔案而產生的</string>
   <string name="sort_track_order">曲目順序</string>
   <string name="library_label">資料庫</string>
   <string name="audiobooks_label">有聲書</string>
@@ -696,8 +695,6 @@
   <string name="leave_feedback">反饋問題</string>
   <string name="log_file">發送日誌文件</string>
 
-  <string name="app_pro">FocusPodcast 高級版</string>
-  <string name="need_pro">需要升級 FocusPodcast 高級版</string>
   <string name="pro_summary">更多主題、正在播放主題、自定義首頁等等，打造專屬於自己的獨一無二的播客app</string>
   <string name="buy_now">查看所有高級特性</string>
 
@@ -727,11 +724,11 @@
   <string name="full">全景風</string>
 
   <string name="app_widget_classic_name">經典模式</string>
-  <string name="app_widget_md_name">MD (FocusPodcast 高級版)</string>
-  <string name="app_widget_md3_name">MD3 (FocusPodcast 高級版)</string>
-  <string name="app_widget_big_name">大型模式 (FocusPodcast 高級版)</string>
-  <string name="app_widget_circle_name">唱盤 (FocusPodcast 高級版)</string>
-  <string name="app_widget_text_name">文字模式 (FocusPodcast 高級版)</string>
+  <string name="app_widget_md_name">MD</string>
+  <string name="app_widget_md3_name">MD3</string>
+  <string name="app_widget_big_name">大型模式</string>
+  <string name="app_widget_circle_name">唱盤</string>
+  <string name="app_widget_text_name">文字模式</string>
 
   <string name="limit_subs_notify">已達免費版訂閱數的上限</string>
 
@@ -807,7 +804,7 @@
   <string name="browse_episodes_label">瀏覽單集</string>
   <string name="clear_filter_label">清除篩選</string>
   <string name="notification_rationale_title">允許通知？</string>
-  <string name="notification_rationale_message">FocusPodcast 透過通知顯示下載進度，並提醒你新單集和下載失敗。</string>
+  <string name="notification_rationale_message">Yagi 透過通知顯示下載進度，並提醒你新單集和下載失敗。</string>
   <string name="allow_label">允許</string>
   <string name="not_now_label">稍後再說</string>
   <plurals name="feed_filter_hides_all_episodes">
@@ -815,7 +812,7 @@
   </plurals>
   <string name="pref_playback_notification_category">播放通知</string>
   <string name="pref_system_notification_settings_title">系統通知設定</string>
-  <string name="pref_system_notification_settings_sum">選擇 FocusPodcast 顯示哪些類型的通知</string>
+  <string name="pref_system_notification_settings_sum">選擇 Yagi 顯示哪些類型的通知</string>
   <string name="pref_subscriptions_updates_title">訂閱與更新</string>
   <string name="pref_subscriptions_updates_sum">播客搜尋、重新整理排程、訂閱列表</string>
   <string name="pref_layout_navigation_category">版面與導覽</string>
@@ -980,4 +977,5 @@
     <string name="storage_player_episode_kept">播放器中的單集不會在此刪除。</string>
     <string name="storage_player_episode_kept_titled">播放器中的單集不會在此刪除（%1$s）。</string>
     <string name="storage_cleanup_link_sum">選擇何時自動刪除已播放的單集</string>
+  <string name="app_tagline">Podcast 與有聲書</string>
 </resources>

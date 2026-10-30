@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:squareImageView="http://schemas.android.com/apk/dev.russell.focuspodcast"
+    xmlns:squareImageView="http://schemas.android.com/apk/dev.russell.yagi"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/cover_fragment"
     android:layout_width="match_parent"
@@ -19,7 +19,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content">
 
-            <dev.russell.focuspodcast.view.RetroShapeableImageView
+            <dev.russell.yagi.view.RetroShapeableImageView
                 android:id="@+id/imgvCover"
                 android:importantForAccessibility="no"
                 android:layout_width="300dp"
@@ -32,7 +32,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
-            <dev.russell.focuspodcast.view.RetroShapeableImageView
+            <dev.russell.yagi.view.RetroShapeableImageView
                 android:id="@+id/album_cover_overlay"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"

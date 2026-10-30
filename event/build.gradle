@@ -4,7 +4,7 @@ plugins {
 apply from: "../common.gradle"
 android {
     defaultConfig {
-        namespace = "dev.russell.focuspodcast.event"
+        namespace = "dev.russell.yagi.event"
     }
 }
 dependencies {

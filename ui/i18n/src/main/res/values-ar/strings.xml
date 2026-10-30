@@ -454,7 +454,6 @@
   <string name="enqueue_location_front">أمام</string>
   <string name="enqueue_location_after_current">بعد الحلقة الحالية</string>
   <string name="pref_smart_mark_as_played_disabled">معطل</string>
-  <string name="documentation_support">المساعدة والدعم</string>
     <string name="bug_report_title">بلغ عن خطأ بالتطبيق</string>
     <string name="copy_to_clipboard">إنسخ لذاكرة القصاصات</string>
   <string name="copied_to_clipboard">تم النسخ لذاكرة القصاصات</string>
@@ -472,7 +471,7 @@
   <string name="back_button_open_drawer">أفتح درج التنقل</string>
   <string name="back_button_double_tap">النقر مرتين للخروج</string>
   <string name="back_button_show_prompt">التاكيد للخروج</string>
-  <string name="close_prompt">هل أنت متأكد أنك تريد غلق FocusPodcast?</string>
+  <string name="close_prompt">هل أنت متأكد أنك تريد غلق Yagi?</string>
   <string name="double_tap_toast">انقر زر الرجوع للخروج</string>
   <string name="pref_delete_removes_from_queue_title">المسح يزيل الحلقة من لائحة الاستماع</string>
   <string name="pref_delete_removes_from_queue_sum">أزل الحلقة من لائحة الاستماع آليا عند مسحها.</string>
@@ -500,8 +499,8 @@
   <!--import and export-->
   <string name="opml_export_summary">نقل إشتراكاتك لبرنامج بوكاست آخر</string>
   <string name="opml_import_summary">إستيراد اشتراكاتك من برنامج آخر</string>
-  <string name="database_export_summary">نقل الاشتراكات والحلقات المسموعة ولائحة الإستماع لـ FocusPodcast على جهاز آخر</string>
-  <string name="database_import_summary">استوراد قاعدة بيانات FocusPodcast من جهاز آخر</string>
+  <string name="database_export_summary">نقل الاشتراكات والحلقات المسموعة ولائحة الإستماع لـ Yagi على جهاز آخر</string>
+  <string name="database_import_summary">استوراد قاعدة بيانات Yagi من جهاز آخر</string>
   <string name="opml_import_label">استيراد (OPML)</string>
   <string name="opml_add_podcast_label">استورد قائمة بودكاستات (OPML)</string>
   <string name="opml_reader_error">حدث خطأ أثناء قراءة مستند OPML:</string>
@@ -517,8 +516,8 @@
   <string name="export_success_title">تم التصدير بنجاح</string>
     <string name="opml_import_ask_read_permission">الوصول الى مساحة التخزين الخارجية مطلوب لقراءة ملف الـ OPML</string>
   <string name="successful_import_label">استيراد ناجح</string>
-  <string name="import_ok">الرجاء الضغط على \"حسناً\" لإعادة تشغيل FocusPodcast</string>
-  <string name="import_no_downgrade">تم تصدير قاعدة البيانات هذه بإصدار حديث  من FocusPodcast. التثبيت الحالي الخاص بك لا يعرف حتى الآن كيفية التعامل مع هذا الملف.</string>
+  <string name="import_ok">الرجاء الضغط على \"حسناً\" لإعادة تشغيل Yagi</string>
+  <string name="import_no_downgrade">تم تصدير قاعدة البيانات هذه بإصدار حديث  من Yagi. التثبيت الحالي الخاص بك لا يعرف حتى الآن كيفية التعامل مع هذا الملف.</string>
   <!--Sleep timer-->
   <string name="set_sleeptimer_label">ضبط مؤقت النوم</string>
   <string name="disable_sleeptimer_label">إلغاء مؤقت النوم</string>
@@ -569,10 +568,10 @@
   <string name="gpodnetauth_host">اسم المضيف</string>
   <string name="gpodnetauth_select_server">أختر خادوم</string>
   <string name="gpodnetauth_device_name">أسم الجهاز</string>
-  <string name="gpodnetauth_device_name_default">FocusPodcast على %1$s</string>
+  <string name="gpodnetauth_device_name_default">Yagi على %1$s</string>
   <string name="gpodnetauth_existing_devices">أجهزة موجودة</string>
   <string name="gpodnetauth_create_device">أنشئ جهاز</string>
-  <string name="gpodnetauth_finish_descr">تهانينا! حسابك في gpodder.net مربوط الآن مغ جهازك. سيزامن FocusPodcast من الآن وصاعدا إشتراكاتك على جهازك مع حسابك على gpodder.net.</string>
+  <string name="gpodnetauth_finish_descr">تهانينا! حسابك في gpodder.net مربوط الآن مغ جهازك. سيزامن Yagi من الآن وصاعدا إشتراكاتك على جهازك مع حسابك على gpodder.net.</string>
   <string name="gpodnetauth_finish_butsyncnow">ابدأ المزامنة الآن</string>
   <string name="gpodnetsync_error_title">خظأ في التزامن مع gpodder.net</string>
   <string name="gpodnetsync_error_descr">حدث خطأ أثناء التزامن: \u0020</string>
@@ -616,10 +615,10 @@
   <string name="episode_filters_hint">كلمة واحدة  \ "كلمات متعددة \"</string>
   <string name="keep_updated">محدث بإستمرار</string>
   <string name="keep_updated_summary">قم بإضافة هذا البودكاست عند تحديث (أو التحديث التلقائي) جميع ملفات البودكاستات</string>
-  <string name="auto_download_disabled_globally">التنزيل التلقائي معطل في الإعدادات الرئيسية لـ FocusPodcast</string>
+  <string name="auto_download_disabled_globally">التنزيل التلقائي معطل في الإعدادات الرئيسية لـ Yagi</string>
     <string name="statistics_space_used">المساحة المستخدمة:</string>
   <string name="statistics_view_all">عرض لجميع البودكاستات »</string>
-  <!--FocusPodcastSP-->
+  <!--YagiSP-->
   <string name="sp_apps_importing_feeds_msg">استيراد الاشتراكات من التطبيقات ذات الغرض الواحد ...</string>
   <!--Add podcast fragment-->
   <string name="search_podcast_hint">أبحث عن بودكاست...</string>
@@ -632,7 +631,7 @@
   <string name="local_folder">مجلد محلي</string>
   <string name="reconnect_local_folder">إعادة توصيل المجلد المحلي</string>
   <string name="reconnect_local_folder_warning">في حالة رفض الإذن ، يمكنك استخدام هذا لإعادة الاتصال بالمجلد نفسه. لا تقم بتحديد مجلد آخر.</string>
-  <string name="local_feed_description">هذا البودكاست الإفتراضي تم خلقه بإضافة مجلد محلي إلى FocusPodcast</string>
+  <string name="local_feed_description">هذا البودكاست الإفتراضي تم خلقه بإضافة مجلد محلي إلى Yagi</string>
   <string name="unable_to_start_system_file_manager">غير قادر على تشغيل مدير ملفات النظام</string>
   <string name="filter">مصفى</string>
   <!--Sort-->

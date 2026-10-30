@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="Theme.FocusPodcast.Base.Adaptive" parent="Theme.Material3.DayNight.NoActionBar">
+    <style name="Theme.Yagi.Base.Adaptive" parent="Theme.Material3.DayNight.NoActionBar">
         <item name="toolbarPopupTheme">@style/ThemeOverlay.AppCompat.Light</item>
         <item name="roundSelector">@drawable/round_selector</item>
         <item name="rectSelector">@drawable/rect_selector</item>
@@ -14,13 +14,13 @@
     </style>
 
 
-    <style name="Theme.FocusPodcast.Base" parent="Theme.FocusPodcast.Base.Black">
+    <style name="Theme.Yagi.Base" parent="Theme.Yagi.Base.Black">
         <item name="android:actionOverflowButtonStyle">@style/Widget.ActionButton.Overflow</item>
         <item name="colorSurface">@color/darkColorSurface</item>
         <item name="elevationOverlayColor">@color/elevationOverlay</item>
     </style>
 
-    <style name="Theme.FocusPodcast.Base.Black" parent="Theme.Material3.Dark.NoActionBar">
+    <style name="Theme.Yagi.Base.Black" parent="Theme.Material3.Dark.NoActionBar">
         <item name="android:textAllCaps">false</item>
         <item name="roundSelector">@drawable/round_selector</item>
         <item name="rectSelector">@drawable/rect_selector</item>
@@ -33,7 +33,7 @@
         <item name="elevationOverlayColor">@color/elevationOverlayDark</item>
     </style>
 
-    <style name="Theme.FocusPodcast.Base.Light" parent="Theme.Material3.Light.NoActionBar">
+    <style name="Theme.Yagi.Base.Light" parent="Theme.Material3.Light.NoActionBar">
         <item name="roundSelector">@drawable/round_selector</item>
         <item name="rectSelector">@drawable/rect_selector</item>
         <item name="toolbarPopupTheme">@style/ThemeOverlay.AppCompat.Light</item>

@@ -12,7 +12,7 @@
         android:nestedScrollingEnabled="false"
         android:paddingHorizontal="@dimen/additional_horizontal_spacing" />
 
-    <dev.russell.focuspodcast.common.views.AccentProgressBar
+    <dev.russell.yagi.common.views.AccentProgressBar
         android:id="@+id/progLoading"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

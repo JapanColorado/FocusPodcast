@@ -399,7 +399,6 @@
   <string name="enqueue_location_front">Vorne</string>
   <string name="enqueue_location_after_current">Hinter der aktuell gespielten Episode</string>
   <string name="pref_smart_mark_as_played_disabled">Deaktiviert</string>
-  <string name="documentation_support">Dokumentation + Support</string>
   <string name="bug_report_title">Fehler melden</string>
     <string name="copy_to_clipboard">In die Zwischenablage kopieren</string>
   <string name="copied_to_clipboard">In die Zwischenablage kopiert</string>
@@ -417,7 +416,7 @@
   <string name="back_button_open_drawer">Öffne Seitenleiste</string>
   <string name="back_button_double_tap">Doppelt tippen zum Verlassen</string>
   <string name="back_button_show_prompt">Bestätigen zum Verlassen</string>
-  <string name="close_prompt">Bist du sicher, dass du FocusPodcast schließen möchtest?</string>
+  <string name="close_prompt">Bist du sicher, dass du Yagi schließen möchtest?</string>
   <string name="double_tap_toast">Zurück-Button erneut tippen zum Verlassen</string>
   <string name="pref_delete_removes_from_queue_title">Löschen entfernt aus Warteschlange</string>
   <string name="pref_delete_removes_from_queue_sum">Entferne Episoden automatisch aus der Warteschlange, wenn sie gelöscht werden.</string>
@@ -445,8 +444,8 @@
   <!--import and export-->
   <string name="opml_export_summary">Deine Abonnements auf eine andere Podcast-App übertragen</string>
   <string name="opml_import_summary">Deine Abonnements von einer anderen Podcast-App importieren</string>
-  <string name="database_export_summary">Deine Abonnements, gehörte Episoden und die Warteschlange auf FocusPodcast auf einem anderen Gerät übertragen</string>
-  <string name="database_import_summary">FocusPodcast-Datenbank von einem anderen Gerät importieren</string>
+  <string name="database_export_summary">Deine Abonnements, gehörte Episoden und die Warteschlange auf Yagi auf einem anderen Gerät übertragen</string>
+  <string name="database_import_summary">Yagi-Datenbank von einem anderen Gerät importieren</string>
   <string name="opml_import_label">OPML Import</string>
   <string name="opml_add_podcast_label">Podcast-Liste importieren (OPML)</string>
   <string name="opml_reader_error">Beim Einlesen der OPML-Datei ist ein Fehler aufgetreten:</string>
@@ -462,8 +461,8 @@
   <string name="export_success_title">Export erfolgreich</string>
     <string name="opml_import_ask_read_permission">Zugriff auf externen Speicher wird benötigt, um die OPML Datei zu lesen</string>
   <string name="successful_import_label">Import erfolgreich</string>
-  <string name="import_ok">Bitte drücken Sie OK, um FocusPodcast neu zu starten.</string>
-  <string name="import_no_downgrade">Diese Datenbank wurde mit einer neueren Version von FocusPodcast exportiert. Deine im Moment installierte Version kann die Datei leider nicht bearbeiten.</string>
+  <string name="import_ok">Bitte drücken Sie OK, um Yagi neu zu starten.</string>
+  <string name="import_no_downgrade">Diese Datenbank wurde mit einer neueren Version von Yagi exportiert. Deine im Moment installierte Version kann die Datei leider nicht bearbeiten.</string>
   <!--Sleep timer-->
   <string name="set_sleeptimer_label">Timer einstellen</string>
   <string name="disable_sleeptimer_label">Schlummerfunktion deaktivieren</string>
@@ -502,10 +501,10 @@
   <string name="gpodnetauth_host">Hostname</string>
   <string name="gpodnetauth_select_server">Server auswählen</string>
   <string name="gpodnetauth_device_name">Gerätename</string>
-  <string name="gpodnetauth_device_name_default">FocusPodcast auf %1$s</string>
+  <string name="gpodnetauth_device_name_default">Yagi auf %1$s</string>
   <string name="gpodnetauth_existing_devices">Bestehende Geräte</string>
   <string name="gpodnetauth_create_device">Gerät anlegen</string>
-  <string name="gpodnetauth_finish_descr">Glückwunsch! Dein gpodder.net Profil ist jetzt mit deinem Gerät verbunden. Von nun an wird FocusPodcast automatisch deine Abonnements mit deinem gpodder.net Profil synchronisieren.</string>
+  <string name="gpodnetauth_finish_descr">Glückwunsch! Dein gpodder.net Profil ist jetzt mit deinem Gerät verbunden. Von nun an wird Yagi automatisch deine Abonnements mit deinem gpodder.net Profil synchronisieren.</string>
   <string name="gpodnetauth_finish_butsyncnow">Jetzt synchronisieren</string>
   <string name="gpodnetsync_error_title">gpodder.net Synchronisierungsfehler</string>
   <string name="gpodnetsync_error_descr">Ein Fehler ist beim Synchronisieren aufgetreten:\u0020</string>
@@ -554,7 +553,7 @@
   <string name="auto_download_disabled_globally">Automatisches Herunterladen ist in den Einstellungen deaktiviert</string>
     <string name="statistics_space_used">Verwendeter Speicherplatz:</string>
   <string name="statistics_view_all">Für alle Podcasts ansehen »</string>
-  <!--FocusPodcastSP-->
+  <!--YagiSP-->
   <string name="sp_apps_importing_feeds_msg">Importiere Abonnements aus Single-Purpose Apps</string>
   <!--Add podcast fragment-->
   <string name="search_podcast_hint">Podcast suchen…</string>

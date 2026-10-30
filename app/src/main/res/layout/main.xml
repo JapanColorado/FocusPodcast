@@ -38,7 +38,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:visibility="gone"
-            app:layout_behavior="dev.russell.focuspodcast.view.LockableBottomSheetBehavior" />
+            app:layout_behavior="dev.russell.yagi.view.LockableBottomSheetBehavior" />
 
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
     </LinearLayout>

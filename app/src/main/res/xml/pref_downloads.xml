@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:numberpicker="http://schemas.android.com/apk/dev.russell.focuspodcast">
+    xmlns:numberpicker="http://schemas.android.com/apk/dev.russell.yagi">
 
-    <dev.russell.focuspodcast.common.common.prefs.supportv7.ATEPreferenceCategory
+    <dev.russell.yagi.common.common.prefs.supportv7.ATEPreferenceCategory
         android:layout="@layout/preference_category_title"
         android:title="@string/automation">
-        <dev.russell.focuspodcast.common.common.prefs.supportv7.ATESwitchPreference
+        <dev.russell.yagi.common.common.prefs.supportv7.ATESwitchPreference
             android:layout="@layout/list_item_view_switch_no_title"
             android:key="pref_auto_download_enable"
             android:icon="@drawable/ic_auto_download"
             android:title="@string/pref_automatic_download_title"
             android:defaultValue="false"/>
-        <dev.russell.focuspodcast.common.common.prefs.supportv7.ATEListPreference
+        <dev.russell.yagi.common.common.prefs.supportv7.ATEListPreference
             android:layout="@layout/list_item_view"
             android:defaultValue="25"
             android:entries="@array/episode_cache_size_entries"
@@ -19,7 +19,7 @@
             android:title="@string/pref_episode_cache_title"
             android:summary="@string/pref_episode_cache_summary"
             android:entryValues="@array/episode_cache_size_values"/>
-        <dev.russell.focuspodcast.common.common.prefs.supportv7.ATEListPreference
+        <dev.russell.yagi.common.common.prefs.supportv7.ATEListPreference
             android:layout="@layout/list_item_view"
             android:defaultValue="-1"
             android:entries="@array/episode_cleanup_entries"
@@ -27,18 +27,18 @@
             android:title="@string/pref_episode_cleanup_title"
             android:summary="@string/pref_episode_cleanup_summary"
             android:entryValues="@array/episode_cleanup_values"/>
-        <dev.russell.focuspodcast.common.common.prefs.supportv7.ATESwitchPreference
+        <dev.russell.yagi.common.common.prefs.supportv7.ATESwitchPreference
             android:layout="@layout/list_item_view_switch"
             android:key="pref_auto_download_enable_on_battery"
             android:title="@string/pref_automatic_download_on_battery_title"
             android:summary="@string/pref_automatic_download_on_battery_sum"
             android:defaultValue="true"/>
-    </dev.russell.focuspodcast.common.common.prefs.supportv7.ATEPreferenceCategory>
+    </dev.russell.yagi.common.common.prefs.supportv7.ATEPreferenceCategory>
 
-    <dev.russell.focuspodcast.common.common.prefs.supportv7.ATEPreferenceCategory
+    <dev.russell.yagi.common.common.prefs.supportv7.ATEPreferenceCategory
         android:layout="@layout/preference_category_title"
         android:title="@string/pref_mobile_network">
-        <dev.russell.focuspodcast.common.common.prefs.supportv7.ATEMultiListPreference
+        <dev.russell.yagi.common.common.prefs.supportv7.ATEMultiListPreference
             android:defaultValue="@array/mobile_update_default_value"
             android:entries="@array/mobile_update_entries"
             android:entryValues="@array/mobile_update_values"
@@ -46,18 +46,18 @@
             android:key="pref_mobile_update_types"
             android:layout="@layout/list_item_view_no_title"
             android:title="@string/pref_mobileUpdate_sum" />
-    </dev.russell.focuspodcast.common.common.prefs.supportv7.ATEPreferenceCategory>
+    </dev.russell.yagi.common.common.prefs.supportv7.ATEPreferenceCategory>
 
-    <dev.russell.focuspodcast.common.common.prefs.supportv7.ATEPreferenceCategory
+    <dev.russell.yagi.common.common.prefs.supportv7.ATEPreferenceCategory
         android:layout="@layout/preference_category_title"
         android:title="@string/pref_deleting_episodes_category">
-        <dev.russell.focuspodcast.common.common.prefs.supportv7.ATEPreference
+        <dev.russell.yagi.common.common.prefs.supportv7.ATEPreference
             android:icon="@drawable/ic_data_usage"
             android:key="prefStorageUsage"
             android:layout="@layout/list_item_view"
             android:summary="@string/storage_usage_summary_loading"
             android:title="@string/storage_usage_title" />
-        <dev.russell.focuspodcast.common.common.prefs.supportv7.ATESwitchPreference
+        <dev.russell.yagi.common.common.prefs.supportv7.ATESwitchPreference
             android:defaultValue="false"
             android:enabled="true"
             android:icon="@drawable/ic_delete_auto"
@@ -65,14 +65,14 @@
             android:layout="@layout/list_item_view_switch"
             android:summary="@string/pref_auto_delete_sum"
             android:title="@string/pref_auto_delete_title" />
-        <dev.russell.focuspodcast.common.common.prefs.supportv7.ATESwitchPreference
+        <dev.russell.yagi.common.common.prefs.supportv7.ATESwitchPreference
             android:defaultValue="true"
             android:enabled="true"
             android:key="pref_keeps_favorite_episodes"
             android:layout="@layout/list_item_view_switch"
             android:summary="@string/pref_favorite_keeps_episodes_sum"
             android:title="@string/pref_favorite_keeps_episodes_title" />
-        <dev.russell.focuspodcast.common.common.prefs.supportv7.ATESwitchPreference
+        <dev.russell.yagi.common.common.prefs.supportv7.ATESwitchPreference
             android:defaultValue="false"
             android:enabled="true"
             android:icon="@drawable/ic_playlist_remove"
@@ -80,28 +80,28 @@
             android:layout="@layout/list_item_view_switch"
             android:summary="@string/pref_delete_removes_from_queue_sum"
             android:title="@string/pref_delete_removes_from_queue_title" />
-    </dev.russell.focuspodcast.common.common.prefs.supportv7.ATEPreferenceCategory>
+    </dev.russell.yagi.common.common.prefs.supportv7.ATEPreferenceCategory>
 
-    <dev.russell.focuspodcast.common.common.prefs.supportv7.ATEPreferenceCategory
+    <dev.russell.yagi.common.common.prefs.supportv7.ATEPreferenceCategory
         android:layout="@layout/preference_category_title"
         android:title="@string/advanced">
-        <dev.russell.focuspodcast.pref.NumberPickerPreference
+        <dev.russell.yagi.pref.NumberPickerPreference
             android:defaultValue="4"
             android:key="pref_parallel_downloads"
             android:layout="@layout/list_item_view"
             android:title="@string/pref_parallel_downloads_title"
             numberpicker:maxValue="50"
             numberpicker:minValue="1" />
-        <dev.russell.focuspodcast.common.common.prefs.supportv7.ATEPreference
+        <dev.russell.yagi.common.common.prefs.supportv7.ATEPreference
             android:icon="@drawable/ic_round_vpn_lock_24"
             android:key="prefProxy"
             android:layout="@layout/list_item_view_no_title"
             android:summary="@string/pref_proxy_sum"
             android:title="@string/pref_proxy_title" />
-        <dev.russell.focuspodcast.common.common.prefs.supportv7.ATEPreference
+        <dev.russell.yagi.common.common.prefs.supportv7.ATEPreference
             android:key="prefChooseDataDir"
             android:icon="@drawable/ic_round_storage_24"
             android:layout="@layout/list_item_view_no_title"
             android:title="@string/choose_data_directory" />
-    </dev.russell.focuspodcast.common.common.prefs.supportv7.ATEPreferenceCategory>
+    </dev.russell.yagi.common.common.prefs.supportv7.ATEPreferenceCategory>
 </PreferenceScreen>

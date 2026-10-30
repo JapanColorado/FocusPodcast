@@ -384,7 +384,7 @@
   <string name="synchronization_full_sync_title">Impor sincronização total</string>
   <string name="synchronization_login_status"><![CDATA[Iniciou sessão como <i>%1$s</i> em <i>%2$s</i>. <br/><br/>Se quiser, pode escolher outro serviço de sincronização assim quer terminar a sessão]]></string>
   <string name="synchronization_summary_unchoosen">Pode escolher diversos serviços para sincronizar as suas subscrições e o estado de reprodução dos episódios com</string>
-    <string name="synchronization_nextcloud_authenticate_browser">Conceda o acesso necessário através do navegador web e retorne a FocusPodcast.</string>
+    <string name="synchronization_nextcloud_authenticate_browser">Conceda o acesso necessário através do navegador web e retorne a Yagi.</string>
   <string name="synchronization_choose_title">Escolher serviço de sincroniação</string>
   <string name="synchronization_force_sync_summary">Voltar a sincronizar todas as subscrições e o estado de reprodução</string>
   <string name="synchronization_sync_summary">Sincronizar alterações às subscrições e ao estado de reprodução</string>
@@ -417,7 +417,6 @@
   <string name="enqueue_location_front">Frente</string>
   <string name="enqueue_location_after_current">Após o episódio atual</string>
   <string name="pref_smart_mark_as_played_disabled">Desativada</string>
-  <string name="documentation_support">Documentação e ajuda</string>
     <string name="bug_report_title">Reportar erros</string>
     <string name="copy_to_clipboard">Copiar para a área de transferência</string>
   <string name="copied_to_clipboard">Copiado para a área de transferência</string>
@@ -465,8 +464,8 @@
   <!--import and export-->
   <string name="opml_export_summary">Transferir subscrições para outra aplicação de podcasts</string>
   <string name="opml_import_summary">Importar subscrições de outra aplicação de podcasts</string>
-  <string name="database_export_summary">Transferir subscrições, episódios e fila de reprodução do FocusPodcast para outro dispositivo</string>
-  <string name="database_import_summary">Importar base de dados FocusPodcast de outro dispositivo</string>
+  <string name="database_export_summary">Transferir subscrições, episódios e fila de reprodução do Yagi para outro dispositivo</string>
+  <string name="database_import_summary">Importar base de dados Yagi de outro dispositivo</string>
   <string name="opml_import_label">Importação OPML</string>
   <string name="opml_add_podcast_label">Importar lista de podcasts (OPML)</string>
   <string name="opml_reader_error">Ocorreu um erro ao ler o ficheiro OPML:</string>
@@ -483,7 +482,7 @@
     <string name="opml_import_ask_read_permission">Requer acesso ao armazenamento externo para ler o ficheiro OPML</string>
   <string name="successful_import_label">Importação bem sucedida</string>
   <string name="import_ok">Prima OK para reiniciar a aplicação</string>
-  <string name="import_no_downgrade">A base de dados foi exportada de uma versão mais recente do FocusPodcast. A sua versão da aplicação não sabe como manipular este ficheiro.</string>
+  <string name="import_no_downgrade">A base de dados foi exportada de uma versão mais recente do Yagi. A sua versão da aplicação não sabe como manipular este ficheiro.</string>
   <!--Sleep timer-->
   <string name="set_sleeptimer_label">Definir temporizador</string>
   <string name="disable_sleeptimer_label">Desativar temporizador</string>
@@ -522,7 +521,7 @@
   <string name="gpodnetauth_host">Nome do servidor</string>
   <string name="gpodnetauth_select_server">Selecione o servidor</string>
   <string name="gpodnetauth_device_name">Nome do dispositivo</string>
-  <string name="gpodnetauth_device_name_default">FocusPodcast em %1$s</string>
+  <string name="gpodnetauth_device_name_default">Yagi em %1$s</string>
   <string name="gpodnetauth_existing_devices">Dispositivos existentes</string>
   <string name="gpodnetauth_create_device">Criar dispositivo</string>
   <string name="gpodnetauth_finish_descr">Parabéns! A sua conta gpodder.net está vinculada ao seu dispositivo. Agora, já pode sincronizar as subscrições no dispositivo com a sua conta gpodder.net.</string>
@@ -573,10 +572,10 @@
   <string name="episode_filters_hint">Uma palavra \"Várias palavras\"</string>
   <string name="keep_updated">Manter atualizada</string>
   <string name="keep_updated_summary">Incluir este podcast ao recarregar automaticamente todos os podcasts</string>
-  <string name="auto_download_disabled_globally">A descarga automática está desativada nas definições do FocusPodcast</string>
+  <string name="auto_download_disabled_globally">A descarga automática está desativada nas definições do Yagi</string>
   <string name="statistics_space_used">Espaço utilizado:</string>
     <string name="statistics_view_all">Ver para todos os podcasts »</string>
-  <!--FocusPodcastSP-->
+  <!--YagiSP-->
   <string name="sp_apps_importing_feeds_msg">Importar subscrições de aplicações single-purpose...</string>
   <!--Add podcast fragment-->
   <string name="search_podcast_hint">Pesquisar podcast...</string>
@@ -589,7 +588,7 @@
   <string name="local_folder">Pasta local</string>
   <string name="reconnect_local_folder">Restabelecer ligação a pasta local</string>
   <string name="reconnect_local_folder_warning">Em casos de recusa de permissões, pode utilizar isto para estabelecer uma nova ligação à mesma pasta. Não deve escolher outra pasta.</string>
-  <string name="local_feed_description">Este podcast virtual foi criado através da adição de uma pasta ao FocusPodcast.</string>
+  <string name="local_feed_description">Este podcast virtual foi criado através da adição de uma pasta ao Yagi.</string>
   <string name="unable_to_start_system_file_manager">Não foi possível iniciar o gestor de ficheiros</string>
   <string name="filter">Filtro</string>
   <!--Sort-->

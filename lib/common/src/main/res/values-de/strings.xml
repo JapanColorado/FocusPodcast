@@ -23,14 +23,11 @@
     <string name="add_action">Hinzufügen</string>
     <string name="copied_to_clipboard">In die Zwischenablage kopiert</string>
     <string name="share">Teilen</string>
-    <string name="send_file">Bitte senden Sie mir eine E-Mail, und die E-Mail-Adresse wurde kopiert</string>
+    <string name="bug_report_share_log">Protokoll speichern oder teilen und dann an das GitHub-Issue anhängen</string>
     <string name="asc">Aufsteigend</string>
     <string name="desc">Absteigend</string>
     <string name="title">Titel</string>
-    <string name="made_by">Von Allen Town</string>
-    <string name="twitter_follow_me">Folge mir</string>
-    <string name="others_app_of_us">Unsere anderen Apps</string>
-    <string name="rate_me">Bewerten</string>
+    <string name="made_by">Von JapanColorado\nBasiert auf FocusPodcast von allen town und auf AntennaPod</string>
     <string name="version" translateable="false">Version %s</string>
     <string name="pref_header_general">Design</string>
     <string name="communication">Kommunikation</string>
@@ -67,7 +64,6 @@
     <string name="preference_search_hint">Suche…</string>
     <string name="preference_search_no_results">Keine Ergebnisse</string>
     <string name="searchpreference_clear_history">Verlauf löschen</string>
-    <string name="documentation_support">FAQ &amp; Hilfe</string>
     <string name="bug_report_title">Fehler melden</string>
 
     <!-- Info-Bildschirm -->

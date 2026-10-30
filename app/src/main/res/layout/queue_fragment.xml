@@ -10,7 +10,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <dev.russell.focuspodcast.core.view.TopAppBarLayout
+        <dev.russell.yagi.core.view.TopAppBarLayout
             android:id="@+id/appBarLayout"
             style="?appBarLayoutStyle"
             android:layout_width="match_parent"
@@ -24,24 +24,24 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <dev.russell.focuspodcast.view.MultiSwipeRefreshLayout
+            <dev.russell.yagi.view.MultiSwipeRefreshLayout
                 android:id="@+id/swipeRefresh"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_below="@id/divider">
 
-                <dev.russell.focuspodcast.view.StorePositionRecyclerView
+                <dev.russell.yagi.view.StorePositionRecyclerView
                     android:id="@+id/recyclerView"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:paddingHorizontal="@dimen/additional_horizontal_spacing" />
 
-            </dev.russell.focuspodcast.view.MultiSwipeRefreshLayout>
+            </dev.russell.yagi.view.MultiSwipeRefreshLayout>
         </LinearLayout>
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
 
-    <dev.russell.focuspodcast.common.views.AccentProgressBar
+    <dev.russell.yagi.common.views.AccentProgressBar
         android:id="@+id/progLoading"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

@@ -41,5 +41,5 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        tools:text="@string/app_pro" />
+        tools:text="@string/app_name" />
 </androidx.constraintlayout.widget.ConstraintLayout>

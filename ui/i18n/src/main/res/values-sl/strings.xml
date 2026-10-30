@@ -425,7 +425,6 @@
   <string name="enqueue_location_front">Na začetku</string>
   <string name="enqueue_location_after_current">Po trenutni epizodi</string>
   <string name="pref_smart_mark_as_played_disabled">Onemogočeno</string>
-  <string name="documentation_support">Dokumentacija &amp; Podpora</string>
   <string name="bug_report_title">Sporoči bug</string>
     <string name="copy_to_clipboard">Kopirati v odložišče</string>
   <string name="copied_to_clipboard">Kopirano v odložišče</string>
@@ -443,7 +442,7 @@
   <string name="back_button_open_drawer">Odprite navigacijski predal</string>
   <string name="back_button_double_tap">Dvakrat tapnite za izhod</string>
   <string name="back_button_show_prompt">Potrdite za izhod</string>
-  <string name="close_prompt">Ali ste prepričani, da želite zapreti FocusPodcast?</string>
+  <string name="close_prompt">Ali ste prepričani, da želite zapreti Yagi?</string>
   <string name="double_tap_toast">Za izhod znova tapnite gumb za nazaj</string>
   <string name="pref_delete_removes_from_queue_title">Izbriši odstranjene iz čakalne vrste</string>
   <string name="pref_delete_removes_from_queue_sum">Samodejno odstranite epizodo iz čakalne vrste, ko je izbrisana.</string>
@@ -471,8 +470,8 @@
   <!--import and export-->
   <string name="opml_export_summary">Prenesite svoje naročnine v drugo aplikacijo za podcaste</string>
   <string name="opml_import_summary">Uvozite svoje naročnine iz druge aplikacije za podcaste</string>
-  <string name="database_export_summary">Prenesite naročnine, poslušane epizode in čakalno vrsto na FocusPodcast, na drugo napravo</string>
-  <string name="database_import_summary">Uvozite bazo podatkov FocusPodcast iz druge naprave</string>
+  <string name="database_export_summary">Prenesite naročnine, poslušane epizode in čakalno vrsto na Yagi, na drugo napravo</string>
+  <string name="database_import_summary">Uvozite bazo podatkov Yagi iz druge naprave</string>
   <string name="opml_import_label">Uvoz OPML</string>
   <string name="opml_add_podcast_label">Uvozite podcast seznam (OPML)</string>
   <string name="opml_reader_error">Pri branju dokumenta OPML je prišlo do napake:</string>
@@ -488,8 +487,8 @@
   <string name="export_success_title">Izvoz uspešen</string>
     <string name="opml_import_ask_read_permission">Za branje datoteke OPML je potreben dostop do zunanjega pomnilnika</string>
   <string name="successful_import_label">Uvoz uspešen</string>
-  <string name="import_ok">Pritisnite OK, da znova zaženete FocusPodcast</string>
-  <string name="import_no_downgrade">Ta zbirka podatkov je bila izvožena z novejšo različico FocusPodcast. Vaša trenutna namestitev še ne ve, kako ravnati s to datoteko.</string>
+  <string name="import_ok">Pritisnite OK, da znova zaženete Yagi</string>
+  <string name="import_no_downgrade">Ta zbirka podatkov je bila izvožena z novejšo različico Yagi. Vaša trenutna namestitev še ne ve, kako ravnati s to datoteko.</string>
   <!--Sleep timer-->
   <string name="set_sleeptimer_label">Nastavite časovnik za spanje</string>
   <string name="disable_sleeptimer_label">Onemogočite časovnik spanja</string>
@@ -534,10 +533,10 @@
   <string name="gpodnetauth_host">Ime gostitelja</string>
   <string name="gpodnetauth_select_server">Izberi server</string>
   <string name="gpodnetauth_device_name">Ime naprave</string>
-  <string name="gpodnetauth_device_name_default">FocusPodcast je na %1$s</string>
+  <string name="gpodnetauth_device_name_default">Yagi je na %1$s</string>
   <string name="gpodnetauth_existing_devices">Obstoječe naprave</string>
   <string name="gpodnetauth_create_device">Ustvari napravo</string>
-  <string name="gpodnetauth_finish_descr">Čestitam! Vaš račun gpodder.net je zdaj povezan z vašo napravo. FocusPodcast bo od zdaj naprej samodejno sinhroniziral naročnine na vaši napravi z vašim računom gpodder.net.</string>
+  <string name="gpodnetauth_finish_descr">Čestitam! Vaš račun gpodder.net je zdaj povezan z vašo napravo. Yagi bo od zdaj naprej samodejno sinhroniziral naročnine na vaši napravi z vašim računom gpodder.net.</string>
   <string name="gpodnetauth_finish_butsyncnow">Začnite sedaj sinhronizirati </string>
   <string name="gpodnetsync_error_title">napaka pri sinhronizaciji gpodder.net</string>
   <string name="gpodnetsync_error_descr">Med sinhronizacijo je prišlo do napake:\u0020</string>
@@ -581,10 +580,10 @@
   <string name="episode_filters_hint">Posamezne besede \"Več besed\"</string>
   <string name="keep_updated">Ostanite posodobljeni</string>
   <string name="keep_updated_summary">Vključite osveževanje tega podcasta pri (samodejnem) osveževanju vseh podcastov</string>
-  <string name="auto_download_disabled_globally">Samodejni prenos je onemogočen v glavnih nastavitvah FocusPodcast</string>
+  <string name="auto_download_disabled_globally">Samodejni prenos je onemogočen v glavnih nastavitvah Yagi</string>
     <string name="statistics_space_used">Porabljen prostor:</string>
   <string name="statistics_view_all">Poglej za vse podcaste »</string>
-  <!--FocusPodcastSP-->
+  <!--YagiSP-->
   <string name="sp_apps_importing_feeds_msg">Uvažanje naročnin iz enonamenskih aplikacij …</string>
   <!--Add podcast fragment-->
   <string name="search_podcast_hint">Išči podcast...</string>
@@ -597,7 +596,7 @@
   <string name="local_folder">Lokalna mapa</string>
   <string name="reconnect_local_folder">Ponovno povežite lokalno mapo</string>
   <string name="reconnect_local_folder_warning">V primeru zavrnitve dovoljenj lahko to uporabite za ponovno povezavo s popolnoma isto mapo. Ne izberite druge mape.</string>
-  <string name="local_feed_description">Ta virtualni podcast je bil ustvarjen z dodajanjem mape v FocusPodcast.</string>
+  <string name="local_feed_description">Ta virtualni podcast je bil ustvarjen z dodajanjem mape v Yagi.</string>
   <string name="unable_to_start_system_file_manager">Sistemskega upravitelja datotek ni mogoče zagnati</string>
   <string name="filter">Filter</string>
   <!--Sort-->

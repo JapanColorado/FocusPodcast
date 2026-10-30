@@ -16,11 +16,11 @@ android {
     }
 
     defaultConfig {
-        namespace = "dev.russell.focuspodcast.core"
+        namespace = "dev.russell.yagi.core"
         buildConfigField "String", "VERSION_NAME", "\"${rootProject.ext.versionName}\""
         kapt {
             arguments {
-                arg('eventBusIndex', 'dev.russell.focuspodcast.core.ApCoreEventBusIndex')
+                arg('eventBusIndex', 'dev.russell.yagi.core.ApCoreEventBusIndex')
             }
         }
     }

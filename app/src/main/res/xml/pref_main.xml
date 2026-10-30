@@ -3,62 +3,62 @@
     xmlns:search="http://schemas.android.com/apk/res-auto">
 
     <!-- 2.0.0 worked; 2.1.0 has a bug with custom strings, so override them by declaring resources with the same names -->
-    <dev.russell.focuspodcast.searchpreference.SearchPreference
+    <dev.russell.yagi.searchpreference.SearchPreference
         android:key="searchPreference"
         search:textClearHistory="@string/searchpreference_clear_history"
         search:textHint="@string/preference_search_hint"
         search:textNoResults="@string/preference_search_no_results" />
 
-    <dev.russell.focuspodcast.common.common.prefs.supportv7.ATEPreference
+    <dev.russell.yagi.common.common.prefs.supportv7.ATEPreference
         android:icon="@drawable/ic_appearance"
         android:key="pref_appearance"
         android:layout="@layout/list_item_view_no_title_main"
         android:summary="@string/pref_appearance_sum"
         android:title="@string/appearance" />
 
-    <dev.russell.focuspodcast.common.common.prefs.supportv7.ATEPreference
+    <dev.russell.yagi.common.common.prefs.supportv7.ATEPreference
         android:icon="@drawable/ic_sound_waves"
         android:key="pref_playback"
         android:layout="@layout/list_item_view_no_title_main"
         android:summary="@string/pref_playback_sum"
         android:title="@string/playback_pref" />
 
-    <dev.russell.focuspodcast.common.common.prefs.supportv7.ATEPreference
+    <dev.russell.yagi.common.common.prefs.supportv7.ATEPreference
         android:icon="@drawable/ic_skip_24dp"
         android:key="pref_ad_skip"
         android:layout="@layout/list_item_view_no_title_main"
         android:summary="@string/pref_ad_skip_sum"
         android:title="@string/pref_ad_skip_category" />
 
-    <dev.russell.focuspodcast.common.common.prefs.supportv7.ATEPreference
+    <dev.russell.yagi.common.common.prefs.supportv7.ATEPreference
         android:icon="@drawable/ic_podcast"
         android:key="pref_subscriptions"
         android:layout="@layout/list_item_view_no_title_main"
         android:summary="@string/pref_subscriptions_updates_sum"
         android:title="@string/pref_subscriptions_updates_title" />
 
-    <dev.russell.focuspodcast.common.common.prefs.supportv7.ATEPreference
+    <dev.russell.yagi.common.common.prefs.supportv7.ATEPreference
         android:icon="@drawable/ic_auto_download"
         android:key="pref_downloads"
         android:layout="@layout/list_item_view_no_title_main"
         android:summary="@string/pref_downloads_storage_sum"
         android:title="@string/pref_downloads_storage_title" />
 
-    <dev.russell.focuspodcast.common.common.prefs.supportv7.ATEPreference
+    <dev.russell.yagi.common.common.prefs.supportv7.ATEPreference
         android:icon="@drawable/ic_notifications"
         android:key="notifications"
         android:layout="@layout/list_item_view_no_title_main"
         android:summary="@string/pref_notifications_sum"
         android:title="@string/notification_pref_fragment" />
 
-    <dev.russell.focuspodcast.common.common.prefs.supportv7.ATEPreference
+    <dev.russell.yagi.common.common.prefs.supportv7.ATEPreference
         android:icon="@drawable/ic_cloud"
         android:key="pref_sync"
         android:layout="@layout/list_item_view_no_title_main"
         android:summary="@string/pref_sync_backup_sum"
         android:title="@string/pref_sync_backup_title" />
 
-    <dev.russell.focuspodcast.common.common.prefs.supportv7.ATEPreference
+    <dev.russell.yagi.common.common.prefs.supportv7.ATEPreference
         android:icon="@drawable/ic_info"
         android:key="pref_about_support"
         android:layout="@layout/list_item_view_no_title_main"

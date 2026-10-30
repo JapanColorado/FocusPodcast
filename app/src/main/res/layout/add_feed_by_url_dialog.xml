@@ -6,7 +6,7 @@
     android:paddingHorizontal="24dp"
     android:paddingTop="16dp">
 
-    <dev.russell.focuspodcast.common.views.AccentTextInputLayout
+    <dev.russell.yagi.common.views.AccentTextInputLayout
         android:id="@+id/urlInputLayout"
         style="?attr/textInputOutlinedDenseStyle"
         android:layout_width="match_parent"
@@ -14,13 +14,13 @@
         android:hint="@string/feed_url_hint"
         app:errorEnabled="true">
 
-        <dev.russell.focuspodcast.common.views.CursorAccentTextInputEditText
+        <dev.russell.yagi.common.views.CursorAccentTextInputEditText
             android:id="@+id/urlEditText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:imeOptions="actionDone"
             android:inputType="textUri"
             android:maxLines="1" />
-    </dev.russell.focuspodcast.common.views.AccentTextInputLayout>
+    </dev.russell.yagi.common.views.AccentTextInputLayout>
 
 </FrameLayout>

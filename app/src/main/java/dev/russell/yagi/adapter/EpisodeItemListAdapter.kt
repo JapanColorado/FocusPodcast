@@ -1,0 +1,195 @@
+package dev.russell.yagi.adapter
+
+import dev.russell.yagi.common.util.MenuIconUtil.showContextMenuIcon
+import dev.russell.yagi.R
+import dev.russell.yagi.activity.MainActivity
+import dev.russell.yagi.core.util.FeedItemUtil
+import dev.russell.yagi.fragment.FeedItemsViewPagerFragment
+import dev.russell.yagi.menuprocess.FeedItemMenuProcess
+import dev.russell.yagi.model.feed.FeedItem
+import dev.russell.yagi.viewholder.EpisodeItemViewHolder
+import android.app.Activity
+import android.os.Build
+import android.view.*
+import android.view.ContextMenu.ContextMenuInfo
+import android.view.View.OnCreateContextMenuListener
+import androidx.annotation.MenuRes
+import androidx.recyclerview.widget.RecyclerView
+import org.apache.commons.lang3.ArrayUtils
+import java.lang.ref.WeakReference
+
+/**
+ * List adapter for the list of new episodes.
+ */
+open class EpisodeItemListAdapter(mainActivity: MainActivity, @MenuRes menuResId: Int) :
+    MultiSelectAdapter<EpisodeItemViewHolder?>(mainActivity, menuResId),
+    OnCreateContextMenuListener {
+    private val mainActivityRef: WeakReference<MainActivity>
+    private var episodes: List<FeedItem> = ArrayList()
+    var longPressedItem: FeedItem? = null
+        private set
+    var longPressedPosition = 0 // used to init actionMode
+    fun updateItems(items: List<FeedItem>) {
+        episodes = items
+        notifyDataSetChanged()
+    }
+
+    override fun getItemViewType(position: Int): Int {
+        return R.id.view_type_episode_item
+    }
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): EpisodeItemViewHolder {
+        val mainActivity = checkNotNull(mainActivityRef.get()) {
+            "the MainActivity is gone while its episode list is still creating rows"
+        }
+        return EpisodeItemViewHolder(mainActivity, parent)
+    }
+
+    override fun onBindViewHolder(holder: EpisodeItemViewHolder, pos: Int) {
+        // Reset state of recycled views
+        holder.coverHolder.visibility = View.VISIBLE
+        holder.dragHandle.visibility = View.GONE
+        beforeBindViewHolder(holder, pos)
+        val item = episodes[pos]
+        holder.bind(item)
+        holder.itemView.setOnClickListener { v: View? ->
+            val activity = mainActivityRef.get()
+            if (activity != null && !inActionMode()) {
+                val ids = FeedItemUtil.getIds(episodes)
+                val position = ArrayUtils.indexOf(ids, item.id)
+                activity.loadChildFragment(FeedItemsViewPagerFragment.newInstance(ids, position))
+            } else {
+                toggleSelection(holder.bindingAdapterPosition)
+            }
+        }
+        holder.itemView.setOnCreateContextMenuListener(this)
+        holder.itemView.setOnLongClickListener { v: View? ->
+            rememberLongPressed(holder.bindingAdapterPosition)
+            false
+        }
+        holder.itemView.setOnTouchListener { v: View?, e: MotionEvent ->
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                if (e.isFromSource(InputDevice.SOURCE_MOUSE)
+                    && e.buttonState == MotionEvent.BUTTON_SECONDARY
+                ) {
+                    rememberLongPressed(holder.bindingAdapterPosition)
+                    return@setOnTouchListener false
+                }
+            }
+            false
+        }
+        if (inActionMode()) {
+            holder.playPauseProgressButton.visibility = View.GONE
+            holder.selectCheckBox.setOnClickListener { v: View? -> toggleSelection(holder.bindingAdapterPosition) }
+            holder.selectCheckBox.isChecked = isSelected(pos)
+            holder.selectCheckBox.visibility = View.VISIBLE
+        } else {
+            holder.selectCheckBox.visibility = View.GONE
+        }
+        afterBindViewHolder(holder, pos)
+        holder.hideSeparatorIfNecessary()
+    }
+
+    protected open fun beforeBindViewHolder(holder: EpisodeItemViewHolder?, pos: Int) {}
+    protected open fun afterBindViewHolder(holder: EpisodeItemViewHolder, pos: Int) {}
+    override fun onViewRecycled(holder: EpisodeItemViewHolder) {
+        super.onViewRecycled(holder)
+        holder.cancelPendingWork()
+        // Set all listeners to null. This is required to prevent leaking fragments that have set a listener.
+        // Activity -> recycledViewPool -> EpisodeItemViewHolder -> Listener -> Fragment (can not be garbage collected)
+        holder.itemView.setOnClickListener(null)
+        holder.itemView.setOnCreateContextMenuListener(null)
+        holder.itemView.setOnLongClickListener(null)
+        holder.itemView.setOnTouchListener(null)
+        holder.playPauseProgressButton.setOnClickListener(null)
+        holder.dragHandle.setOnTouchListener(null)
+        holder.coverHolder.setOnTouchListener(null)
+    }
+
+    /**
+     * [.notifyItemChanged] is final, so we can not override.
+     * Calling [.notifyItemChanged] may bind the item to a new ViewHolder and execute a transition.
+     * This causes flickering and breaks the download animation that stores the old progress in the View.
+     * Instead, we tell the adapter to use partial binding by calling [.notifyItemChanged].
+     * We actually ignore the payload and always do a full bind but calling the partial bind method ensures
+     * that ViewHolders are always re-used.
+     *
+     * @param position Position of the item that has changed
+     */
+    fun notifyItemChangedCompat(position: Int) {
+        notifyItemChanged(position, "foo")
+    }
+
+    override fun getItemId(position: Int): Long {
+        return episodes[position].id
+    }
+
+    override fun getItemCount(): Int {
+        return episodes.size
+    }
+
+    protected fun getItem(index: Int): FeedItem {
+        return episodes[index]
+    }
+
+    protected val activity: Activity?
+        protected get() = mainActivityRef.get()
+
+    /**
+     * bindingAdapterPosition is NO_POSITION while the holder is detached or the list changed
+     * since the last layout (e.g. an item removed by a download/queue event during a long press).
+     */
+    private fun rememberLongPressed(position: Int) {
+        if (position == RecyclerView.NO_POSITION || position >= itemCount) {
+            longPressedItem = null
+            longPressedPosition = RecyclerView.NO_POSITION
+            return
+        }
+        longPressedItem = getItem(position)
+        longPressedPosition = position
+    }
+
+    override fun onCreateContextMenu(menu: ContextMenu, v: View, menuInfo: ContextMenuInfo?) {
+        val mainActivity = mainActivityRef.get() ?: return
+        val inflater = mainActivity.menuInflater
+        if (inActionMode()) {
+            inflater.inflate(R.menu.multi_select_context_popup, menu)
+        } else {
+            val pressed = longPressedItem ?: return
+            inflater.inflate(R.menu.feeditemlist_context, menu)
+            showContextMenuIcon(menu)
+            menu.setHeaderTitle(pressed.title)
+            FeedItemMenuProcess.onPrepareMenu(menu, pressed, R.id.skip_episode_item)
+        }
+    }
+
+    fun onContextItemSelected(item: MenuItem): Boolean {
+        if (item.itemId == R.id.multi_select) {
+            startSelectMode(longPressedPosition)
+            return true
+        } else if (item.itemId == R.id.select_all_above) {
+            setSelected(0, longPressedPosition, true)
+            return true
+        } else if (item.itemId == R.id.select_all_below) {
+            setSelected(longPressedPosition + 1, itemCount, true)
+            return true
+        }
+        return false
+    }
+
+    val selectedItems: List<FeedItem>
+        get() {
+            val items: MutableList<FeedItem> = ArrayList()
+            for (i in 0 until itemCount) {
+                if (isSelected(i)) {
+                    items.add(getItem(i))
+                }
+            }
+            return items
+        }
+
+    init {
+        mainActivityRef = WeakReference(mainActivity)
+        setHasStableIds(true)
+    }
+}

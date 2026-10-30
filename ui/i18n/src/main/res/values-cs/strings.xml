@@ -405,7 +405,6 @@
   <string name="enqueue_location_front">začátek</string>
   <string name="enqueue_location_after_current">za hrající epizodu</string>
   <string name="pref_smart_mark_as_played_disabled">Vypnuto</string>
-  <string name="documentation_support">Dokumentace &amp; Podpora</string>
     <string name="bug_report_title">Nahlásit chybu</string>
     <string name="copy_to_clipboard">Zkopírovat do schránky</string>
   <string name="copied_to_clipboard">Zkopírováno do schránky</string>
@@ -423,7 +422,7 @@
   <string name="back_button_open_drawer">Otevřít hamburgrové menu</string>
   <string name="back_button_double_tap">Zavřít aplikaci dvojitým dotykem</string>
   <string name="back_button_show_prompt">Potvrdit ukončení aplikace</string>
-  <string name="close_prompt">Skutečně chcete zavřít FocusPodcast?</string>
+  <string name="close_prompt">Skutečně chcete zavřít Yagi?</string>
   <string name="double_tap_toast">Znovu se dotkněte tlačítka zpět pro ukončení aplikace</string>
   <string name="pref_delete_removes_from_queue_title">Mazání také odstraňuje epizody z fronty</string>
   <string name="pref_delete_removes_from_queue_sum">Automaticky odstraní epizodu z fronty poté, co je smazána.</string>
@@ -450,8 +449,8 @@
   <!--import and export-->
   <string name="opml_export_summary">Přenést odběry do jiné podcastové aplikace</string>
   <string name="opml_import_summary">Importovat vaše odběry z jiné podcastové aplikace</string>
-  <string name="database_export_summary">Přenést odběry, poslechnuté epizody a frontu do aplikace FocusPodcast na jiném zařízení</string>
-  <string name="database_import_summary">Importovat FocusPodcast databázi z jiného zařízení</string>
+  <string name="database_export_summary">Přenést odběry, poslechnuté epizody a frontu do aplikace Yagi na jiném zařízení</string>
+  <string name="database_import_summary">Importovat Yagi databázi z jiného zařízení</string>
   <string name="opml_import_label">OPML import</string>
   <string name="opml_add_podcast_label">Importovat podcasty (OPML)</string>
   <string name="opml_reader_error">Došlo k chybě při čtení OPML dokumentu:</string>
@@ -468,7 +467,7 @@
     <string name="opml_import_ask_read_permission">Pro přečtení OPML souboru je vyžadován  přístup k externímu úložišti</string>
   <string name="successful_import_label">Import úspěšný</string>
   <string name="import_ok">Ťuknutím na OK restartujte AntenaPod</string>
-  <string name="import_no_downgrade">Tato databáze byla exportována z novější verze aplikace FocusPodcast. Vaše instalovaná verze není schopná ji zpracovat.</string>
+  <string name="import_no_downgrade">Tato databáze byla exportována z novější verze aplikace Yagi. Vaše instalovaná verze není schopná ji zpracovat.</string>
   <!--Sleep timer-->
   <string name="set_sleeptimer_label">Nastavit časovač vypnutí</string>
   <string name="disable_sleeptimer_label">Deaktivovat časovač vypnutí</string>
@@ -513,10 +512,10 @@
   <string name="gpodnetauth_host">Hostname</string>
   <string name="gpodnetauth_select_server">Vybrat server</string>
   <string name="gpodnetauth_device_name">Název zařízení</string>
-  <string name="gpodnetauth_device_name_default">FocusPodcast na %1$s</string>
+  <string name="gpodnetauth_device_name_default">Yagi na %1$s</string>
   <string name="gpodnetauth_existing_devices">Existující zařízení</string>
   <string name="gpodnetauth_create_device">Vytvořit zařízení</string>
-  <string name="gpodnetauth_finish_descr">Gratulujeme! Váš gpodder.net účet je nyní úspěšně propojen s vaším zařízením. FocusPodcast bude automaticky synchronizovat odebírané podcasty s nastaveným účtem na gpodder.net.</string>
+  <string name="gpodnetauth_finish_descr">Gratulujeme! Váš gpodder.net účet je nyní úspěšně propojen s vaším zařízením. Yagi bude automaticky synchronizovat odebírané podcasty s nastaveným účtem na gpodder.net.</string>
   <string name="gpodnetauth_finish_butsyncnow">Synchronizovat nyní</string>
   <string name="gpodnetsync_error_title">gpodder.net synchronizace selhala</string>
   <string name="gpodnetsync_error_descr">V průběhu synchronizace nastala chyba:\u0020</string>
@@ -560,10 +559,10 @@
   <string name="episode_filters_hint">Jednoslovné \"Víceslovné\"</string>
   <string name="keep_updated">Udržovat aktuální</string>
   <string name="keep_updated_summary">Zahrnout tento podcast při (automatickém) obnovování všech podcastů</string>
-  <string name="auto_download_disabled_globally">Automatické stahování je zakázané v hlavním nastavení FocusPodcastu</string>
+  <string name="auto_download_disabled_globally">Automatické stahování je zakázané v hlavním nastavení Yagiu</string>
     <string name="statistics_space_used">Zabírá místa:</string>
   <string name="statistics_view_all">Náhled všech podcastů »</string>
-  <!--FocusPodcastSP-->
+  <!--YagiSP-->
   <string name="sp_apps_importing_feeds_msg">Importuji odběry z jednoúčelových aplikací...</string>
   <!--Add podcast fragment-->
   <string name="search_podcast_hint">Vyhledat podcast…</string>
@@ -576,7 +575,7 @@
   <string name="local_folder">Místní adresář</string>
   <string name="reconnect_local_folder">Znovu připojit místní adresář</string>
   <string name="reconnect_local_folder_warning">V případě zamítnutých oprávnění může být tato možnost použita pro připojení ke stejnému adresáři. Nevybírejte ale jiný adresář.</string>
-  <string name="local_feed_description">Byl založen následující virtuální podcast vytvořením adresáře v FocusPodcast.</string>
+  <string name="local_feed_description">Byl založen následující virtuální podcast vytvořením adresáře v Yagi.</string>
   <string name="unable_to_start_system_file_manager">Nedaří se spustit správce souborů</string>
   <string name="filter">Filtr</string>
   <!--Sort-->

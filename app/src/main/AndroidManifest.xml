@@ -31,9 +31,9 @@
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-sdk tools:overrideLibrary="com.paul623.wdsyncer"/>
     <application
-        android:name="dev.russell.focuspodcast.MyApp"
+        android:name="dev.russell.yagi.MyApp"
         android:allowAudioPlaybackCapture="true"
-        android:backupAgent="dev.russell.focuspodcast.core.backup.OPMLBackupAgent"
+        android:backupAgent="dev.russell.yagi.core.backup.OPMLBackupAgent"
         android:enableOnBackInvokedCallback="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
@@ -43,12 +43,12 @@
         android:restoreAnyVersion="true"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.FocusPodcast.Splash"
+        android:theme="@style/Theme.Yagi.Splash"
         android:usesCleartextTraffic="true"
         android:allowBackup="true"
         tools:replace="android:icon,android:allowBackup">
         <activity
-            android:name="dev.russell.focuspodcast.activity.SimpleToolbarActivity"
+            android:name="dev.russell.yagi.activity.SimpleToolbarActivity"
             android:exported="false" />
         <!-- Lets AppCompat persist the per-app language on Android 12 and older -->
         <service
@@ -77,18 +77,18 @@
             android:value="true" />
 
         <activity
-            android:name="dev.russell.focuspodcast.activity.LockScreenActivity"
+            android:name="dev.russell.yagi.activity.LockScreenActivity"
             android:exported="true"
             >
             <intent-filter>
-                <action android:name="dev.russell.focuspodcast.LockScreenActivity" />
+                <action android:name="dev.russell.yagi.LockScreenActivity" />
                 <category android:name="android.intent.category.DEFAULT" />
 
             </intent-filter>
         </activity>
-        <activity android:name="dev.russell.focuspodcast.activity.DriveModeActivity" />
+        <activity android:name="dev.russell.yagi.activity.DriveModeActivity" />
         <activity
-            android:name="dev.russell.focuspodcast.activity.SplashActivity"
+            android:name="dev.russell.yagi.activity.SplashActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:exported="true"
             android:label="@string/app_name">
@@ -104,7 +104,7 @@
 
         </activity>
         <activity
-            android:name="dev.russell.focuspodcast.activity.MainActivity"
+            android:name="dev.russell.yagi.activity.MainActivity"
             android:exported="true"
             android:configChanges="keyboardHidden|screenSize|smallestScreenSize|screenLayout|density|keyboard|navigation"
             android:label="@string/app_name"
@@ -127,7 +127,7 @@
                     android:scheme="https" />
             </intent-filter>
             <intent-filter>
-                <action android:name="dev.russell.focuspodcast.intents.MAIN_ACTIVITY" />
+                <action android:name="dev.russell.yagi.intents.MAIN_ACTIVITY" />
                 <action android:name="android.service.quicksettings.action.QS_TILE_PREFERENCES"/>
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
@@ -135,38 +135,38 @@
 
 
         <activity
-            android:name="dev.russell.focuspodcast.activity.FeedAuthenticationActivity"
+            android:name="dev.russell.yagi.activity.FeedAuthenticationActivity"
             android:launchMode="singleInstance"
-            android:theme="@style/Theme.FocusPodcast.Dialog" />
+            android:theme="@style/Theme.Yagi.Dialog" />
         <activity
-            android:name="dev.russell.focuspodcast.activity.SettingsActivity"
+            android:name="dev.russell.yagi.activity.SettingsActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:label="@string/settings_label"
             android:theme="@style/MainTheme">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="dev.russell.focuspodcast.activity.MainActivity" />
+                android:value="dev.russell.yagi.activity.MainActivity" />
         </activity>
 
         <activity
-            android:name="dev.russell.focuspodcast.activity.CreateSubscriptionShortcutActivity"
+            android:name="dev.russell.yagi.activity.CreateSubscriptionShortcutActivity"
             android:exported="true"
             android:icon="@drawable/ic_folder_shortcut_black"
             android:label="@string/shortcut_subscription_label"
-            android:theme="@style/Theme.FocusPodcast.Dialog">
+            android:theme="@style/Theme.Yagi.Dialog">
             <intent-filter>
                 <action android:name="android.intent.action.CREATE_SHORTCUT" />
             </intent-filter>
         </activity>
 
         <receiver
-            android:name="dev.russell.focuspodcast.core.widget.appwidgets.AppWidgetClassic"
+            android:name="dev.russell.yagi.core.widget.appwidgets.AppWidgetClassic"
             android:exported="true"
             android:label="@string/app_widget_classic_name">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
-                <action android:name="dev.russell.focuspodcast.FORCE_WIDGET_UPDATE" />
-                <action android:name="dev.russell.focuspodcast.STOP_WIDGET_UPDATE" />
+                <action android:name="dev.russell.yagi.FORCE_WIDGET_UPDATE" />
+                <action android:name="dev.russell.yagi.STOP_WIDGET_UPDATE" />
             </intent-filter>
 
             <meta-data
@@ -175,7 +175,7 @@
         </receiver>
 
         <receiver
-            android:name="dev.russell.focuspodcast.core.widget.appwidgets.AppWidgetCircle"
+            android:name="dev.russell.yagi.core.widget.appwidgets.AppWidgetCircle"
             android:exported="true"
             android:label="@string/app_widget_circle_name">
             <intent-filter>
@@ -188,7 +188,7 @@
         </receiver>
 
         <receiver
-            android:name="dev.russell.focuspodcast.core.widget.appwidgets.AppWidgetText"
+            android:name="dev.russell.yagi.core.widget.appwidgets.AppWidgetText"
             android:exported="true"
             android:label="@string/app_widget_text_name">
             <intent-filter>
@@ -201,7 +201,7 @@
         </receiver>
 
         <receiver
-            android:name="dev.russell.focuspodcast.core.widget.appwidgets.AppWidgetMD3"
+            android:name="dev.russell.yagi.core.widget.appwidgets.AppWidgetMD3"
             android:exported="true"
             android:label="@string/app_widget_md3_name">
             <intent-filter>
@@ -214,7 +214,7 @@
         </receiver>
 
         <receiver
-            android:name="dev.russell.focuspodcast.core.widget.appwidgets.AppWidgetBig"
+            android:name="dev.russell.yagi.core.widget.appwidgets.AppWidgetBig"
             android:exported="true"
             android:label="@string/app_widget_big_name">
             <intent-filter>
@@ -228,7 +228,7 @@
 
 
         <receiver
-            android:name="dev.russell.focuspodcast.core.widget.appwidgets.AppWidgetMD"
+            android:name="dev.russell.yagi.core.widget.appwidgets.AppWidgetMD"
             android:exported="true"
             android:label="@string/app_widget_md_name">
             <intent-filter>
@@ -242,7 +242,7 @@
 
 
         <activity
-            android:name="dev.russell.focuspodcast.activity.ImportOPMLActivity"
+            android:name="dev.russell.yagi.activity.ImportOPMLActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:exported="true"
             android:label="@string/opml_import_label"
@@ -330,30 +330,30 @@
 
         </activity>
         <activity
-            android:name="dev.russell.focuspodcast.activity.VideoPlayerActivity"
+            android:name="dev.russell.yagi.activity.VideoPlayerActivity"
             android:configChanges="keyboardHidden|orientation|screenSize|screenLayout|smallestScreenSize"
             android:exported="false"
             android:supportsPictureInPicture="true"
             android:theme="@style/MainTheme">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="dev.russell.focuspodcast.activity.MainActivity" />
+                android:value="dev.russell.yagi.activity.MainActivity" />
 
             <intent-filter>
-                <action android:name="dev.russell.focuspodcast.intents.VIDEO_PLAYER" />
+                <action android:name="dev.russell.yagi.intents.VIDEO_PLAYER" />
 
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
         <activity
-            android:name="dev.russell.focuspodcast.activity.RssSearchActivity"
+            android:name="dev.russell.yagi.activity.RssSearchActivity"
             android:configChanges="orientation|screenSize"
             android:exported="true"
             android:label="@string/add_feed_label"
-            android:theme="@style/Theme.FocusPodcast.Dialog">
+            android:theme="@style/Theme.Yagi.Dialog">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="dev.russell.focuspodcast.activity.MainActivity" />
+                android:value="dev.russell.yagi.activity.MainActivity" />
 
             <!-- URLs ending with '.xml' or '.rss' -->
             <intent-filter>
@@ -460,14 +460,14 @@
         </activity>
 
         <receiver
-            android:name="dev.russell.focuspodcast.receiver.ConnectivityChangeReceiver"
+            android:name="dev.russell.yagi.receiver.ConnectivityChangeReceiver"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
             </intent-filter>
         </receiver>
         <receiver
-            android:name="dev.russell.focuspodcast.receiver.PowerConnectionReceiver"
+            android:name="dev.russell.yagi.receiver.PowerConnectionReceiver"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.ACTION_POWER_CONNECTED" />

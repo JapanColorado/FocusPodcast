@@ -387,7 +387,6 @@
   <string name="enqueue_location_front">Lõppu</string>
   <string name="enqueue_location_after_current">Pärast praegust saadet</string>
   <string name="pref_smart_mark_as_played_disabled">Välja lülitatud</string>
-  <string name="documentation_support">Dokumentatsioon &amp; tugi</string>
     <string name="bug_report_title">Raporteeri veast</string>
     <string name="copy_to_clipboard">Kopeeri lõikelauale</string>
   <string name="copied_to_clipboard">Kopeeritud lõikelauale</string>
@@ -405,7 +404,7 @@
   <string name="back_button_open_drawer">Avab navigeerimise sahtli</string>
   <string name="back_button_double_tap">Topeltkoputus väljub</string>
   <string name="back_button_show_prompt">Väljumine kinnitusega</string>
-  <string name="close_prompt">Kas tahad kindlasti sulgeda FocusPodcasti?</string>
+  <string name="close_prompt">Kas tahad kindlasti sulgeda Yagii?</string>
   <string name="double_tap_toast">Koputa nuppu väljumiseks uuesti</string>
   <string name="pref_delete_removes_from_queue_title">Kustutamine eemaldab järjekorrast</string>
   <string name="pref_delete_removes_from_queue_sum">Saade eemaldatakse järjekorrast pärast kustutamist automaatselt.</string>
@@ -430,8 +429,8 @@
   <!--import and export-->
   <string name="opml_export_summary">Tellimuste liigutamine teise taskuhäälingu äppi</string>
   <string name="opml_import_summary">Tellimuste importimine teisest taskuhäälingu äpist</string>
-  <string name="database_export_summary">Tellimuste, kuulatud saadete ja ooterjärjekorra liigutamine FocusPodcasti mõnes teises seadmes</string>
-  <string name="database_import_summary">FocusPodcasti andmebaasi import teisest seadmest</string>
+  <string name="database_export_summary">Tellimuste, kuulatud saadete ja ooterjärjekorra liigutamine Yagii mõnes teises seadmes</string>
+  <string name="database_import_summary">Yagii andmebaasi import teisest seadmest</string>
   <string name="opml_import_label">OPML import</string>
   <string name="opml_add_podcast_label">Impordi taskuhäälingute nimekiri (OPML)</string>
   <string name="opml_reader_error">OPML dokumendi lugemisel tekkis tõrge:</string>
@@ -447,8 +446,8 @@
   <string name="export_success_title">Eksportimine edukas</string>
     <string name="opml_import_ask_read_permission">OPML faili lugemiseks on vajalik ligipääs välisele salvestusruumile</string>
   <string name="successful_import_label">Importimine oli edukas</string>
-  <string name="import_ok">Vajuta OK, et FocusPodcast taaskäivitada</string>
-  <string name="import_no_downgrade">See andmebaas on eksporditud FocusPodcasti uuemast versioonist. Sinu praegune äpp ei oska seda faili käsitseda.</string>
+  <string name="import_ok">Vajuta OK, et Yagi taaskäivitada</string>
+  <string name="import_no_downgrade">See andmebaas on eksporditud Yagii uuemast versioonist. Sinu praegune äpp ei oska seda faili käsitseda.</string>
   <!--Sleep timer-->
   <string name="set_sleeptimer_label">Määra unetaimer</string>
   <string name="disable_sleeptimer_label">Keela unetaimer</string>
@@ -487,10 +486,10 @@
   <string name="gpodnetauth_host">Hostinimi</string>
   <string name="gpodnetauth_select_server">Vali server</string>
   <string name="gpodnetauth_device_name">Seadme nimi</string>
-  <string name="gpodnetauth_device_name_default">FocusPodcast %1$s seadmel</string>
+  <string name="gpodnetauth_device_name_default">Yagi %1$s seadmel</string>
   <string name="gpodnetauth_existing_devices">Olemasolevad seadmed</string>
   <string name="gpodnetauth_create_device">Loo uus seade</string>
-  <string name="gpodnetauth_finish_descr">Palju õnne! Sinu gpodder.net konto on nüüd lingitud sinu seadmega. FocusPodcast süngib nüüdsest tellimused sinu seadmes gpodder.net-i kontoga.</string>
+  <string name="gpodnetauth_finish_descr">Palju õnne! Sinu gpodder.net konto on nüüd lingitud sinu seadmega. Yagi süngib nüüdsest tellimused sinu seadmes gpodder.net-i kontoga.</string>
   <string name="gpodnetauth_finish_butsyncnow">Alusta kohe sünkroonimist</string>
   <string name="gpodnetsync_error_title">gpodder.net sünkroonimise viga</string>
   <string name="gpodnetsync_error_descr">Sünkroonimise ajal tekkis viga:\u0020</string>
@@ -533,10 +532,10 @@
   <string name="episode_filters_hint">Üksikud sõnad \"Mitu sõna\"</string>
   <string name="keep_updated">Hoia uuendatuna</string>
   <string name="keep_updated_summary">Uuenda koos teiste taskuhäälingute (automaatse) värskendamisega ka seda</string>
-  <string name="auto_download_disabled_globally">Automaatne allalaadimine on keelatud FocusPodcasti peamistes seadetes</string>
+  <string name="auto_download_disabled_globally">Automaatne allalaadimine on keelatud Yagii peamistes seadetes</string>
     <string name="statistics_space_used">Kasutatud kettaruum:</string>
   <string name="statistics_view_all">Vaata kõiki taskuhäälinguid »</string>
-  <!--FocusPodcastSP-->
+  <!--YagiSP-->
   <string name="sp_apps_importing_feeds_msg">Tellimuste importimine teistest äppidest...</string>
   <!--Add podcast fragment-->
   <string name="search_podcast_hint">Otsi taskuhäälingut...</string>
@@ -549,7 +548,7 @@
   <string name="local_folder">Kohalik kaust</string>
   <string name="reconnect_local_folder">Ühenda kohalik kaust uuesti</string>
   <string name="reconnect_local_folder_warning">Ligipääsuõiguste keelamise puhul võid kasutada seda, et täpselt sama kausta uuesti ühendada. Ära valli mõnda teist kausta.</string>
-  <string name="local_feed_description">See virtuaalne taskuhääling loodi kausta lisamisega FocusPodcasti.</string>
+  <string name="local_feed_description">See virtuaalne taskuhääling loodi kausta lisamisega Yagii.</string>
   <string name="unable_to_start_system_file_manager">Süsteemi failihalduri käivitamine ebaõnnestus</string>
   <string name="filter">Filter</string>
   <!--Sort-->

@@ -7,19 +7,16 @@
     <string name="add_action">追加</string>
     <string name="copied_to_clipboard">コピーされました</string>
     <string name="share">共有</string>
-    <string name="send_file">メールを送ってください。メール アドレスがコピーされました</string>
+    <string name="bug_report_share_log">ログを保存または共有して、GitHub の Issue に添付してください</string>
 
     <string name="asc">昇順</string>
     <string name="desc">降順</string>
     <string name="title">タイトル</string>
     <string name="pref_language_name">言語を選択</string>
-    <string name="made_by">著者アレン・タウン</string>
-    <string name="twitter_follow_me">フォローしてください</string>
-    <string name="rate_me">評価</string>
+    <string name="made_by">作者 JapanColorado\nallen town の FocusPodcast と AntennaPod をもとに作成</string>
     <string name="pref_header_general">テーマ</string>
     <string name="communication">コミュニケーション</string>
     <string name="change_log">ログを更新</string>
-    <string name="others_app_of_us">その他のアプリ</string>
     <string name="others">その他</string>
 
     <string name="colors">色</string>
@@ -50,7 +47,6 @@
     <string name="preference_search_hint">検索</string>
     <string name="preference_search_no_results">結果がありません</string>
     <string name="searchpreference_clear_history">履歴をクリア</string>
-    <string name="documentation_support">よくある質問とヘルプ</string>
     <string name="bug_report_title">バグを報告</string>
     <!--画面について-->
     <string name="about_pref">概要</string>

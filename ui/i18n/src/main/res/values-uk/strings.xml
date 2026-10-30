@@ -425,7 +425,6 @@
   <string name="enqueue_location_front">На початок</string>
   <string name="enqueue_location_after_current">Після поточного епізоду</string>
   <string name="pref_smart_mark_as_played_disabled">Вимкнено</string>
-  <string name="documentation_support">Документація і Підтримка</string>
     <string name="bug_report_title">Повідомити про помилку</string>
     <string name="copy_to_clipboard">Копіювати</string>
   <string name="copied_to_clipboard">Скопійовано</string>
@@ -443,7 +442,7 @@
   <string name="back_button_open_drawer">Відкрити меню навігації</string>
   <string name="back_button_double_tap">Натисніть двічі, щоб вийти</string>
   <string name="back_button_show_prompt">Підтвердіть вихід</string>
-  <string name="close_prompt">Дійсно закрити FocusPodcast?</string>
+  <string name="close_prompt">Дійсно закрити Yagi?</string>
   <string name="double_tap_toast">Натисніть кнопку назад ще раз, щоб вийти</string>
   <string name="pref_delete_removes_from_queue_title">Видалення з черги видалених епізодів</string>
   <string name="pref_delete_removes_from_queue_sum">Автоматично видаляти епізод із черги, коли він буде видалений.</string>
@@ -471,8 +470,8 @@
   <!--import and export-->
   <string name="opml_export_summary">Перенесіть свої підписки на інший додаток для подкастів</string>
   <string name="opml_import_summary">Імпортуйте свої підписки з іншого додатка для подкастів</string>
-  <string name="database_export_summary">Перенесіть підписки, прослухані епізоди та чергу на FocusPodcast в іншому пристрої</string>
-  <string name="database_import_summary">Імпортуйте базу даних FocusPodcast з іншого пристрою</string>
+  <string name="database_export_summary">Перенесіть підписки, прослухані епізоди та чергу на Yagi в іншому пристрої</string>
+  <string name="database_import_summary">Імпортуйте базу даних Yagi з іншого пристрою</string>
   <string name="opml_import_label">OPML імпорт</string>
   <string name="opml_add_podcast_label">Імпортувати список подкастів (OPML)</string>
   <string name="opml_reader_error">Помилка при читанні документа OPML:</string>
@@ -488,8 +487,8 @@
   <string name="export_success_title">Успішний експорт</string>
     <string name="opml_import_ask_read_permission">Щоб прочитати файл OPML потрібен доступ до зовнішнього носія</string>
   <string name="successful_import_label">Імпорт - успішний</string>
-  <string name="import_ok">Будь ласка, натисніть OK, щоб перезапустити FocusPodcast</string>
-  <string name="import_no_downgrade">Ця база даних була експортована з новішою версією FocusPodcast. Ваша поточна установка ще не знає, як обробляти цей файл.</string>
+  <string name="import_ok">Будь ласка, натисніть OK, щоб перезапустити Yagi</string>
+  <string name="import_no_downgrade">Ця база даних була експортована з новішою версією Yagi. Ваша поточна установка ще не знає, як обробляти цей файл.</string>
   <!--Sleep timer-->
   <string name="set_sleeptimer_label">Таймер сну</string>
   <string name="disable_sleeptimer_label">Вимкнути засинання</string>
@@ -534,7 +533,7 @@
   <string name="gpodnetauth_host">Ім\'я хоста</string>
   <string name="gpodnetauth_select_server">Вибрати сервер</string>
   <string name="gpodnetauth_device_name">Назва пристрою</string>
-  <string name="gpodnetauth_device_name_default">FocusPodcast на %1$s</string>
+  <string name="gpodnetauth_device_name_default">Yagi на %1$s</string>
   <string name="gpodnetauth_existing_devices">Існуючі пристрої</string>
   <string name="gpodnetauth_create_device">Створити пристрій</string>
   <string name="gpodnetauth_finish_descr">Поздоровляємо! Ваш обліковий запис на gpodder.net зараз пов\'язаний за вашим пристроєм</string>
@@ -581,10 +580,10 @@
   <string name="episode_filters_hint">Окремі слова \"Кілька слів\"</string>
   <string name="keep_updated">Підтримувати оновленим</string>
   <string name="keep_updated_summary">Включати цей подкаст під час (автоматичного) оновлення всіх подкастів</string>
-  <string name="auto_download_disabled_globally">Автозавантаження вимкнено в налаштуваннях FocusPodcast</string>
+  <string name="auto_download_disabled_globally">Автозавантаження вимкнено в налаштуваннях Yagi</string>
     <string name="statistics_space_used">Використано простору:</string>
   <string name="statistics_view_all">Переглянути всі подкасти »</string>
-  <!--FocusPodcastSP-->
+  <!--YagiSP-->
   <string name="sp_apps_importing_feeds_msg">Імпорт подкастів з інших програм...</string>
   <!--Add podcast fragment-->
   <string name="search_podcast_hint">Шукати подкаст...</string>
@@ -597,7 +596,7 @@
   <string name="local_folder">Локальна папка</string>
   <string name="reconnect_local_folder">Перепідключити локальну папку</string>
   <string name="reconnect_local_folder_warning">У разі відмови у дозволі ви можете використовувати це для повторного підключення до тієї ж папки. Не вибирайте іншу папку.</string>
-  <string name="local_feed_description">Цей віртуальний подкаст був створений шляхом додавання папки до FocusPodcast.</string>
+  <string name="local_feed_description">Цей віртуальний подкаст був створений шляхом додавання папки до Yagi.</string>
   <string name="unable_to_start_system_file_manager">Не запускається системний файловий менеджер</string>
   <string name="filter">Фільтр</string>
   <!--Sort-->

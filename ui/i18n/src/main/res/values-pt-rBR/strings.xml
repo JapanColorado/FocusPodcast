@@ -408,7 +408,6 @@
   <string name="enqueue_location_front">Início</string>
   <string name="enqueue_location_after_current">Depois do episódio atual</string>
   <string name="pref_smart_mark_as_played_disabled">Desabilitado</string>
-  <string name="documentation_support">Documentação &amp; suporte</string>
     <string name="bug_report_title">Reportar um bug</string>
     <string name="copy_to_clipboard">Copiar para clipboard</string>
   <string name="copied_to_clipboard">Copiado para clipboard</string>
@@ -426,7 +425,7 @@
   <string name="back_button_open_drawer">Abrir o menu de navegação</string>
   <string name="back_button_double_tap">Toque duplo para sair</string>
   <string name="back_button_show_prompt">Confirmar para sair</string>
-  <string name="close_prompt">Tem certeza que deseja fechar o FocusPodcast?</string>
+  <string name="close_prompt">Tem certeza que deseja fechar o Yagi?</string>
   <string name="double_tap_toast">Clique novamente no botão voltar para sair</string>
   <string name="pref_delete_removes_from_queue_title">Excluir remove da fila</string>
   <string name="pref_delete_removes_from_queue_sum">Remove automaticamente um episódio da fila quando ele é excluído.</string>
@@ -455,8 +454,8 @@
   <!--import and export-->
   <string name="opml_export_summary">Transfere suas assinaturas para outro aplicativo de podcast</string>
   <string name="opml_import_summary">Importa suas assinaturas de outro aplicativo de podcast</string>
-  <string name="database_export_summary">Transfere as assinaturas, os episódios ouvidos e a fila para o FocusPodcast em outro dispositivo</string>
-  <string name="database_import_summary">Importa o banco de dados FocusPodcast de outro dispositivo</string>
+  <string name="database_export_summary">Transfere as assinaturas, os episódios ouvidos e a fila para o Yagi em outro dispositivo</string>
+  <string name="database_import_summary">Importa o banco de dados Yagi de outro dispositivo</string>
   <string name="opml_import_label">Importação de OPML</string>
   <string name="opml_add_podcast_label">Importar lista de podcasts (OPML)</string>
   <string name="opml_reader_error">Ocorreu um erro ao ler o documento OPML:</string>
@@ -472,8 +471,8 @@
   <string name="export_success_title">Exportado com sucesso</string>
     <string name="opml_import_ask_read_permission">É necessário acesso ao armazenamento externo para ler o arquivo OPML</string>
   <string name="successful_import_label">Importação bem sucedida</string>
-  <string name="import_ok">Por favor, pressione OK para reiniciar o FocusPodcast</string>
-  <string name="import_no_downgrade">Este banco de dados foi exportado com uma versão mais recente do FocusPodcast. Sua instalação atual ainda não sabe como lidar com este arquivo.</string>
+  <string name="import_ok">Por favor, pressione OK para reiniciar o Yagi</string>
+  <string name="import_no_downgrade">Este banco de dados foi exportado com uma versão mais recente do Yagi. Sua instalação atual ainda não sabe como lidar com este arquivo.</string>
   <!--Sleep timer-->
   <string name="set_sleeptimer_label">Configura desligamento automático</string>
   <string name="disable_sleeptimer_label">Desabilita desligamento automático</string>
@@ -512,10 +511,10 @@
   <string name="gpodnetauth_host">Nome do servidor</string>
   <string name="gpodnetauth_select_server">Selecione o servidor</string>
   <string name="gpodnetauth_device_name">Nome do dispositivo</string>
-  <string name="gpodnetauth_device_name_default">FocusPodcast em %1$s</string>
+  <string name="gpodnetauth_device_name_default">Yagi em %1$s</string>
   <string name="gpodnetauth_existing_devices">Dispositivos existentes</string>
   <string name="gpodnetauth_create_device">Criar dispositivo</string>
-  <string name="gpodnetauth_finish_descr">Parabéns! Sua conta gpodder.net agora está conectada ao seu dispositivo. O FocusPodcast irá, daqui em diante, sincronizar automaticamente assinaturas do seu dispositivo com sua conta gpodder.net.</string>
+  <string name="gpodnetauth_finish_descr">Parabéns! Sua conta gpodder.net agora está conectada ao seu dispositivo. O Yagi irá, daqui em diante, sincronizar automaticamente assinaturas do seu dispositivo com sua conta gpodder.net.</string>
   <string name="gpodnetauth_finish_butsyncnow">Iniciar sincronização agora</string>
   <string name="gpodnetsync_error_title">gpodder.net: erro de sincronização</string>
   <string name="gpodnetsync_error_descr">Ocorreu um erro durante a sincronização:\u0020</string>
@@ -561,10 +560,10 @@
   <string name="episode_filters_hint">Palavras soltas \"Sequência de palavras\"</string>
   <string name="keep_updated">Manter atualizado</string>
   <string name="keep_updated_summary">Incluir este podcast ao atualizar (automaticamente) todos os podcasts</string>
-  <string name="auto_download_disabled_globally">O download automático está desativado nas configurações principais do FocusPodcast</string>
+  <string name="auto_download_disabled_globally">O download automático está desativado nas configurações principais do Yagi</string>
     <string name="statistics_space_used">Espaço utilizado:</string>
   <string name="statistics_view_all">Visualização para todos os podcasts »</string>
-  <!--FocusPodcastSP-->
+  <!--YagiSP-->
   <string name="sp_apps_importing_feeds_msg">Importando assinaturas de aplicativos de finalidade única...</string>
   <!--Add podcast fragment-->
   <string name="search_podcast_hint">Procurar podcast...</string>
@@ -577,7 +576,7 @@
   <string name="local_folder">Pasta local</string>
   <string name="reconnect_local_folder">Reconectar pasta local</string>
   <string name="reconnect_local_folder_warning">Em caso de negação de permissão, você pode usar isso para se reconectar exatamente à mesma pasta. Não selecione outra pasta.</string>
-  <string name="local_feed_description">Este podcast virtual foi criado adicionando uma pasta ao FocusPodcast.</string>
+  <string name="local_feed_description">Este podcast virtual foi criado adicionando uma pasta ao Yagi.</string>
   <string name="unable_to_start_system_file_manager">Incapaz de iniciar o gerenciador de arquivos do sistema</string>
   <string name="filter">Filtrar</string>
   <!--Sort-->

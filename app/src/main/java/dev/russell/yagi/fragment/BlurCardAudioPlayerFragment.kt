@@ -1,0 +1,90 @@
+package dev.russell.yagi.fragment
+
+import android.graphics.Bitmap
+import android.graphics.Color
+import android.graphics.PorterDuff
+import android.graphics.drawable.ColorDrawable
+import android.graphics.drawable.Drawable
+import android.os.Bundle
+import android.view.View
+import android.view.View.GONE
+import android.view.View.VISIBLE
+import androidx.core.content.ContextCompat
+import dev.russell.yagi.theme.util.TintHelper
+import dev.russell.yagi.theme.util.ToolbarContentTintHelper
+import dev.russell.yagi.common.extensions.applyColor
+import com.bumptech.glide.Glide
+import dev.russell.yagi.R
+import dev.russell.yagi.core.glide.GlideApp
+import dev.russell.yagi.core.glide.GlideRequest
+import dev.russell.yagi.core.pref.Prefs
+import dev.russell.yagi.event.CoverColorChangeEvent
+import dev.russell.yagi.glide.BlurTransformation
+import dev.russell.yagi.glide.crossfadeListener
+
+/**
+ * Known bug: when chapters are present, tapping the overflow menu and then switching the color has no effect; tapping overflow again fixes it.
+ */
+open class BlurCardAudioPlayerFragment : AudioPlayerFragment(false) {
+    override fun coverColorUpdate(event: CoverColorChangeEvent) {
+        super.coverColorUpdate(event)
+        lastPlaybackControlsColor = /*if(event.color.backgroundColor.isColorLight) colorControlNormal() else*/  Color.WHITE
+        lastDisabledPlaybackControlsColor = /*if(event.color.backgroundColor.isColorLight) colorControlNormal()
+        else*/ ContextCompat.getColor(requireContext(), R.color.md_grey_200)
+        gradientBackgroundEnabled = false
+        colorGradientBackground.visibility = GONE
+        colorBackground.visibility = VISIBLE
+        updateBlur(event.bitmap)
+        ToolbarContentTintHelper.colorizeToolbar(toolbar, lastPlaybackControlsColor, activity)
+
+        applyControlsColor(lastPlaybackControlsColor)
+        txtvPosition.setTextColor(lastPlaybackControlsColor)
+        txtvLength.setTextColor(lastPlaybackControlsColor)
+
+        event.coverViewHolder?.chapterTv?.setTextColor(lastDisabledPlaybackControlsColor)
+        event.coverViewHolder?.episodeTv?.setTextColor(lastPlaybackControlsColor)
+        event.coverViewHolder?.podcastTv?.setTextColor(lastDisabledPlaybackControlsColor)
+        event.coverViewHolder?.preChapterIv?.setColorFilter(lastPlaybackControlsColor, PorterDuff.Mode.SRC_IN)
+        event.coverViewHolder?.nextChapterIv?.setColorFilter(lastPlaybackControlsColor, PorterDuff.Mode.SRC_IN)
+
+        sbPosition.applyColor(Color.WHITE)
+        playPauseButton.apply {
+            TintHelper.setTintAuto(this, Color.WHITE, true)
+        }
+
+        //with this line there is a reproducible issue: setting a "custom color" during playback and coming back leaves the play button animation unfinished
+        TintHelper.setTintAuto(
+            butPlay,
+            Color.BLACK,
+            false
+        )
+
+        if (isFromScreenActivity) {
+            swipeUpIv.setColorFilter(lastDisabledPlaybackControlsColor, PorterDuff.Mode.SRC_IN)
+            swipeUpTipTv.setTextColor(lastDisabledPlaybackControlsColor)
+        }
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+    }
+    private var lastRequest: GlideRequest<Drawable>? = null
+
+
+
+    private fun updateBlur(bitmap: Bitmap?) {
+        // https://github.com/bumptech/glide/issues/527#issuecomment-148840717
+        GlideApp.with(this)
+            .load(bitmap)
+            .transform(
+                BlurTransformation.Builder(requireContext()).blurRadius(Prefs.blurAmount.toFloat())
+                    .build()
+            ).thumbnail(lastRequest)
+            .error(Glide.with(this).load(ColorDrawable(Color.DKGRAY)).fitCenter())
+            .also {
+                lastRequest = it.clone()
+                it.crossfadeListener()
+                    .into(colorBackground)
+            }
+    }
+}

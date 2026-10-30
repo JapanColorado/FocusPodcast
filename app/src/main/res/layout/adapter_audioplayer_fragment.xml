@@ -135,7 +135,7 @@
                 android:layoutDirection="ltr"
                 android:orientation="vertical">
 
-                <dev.russell.focuspodcast.view.AdMarkerSeekBar
+                <dev.russell.yagi.view.AdMarkerSeekBar
                     android:id="@+id/sbPosition"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"

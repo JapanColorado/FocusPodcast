@@ -55,7 +55,7 @@
 
                 <com.google.android.material.textview.MaterialTextView
                     android:id="@+id/txtvTitle"
-                    style="@style/FocusPodcast.TextView.ListItemPrimaryTitle2"
+                    style="@style/Yagi.TextView.ListItemPrimaryTitle2"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:maxLines="2"
@@ -72,7 +72,7 @@
 
                 <com.google.android.material.textview.MaterialTextView
                     android:id="@+id/txtvPubDate"
-                    style="@style/FocusPodcast.TextView.ListItemSecondaryTitle"
+                    style="@style/Yagi.TextView.ListItemSecondaryTitle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textColor="?third_text_color"
@@ -80,7 +80,7 @@
 
                 <com.google.android.material.textview.MaterialTextView
                     android:id="@+id/separatorIcons"
-                    style="@style/FocusPodcast.TextView.ListItemSecondaryTitle"
+                    style="@style/Yagi.TextView.ListItemSecondaryTitle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="4dp"
@@ -94,7 +94,7 @@
 
                 <com.google.android.material.textview.MaterialTextView
                     android:id="@+id/txtvAuthor"
-                    style="@style/FocusPodcast.TextView.ListItemSecondaryTitle"
+                    style="@style/Yagi.TextView.ListItemSecondaryTitle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:ellipsize="middle"
@@ -103,7 +103,7 @@
                     tools:background="@android:color/holo_green_dark"
                     tools:text="author" />
 
-                <dev.russell.focuspodcast.common.views.AccentImageView
+                <dev.russell.yagi.common.views.AccentImageView
                     android:id="@+id/ivIsVideo"
                     android:visibility="gone"
                     tools:visibility="visible"
@@ -130,7 +130,7 @@
 
         </LinearLayout>
 
-        <dev.russell.focuspodcast.view.PlayPauseProgressButton
+        <dev.russell.yagi.view.PlayPauseProgressButton
             android:id="@+id/subscribe_button"
             style="@style/Widget_PlayerFM_PlayPauseButton"
             android:layout_width="48dp"

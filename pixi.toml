@@ -1,6 +1,6 @@
 [workspace]
-name = "focuspodcast"
-description = "FocusPodcast Android app: build, test and lint tasks"
+name = "yagi"
+description = "Yagi Android app: build, test and lint tasks"
 channels = ["conda-forge"]
 platforms = ["linux-64"]
 
@@ -19,8 +19,8 @@ build = { cmd = "./gradlew assembleRelease", depends-on = ["check-env"], descrip
 build-debug = { cmd = "./gradlew assembleDebug", depends-on = ["check-env"], description = "Assemble the debug APK" }
 install = { cmd = "bash scripts/install.sh release", depends-on = ["build"], description = "Build and install the release APK on the connected adb device (needs secrets.properties)" }
 install-debug = { cmd = "bash scripts/install.sh debug", depends-on = ["build-debug"], description = "Build and install the debug APK on the connected adb device" }
-run = { cmd = "adb shell am start -n dev.russell.focuspodcast/dev.russell.focuspodcast.activity.SplashActivity", depends-on = ["install"], description = "Install the release APK and launch it" }
-run-debug = { cmd = "adb shell am start -n dev.russell.focuspodcast.debug/dev.russell.focuspodcast.activity.SplashActivity", depends-on = ["install-debug"], description = "Install the debug APK and launch it" }
+run = { cmd = "adb shell am start -n dev.russell.yagi/dev.russell.yagi.activity.SplashActivity", depends-on = ["install"], description = "Install the release APK and launch it" }
+run-debug = { cmd = "adb shell am start -n dev.russell.yagi.debug/dev.russell.yagi.activity.SplashActivity", depends-on = ["install-debug"], description = "Install the debug APK and launch it" }
 clean = { cmd = "./gradlew clean", description = "Delete all Gradle build outputs" }
 
 # Verification
@@ -31,4 +31,4 @@ detekt = { cmd = "./gradlew detekt", depends-on = ["check-env"], description = "
 check = { depends-on = ["build-debug", "test", "lint", "nn", "detekt"], description = "Everything CI would run" }
 
 # Device inspection
-logs = { cmd = "adb logcat --pid=$(adb shell pidof -s dev.russell.focuspodcast)", description = "Logcat for the running release app" }
+logs = { cmd = "adb logcat --pid=$(adb shell pidof -s dev.russell.yagi)", description = "Logcat for the running release app" }

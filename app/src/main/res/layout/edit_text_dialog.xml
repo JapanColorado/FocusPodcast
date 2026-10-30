@@ -5,17 +5,17 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:padding="16dp">
-    <dev.russell.focuspodcast.common.views.AccentTextInputLayout
+    <dev.russell.yagi.common.views.AccentTextInputLayout
         style="?attr/textInputOutlinedDenseStyle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:hintEnabled="true">
-    <dev.russell.focuspodcast.common.views.CursorAccentTextInputEditText
+    <dev.russell.yagi.common.views.CursorAccentTextInputEditText
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:inputType="text"
             android:ems="10"
             android:id="@+id/urlEditText" />
-    </dev.russell.focuspodcast.common.views.AccentTextInputLayout>
+    </dev.russell.yagi.common.views.AccentTextInputLayout>
 
 </LinearLayout>

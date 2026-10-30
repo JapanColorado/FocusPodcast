@@ -14,7 +14,7 @@
         <com.google.android.material.appbar.AppBarLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
-        <dev.russell.focuspodcast.core.view.TopAppBarLayout
+        <dev.russell.yagi.core.view.TopAppBarLayout
             android:id="@+id/appBarLayout"
             style="?appBarLayoutStyle"
             android:layout_width="match_parent"
@@ -24,7 +24,7 @@
             android:theme="@style/CenteredCheckBoxTheme" />
 
 
-        <dev.russell.focuspodcast.view.TagsSectionView
+        <dev.russell.yagi.view.TagsSectionView
             app:layout_scrollFlags="scroll|enterAlways"
             android:background="?colorSurface"
             android:id="@+id/tags_view"
@@ -76,7 +76,7 @@
             tools:text="Error message"
             tools:visibility="visible" />
 
-        <dev.russell.focuspodcast.common.views.AccentMaterialButton
+        <dev.russell.yagi.common.views.AccentMaterialButton
             android:id="@+id/butRetry"
             style="@style/Widget.Material3.Button"
             android:layout_width="wrap_content"

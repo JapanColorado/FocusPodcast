@@ -1,20 +1,20 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
 
-    <style name="Theme.FocusPodcast.FollowSystem" parent="Theme.FocusPodcast.Base.Adaptive">
+    <style name="Theme.Yagi.FollowSystem" parent="Theme.Yagi.Base.Adaptive">
         <item name="android:statusBarColor">@android:color/transparent</item>
     </style>
 
 
-    <style name="Theme.FocusPodcast.MD3" parent="@style/Theme.Material3.DayNight.NoActionBar">
+    <style name="Theme.Yagi.MD3" parent="@style/Theme.Material3.DayNight.NoActionBar">
         <item name="roundSelector">@drawable/round_selector</item>
         <item name="rectSelector">@drawable/rect_selector</item>
         <item name="materialCardViewStyle">@style/Widget.Material3.CardView.Elevated</item>
         <item name="materialButtonStyle">@style/MaterialButtonTheme</item>
     </style>
 
-    <style name="Theme.FocusPodcast.Notification" parent="@android:style/TextAppearance.StatusBar.EventContent" />
+    <style name="Theme.Yagi.Notification" parent="@android:style/TextAppearance.StatusBar.EventContent" />
 
-    <style name="Theme.FocusPodcast.Notification.Title" parent="@android:style/TextAppearance.StatusBar.EventContent.Title" />
+    <style name="Theme.Yagi.Notification.Title" parent="@android:style/TextAppearance.StatusBar.EventContent.Title" />
 
     <style name="OverFlowButton">
         <item name="srcCompat">@drawable/ic_more_vert</item>
@@ -264,7 +264,7 @@
         <item name="cornerSizeBottomRight">16dp</item>
     </style>
 
-    <style name="Theme.FocusPodcast.Dialog" parent="Theme.Material3.DayNight.Dialog">
+    <style name="Theme.Yagi.Dialog" parent="Theme.Material3.DayNight.Dialog">
         <item name="windowNoTitle">true</item>
         <item name="android:windowIsFloating">true</item>
         <item name="android:windowIsTranslucent">true</item>
@@ -280,7 +280,7 @@
         </item>
     </style>
 
-    <style name="Theme.AppWidget" parent="Theme.FocusPodcast.FollowSystem" />
+    <style name="Theme.AppWidget" parent="Theme.Yagi.FollowSystem" />
 
     <style name="aboutSettingsContainer">
         <item name="android:background">?attr/rectSelector</item>

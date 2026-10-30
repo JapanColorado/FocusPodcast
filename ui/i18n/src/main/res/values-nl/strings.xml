@@ -384,7 +384,7 @@
   <string name="synchronization_full_sync_title">Volledige synchronisatie afdwingen</string>
   <string name="synchronization_login_status"><![CDATA[Ingelogd als <i>%1$s</i> op <i>%2$s</i>. <br/><br/>Na het uitloggen kun je een synchronizatiedienst kiezen]]></string>
   <string name="synchronization_summary_unchoosen">Er is keuze uit meerdere aanbieders om de abonnementen en aflevering-stand mee te synchroniseren</string>
-    <string name="synchronization_nextcloud_authenticate_browser">Verleen toegang in de geopende webbrowser en keer terug naar FocusPodcast.</string>
+    <string name="synchronization_nextcloud_authenticate_browser">Verleen toegang in de geopende webbrowser en keer terug naar Yagi.</string>
   <string name="synchronization_choose_title">Kies een synchronisatiedienst</string>
   <string name="synchronization_force_sync_summary">Alle abonnementen en afspeelstatussen opnieuw synchroniseren</string>
   <string name="synchronization_sync_summary">Alle gewijzigde abonnementen en afspeelstatussen opnieuw synchroniseren</string>
@@ -417,7 +417,6 @@
   <string name="enqueue_location_front">Begin</string>
   <string name="enqueue_location_after_current">Na huidige aflevering</string>
   <string name="pref_smart_mark_as_played_disabled">Uitgeschakeld</string>
-  <string name="documentation_support">Documentatie en ondersteuning</string>
     <string name="bug_report_title">Bug melden</string>
     <string name="copy_to_clipboard">Kopiëren naar klembord</string>
   <string name="copied_to_clipboard">Gekopieerd naar het klembord</string>
@@ -435,7 +434,7 @@
   <string name="back_button_open_drawer">Navigatielade openen</string>
   <string name="back_button_double_tap">Dubbeltik om af te sluiten</string>
   <string name="back_button_show_prompt">Afsluiten bevestigen</string>
-  <string name="close_prompt">FocusPodcast afsluiten?</string>
+  <string name="close_prompt">Yagi afsluiten?</string>
   <string name="double_tap_toast">Tik nogmaals op de terugknop om af te sluiten</string>
   <string name="pref_delete_removes_from_queue_title">Afleveringen verwijderen uit wachtrij na wissen</string>
   <string name="pref_delete_removes_from_queue_sum">Verwijder een aflevering uit de wachtrij als de aflevering in kwestie is verwijderd.</string>
@@ -465,8 +464,8 @@
   <!--import and export-->
   <string name="opml_export_summary">Abonnementen overzetten naar een andere podcast-app</string>
   <string name="opml_import_summary">Abonnementen importeren uit andere podcast-app</string>
-  <string name="database_export_summary">Abonnementen, beluisterde afleveringen en wachtrij overzetten naar FocusPodcast op een ander toestel</string>
-  <string name="database_import_summary">FocusPodcast database van een ander toestel importeren</string>
+  <string name="database_export_summary">Abonnementen, beluisterde afleveringen en wachtrij overzetten naar Yagi op een ander toestel</string>
+  <string name="database_import_summary">Yagi database van een ander toestel importeren</string>
   <string name="opml_import_label">OPML importeren</string>
   <string name="opml_add_podcast_label">Podcastlijst (opml) importeren</string>
   <string name="opml_reader_error">Er is iets misgegaan tijdens het lezen van het OPML-bestand:</string>
@@ -482,8 +481,8 @@
   <string name="export_success_title">Geëxporteerd</string>
     <string name="opml_import_ask_read_permission">Toegang tot externe locaties is nodig om het OPML-bestand te kunnen lezen</string>
   <string name="successful_import_label">Importeren voltooid</string>
-  <string name="import_ok">Druk op \'Oké\' om FocusPodcast opnieuw te starten.</string>
-  <string name="import_no_downgrade">Deze database is geëxporteerd door een nieuwere versie van FocusPodcast. Je huidige versie weet nog niet hoe daar mee om te gaan.</string>
+  <string name="import_ok">Druk op \'Oké\' om Yagi opnieuw te starten.</string>
+  <string name="import_no_downgrade">Deze database is geëxporteerd door een nieuwere versie van Yagi. Je huidige versie weet nog niet hoe daar mee om te gaan.</string>
   <!--Sleep timer-->
   <string name="set_sleeptimer_label">Slaaptimer instellen</string>
   <string name="disable_sleeptimer_label">Slaaptimer uitschakelen</string>
@@ -522,10 +521,10 @@
   <string name="gpodnetauth_host">Hostnaam</string>
   <string name="gpodnetauth_select_server">Server kiezen</string>
   <string name="gpodnetauth_device_name">Toestelnaam</string>
-  <string name="gpodnetauth_device_name_default">FocusPodcast op %1$s</string>
+  <string name="gpodnetauth_device_name_default">Yagi op %1$s</string>
   <string name="gpodnetauth_existing_devices">Bestaande apparaten</string>
   <string name="gpodnetauth_create_device">Toestel toevoegen</string>
-  <string name="gpodnetauth_finish_descr">Gefeliciteerd! Je gpodder.net-account is nu gekoppeld aan je toestel. FocusPodcast synchroniseert voortaan de abonnementen op je toestel automatisch met je gpodder.net-account</string>
+  <string name="gpodnetauth_finish_descr">Gefeliciteerd! Je gpodder.net-account is nu gekoppeld aan je toestel. Yagi synchroniseert voortaan de abonnementen op je toestel automatisch met je gpodder.net-account</string>
   <string name="gpodnetauth_finish_butsyncnow">Nu synchroniseren</string>
   <string name="gpodnetsync_error_title">gpodder.net - synchronisatiefout</string>
   <string name="gpodnetsync_error_descr">Er is een fout opgetreden tijdens het synchroniseren:\u0020</string>
@@ -573,10 +572,10 @@
   <string name="episode_filters_hint">Losse woorden \"Meerdere tussen aanhalingstekens\"</string>
   <string name="keep_updated">Bijgewerkt houden</string>
   <string name="keep_updated_summary">Deze podcast meenemen bij het (automatisch) verversen van alle podcasts</string>
-  <string name="auto_download_disabled_globally">Automatisch downloaden is uitgeschakeld in de FocusPodcast-instellingen</string>
+  <string name="auto_download_disabled_globally">Automatisch downloaden is uitgeschakeld in de Yagi-instellingen</string>
   <string name="statistics_space_used">Gebruikte ruimte:</string>
     <string name="statistics_view_all">Alle podcasts tonen »</string>
-  <!--FocusPodcastSP-->
+  <!--YagiSP-->
   <string name="sp_apps_importing_feeds_msg">Bezig met importeren van abonnementen uit eenmalige apps...</string>
   <!--Add podcast fragment-->
   <string name="search_podcast_hint">Podcast zoeken...</string>
@@ -589,7 +588,7 @@
   <string name="local_folder">Lokale map</string>
   <string name="reconnect_local_folder">Lokale map opnieuw koppelen</string>
   <string name="reconnect_local_folder_warning">Als je geen rechten hebt, gebruik dan dit om de map opnieuw te koppelen. Kies geen andere map.</string>
-  <string name="local_feed_description">De virtuele podcast is aangemaakt door een aan FocusPodcast toegevoegde map.</string>
+  <string name="local_feed_description">De virtuele podcast is aangemaakt door een aan Yagi toegevoegde map.</string>
   <string name="unable_to_start_system_file_manager">De bestandsbeheerder-app kan niet worden geopend</string>
   <string name="filter">Filter</string>
   <!--Sort-->

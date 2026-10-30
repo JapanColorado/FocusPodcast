@@ -1,14 +1,14 @@
 {
   "project_info": {
     "project_number": "000000000000",
-    "project_id": "focuspodcast-dev-placeholder",
-    "storage_bucket": "focuspodcast-dev-placeholder.appspot.com"
+    "project_id": "yagi-dev-placeholder",
+    "storage_bucket": "yagi-dev-placeholder.appspot.com"
   },
   "client": [
     {
       "client_info": {
         "mobilesdk_app_id": "1:000000000000:android:0000000000000000",
-        "android_client_info": { "package_name": "dev.russell.focuspodcast" }
+        "android_client_info": { "package_name": "dev.russell.yagi" }
       },
       "oauth_client": [],
       "api_key": [ { "current_key": "AIzaSyDUMMY_KEY_FOR_LOCAL_BUILD_ONLY_000000" } ],

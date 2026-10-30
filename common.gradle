@@ -15,7 +15,7 @@ android {
         vectorDrawables.useSupportLibrary = true
         vectorDrawables.generatedDensities = []
 
-        testApplicationId = "dev.russell.focuspodcast.core.tests"
+        testApplicationId = "dev.russell.yagi.core.tests"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 

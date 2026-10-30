@@ -9,7 +9,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <dev.russell.focuspodcast.core.view.TopAppBarLayout
+        <dev.russell.yagi.core.view.TopAppBarLayout
             android:id="@+id/appBarLayout"
             style="?appBarLayoutStyle"
             android:layout_width="match_parent"
@@ -33,7 +33,7 @@
                 tools:listitem="@layout/audiobook_item" />
         </FrameLayout>
 
-        <dev.russell.focuspodcast.common.views.AccentFloatingActionButton
+        <dev.russell.yagi.common.views.AccentFloatingActionButton
             android:id="@+id/audiobooksAdd"
             style="@style/Widget.Material3.FloatingActionButton.Primary"
             android:layout_width="56dp"

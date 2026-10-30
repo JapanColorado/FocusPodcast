@@ -8,7 +8,7 @@
     android:paddingHorizontal="20dp"
     android:paddingTop="8dp">
 
-    <dev.russell.focuspodcast.common.views.AccentTextInputLayout
+    <dev.russell.yagi.common.views.AccentTextInputLayout
         android:id="@+id/bookmarkNoteLayout"
         style="?attr/textInputOutlinedDenseStyle"
         android:layout_width="match_parent"
@@ -16,7 +16,7 @@
         android:hint="@string/bookmark_note_hint"
         app:hintEnabled="true">
 
-        <dev.russell.focuspodcast.common.views.CursorAccentTextInputEditText
+        <dev.russell.yagi.common.views.CursorAccentTextInputEditText
             android:id="@+id/bookmarkNote"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -24,6 +24,6 @@
             android:inputType="textMultiLine|textCapSentences"
             android:maxLines="6"
             android:minLines="2" />
-    </dev.russell.focuspodcast.common.views.AccentTextInputLayout>
+    </dev.russell.yagi.common.views.AccentTextInputLayout>
 
 </LinearLayout>

@@ -10,7 +10,7 @@
         android:orientation="vertical">
 
         <!-- colorSurface may be overridden, so adding this background actually looks wrong -->
-        <dev.russell.focuspodcast.common.views.AccentTabLayout
+        <dev.russell.yagi.common.views.AccentTabLayout
             android:id="@+id/sliding_tabs"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

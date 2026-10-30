@@ -26,7 +26,7 @@
     android:paddingEnd="0dp"
     tools:gravity="start|center_vertical">
 
-    <dev.russell.focuspodcast.common.common.views.AccentCheckbox
+    <dev.russell.yagi.common.common.views.AccentCheckbox
         android:id="@+id/checkbox"
         style="@style/Widget.Material3.CompoundButton.CheckBox"
         android:layout_width="wrap_content"

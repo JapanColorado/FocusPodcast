@@ -292,7 +292,7 @@
   <string name="playback_error_source">Prieiga prie medijos failo negalima</string>
   <string name="playback_error_unknown">Nežinoma klaida</string>
   <string name="no_media_playing_label">Atkūrimas nevyksta</string>
-  <string name="unknown_media_key">„FocusPodcast“ – nežinomas medijos klavišas: %1$d</string>
+  <string name="unknown_media_key">„Yagi“ – nežinomas medijos klavišas: %1$d</string>
   <string name="error_file_not_found">Failas nerastas</string>
   <string name="no_media_label">Elementas neturi medijos failo</string>
   <!--Queue operations-->
@@ -414,7 +414,7 @@
   <string name="synchronization_full_sync_title">Priverstinis pilnas sinchronizavimas</string>
   <string name="synchronization_login_status"><![CDATA[Prisijungta kaip <i>%1$s</i> <i>%2$s</i> serveryje. <br/><br/>Atsijungę vėl galėsite pasirinkti sinchronizavimo teikėją]]></string>
   <string name="synchronization_summary_unchoosen">Galite pasirinkti iš keleto teikėjų prenumeratų ir epizodų atkūrimo būsenai sinchronizuoti</string>
-    <string name="synchronization_nextcloud_authenticate_browser">Suteikite prieigą atsivėrusioje interneto naršyklėje ir sugrįžkite į „FocusPodcast“.</string>
+    <string name="synchronization_nextcloud_authenticate_browser">Suteikite prieigą atsivėrusioje interneto naršyklėje ir sugrįžkite į „Yagi“.</string>
   <string name="synchronization_choose_title">Pasirinkite sinchronizavimo teikėją</string>
   <string name="synchronization_force_sync_summary">Sinchronizuoti visų prenumeratų ir epizodų būsenas iš naujo</string>
   <string name="synchronization_sync_summary">Sinchronizuoti prenumeratų ir epizodų būsenų pokyčius</string>
@@ -447,7 +447,6 @@
   <string name="enqueue_location_front">Į pradžią</string>
   <string name="enqueue_location_after_current">Po dabartinio epizodo</string>
   <string name="pref_smart_mark_as_played_disabled">Išjungtas</string>
-  <string name="documentation_support">Dokumentacija ir palaikymas</string>
     <string name="bug_report_title">Pranešti apie klaidą</string>
     <string name="copy_to_clipboard">Kopijuoti į iškarpinę</string>
   <string name="copied_to_clipboard">Nukopijuotas į iškarpinę</string>
@@ -465,7 +464,7 @@
   <string name="back_button_open_drawer">Atverti naršymo stalčių</string>
   <string name="back_button_double_tap">Palietus dukart - išeiti</string>
   <string name="back_button_show_prompt">Patvirtinti išėjimą</string>
-  <string name="close_prompt">Ar tikrai norite užverti „FocusPodcast“?</string>
+  <string name="close_prompt">Ar tikrai norite užverti „Yagi“?</string>
   <string name="double_tap_toast">Jei norite išeiti, dar kartą palieskite grįžimo mygtuką</string>
   <string name="pref_delete_removes_from_queue_title">Ištrynus pašalinti iš eilės</string>
   <string name="pref_delete_removes_from_queue_sum">Ištrynus epizodą automatiškai pašalinti jį iš eilės</string>
@@ -495,8 +494,8 @@
   <!--import and export-->
   <string name="opml_export_summary">Perkelti prenumeratas į kitą tinklalaidžių programėlę</string>
   <string name="opml_import_summary">Importuoti prenumeratas iš kitos tinklalaidžių programėlės</string>
-  <string name="database_export_summary">Perkelti prenumeratas, perklausytus epizodus ir eilę į „FocusPodcast“ kitame įrenginyje</string>
-  <string name="database_import_summary">Importuoti „FocusPodcast“ duomenų bazę iš kito įrenginio</string>
+  <string name="database_export_summary">Perkelti prenumeratas, perklausytus epizodus ir eilę į „Yagi“ kitame įrenginyje</string>
+  <string name="database_import_summary">Importuoti „Yagi“ duomenų bazę iš kito įrenginio</string>
   <string name="opml_import_label">OPML importas</string>
   <string name="opml_add_podcast_label">Importuoti tinklalaidžių sąrašą (OPML)</string>
   <string name="opml_reader_error">Skaitant OPML failą įvyko klaida:</string>
@@ -512,8 +511,8 @@
   <string name="export_success_title">Sėkmingai eksportuota</string>
     <string name="opml_import_ask_read_permission">Norint nuskaityti OPML failą reikalinga prieiga prie išorinės laikmenos</string>
   <string name="successful_import_label">Sėkmingai importuota</string>
-  <string name="import_ok">Spauskite „OK“, kad paleisti „FocusPodcast“ iš naujo</string>
-  <string name="import_no_downgrade">Ši duomenų bazė buvo eksportuota naudojant naujesnę „FocusPodcast“ versija. Dabartinė įdiegtis nežino, kaip apdorotį šį failą.</string>
+  <string name="import_ok">Spauskite „OK“, kad paleisti „Yagi“ iš naujo</string>
+  <string name="import_no_downgrade">Ši duomenų bazė buvo eksportuota naudojant naujesnę „Yagi“ versija. Dabartinė įdiegtis nežino, kaip apdorotį šį failą.</string>
   <!--Sleep timer-->
   <string name="set_sleeptimer_label">Nustatyti miego laikmatį</string>
   <string name="disable_sleeptimer_label">Išjungti miego laikmatį</string>
@@ -558,10 +557,10 @@
   <string name="gpodnetauth_host">Serverio adresas</string>
   <string name="gpodnetauth_select_server">Pasirinkti serverį</string>
   <string name="gpodnetauth_device_name">Įrenginio pavadinimas</string>
-  <string name="gpodnetauth_device_name_default">„FocusPodcast“ %1$s įrenginyje</string>
+  <string name="gpodnetauth_device_name_default">„Yagi“ %1$s įrenginyje</string>
   <string name="gpodnetauth_existing_devices">Esami įrenginiai</string>
   <string name="gpodnetauth_create_device">Sukurti įrenginį</string>
-  <string name="gpodnetauth_finish_descr">Sveikiname! Jūsų „gpodder.net“ paskyra susieta su šiuo įrenginiu. Nuo šiol „FocusPodcast“ automatiškai sinchronizuos prenumeratas šiame įrenginyje su Jūsų „gpodder.net“ paskyra.</string>
+  <string name="gpodnetauth_finish_descr">Sveikiname! Jūsų „gpodder.net“ paskyra susieta su šiuo įrenginiu. Nuo šiol „Yagi“ automatiškai sinchronizuos prenumeratas šiame įrenginyje su Jūsų „gpodder.net“ paskyra.</string>
   <string name="gpodnetauth_finish_butsyncnow">Pradėti sinchronizavimą dabar</string>
   <string name="gpodnetsync_error_title">„gpodder.net“ sinchronizavimo klaida</string>
   <string name="gpodnetsync_error_descr">Sinchronizavimo metu įvyko klaida:\u0020</string>
@@ -609,10 +608,10 @@
   <string name="episode_filters_hint">Pavieniai žodžiai \"frazės kabutėse\"</string>
   <string name="keep_updated">Pastoviai atnaujinti</string>
   <string name="keep_updated_summary">Įtraukti šią tinklalaidę į (automatinį) visų tinklalaidžių atnaujinimą</string>
-  <string name="auto_download_disabled_globally">Automatinis atsiuntimas išjungtas pagrindiniuose „FocusPodcast“ nustatymuose</string>
+  <string name="auto_download_disabled_globally">Automatinis atsiuntimas išjungtas pagrindiniuose „Yagi“ nustatymuose</string>
   <string name="statistics_space_used">Naudojama disko vieta:</string>
     <string name="statistics_view_all">Žiūrėti visoms tinklalaidėms »</string>
-  <!--FocusPodcastSP-->
+  <!--YagiSP-->
   <string name="sp_apps_importing_feeds_msg">Įkeliamos prenumeratos iš specializuotų programėlių...</string>
   <!--Add podcast fragment-->
   <string name="search_podcast_hint">Ieškoti tinklalaidės...</string>
@@ -625,7 +624,7 @@
   <string name="local_folder">Vietinis aplankas</string>
   <string name="reconnect_local_folder">Prijungti vietinį aplanką iš naujo</string>
   <string name="reconnect_local_folder_warning">Atmetus leidimą, galite naudoti tai prijungti tam pačiam aplankui. Nenustatykite kito aplanko.</string>
-  <string name="local_feed_description">Ši virtuali tinklalaidė sukurta į „FocusPodcast“ pridėjus aplanką.</string>
+  <string name="local_feed_description">Ši virtuali tinklalaidė sukurta į „Yagi“ pridėjus aplanką.</string>
   <string name="unable_to_start_system_file_manager">Nepavyko paleisti sistemos failų tvarkytuvės</string>
   <string name="filter">Filtruoti</string>
   <!--Sort-->

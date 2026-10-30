@@ -3,17 +3,17 @@ How to report a bug
 - Before anything else, please make sure you are on the latest version, the bug you are experiencing may have been fixed already!
 - Use the search function to see if someone else has already submitted the same bug report.
 - Try to describe the problem with as much detail as possible.
-- Some bugs may only occur on certain devices or versions of Android. Please add information about your device and the version of Android that is running on it (you can look these up under `Settings → About Phone`), as well as which version of FocusPodcast you are using.
+- Some bugs may only occur on certain devices or versions of Android. Please add information about your device and the version of Android that is running on it (you can look these up under `Settings → About Phone`), as well as which version of Yagi you are using.
 - If the bug only seems to occur with a certain podcast, please include the URL of that podcast.
 - If possible, add instructions on how to reproduce the bug.
-- If possible, add a logfile to your post. This is especially useful if the bug makes the application crash. FocusPodcast has an `report bug` feature for this.
+- If possible, add a logfile to your post. This is especially useful if the bug makes the application crash. Yagi has an `report bug` feature for this.
 - Usually, you can take a screenshot of your smartphone by pressing *Power* + *Volume down* for a few seconds.
 - Please use the following **[template](../../issues/new?labels=Type%3A+Possible+bug&template=bug_report.yml)**.
 
 
 How to submit a feature request
 -------------------------------
-- Make sure you are using the latest version of FocusPodcast. Perhaps the feature you are looking for has already been implemented.
+- Make sure you are using the latest version of Yagi. Perhaps the feature you are looking for has already been implemented.
 - Use the search function to see if someone else has already submitted the same feature request. If there is another request already, please upvote the first post instead of commenting something like "I also want this".
 - To make it easier for us to keep track of requests, please only make one feature request per issue.
 - Give a brief explanation about the problem that may currently exist and how your requested feature solves this problem.

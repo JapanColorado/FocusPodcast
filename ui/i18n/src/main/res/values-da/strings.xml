@@ -384,7 +384,7 @@
   <string name="synchronization_full_sync_title">Fremtving fuld synkronisering</string>
   <string name="synchronization_login_status"><![CDATA[Logget ind som <i>%1$s</i> på <i>%2$s</i>. <br/><br/>Du kan vælge din synkroniseringsudbyder igen, når du har logget ud]]></string>
   <string name="synchronization_summary_unchoosen">Du kan vælge mellem flere udbydere til at synkronisere dine abonnementer og afspilningsstatus for afsnit med</string>
-  <string name="synchronization_nextcloud_authenticate_browser">Giv adgang ved hjælp af den åbne internetbrowser, og vend tilbage til FocusPodcast.</string>
+  <string name="synchronization_nextcloud_authenticate_browser">Giv adgang ved hjælp af den åbne internetbrowser, og vend tilbage til Yagi.</string>
   <string name="synchronization_choose_title">Vælg synkroniseringsudbyder</string>
   <string name="synchronization_force_sync_summary">Re-synkroniser alle abonnementer og afspilningsstatus for afsnit</string>
   <string name="synchronization_sync_summary">Synkroniser ændringer i abonnement og afsnitstilstand</string>
@@ -417,7 +417,6 @@
   <string name="enqueue_location_front">Starten</string>
   <string name="enqueue_location_after_current">Efter aktuelt afsnit</string>
   <string name="pref_smart_mark_as_played_disabled">Slået fra</string>
-  <string name="documentation_support">Dokumentation &amp; Support</string>
     <string name="bug_report_title">Rapportér fejl i appen</string>
     <string name="copy_to_clipboard">Kopier til udklipsholder</string>
   <string name="copied_to_clipboard">Kopieret til udklipsholder</string>
@@ -435,7 +434,7 @@
   <string name="back_button_open_drawer">Åbn navigationsskuffen</string>
   <string name="back_button_double_tap">Dobbelttryk for at afslutte</string>
   <string name="back_button_show_prompt">Bekræft for at afslutte</string>
-  <string name="close_prompt">Er du sikker på at du vil lukke FocusPodcast?</string>
+  <string name="close_prompt">Er du sikker på at du vil lukke Yagi?</string>
   <string name="double_tap_toast">Tryk på tilbageknappen igen for at afslutte</string>
   <string name="pref_delete_removes_from_queue_title">Slet fjerner fra kø</string>
   <string name="pref_delete_removes_from_queue_sum">Fjern automatisk afsnit fra køen, når det slettes.</string>
@@ -465,8 +464,8 @@
   <!--import and export-->
   <string name="opml_export_summary">Flyt abonnementer til anden podcast program</string>
   <string name="opml_import_summary">Importér dine abonnementer fra et andet podcast-program</string>
-  <string name="database_export_summary">Flyt abonnementer, aflyttede afsnit og kø til FocusPodcast på en anden enhed</string>
-  <string name="database_import_summary">Importér FocusPodcast-database fra en anden enhed</string>
+  <string name="database_export_summary">Flyt abonnementer, aflyttede afsnit og kø til Yagi på en anden enhed</string>
+  <string name="database_import_summary">Importér Yagi-database fra en anden enhed</string>
   <string name="opml_import_label">OPML-import</string>
   <string name="opml_add_podcast_label">Importér podcastliste (OPML)</string>
   <string name="opml_reader_error">Der opstod en fejl, da OPML-dokumentet blev forsøgt indlæst:</string>
@@ -482,8 +481,8 @@
   <string name="export_success_title">Eksport lykkedes</string>
     <string name="opml_import_ask_read_permission">Adgang til eksternt lager er påkrævet for at læse OPML-filen</string>
   <string name="successful_import_label">Importeret</string>
-  <string name="import_ok">Tryk venligst OK for at genstarte FocusPodcast</string>
-  <string name="import_no_downgrade">Databasen blev eksporteret fra en nyere version af FocusPodcast. Din nuværende installation ved endnu ikke hvordan den skal håndtere denne fil.</string>
+  <string name="import_ok">Tryk venligst OK for at genstarte Yagi</string>
+  <string name="import_no_downgrade">Databasen blev eksporteret fra en nyere version af Yagi. Din nuværende installation ved endnu ikke hvordan den skal håndtere denne fil.</string>
   <!--Sleep timer-->
   <string name="set_sleeptimer_label">Indstil søvntimer</string>
   <string name="disable_sleeptimer_label">Slå søvntimer fra</string>
@@ -522,10 +521,10 @@
   <string name="gpodnetauth_host">Værtsnavn</string>
   <string name="gpodnetauth_select_server">Vælg server</string>
   <string name="gpodnetauth_device_name">Enhedsnavn</string>
-  <string name="gpodnetauth_device_name_default">FocusPodcast på %1$s</string>
+  <string name="gpodnetauth_device_name_default">Yagi på %1$s</string>
   <string name="gpodnetauth_existing_devices">Eksisterende enheder</string>
   <string name="gpodnetauth_create_device">Opret ny enhed</string>
-  <string name="gpodnetauth_finish_descr">Tillykke! Din gpodder.net-konto er nu forbundet med din enhed. FocusPodcast vil fra nu af automatisk synkronisere dine abonnementer på din enhed med din gpodder.net-konto.</string>
+  <string name="gpodnetauth_finish_descr">Tillykke! Din gpodder.net-konto er nu forbundet med din enhed. Yagi vil fra nu af automatisk synkronisere dine abonnementer på din enhed med din gpodder.net-konto.</string>
   <string name="gpodnetauth_finish_butsyncnow">Start synkronisering nu</string>
   <string name="gpodnetsync_error_title">gpodder.net-synkroniseringsfejl</string>
   <string name="gpodnetsync_error_descr">En fejl opstod under synkronisering:\u0020</string>
@@ -573,10 +572,10 @@
   <string name="episode_filters_hint">Enkelte ord \"Flere ord\"</string>
   <string name="keep_updated">Hold opdateret</string>
   <string name="keep_updated_summary">Inkludere denne podcast når alle podcast genindlæses</string>
-  <string name="auto_download_disabled_globally">Automatisk download slået fra i de generelle FocusPodcast indstilinger</string>
+  <string name="auto_download_disabled_globally">Automatisk download slået fra i de generelle Yagi indstilinger</string>
   <string name="statistics_space_used">Plads brugt:</string>
     <string name="statistics_view_all">Vis for alle podcasts »</string>
-  <!--FocusPodcastSP-->
+  <!--YagiSP-->
   <string name="sp_apps_importing_feeds_msg">Importerer abonnementer fra enkeltformålsapps…</string>
   <!--Add podcast fragment-->
   <string name="search_podcast_hint">Søg efter podcast ...</string>
@@ -589,7 +588,7 @@
   <string name="local_folder">Lokal mappe</string>
   <string name="reconnect_local_folder">Genforbind lokal mappe</string>
   <string name="reconnect_local_folder_warning">I tilfælde af nægtelse af tilladelse kan du bruge denne til at forbinde til præcis den samme mappe. Vælg ikke en anden mappe.</string>
-  <string name="local_feed_description">Denne virtuelle podcast blev oprettet ved at en mappe blev føjet til FocusPodcast.</string>
+  <string name="local_feed_description">Denne virtuelle podcast blev oprettet ved at en mappe blev føjet til Yagi.</string>
   <string name="unable_to_start_system_file_manager">Kunne ikke starte system filhåndtering</string>
   <string name="filter">Filtrér</string>
   <!--Sort-->

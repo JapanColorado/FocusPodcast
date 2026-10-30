@@ -1,0 +1,269 @@
+package dev.russell.yagi.fragment
+
+import dev.russell.yagi.core.view.TopAppBarLayout
+import dev.russell.yagi.common.util.TopSnackbarUtil
+import dev.russell.yagi.common.views.ItemCategoryDecoration
+import dev.russell.yagi.R
+import dev.russell.yagi.activity.RssSearchActivity
+import dev.russell.yagi.core.pref.Prefs.clearOnlinePodcastSearchHistory
+import dev.russell.yagi.core.pref.Prefs.onlinePodcastSearchHistory
+import dev.russell.yagi.core.util.FeedUrlInput
+import dev.russell.yagi.discovery.PodcastSearcher
+import dev.russell.yagi.event.SearchOnlineEvent
+import dev.russell.yagi.fragment.onlinesearch.OnlineSearchEpisodesFragment
+import dev.russell.yagi.fragment.onlinesearch.OnlineSearchPodcastFragment
+import dev.russell.yagi.util.ClipboardFeedUrl
+import android.content.Context
+import android.content.Intent
+import android.os.Bundle
+import android.text.TextUtils
+import android.view.LayoutInflater
+import android.view.MenuItem
+import android.view.View
+import android.view.View.OnFocusChangeListener
+import android.view.ViewGroup
+import android.view.inputmethod.InputMethodManager
+import android.widget.Toast
+import androidx.appcompat.widget.AppCompatImageView
+import androidx.appcompat.widget.SearchView
+import androidx.appcompat.widget.Toolbar
+import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.RecyclerView
+import androidx.viewpager2.adapter.FragmentStateAdapter
+import androidx.viewpager2.widget.ViewPager2
+import dev.russell.yagi.theme.util.EditTextUtil
+import com.beloo.widget.chipslayoutmanager.ChipsLayoutManager
+import com.google.android.material.chip.Chip
+import com.google.android.material.tabs.TabLayout
+import com.google.android.material.tabs.TabLayoutMediator
+import com.google.android.material.tabs.TabLayoutMediator.TabConfigurationStrategy
+import org.greenrobot.eventbus.EventBus
+
+class OnlineSearchFragment
+/**
+ * Constructor
+ */
+constructor() : Fragment() {
+    private lateinit var tabLayout: TabLayout
+    private lateinit var viewPager: ViewPager2
+    private var tabViewPagerLayout: View? = null
+    private var suggestionLayout: View? = null
+    private lateinit var clearHistoryIv: AppCompatImageView
+    private lateinit var recyclerView: RecyclerView
+    private lateinit var searchHistoryAdapter: SearchHistoryAdapter
+    private var searchKeywordHistory: MutableList<String?> = mutableListOf()
+    public override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+    }
+
+    public override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        // Inflate the layout for this fragment
+        val root: View = inflater.inflate(R.layout.collapsing_pager_fragment, container, false)
+        viewPager = root.findViewById(R.id.viewpager)
+        viewPager.setOffscreenPageLimit(2)
+        viewPager.setAdapter(PagerAdapter(this))
+        tabLayout = root.findViewById(R.id.sliding_tabs)
+        TabLayoutMediator(
+            tabLayout,
+            viewPager,
+            TabConfigurationStrategy({ tab: TabLayout.Tab, position: Int ->
+                when (position) {
+                    0 -> tab.setText(R.string.feeds_label)
+                    1 -> tab.setText(R.string.episodes_label)
+                    else -> {}
+                }
+            })
+        ).attach()
+        tabViewPagerLayout = root.findViewById(R.id.tab_viewpager_layout)
+        suggestionLayout = root.findViewById(R.id.suggestion_layout)
+        clearHistoryIv = root.findViewById(R.id.clear_history_iv)
+        recyclerView = root.findViewById(R.id.recycler_view)
+        searchKeywordHistory = onlinePodcastSearchHistory.toMutableList()
+        val chipsLayoutManager: ChipsLayoutManager = ChipsLayoutManager.newBuilder(getContext())
+            .build()
+        recyclerView.setLayoutManager(chipsLayoutManager)
+        recyclerView.addItemDecoration(ItemCategoryDecoration(requireContext(), 4))
+        searchHistoryAdapter = SearchHistoryAdapter()
+        searchHistoryAdapter.setHasStableIds(true)
+        recyclerView.setAdapter(searchHistoryAdapter)
+        // Expanding the SearchView fires onQueryTextChange synchronously, which calls
+        // showSearchLayout(), so the toolbar must be set up after the views and adapter exist.
+        setupToolbar(root.findViewById<TopAppBarLayout>(R.id.appBarLayout).toolbar)
+        showSearchLayout(false)
+        clearHistoryIv.setOnClickListener(object : View.OnClickListener {
+            public override fun onClick(v: View) {
+                searchKeywordHistory.clear()
+                clearOnlinePodcastSearchHistory()
+                showSearchLayout(false)
+            }
+        })
+        return root
+    }
+
+    public override fun onDestroy() {
+        super.onDestroy()
+    }
+
+    class PagerAdapter internal constructor(fragment: Fragment) : FragmentStateAdapter(fragment) {
+        public override fun createFragment(position: Int): Fragment {
+            when (position) {
+                0 -> return OnlineSearchPodcastFragment.newInstance()
+                1 -> return OnlineSearchEpisodesFragment.newInstance()
+                else -> return OnlineSearchPodcastFragment.newInstance()
+            }
+        }
+
+        public override fun getItemCount(): Int {
+            return 2
+        }
+    }
+
+    lateinit var sv: SearchView
+    private fun setupToolbar(toolbar: Toolbar) {
+        toolbar.setNavigationOnClickListener(View.OnClickListener({ v: View? -> getParentFragmentManager().popBackStack() }))
+        toolbar.inflateMenu(R.menu.online_search)
+        val searchItem: MenuItem = toolbar.getMenu().findItem(R.id.action_search)
+        sv = searchItem.getActionView() as SearchView
+        EditTextUtil.setCursorDrawableForSearchView(sv)
+        sv.setQueryHint(getString(R.string.search_podcast_hint))
+        sv.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+            public override fun onQueryTextSubmit(s: String): Boolean {
+                sv.clearFocus()
+                search(s)
+                return true
+            }
+
+            public override fun onQueryTextChange(s: String): Boolean {
+                if (TextUtils.isEmpty(s)) {
+                    showSearchLayout(false)
+                }
+                return false
+            }
+        })
+        sv.setOnQueryTextFocusChangeListener(OnFocusChangeListener({ view: View, hasFocus: Boolean ->
+            if (hasFocus) {
+                showInputMethod(view.findFocus())
+            }
+        }))
+        searchItem.setOnActionExpandListener(object : MenuItem.OnActionExpandListener {
+            public override fun onMenuItemActionExpand(item: MenuItem): Boolean {
+                return true
+            }
+
+            public override fun onMenuItemActionCollapse(item: MenuItem): Boolean {
+                requireActivity().getSupportFragmentManager().popBackStack()
+                return true
+            }
+        })
+        searchItem.expandActionView()
+        val clipboardUrl = ClipboardFeedUrl.read(requireContext())
+        if (clipboardUrl != null) {
+            TopSnackbarUtil.showSnack(context, R.string.feed_url_copied_tip, Toast.LENGTH_LONG)
+            sv.setQuery(clipboardUrl, false)
+        }
+
+        /*if (getArguments().getString(ARG_QUERY, null) != null) {
+            sv.setQuery(getArguments().getString(ARG_QUERY, null), true);
+        }*/
+    }
+
+    private fun addUrl(url: String) {
+        val intent: Intent = Intent(getActivity(), RssSearchActivity::class.java)
+        intent.putExtra(RssSearchActivity.ARG_FEEDURL, url)
+        startActivity(intent)
+        //close this fragment once it has been added
+        parentFragmentManager.popBackStack()
+    }
+
+    private fun showSearchLayout(show: Boolean) {
+        suggestionLayout?.visibility = if (show) View.GONE else View.VISIBLE
+        tabViewPagerLayout?.visibility = if (show) View.VISIBLE else View.INVISIBLE
+        if (::searchHistoryAdapter.isInitialized) {
+            searchHistoryAdapter.notifyDataSetChanged()
+        }
+    }
+
+    private fun search(query: String) {
+        // A pasted feed URL (possibly wrapped in the invisible spaces chat apps add) opens the
+        // feed preview instead of searching
+        val feedUrl = FeedUrlInput.normalize(query)
+        if (feedUrl != null) {
+            addUrl(feedUrl)
+            return
+        }
+        val finalQuery: String = query.trim()
+        if (!searchKeywordHistory.contains(finalQuery)) {
+            searchKeywordHistory.add(finalQuery)
+            onlinePodcastSearchHistory = searchKeywordHistory
+        }
+        showSearchLayout(true)
+        EventBus.getDefault().post(SearchOnlineEvent(finalQuery))
+    }
+
+    private fun showInputMethod(view: View) {
+        val imm: InputMethodManager? =
+            requireActivity().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager?
+        if (imm != null) {
+            imm.showSoftInput(view, 0)
+        }
+    }
+
+    internal inner class SearchHistoryAdapter constructor() :
+        RecyclerView.Adapter<SearchHistoryAdapter.ViewHolder>() {
+        public override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+            val inflater: LayoutInflater = LayoutInflater.from(parent.getContext())
+            val entryView: View = inflater.inflate(R.layout.single_assist_chip, parent, false)
+            return ViewHolder(entryView as Chip)
+        }
+
+        public override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+            holder.chip.setText(searchKeywordHistory.get(position))
+            holder.chip.setCheckedIconVisible(holder.chip.isChecked())
+            holder.chip.setOnClickListener(object : View.OnClickListener {
+                public override fun onClick(v: View) {
+                    // the row can be detached or the history rewritten between bind and click
+                    val pos: Int = holder.bindingAdapterPosition
+                    if (pos == RecyclerView.NO_POSITION || pos >= searchKeywordHistory.size) {
+                        return
+                    }
+                    sv.setQuery(searchKeywordHistory.get(pos), true)
+                }
+            })
+        }
+
+        public override fun getItemCount(): Int {
+            return searchKeywordHistory.size
+        }
+
+        public override fun getItemId(position: Int): Long {
+            return searchKeywordHistory.get(position).hashCode().toLong()
+        }
+
+        inner class ViewHolder internal constructor(var chip: Chip) : RecyclerView.ViewHolder(
+            chip
+        )
+    }
+
+    companion object {
+        private val ARG_SEARCHER: String = "searcher"
+        private val ARG_QUERY: String = "query"
+
+        @JvmStatic
+        @JvmOverloads
+        fun newInstance(
+            searchProvider: Class<out PodcastSearcher?>,
+            query: String? = null
+        ): OnlineSearchFragment {
+            val fragment: OnlineSearchFragment = OnlineSearchFragment()
+            val arguments: Bundle = Bundle()
+            arguments.putString(ARG_SEARCHER, searchProvider.getName())
+            arguments.putString(ARG_QUERY, query)
+            fragment.setArguments(arguments)
+            return fragment
+        }
+    }
+}

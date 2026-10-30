@@ -51,7 +51,7 @@
 
                 <com.google.android.material.textview.MaterialTextView
                     android:id="@+id/txtvPublished"
-                    style="@style/FocusPodcast.TextView.ListItemSecondaryTitle"
+                    style="@style/Yagi.TextView.ListItemSecondaryTitle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     tools:background="@android:color/holo_green_dark"
@@ -59,7 +59,7 @@
 
                 <com.google.android.material.textview.MaterialTextView
                     android:id="@+id/txtvTranscriptAvailable"
-                    style="@style/FocusPodcast.TextView.ListItemSecondaryTitle"
+                    style="@style/Yagi.TextView.ListItemSecondaryTitle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="2dp"
@@ -78,9 +78,9 @@
                     android:gravity="center_vertical"
                     android:orientation="horizontal">
 
-                    <dev.russell.focuspodcast.common.views.AccentTextView
+                    <dev.russell.yagi.common.views.AccentTextView
                         android:id="@+id/txtvPodcast"
-                        style="@style/FocusPodcast.TextView.ListItemSecondaryTitle"
+                        style="@style/Yagi.TextView.ListItemSecondaryTitle"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
@@ -88,7 +88,7 @@
                         tools:background="@android:color/holo_green_dark"
                         tools:text="Podcast title , long text title , yes ,i am a long title long ong than you can see" />
 
-                    <dev.russell.focuspodcast.common.views.AccentImageView
+                    <dev.russell.yagi.common.views.AccentImageView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:clickable="false"
@@ -162,7 +162,7 @@
 
                         <com.google.android.material.textview.MaterialTextView
                             android:id="@+id/tv_item_size"
-                            style="@style/FocusPodcast.TextView.ListItemSecondaryTitle"
+                            style="@style/Yagi.TextView.ListItemSecondaryTitle"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             tools:background="@android:color/holo_green_dark"
@@ -197,7 +197,7 @@
                         </FrameLayout>
 
                         <com.google.android.material.textview.MaterialTextView
-                            style="@style/FocusPodcast.TextView.ListItemSecondaryTitle"
+                            style="@style/Yagi.TextView.ListItemSecondaryTitle"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:importantForAccessibility="no"
@@ -233,7 +233,7 @@
                         </FrameLayout>
 
                         <com.google.android.material.textview.MaterialTextView
-                            style="@style/FocusPodcast.TextView.ListItemSecondaryTitle"
+                            style="@style/Yagi.TextView.ListItemSecondaryTitle"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:importantForAccessibility="no"
@@ -269,7 +269,7 @@
                         </FrameLayout>
 
                         <com.google.android.material.textview.MaterialTextView
-                            style="@style/FocusPodcast.TextView.ListItemSecondaryTitle"
+                            style="@style/Yagi.TextView.ListItemSecondaryTitle"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:importantForAccessibility="no"
@@ -305,7 +305,7 @@
                         </FrameLayout>
 
                         <com.google.android.material.textview.MaterialTextView
-                            style="@style/FocusPodcast.TextView.ListItemSecondaryTitle"
+                            style="@style/Yagi.TextView.ListItemSecondaryTitle"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:importantForAccessibility="no"
@@ -401,7 +401,7 @@
 
             </com.faltenreich.skeletonlayout.SkeletonLayout>
 
-            <dev.russell.focuspodcast.view.PodWebView
+            <dev.russell.yagi.view.PodWebView
                 android:id="@+id/webvDescription"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

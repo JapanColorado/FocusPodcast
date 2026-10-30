@@ -21,7 +21,7 @@
         android:contentDescription="@string/decrease_speed"
         android:background="?attr/selectableItemBackgroundBorderless" />
 
-    <dev.russell.focuspodcast.common.views.AccentAlphaSlider
+    <dev.russell.yagi.common.views.AccentAlphaSlider
         android:id="@+id/playback_speed"
         android:layout_width="0dp"
         android:layout_height="wrap_content"

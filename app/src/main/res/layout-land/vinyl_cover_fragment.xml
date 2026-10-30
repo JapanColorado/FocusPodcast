@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:squareImageView="http://schemas.android.com/apk/dev.russell.focuspodcast"
+    xmlns:squareImageView="http://schemas.android.com/apk/dev.russell.yagi"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/cover_fragment"
     android:layout_width="match_parent"
@@ -13,7 +13,7 @@
         android:layout_height="match_parent"
         android:layout_weight="1">
 
-        <dev.russell.focuspodcast.ui.common.SquareImageView
+        <dev.russell.yagi.ui.common.SquareImageView
             android:id="@+id/imgvCover"
             android:importantForAccessibility="no"
             android:visibility="gone"
@@ -27,7 +27,7 @@
             android:scaleType="centerCrop"
             tools:srcCompat="@tools:sample/backgrounds/scenic[6]" />
 
-        <dev.russell.focuspodcast.playback.VinylAlbumCoverView
+        <dev.russell.yagi.playback.VinylAlbumCoverView
             android:id="@+id/imgvCoverVinyl"
             android:layout_width="match_parent"
             android:layout_height="match_parent"

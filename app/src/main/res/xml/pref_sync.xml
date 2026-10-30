@@ -1,68 +1,68 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:search="http://schemas.android.com/apk/dev.russell.focuspodcast.searchpreference">
-    <dev.russell.focuspodcast.common.common.prefs.supportv7.ATEPreferenceCategory
+    xmlns:search="http://schemas.android.com/apk/dev.russell.yagi.searchpreference">
+    <dev.russell.yagi.common.common.prefs.supportv7.ATEPreferenceCategory
         android:layout="@layout/preference_category_title"
         android:title="@string/synchronization_episodes_sync">
 
-        <dev.russell.focuspodcast.common.common.prefs.supportv7.ATEPreference
+        <dev.russell.yagi.common.common.prefs.supportv7.ATEPreference
             android:key="preference_synchronization_description"
             android:layout="@layout/list_item_view_no_title"
             app:do_not_accent_icon="true"
             android:summary="@string/synchronization_summary_unchoosen" />
 
-        <dev.russell.focuspodcast.common.common.prefs.supportv7.ATEPreference
+        <dev.russell.yagi.common.common.prefs.supportv7.ATEPreference
             android:key="pref_gpodnet_setlogin_information"
             android:layout="@layout/list_item_view_no_title"
             android:summary="@string/pref_gpodnet_setlogin_information_sum"
             android:title="@string/pref_gpodnet_setlogin_information_title"
             app:isPreferenceVisible="false" />
 
-        <dev.russell.focuspodcast.common.common.prefs.supportv7.ATEPreference
+        <dev.russell.yagi.common.common.prefs.supportv7.ATEPreference
             android:key="pref_synchronization_sync"
             android:layout="@layout/list_item_view_no_title"
             android:summary="@string/synchronization_sync_summary"
             android:title="@string/synchronization_sync_changes_title" />
 
-        <dev.russell.focuspodcast.common.common.prefs.supportv7.ATEPreference
+        <dev.russell.yagi.common.common.prefs.supportv7.ATEPreference
             android:key="pref_synchronization_force_full_sync"
             android:layout="@layout/list_item_view_no_title"
             android:summary="@string/synchronization_force_sync_summary"
             android:title="@string/synchronization_full_sync_title" />
 
-        <dev.russell.focuspodcast.common.common.prefs.supportv7.ATEPreference
+        <dev.russell.yagi.common.common.prefs.supportv7.ATEPreference
             android:key="pref_synchronization_logout"
             android:layout="@layout/list_item_view_no_title"
             android:title="@string/synchronization_logout" />
-    </dev.russell.focuspodcast.common.common.prefs.supportv7.ATEPreferenceCategory>
+    </dev.russell.yagi.common.common.prefs.supportv7.ATEPreferenceCategory>
 
-    <dev.russell.focuspodcast.common.common.prefs.supportv7.ATEPreferenceCategory
+    <dev.russell.yagi.common.common.prefs.supportv7.ATEPreferenceCategory
         android:layout="@layout/preference_category_title"
         android:title="@string/import_export_pref">
-        <dev.russell.focuspodcast.common.common.prefs.supportv7.ATEPreference
+        <dev.russell.yagi.common.common.prefs.supportv7.ATEPreference
             android:layout="@layout/list_item_view_no_title"
             android:key="prefDatabaseExport"
             android:icon="@drawable/ic_database_export"
             search:keywords="@string/import_export_search_keywords"
             android:title="@string/database_export_label"
             android:summary="@string/database_export_summary"/>
-        <dev.russell.focuspodcast.common.common.prefs.supportv7.ATEPreference
+        <dev.russell.yagi.common.common.prefs.supportv7.ATEPreference
             android:layout="@layout/list_item_view_no_title"
             android:key="prefDatabaseImport"
             search:keywords="@string/import_export_search_keywords"
             android:title="@string/database_import_label"
             android:summary="@string/database_import_summary"/>
-        <dev.russell.focuspodcast.common.common.prefs.supportv7.ATEPreference
+        <dev.russell.yagi.common.common.prefs.supportv7.ATEPreference
             android:layout="@layout/list_item_view_no_title"
             android:key="prefOpmlExport"
             android:icon="@drawable/ic_import_opml"
             android:title="@string/opml_export_label"
             android:summary="@string/opml_export_summary"/>
-        <dev.russell.focuspodcast.common.common.prefs.supportv7.ATEPreference
+        <dev.russell.yagi.common.common.prefs.supportv7.ATEPreference
             android:layout="@layout/list_item_view_no_title"
             android:key="prefOpmlImport"
             android:title="@string/opml_import_label"
             android:summary="@string/opml_import_summary"/>
-    </dev.russell.focuspodcast.common.common.prefs.supportv7.ATEPreferenceCategory>
+    </dev.russell.yagi.common.common.prefs.supportv7.ATEPreferenceCategory>
 </PreferenceScreen>

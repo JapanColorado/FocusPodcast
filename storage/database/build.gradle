@@ -5,7 +5,7 @@ apply from: "../../common.gradle"
 
 android {
     defaultConfig {
-        namespace = "dev.russell.focuspodcast.storage.database"
+        namespace = "dev.russell.yagi.storage.database"
     }
     lint {
         disable += ["StaticFieldLeak"]

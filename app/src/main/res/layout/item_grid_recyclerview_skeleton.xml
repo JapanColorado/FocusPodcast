@@ -10,7 +10,7 @@
     android:background="?attr/selectableItemBackground"
     android:orientation="horizontal">
 
-    <dev.russell.focuspodcast.ui.common.SquareImageView
+    <dev.russell.yagi.ui.common.SquareImageView
         android:id="@+id/imgvCover"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

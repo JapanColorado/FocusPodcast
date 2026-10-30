@@ -115,7 +115,7 @@
 
                 <com.google.android.material.textview.MaterialTextView
                     android:id="@+id/txtvTitle"
-                    style="@style/FocusPodcast.TextView.Heading"
+                    style="@style/Yagi.TextView.Heading"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:ellipsize="end"
@@ -145,7 +145,7 @@
 
 
 
-                    <dev.russell.focuspodcast.view.SubscribeButton
+                    <dev.russell.yagi.view.SubscribeButton
                         android:id="@+id/subscribe_button"
                         android:visibility="gone"
                         tools:visibility="visible"
@@ -189,7 +189,7 @@
     </LinearLayout>
 
 
-    <dev.russell.focuspodcast.view.SeriesDetailInfoView
+    <dev.russell.yagi.view.SeriesDetailInfoView
         android:id="@+id/detailInfoView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

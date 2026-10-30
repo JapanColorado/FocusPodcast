@@ -12,7 +12,7 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
-        <dev.russell.focuspodcast.core.view.TopAppBarLayout
+        <dev.russell.yagi.core.view.TopAppBarLayout
             android:id="@+id/appBarLayout"
             style="?appBarLayoutStyle"
             android:layout_width="match_parent"
@@ -38,14 +38,14 @@
                 tools:text="(i) Information"
                 tools:visibility="visible" />
 
-            <dev.russell.focuspodcast.view.MultiSwipeRefreshLayout
+            <dev.russell.yagi.view.MultiSwipeRefreshLayout
                 android:id="@+id/swipeRefresh"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_above="@id/loadingMore"
                 android:layout_below="@+id/txtvInformation">
 
-                <dev.russell.focuspodcast.view.StorePositionRecyclerView
+                <dev.russell.yagi.view.StorePositionRecyclerView
                     android:id="@android:id/list"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
@@ -57,12 +57,12 @@
                     tools:itemCount="13"
                     tools:listitem="@layout/feeditemlist_item" />
 
-            </dev.russell.focuspodcast.view.MultiSwipeRefreshLayout>
+            </dev.russell.yagi.view.MultiSwipeRefreshLayout>
         </LinearLayout>
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
 
-    <dev.russell.focuspodcast.common.views.AccentProgressBar
+    <dev.russell.yagi.common.views.AccentProgressBar
         android:id="@+id/progLoading"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -85,7 +85,7 @@
         android:paddingBottom="4dp"
         android:visibility="gone">
 
-        <dev.russell.focuspodcast.common.views.AccentProgressBar
+        <dev.russell.yagi.common.views.AccentProgressBar
             android:layout_width="16dp"
             android:layout_height="16dp"
             android:gravity="center_horizontal"

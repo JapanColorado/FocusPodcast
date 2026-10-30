@@ -18,7 +18,7 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal">
 
-        <dev.russell.focuspodcast.common.views.AccentTextInputLayout
+        <dev.russell.yagi.common.views.AccentTextInputLayout
             style="?attr/textInputOutlinedDenseStyle"
             android:layout_width="0dp"
             android:layout_weight="1"
@@ -27,14 +27,14 @@
             android:layout_marginRight="8dp"
             >
 
-            <dev.russell.focuspodcast.common.views.CursorAccentTextInputEditText
+            <dev.russell.yagi.common.views.CursorAccentTextInputEditText
                 android:id="@+id/newTagEditText"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:lines="1" />
-        </dev.russell.focuspodcast.common.views.AccentTextInputLayout>
+        </dev.russell.yagi.common.views.AccentTextInputLayout>
 
-        <dev.russell.focuspodcast.common.views.AccentMaterialButton
+        <dev.russell.yagi.common.views.AccentMaterialButton
             android:id="@+id/newTagButton"
             style="@style/Widget.Material3.Button"
             android:layout_width="wrap_content"

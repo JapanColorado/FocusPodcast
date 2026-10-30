@@ -21,7 +21,7 @@
 
         <com.google.android.material.textview.MaterialTextView
             android:id="@+id/downloadsSummaryText"
-            style="@style/FocusPodcast.TextView.ListItemSecondaryTitle"
+            style="@style/Yagi.TextView.ListItemSecondaryTitle"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -29,7 +29,7 @@
             android:maxLines="1"
             tools:text="12 episodes · 1.4 GB" />
 
-        <dev.russell.focuspodcast.common.views.AccentMaterialTextButton
+        <dev.russell.yagi.common.views.AccentMaterialTextButton
             android:id="@+id/deletePlayedButton"
             style="@style/Widget.Material3.Button.TextButton"
             android:layout_width="wrap_content"
@@ -39,7 +39,7 @@
             tools:visibility="visible" />
     </LinearLayout>
 
-    <dev.russell.focuspodcast.view.StorePositionRecyclerView
+    <dev.russell.yagi.view.StorePositionRecyclerView
         android:id="@+id/recyclerView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

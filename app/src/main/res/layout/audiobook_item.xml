@@ -12,7 +12,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <dev.russell.focuspodcast.ui.common.SquareImageView
+        <dev.russell.yagi.ui.common.SquareImageView
             android:id="@+id/imgvCover"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -37,7 +37,7 @@
 
     <TextView
         android:id="@+id/txtvTitle"
-        style="@style/FocusPodcast.TextView.ListItemPrimaryTitle"
+        style="@style/Yagi.TextView.ListItemPrimaryTitle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="6dp"
@@ -56,7 +56,7 @@
 
     <TextView
         android:id="@+id/txtvProgress"
-        style="@style/FocusPodcast.TextView.ListItemSecondaryTitle"
+        style="@style/Yagi.TextView.ListItemSecondaryTitle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="2dp"

@@ -22,7 +22,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <dev.russell.focuspodcast.view.AspectRatioVideoView
+        <dev.russell.yagi.view.AspectRatioVideoView
             android:id="@+id/videoView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -69,7 +69,7 @@
             tools:alpha="1"
             tools:text="10 seconds back" />
 
-        <dev.russell.focuspodcast.common.views.AccentProgressBar
+        <dev.russell.yagi.common.views.AccentProgressBar
             android:id="@+id/progressBar"
             android:layout_width="64dp"
             android:layout_height="64dp"
@@ -260,7 +260,7 @@
                 tools:text="10" />
         </FrameLayout>
 
-        <dev.russell.focuspodcast.view.PlayButton
+        <dev.russell.yagi.view.PlayButton
             android:id="@+id/playButton"
             android:layout_width="72dp"
             android:layout_height="72dp"
@@ -353,7 +353,7 @@
             android:textColor="@color/white"
             android:textSize="12sp" />
 
-        <dev.russell.focuspodcast.view.AdMarkerSeekBar
+        <dev.russell.yagi.view.AdMarkerSeekBar
             android:id="@+id/sbPosition"
             android:layout_width="0dp"
             android:layout_height="wrap_content"

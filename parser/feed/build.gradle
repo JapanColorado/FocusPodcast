@@ -5,7 +5,7 @@ apply from: "../../common.gradle"
 
 android {
     defaultConfig {
-        namespace = "dev.russell.focuspodcast.parser.feed"
+        namespace = "dev.russell.yagi.parser.feed"
     }
     lint {
         disable += ["TrustAllX509TrustManager"]

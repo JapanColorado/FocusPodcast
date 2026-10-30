@@ -4,7 +4,7 @@ plugins {
 apply from: "../../../common.gradle"
 android {
     defaultConfig {
-        namespace = "dev.russell.focuspodcast.net.sync.model"
+        namespace = "dev.russell.yagi.net.sync.model"
     }
 }
 dependencies {

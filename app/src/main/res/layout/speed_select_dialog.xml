@@ -17,7 +17,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                style="@style/FocusPodcast.TextView.ListItemPrimaryTitle"/>
+                style="@style/Yagi.TextView.ListItemPrimaryTitle"/>
 
         <com.google.android.material.chip.Chip
             style="@style/Widget.Material3.Chip.Assist"
@@ -26,12 +26,12 @@
                 android:id="@+id/add_current_speed_chip"/>
     </LinearLayout>
 
-    <dev.russell.focuspodcast.view.PlaybackSpeedSlider
+    <dev.russell.yagi.view.PlaybackSpeedSlider
             android:id="@+id/speed_seek_bar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="8dp">
-    </dev.russell.focuspodcast.view.PlaybackSpeedSlider>
+    </dev.russell.yagi.view.PlaybackSpeedSlider>
 
     <include
             android:id="@+id/own_settings_card"
@@ -45,7 +45,7 @@
             android:text="@string/speed_presets"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            style="@style/FocusPodcast.TextView.ListItemPrimaryTitle"
+            style="@style/Yagi.TextView.ListItemPrimaryTitle"
             android:layout_marginBottom="8dp"/>
 
     <androidx.recyclerview.widget.RecyclerView

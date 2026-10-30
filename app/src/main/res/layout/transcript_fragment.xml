@@ -15,7 +15,7 @@
         android:paddingBottom="48dp"
         android:visibility="gone" />
 
-    <dev.russell.focuspodcast.common.views.AccentProgressBar
+    <dev.russell.yagi.common.views.AccentProgressBar
         android:id="@+id/transcriptProgress"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
