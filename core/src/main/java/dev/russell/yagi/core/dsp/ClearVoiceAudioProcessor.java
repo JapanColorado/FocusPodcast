@@ -96,8 +96,13 @@ public final class ClearVoiceAudioProcessor extends BaseAudioProcessor {
     protected void onQueueEndOfStream() {
         // The tail still inside the stages is emitted from getOutput() once the last regular
         // output has been consumed, since the output buffer may not be replaced before that.
+        // ExoPlayer's pipeline repeats this call on every pass once the processor before this one
+        // has ended, so it must not arm again after the drain: isEnded() would read false each
+        // time the pipeline checks it, the speed and skip silence processors after this one would
+        // never get their end of stream, and the sink would wait forever (at the end of an episode
+        // and at every speed change).
         ClearVoiceChain current = chain;
-        drainPending = current != null && !current.isBypassed();
+        drainPending = current != null && current.hasAudioInFlight();
     }
 
     @Override

@@ -144,6 +144,11 @@ public final class ClearVoiceChain {
         return stagesFor(requestedLevel, requestedLeveling) == STAGES_NONE && !running;
     }
 
+    /** True while the stages hold audio that {@link #drain} would still push out. */
+    public boolean hasAudioInFlight() {
+        return running;
+    }
+
     /** Upper bound of the shorts {@link #process} or {@link #drain} may write for {@code inSamples}. */
     public int maxOutputSamples(int inSamples) {
         return inSamples + Math.max(clearLatency, warmLatency + levelLatency) * channels;

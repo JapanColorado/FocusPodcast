@@ -20,7 +20,6 @@ import com.google.android.exoplayer2.SeekParameters;
 import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.exoplayer2.audio.AudioAttributes;
 import com.google.android.exoplayer2.audio.AudioCapabilities;
-import com.google.android.exoplayer2.audio.AudioProcessor;
 import com.google.android.exoplayer2.audio.AudioSink;
 import com.google.android.exoplayer2.audio.DefaultAudioSink;
 import com.google.android.exoplayer2.ext.okhttp.OkHttpDataSource;
@@ -44,6 +43,7 @@ import com.google.android.exoplayer2.video.VideoSize;
 import dev.russell.yagi.core.ClientConfig;
 import dev.russell.yagi.core.R;
 import dev.russell.yagi.core.dsp.ClearVoiceAudioProcessor;
+import dev.russell.yagi.core.dsp.PlayerAudioProcessorChain;
 import dev.russell.yagi.core.pref.Prefs;
 import dev.russell.yagi.core.service.download.PodcastHttpClient;
 import dev.russell.yagi.core.service.download.HttpCredentialEncoder;
@@ -197,9 +197,9 @@ public class ExoPlayerWrapper implements IPlayer {
         public AudioSink buildAudioSink(Context context, boolean z, boolean z2, boolean z3) {
             return new DefaultAudioSink.Builder()
                     .setAudioCapabilities(AudioCapabilities.DEFAULT_AUDIO_CAPABILITIES)
-                    .setAudioProcessors(new AudioProcessor[]{
+                    .setAudioProcessorChain(new PlayerAudioProcessorChain(
                             ExoPlayerWrapper.this.downMixAudioProcessor,
-                            ExoPlayerWrapper.this.clearVoiceAudioProcessor})
+                            ExoPlayerWrapper.this.clearVoiceAudioProcessor))
                     .build();
         }
     }

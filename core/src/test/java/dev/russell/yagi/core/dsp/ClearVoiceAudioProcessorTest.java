@@ -6,7 +6,10 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import com.google.android.exoplayer2.C;
+import com.google.android.exoplayer2.audio.AudioProcessingPipeline;
 import com.google.android.exoplayer2.audio.AudioProcessor;
+import com.google.android.exoplayer2.audio.SonicAudioProcessor;
+import com.google.common.collect.ImmutableList;
 
 import org.junit.Test;
 
@@ -15,6 +18,7 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.Random;
 
+import dev.russell.yagi.core.util.playback.DownMixAudioProcessor;
 import dev.russell.yagi.model.playback.ClearVoiceLevel;
 import dev.russell.yagi.model.playback.VolumeLeveling;
 
@@ -77,6 +81,65 @@ public class ClearVoiceAudioProcessorTest {
         assertEquals(input.length, output.length);
         assertTrue(rms(output, RATE * 2) > 3 * rms(input, RATE * 2));
         assertEquals(VolumeLeveling.STRONG, processor.getVolumeLeveling());
+    }
+
+    /**
+     * The sink drains its pipeline at the end of an episode and at every speed change, and waits
+     * until it has ended. The pipeline repeats queueEndOfStream() on every pass, and the speed
+     * processor after this one only ends if it sees this one as ended.
+     */
+    @Test
+    public void endsInThePlayersPipelineWithTheSpeedProcessorBehindIt() throws Exception {
+        int[][] effects = {
+                {ClearVoiceLevel.OFF, VolumeLeveling.OFF},
+                {ClearVoiceLevel.OFF, VolumeLeveling.GENTLE},
+                {ClearVoiceLevel.LIGHT, VolumeLeveling.OFF},
+                {ClearVoiceLevel.STRONG, VolumeLeveling.STRONG},
+                {ClearVoiceLevel.WARM, VolumeLeveling.OFF},
+                {ClearVoiceLevel.WARM, VolumeLeveling.GENTLE},
+        };
+        for (int[] effect : effects) {
+            ClearVoiceAudioProcessor processor = new ClearVoiceAudioProcessor();
+            processor.setLevel(effect[0]);
+            processor.setVolumeLeveling(effect[1]);
+            SonicAudioProcessor speed = new SonicAudioProcessor();
+            speed.setSpeed(1.5f);
+            AudioProcessingPipeline pipeline = new AudioProcessingPipeline(
+                    ImmutableList.of(new DownMixAudioProcessor(), processor, speed));
+            pipeline.configure(new AudioProcessor.AudioFormat(RATE, CHANNELS, C.ENCODING_PCM_16BIT));
+            pipeline.flush();
+
+            byte[] input = randomPcm(RATE);
+            ByteArrayOutputStream collected = new ByteArrayOutputStream();
+            int buffer = RATE / 50 * CHANNELS * 2;
+            for (int pos = 0; pos < input.length; pos += buffer) {
+                int length = Math.min(buffer, input.length - pos);
+                ByteBuffer in = ByteBuffer.allocateDirect(length).order(ByteOrder.nativeOrder());
+                in.put(input, pos, length).flip();
+                while (in.hasRemaining()) {
+                    pipeline.queueInput(in);
+                    drainPipelineOutput(pipeline, collected);
+                }
+            }
+            for (int i = 0; i < 100 && !pipeline.isEnded(); i++) {
+                pipeline.queueEndOfStream();
+                drainPipelineOutput(pipeline, collected);
+            }
+
+            String mode = "voice " + effect[0] + ", leveling " + effect[1];
+            assertTrue("never ended: " + mode, pipeline.isEnded());
+            // Everything queued came out at 1.5x, including what the stages held back.
+            assertEquals(mode, input.length / 1.5 / (CHANNELS * 2), collected.size() / (CHANNELS * 2.0), RATE / 100.0);
+        }
+    }
+
+    private static void drainPipelineOutput(AudioProcessingPipeline pipeline, ByteArrayOutputStream collected) {
+        ByteBuffer out;
+        while ((out = pipeline.getOutput()).hasRemaining()) {
+            byte[] bytes = new byte[out.remaining()];
+            out.get(bytes);
+            collected.write(bytes, 0, bytes.length);
+        }
     }
 
     private static ClearVoiceAudioProcessor configured(int level) throws Exception {
